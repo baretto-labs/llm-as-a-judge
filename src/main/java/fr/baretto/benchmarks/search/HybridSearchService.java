@@ -295,7 +295,11 @@ public class HybridSearchService implements GraphSearchHook {
                    n.name as name,
                    n.fqn as fqn,
                    n.signature as signature,
-                   n.javaDoc as javaDoc
+                   n.javaDoc as javaDoc,
+                   n.body as body,
+                   n.returnType as returnType,
+                   n.visibility as visibility,
+                   n.hierarchy as hierarchy
             """;
 
         try (Session session = neo4jDriver.session()) {
@@ -349,6 +353,18 @@ public class HybridSearchService implements GraphSearchHook {
         }
         if (!record.get("javaDoc").isNull()) {
             properties.put("javaDoc", record.get("javaDoc").asString());
+        }
+        if (!record.get("body").isNull()) {
+            properties.put("body", record.get("body").asString());
+        }
+        if (!record.get("returnType").isNull()) {
+            properties.put("returnType", record.get("returnType").asString());
+        }
+        if (!record.get("visibility").isNull()) {
+            properties.put("visibility", record.get("visibility").asString());
+        }
+        if (!record.get("hierarchy").isNull()) {
+            properties.put("hierarchy", record.get("hierarchy").asString());
         }
 
         return new EntryPoint(nodeId, nodeType, name, fqn, 0.0, properties);

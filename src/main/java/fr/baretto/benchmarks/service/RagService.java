@@ -135,7 +135,7 @@ public class RagService {
         long duration = System.currentTimeMillis() - startTime;
         logger.info("Réponse générée en {} ms", duration);
 
-        return new RagResponse(response, duration, contextChunks.size());
+        return new RagResponse(response, duration, contextChunks);
     }
 
     /**
@@ -254,12 +254,12 @@ public class RagService {
     public static class RagResponse {
         private final String response;
         private final long responseTimeMs;
-        private final int contextChunksCount;
+        private final List<String> contextChunks;
 
-        public RagResponse(String response, long responseTimeMs, int contextChunksCount) {
+        public RagResponse(String response, long responseTimeMs, List<String> contextChunks) {
             this.response = response;
             this.responseTimeMs = responseTimeMs;
-            this.contextChunksCount = contextChunksCount;
+            this.contextChunks = contextChunks;
         }
 
         public String getResponse() {
@@ -271,7 +271,11 @@ public class RagService {
         }
 
         public int getContextChunksCount() {
-            return contextChunksCount;
+            return contextChunks.size();
+        }
+
+        public List<String> getContextChunks() {
+            return contextChunks;
         }
     }
 }

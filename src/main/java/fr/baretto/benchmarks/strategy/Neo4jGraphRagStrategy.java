@@ -684,9 +684,17 @@ public class Neo4jGraphRagStrategy implements RagStrategy {
                 if (!packageName.isEmpty()) {
                     classNode.setProperty("packageName", packageName);
                 }
-
                 if (!modifier.isEmpty()) {
                     classNode.setProperty("modifier", modifier);
+                }
+                cls.getJavadoc().ifPresent(doc -> classNode.setProperty("javaDoc", doc.toText()));
+
+                // Résumé structurel : extends + implements
+                List<String> parents = new ArrayList<>();
+                cls.getExtendedTypes().forEach(t -> parents.add("extends " + t.getNameAsString()));
+                cls.getImplementedTypes().forEach(t -> parents.add("implements " + t.getNameAsString()));
+                if (!parents.isEmpty()) {
+                    classNode.setProperty("hierarchy", String.join(", ", parents));
                 }
 
                 fileNode.createRelationshipTo(classNode, RelationType.CONTAINS);
@@ -973,6 +981,21 @@ public class Neo4jGraphRagStrategy implements RagStrategy {
             methodNode.setProperty("isStatic", method.isStatic());
             methodNode.setProperty("isAbstract", method.isAbstract());
             methodNode.setProperty("isFinal", method.isFinal());
+            try {
+                methodNode.setProperty("signature", method.getDeclarationAsString());
+            } catch (Exception e) {
+                logger.debug("Impossible de stocker la signature de {}: {}", methodName, e.getMessage());
+            }
+            method.getBody().ifPresent(body -> {
+                try {
+                    String bodyStr = body.toString();
+                    // Neo4j limite la taille des propriétés string (max ~32k)
+                    methodNode.setProperty("body", bodyStr.length() > 8000 ? bodyStr.substring(0, 8000) + "..." : bodyStr);
+                } catch (Exception e) {
+                    logger.debug("Impossible de stocker le body de {}: {}", methodName, e.getMessage());
+                }
+            });
+            method.getJavadoc().ifPresent(doc -> methodNode.setProperty("javaDoc", doc.toText()));
 
             classNode.createRelationshipTo(methodNode, RelationType.DECLARES);
 
@@ -1537,9 +1560,22 @@ public class Neo4jGraphRagStrategy implements RagStrategy {
         StringBuilder ctx = new StringBuilder();
         ctx.append(String.format("=== %s [%s] ===\n", ep.fqn(), ep.nodeType()));
 
-        String javaDoc = (String) ep.properties().get("javaDoc");
-        String signature = (String) ep.properties().get("signature");
+        String visibility = (String) ep.properties().get("visibility");
+        String returnType = (String) ep.properties().get("returnType");
+        String signature  = (String) ep.properties().get("signature");
+        String javaDoc    = (String) ep.properties().get("javaDoc");
+        String body       = (String) ep.properties().get("body");
+        String hierarchy  = (String) ep.properties().get("hierarchy");
 
+        if (hierarchy != null && !hierarchy.isBlank()) {
+            ctx.append("Hierarchy: ").append(hierarchy).append("\n");
+        }
+        if (visibility != null && !visibility.isBlank()) {
+            ctx.append("Visibility: ").append(visibility).append("\n");
+        }
+        if (returnType != null && !returnType.isBlank()) {
+            ctx.append("Returns: ").append(returnType).append("\n");
+        }
         if (signature != null && !signature.isBlank()) {
             ctx.append("Signature: ").append(signature).append("\n");
         }
@@ -1547,30 +1583,53 @@ public class Neo4jGraphRagStrategy implements RagStrategy {
             ctx.append("Documentation: ").append(javaDoc).append("\n");
         }
 
-        // Récupérer le contenu du fichier source via le graphe
-        try (Session session = boltDriver.session()) {
-            var result = session.run("""
-                MATCH (n)-[:CONTAINS|DECLARES*1..2]-(f:File)
-                WHERE id(n) = $id
-                RETURN f.content as content, f.path as path
-                LIMIT 1
-                """, Map.of("id", ep.nodeId()));
-            if (result.hasNext()) {
-                var record = result.next();
-                String path = record.get("path").asString("");
-                String content = record.get("content").asString("");
-                if (!content.isBlank()) {
-                    // Inclure seulement les 50 premières lignes pour ne pas surcharger le LLM
-                    String[] lines = content.split("\n");
-                    int limit = Math.min(lines.length, 50);
-                    ctx.append("Source (").append(path).append("):\n");
-                    for (int i = 0; i < limit; i++) {
-                        ctx.append(lines[i]).append("\n");
-                    }
+        if (body != null && !body.isBlank()) {
+            ctx.append("Body:\n").append(body).append("\n");
+        } else if ("Class".equals(ep.nodeType()) || "Interface".equals(ep.nodeType())) {
+            // Pour les classes : lister les méthodes déclarées via le graphe
+            try (Session session = boltDriver.session()) {
+                var result = session.run("""
+                    MATCH (n)-[:DECLARES]->(m:Function)
+                    WHERE id(n) = $id
+                    RETURN m.signature as sig, m.visibility as vis, m.returnType as ret
+                    ORDER BY m.name
+                    """, Map.of("id", ep.nodeId()));
+                List<String> methods = new ArrayList<>();
+                while (result.hasNext()) {
+                    var r = result.next();
+                    String sig = r.get("sig").asString(null);
+                    if (sig != null) methods.add("  " + sig);
                 }
+                if (!methods.isEmpty()) {
+                    ctx.append("Declared methods:\n");
+                    methods.forEach(ctx::append);
+                    ctx.append("\n");
+                }
+            } catch (Exception e) {
+                logger.debug("Impossible de récupérer les méthodes pour {}: {}", ep.fqn(), e.getMessage());
             }
-        } catch (Exception e) {
-            logger.debug("Impossible de récupérer le fichier source pour {}: {}", ep.fqn(), e.getMessage());
+        }
+
+        // Callers : qui appelle cette méthode ?
+        if ("Function".equals(ep.nodeType())) {
+            try (Session session = boltDriver.session()) {
+                var result = session.run("""
+                    MATCH (caller:Function)-[:CALLS]->(n)
+                    WHERE id(n) = $id
+                    RETURN caller.fqn as callerFqn
+                    LIMIT 10
+                    """, Map.of("id", ep.nodeId()));
+                List<String> callers = new ArrayList<>();
+                while (result.hasNext()) {
+                    callers.add(result.next().get("callerFqn").asString("?"));
+                }
+                if (!callers.isEmpty()) {
+                    ctx.append("Called by:\n");
+                    callers.forEach(c -> ctx.append("  - ").append(c).append("\n"));
+                }
+            } catch (Exception e) {
+                logger.debug("Impossible de récupérer les callers pour {}: {}", ep.fqn(), e.getMessage());
+            }
         }
 
         return ctx.toString();

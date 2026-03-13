@@ -40,7 +40,14 @@ public class App extends JFrame {
     private JTextArea chatHistoryArea;
     private JTextField questionField;
     private JButton sendButton;
+    private JButton sourcesButton;
     private JLabel responseTimeLabel;
+
+    // Derniers chunks utilisés
+    private java.util.List<String> lastContextChunks = java.util.List.of();
+
+    // Panneau métriques
+    private MetricsPanel metricsPanel;
 
     // État
     private Path selectedDirectory;
@@ -80,10 +87,12 @@ public class App extends JFrame {
     private void initializeUI() {
         setTitle("Benchmark RAG vs GraphRAG");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(1200, 700);
+        setSize(1200, 820);
         setLocationRelativeTo(null);
 
-        // Créer le layout principal avec SplitPane
+        metricsPanel = new MetricsPanel();
+        metricsPanel.setPreferredSize(new Dimension(0, 160));
+
         JSplitPane splitPane = new JSplitPane(
                 JSplitPane.HORIZONTAL_SPLIT,
                 createConfigurationPanel(),
@@ -92,7 +101,8 @@ public class App extends JFrame {
         splitPane.setDividerLocation(400);
         splitPane.setResizeWeight(0.3);
 
-        add(splitPane);
+        add(splitPane, BorderLayout.CENTER);
+        add(metricsPanel, BorderLayout.SOUTH);
     }
 
     /**
@@ -312,8 +322,16 @@ public class App extends JFrame {
         sendButton = new JButton("Envoyer");
         sendButton.setEnabled(false);
 
+        sourcesButton = new JButton("Sources");
+        sourcesButton.setEnabled(false);
+        sourcesButton.setToolTipText("Afficher les chunks de contexte utilisés pour la dernière réponse");
+
+        JPanel buttonPanel = new JPanel(new GridLayout(1, 2, 4, 0));
+        buttonPanel.add(sendButton);
+        buttonPanel.add(sourcesButton);
+
         inputPanel.add(questionField, BorderLayout.CENTER);
-        inputPanel.add(sendButton, BorderLayout.EAST);
+        inputPanel.add(buttonPanel, BorderLayout.EAST);
 
         // Label temps de réponse
         responseTimeLabel = new JLabel("Temps de réponse: -- ms");
@@ -340,6 +358,9 @@ public class App extends JFrame {
 
         // Bouton d'envoi de question
         sendButton.addActionListener(e -> handleSendQuestion());
+
+        // Bouton sources
+        sourcesButton.addActionListener(e -> showSources());
 
         // Appuyer sur Entrée dans le champ de question
         questionField.addActionListener(e -> handleSendQuestion());
@@ -493,6 +514,13 @@ public class App extends JFrame {
                             response.getResponseTimeMs(),
                             response.getContextChunksCount()
                     ));
+                    metricsPanel.recordQuery(
+                            ragService.getCurrentStrategyName(),
+                            response.getResponseTimeMs(),
+                            response.getContextChunksCount()
+                    );
+                    lastContextChunks = response.getContextChunks();
+                    sourcesButton.setEnabled(true);
                 } catch (Exception ex) {
                     showError("Erreur lors de la génération de la réponse", ex);
                     responseTimeLabel.setText("Erreur");
@@ -505,6 +533,33 @@ public class App extends JFrame {
         };
 
         worker.execute();
+    }
+
+    /**
+     * Ouvre une dialog affichant les chunks de contexte de la dernière réponse.
+     */
+    private void showSources() {
+        if (lastContextChunks.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Aucune source disponible.", "Sources", JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
+
+        JDialog dialog = new JDialog(this, "Sources utilisées (" + lastContextChunks.size() + " chunks) — " + ragService.getCurrentStrategyName(), false);
+        dialog.setSize(800, 600);
+        dialog.setLocationRelativeTo(this);
+
+        JTabbedPane tabs = new JTabbedPane();
+        for (int i = 0; i < lastContextChunks.size(); i++) {
+            JTextArea area = new JTextArea(lastContextChunks.get(i));
+            area.setEditable(false);
+            area.setLineWrap(true);
+            area.setWrapStyleWord(true);
+            area.setFont(new Font("Monospaced", Font.PLAIN, 12));
+            tabs.addTab("Chunk " + (i + 1), new JScrollPane(area));
+        }
+
+        dialog.add(tabs);
+        dialog.setVisible(true);
     }
 
     /**
