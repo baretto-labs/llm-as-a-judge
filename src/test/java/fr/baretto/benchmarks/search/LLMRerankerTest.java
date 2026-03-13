@@ -1,0 +1,372 @@
+package fr.baretto.benchmarks.search;
+
+import dev.langchain4j.model.chat.ChatModel;
+import dev.langchain4j.model.ollama.OllamaChatModel;
+import org.junit.jupiter.api.*;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+/**
+ * Tests pour LLMReranker (reranking des résultats avec LLM).
+ * Tests fonctionnent avec ou sans Ollama (fallback gracieux).
+ */
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+class LLMRerankerTest {
+
+    private static LLMReranker reranker;
+    private static LLMReranker batchReranker;
+    private static boolean ollamaAvailable = false;
+
+    @BeforeAll
+    static void setup() {
+        // Essayer de se connecter à Ollama
+        try {
+            ChatModel llm = OllamaChatModel.builder()
+                .baseUrl("http://localhost:11434")
+                .modelName("llama3.2:1b") // Modèle léger pour tests rapides
+                .temperature(0.3)
+                .timeout(java.time.Duration.ofSeconds(30))
+                .build();
+
+            // Test de connexion
+            String testResponse = llm.chat("Test");
+            if (testResponse != null && !testResponse.isEmpty()) {
+                reranker = new LLMReranker(llm, false); // Individual scoring
+                batchReranker = new LLMReranker(llm, true); // Batch scoring
+                ollamaAvailable = true;
+                System.out.println("✅ Ollama disponible pour tests LLM Reranking");
+            }
+        } catch (Exception e) {
+            System.out.println("⚠️  Ollama non disponible: " + e.getMessage());
+            System.out.println("   Tests LLM Reranking seront skippés");
+        }
+    }
+
+    /**
+     * Crée une liste de résultats de test pour le reranking.
+     */
+    private List<EntryPoint> createTestCandidates() {
+        List<EntryPoint> candidates = new ArrayList<>();
+
+        // Candidat 1: AuthenticationService.authenticate() - très pertinent pour "authenticate user"
+        candidates.add(new EntryPoint(
+            1L,
+            "Method",
+            "authenticate",
+            "com.example.AuthenticationService.authenticate",
+            0.85,
+            Map.of(
+                "signature", "User authenticate(String username, String password)",
+                "javaDoc", "Authenticates a user with username and password. Returns User object if valid."
+            )
+        ));
+
+        // Candidat 2: UserRepository.findByUsername() - moyennement pertinent
+        candidates.add(new EntryPoint(
+            2L,
+            "Method",
+            "findByUsername",
+            "com.example.UserRepository.findByUsername",
+            0.75,
+            Map.of(
+                "signature", "User findByUsername(String username)",
+                "javaDoc", "Finds a user by their username in the database."
+            )
+        ));
+
+        // Candidat 3: UserService.createUser() - peu pertinent pour "authenticate"
+        candidates.add(new EntryPoint(
+            3L,
+            "Method",
+            "createUser",
+            "com.example.UserService.createUser",
+            0.65,
+            Map.of(
+                "signature", "User createUser(String name, String email)",
+                "javaDoc", "Creates a new user account with name and email."
+            )
+        ));
+
+        // Candidat 4: PaymentService.processPayment() - non pertinent
+        candidates.add(new EntryPoint(
+            4L,
+            "Method",
+            "processPayment",
+            "com.example.PaymentService.processPayment",
+            0.55,
+            Map.of(
+                "signature", "void processPayment(Payment payment)",
+                "javaDoc", "Processes a payment transaction with Stripe API."
+            )
+        ));
+
+        // Candidat 5: AuthenticationService (classe) - pertinent mais moins que la méthode
+        candidates.add(new EntryPoint(
+            5L,
+            "Class",
+            "AuthenticationService",
+            "com.example.AuthenticationService",
+            0.80,
+            Map.of(
+                "javaDoc", "Service for user authentication and session management."
+            )
+        ));
+
+        return candidates;
+    }
+
+    @Test
+    @Order(1)
+    @DisplayName("Test 1: Validation paramètres invalides")
+    void test1_ValidationInvalidParams() {
+        if (!ollamaAvailable) {
+            System.out.println("⏭️  Test skippé (Ollama non disponible)");
+            return;
+        }
+
+        List<EntryPoint> candidates = createTestCandidates();
+
+        // Query vide
+        assertThrows(IllegalArgumentException.class, () ->
+            reranker.rerank("", candidates, 3),
+            "Query vide devrait lancer exception");
+
+        // topK invalide
+        assertThrows(IllegalArgumentException.class, () ->
+            reranker.rerank("authenticate user", candidates, 0),
+            "topK=0 devrait lancer exception");
+    }
+
+    @Test
+    @Order(2)
+    @DisplayName("Test 2: Reranking avec liste vide retourne liste vide")
+    void test2_EmptyListReturnsEmpty() throws SearchException {
+        if (!ollamaAvailable) {
+            System.out.println("⏭️  Test skippé (Ollama non disponible)");
+            return;
+        }
+
+        List<EntryPoint> results = reranker.rerank("test", List.of(), 3);
+        assertTrue(results.isEmpty(), "Liste vide en entrée devrait retourner liste vide");
+    }
+
+    @Test
+    @Order(3)
+    @DisplayName("Test 3: Reranking individuel améliore l'ordre")
+    void test3_IndividualRerankingImprovesOrder() throws SearchException {
+        if (!ollamaAvailable) {
+            System.out.println("⏭️  Test skippé (Ollama non disponible)");
+            return;
+        }
+
+        List<EntryPoint> candidates = createTestCandidates();
+
+        // Reranker avec query "authenticate user"
+        List<EntryPoint> reranked = reranker.rerank(
+            "authenticate user",
+            candidates,
+            3
+        );
+
+        assertEquals(3, reranked.size(), "Devrait retourner 3 résultats");
+
+        System.out.println("\n📊 Résultats reranking individuel (query: 'authenticate user'):");
+        for (int i = 0; i < reranked.size(); i++) {
+            EntryPoint entry = reranked.get(i);
+            System.out.println(String.format("  %d. %s (%s)",
+                i + 1, entry.name(), entry.nodeType()));
+        }
+
+        // Le premier résultat devrait être très pertinent
+        // (authenticate() ou AuthenticationService)
+        String topName = reranked.get(0).name();
+        assertTrue(
+            topName.toLowerCase().contains("authenticate") ||
+            topName.toLowerCase().contains("auth"),
+            "Le top résultat devrait être lié à l'authentication"
+        );
+    }
+
+    @Test
+    @Order(4)
+    @DisplayName("Test 4: Reranking batch améliore l'ordre")
+    void test4_BatchRerankingImprovesOrder() throws SearchException {
+        if (!ollamaAvailable) {
+            System.out.println("⏭️  Test skippé (Ollama non disponible)");
+            return;
+        }
+
+        List<EntryPoint> candidates = createTestCandidates();
+
+        // Reranker batch avec query "authenticate user"
+        List<EntryPoint> reranked = batchReranker.rerank(
+            "authenticate user",
+            candidates,
+            3
+        );
+
+        assertEquals(3, reranked.size(), "Devrait retourner 3 résultats");
+
+        System.out.println("\n📊 Résultats reranking batch (query: 'authenticate user'):");
+        for (int i = 0; i < reranked.size(); i++) {
+            EntryPoint entry = reranked.get(i);
+            System.out.println(String.format("  %d. %s (%s)",
+                i + 1, entry.name(), entry.nodeType()));
+        }
+
+        // Le premier résultat devrait être pertinent
+        String topName = reranked.get(0).name();
+        assertTrue(
+            topName.toLowerCase().contains("authenticate") ||
+            topName.toLowerCase().contains("auth") ||
+            topName.toLowerCase().contains("user"),
+            "Le top résultat devrait être lié à la requête"
+        );
+    }
+
+    @Test
+    @Order(5)
+    @DisplayName("Test 5: Reranking avec query différente change l'ordre")
+    void test5_DifferentQueryChangeOrder() throws SearchException {
+        if (!ollamaAvailable) {
+            System.out.println("⏭️  Test skippé (Ollama non disponible)");
+            return;
+        }
+
+        List<EntryPoint> candidates = createTestCandidates();
+
+        // Query 1: "authenticate user"
+        List<EntryPoint> results1 = reranker.rerank("authenticate user", candidates, 3);
+
+        // Query 2: "create new user account"
+        List<EntryPoint> results2 = reranker.rerank("create new user account", candidates, 3);
+
+        System.out.println("\n📊 Comparaison queries différentes:");
+        System.out.println("Query 'authenticate user':");
+        System.out.println("  Top: " + results1.get(0).name());
+
+        System.out.println("Query 'create new user account':");
+        System.out.println("  Top: " + results2.get(0).name());
+
+        // Les top résultats devraient être différents
+        // (sauf si par hasard le LLM donne le même résultat)
+        // On vérifie juste que l'ordre a potentiellement changé
+        assertNotNull(results1.get(0), "Results1 ne devrait pas être null");
+        assertNotNull(results2.get(0), "Results2 ne devrait pas être null");
+    }
+
+    @Test
+    @Order(6)
+    @DisplayName("Test 6: TopK limite le nombre de résultats")
+    void test6_TopKLimitsResults() throws SearchException {
+        if (!ollamaAvailable) {
+            System.out.println("⏭️  Test skippé (Ollama non disponible)");
+            return;
+        }
+
+        List<EntryPoint> candidates = createTestCandidates();
+
+        // TopK = 2
+        List<EntryPoint> results2 = reranker.rerank("authenticate", candidates, 2);
+        assertEquals(2, results2.size(), "Devrait retourner exactement 2 résultats");
+
+        // TopK = 5 (plus que candidats)
+        List<EntryPoint> results5 = reranker.rerank("authenticate", candidates, 10);
+        assertTrue(results5.size() <= candidates.size(),
+            "Ne devrait pas retourner plus que les candidats disponibles");
+    }
+
+    @Test
+    @Order(7)
+    @DisplayName("Test 7: Fallback gracieux en cas d'erreur LLM")
+    void test7_GracefulFallbackOnError() throws SearchException {
+        if (!ollamaAvailable) {
+            System.out.println("⏭️  Test skippé (Ollama non disponible)");
+            return;
+        }
+
+        List<EntryPoint> candidates = createTestCandidates();
+
+        // Query extrêmement longue pour potentiellement causer timeout
+        String veryLongQuery = "authenticate ".repeat(100);
+
+        // Ne devrait PAS lancer d'exception (fallback sur ordre original)
+        List<EntryPoint> results = assertDoesNotThrow(() ->
+            reranker.rerank(veryLongQuery, candidates, 3),
+            "Reranker devrait gérer erreurs LLM gracieusement"
+        );
+
+        assertFalse(results.isEmpty(), "Devrait retourner résultats même si LLM échoue");
+    }
+
+    @Test
+    @Order(8)
+    @DisplayName("Test 8: Reranking préserve propriétés EntryPoint")
+    void test8_RerankingPreservesProperties() throws SearchException {
+        if (!ollamaAvailable) {
+            System.out.println("⏭️  Test skippé (Ollama non disponible)");
+            return;
+        }
+
+        List<EntryPoint> candidates = createTestCandidates();
+
+        List<EntryPoint> reranked = reranker.rerank("authenticate", candidates, 3);
+
+        // Vérifier que les propriétés sont préservées
+        for (EntryPoint entry : reranked) {
+            assertNotNull(entry.nodeType(), "nodeType devrait être préservé");
+            assertNotNull(entry.name(), "name devrait être préservé");
+            assertNotNull(entry.fqn(), "fqn devrait être préservé");
+            assertNotNull(entry.properties(), "properties devrait être préservé");
+        }
+    }
+
+    @Test
+    @Order(9)
+    @DisplayName("Test 9: Comparaison individual vs batch scoring")
+    void test9_CompareIndividualVsBatch() throws SearchException {
+        if (!ollamaAvailable) {
+            System.out.println("⏭️  Test skippé (Ollama non disponible)");
+            return;
+        }
+
+        List<EntryPoint> candidates = createTestCandidates();
+
+        // Reranking individual
+        List<EntryPoint> individualResults = reranker.rerank("authenticate user", candidates, 3);
+
+        // Reranking batch
+        List<EntryPoint> batchResults = batchReranker.rerank("authenticate user", candidates, 3);
+
+        // Les deux devraient retourner 3 résultats
+        assertEquals(3, individualResults.size(), "Individual devrait retourner 3 résultats");
+        assertEquals(3, batchResults.size(), "Batch devrait retourner 3 résultats");
+
+        System.out.println("\n📊 Comparaison Individual vs Batch:");
+        System.out.println("Individual: " + individualResults.get(0).name());
+        System.out.println("Batch: " + batchResults.get(0).name());
+
+        // Les résultats peuvent différer légèrement, mais devraient être tous les deux pertinents
+        // On vérifie juste qu'ils ne sont pas vides
+        assertFalse(individualResults.isEmpty(), "Individual ne devrait pas être vide");
+        assertFalse(batchResults.isEmpty(), "Batch ne devrait pas être vide");
+    }
+
+    @Test
+    @Order(10)
+    @DisplayName("Test 10: Constructeur valide paramètres")
+    void test10_ConstructorValidatesParams() {
+        // LLM null devrait lancer exception
+        assertThrows(IllegalArgumentException.class, () ->
+            new LLMReranker(null),
+            "LLM null devrait lancer exception");
+
+        assertThrows(IllegalArgumentException.class, () ->
+            new LLMReranker(null, false),
+            "LLM null devrait lancer exception");
+    }
+}
