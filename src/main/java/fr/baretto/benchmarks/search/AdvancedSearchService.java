@@ -56,6 +56,35 @@ public class AdvancedSearchService implements GraphSearchHook {
      * @param enableGraphExpansion Active l'expansion K-hop (recommandé: true)
      * @param enableLLMReranking  Active le reranking LLM (nécessite llmModel non-null)
      * @param graphExpansionHops  Nombre de sauts pour expansion (recommandé: 1-2)
+     * @param rrfK                Constante RRF (typiquement 60)
+     */
+    public AdvancedSearchService(
+        Driver neo4jDriver,
+        EmbeddingModel embeddingModel,
+        ChatModel llmModel,
+        boolean enableGraphExpansion,
+        boolean enableLLMReranking,
+        int graphExpansionHops,
+        int rrfK
+    ) {
+        Objects.requireNonNull(neo4jDriver, "neo4jDriver ne peut pas être null");
+        Objects.requireNonNull(embeddingModel, "embeddingModel ne peut pas être null");
+
+        this.hybridSearch = new HybridSearchService(neo4jDriver, embeddingModel, rrfK);
+        this.graphTraversal = new GraphTraversal(neo4jDriver);
+        this.llmReranker = llmModel != null ? new LLMReranker(llmModel) : null;
+        this.communityDetection = new CommunityDetection(neo4jDriver, llmModel);
+
+        this.enableGraphExpansion = enableGraphExpansion;
+        this.enableLLMReranking = enableLLMReranking && llmModel != null;
+        this.graphExpansionHops = Math.max(1, Math.min(graphExpansionHops, 3));
+
+        logger.info("AdvancedSearchService initialisé (graphExpansion={}, llmReranking={}, hops={}, rrfK={})",
+            enableGraphExpansion, this.enableLLMReranking, this.graphExpansionHops, rrfK);
+    }
+
+    /**
+     * Constructeur avec flags explicites mais rrfK par défaut.
      */
     public AdvancedSearchService(
         Driver neo4jDriver,
@@ -65,20 +94,8 @@ public class AdvancedSearchService implements GraphSearchHook {
         boolean enableLLMReranking,
         int graphExpansionHops
     ) {
-        Objects.requireNonNull(neo4jDriver, "neo4jDriver ne peut pas être null");
-        Objects.requireNonNull(embeddingModel, "embeddingModel ne peut pas être null");
-
-        this.hybridSearch = new HybridSearchService(neo4jDriver, embeddingModel);
-        this.graphTraversal = new GraphTraversal(neo4jDriver);
-        this.llmReranker = llmModel != null ? new LLMReranker(llmModel) : null;
-        this.communityDetection = new CommunityDetection(neo4jDriver, llmModel);
-
-        this.enableGraphExpansion = enableGraphExpansion;
-        this.enableLLMReranking = enableLLMReranking && llmModel != null;
-        this.graphExpansionHops = Math.max(1, Math.min(graphExpansionHops, 3));
-
-        logger.info("AdvancedSearchService initialisé (graphExpansion={}, llmReranking={}, hops={})",
-            enableGraphExpansion, this.enableLLMReranking, this.graphExpansionHops);
+        this(neo4jDriver, embeddingModel, llmModel, enableGraphExpansion, enableLLMReranking,
+             graphExpansionHops, RRFFusion.DEFAULT_K);
     }
 
     /**
@@ -90,35 +107,52 @@ public class AdvancedSearchService implements GraphSearchHook {
         EmbeddingModel embeddingModel,
         ChatModel llmModel
     ) {
-        this(neo4jDriver, embeddingModel, llmModel, true, true, 1);
+        this(neo4jDriver, embeddingModel, llmModel, true, true, 1, RRFFusion.DEFAULT_K);
     }
 
     /**
      * Constructeur sans LLM (pas de reranking ni résumés).
      */
     public AdvancedSearchService(Driver neo4jDriver, EmbeddingModel embeddingModel) {
-        this(neo4jDriver, embeddingModel, null, true, false, 1);
+        this(neo4jDriver, embeddingModel, null, true, false, 1, RRFFusion.DEFAULT_K);
     }
 
     @Override
     public List<EntryPoint> findEntryPoints(String query, int topK) throws SearchException {
-        Objects.requireNonNull(query, "query ne peut pas être null");
-        if (query.isBlank()) {
-            throw new IllegalArgumentException("query ne peut pas être vide");
+        return findEntryPoints(query, query, topK);
+    }
+
+    /**
+     * Variante avec queries séparées pour BM25 et embedding.
+     * Utilisée avec HyDE : {@code bm25Query} = requête naturelle originale (safe pour Lucene),
+     * {@code embeddingQuery} = document hypothétique généré par le LLM (optimisé pour le vecteur).
+     *
+     * @param bm25Query      Requête pour la recherche lexicale BM25 (langage naturel)
+     * @param embeddingQuery Requête pour la recherche vectorielle (peut être un document HyDE)
+     * @param topK           Nombre de résultats finaux à retourner
+     */
+    public List<EntryPoint> findEntryPoints(String bm25Query, String embeddingQuery, int topK) throws SearchException {
+        Objects.requireNonNull(bm25Query, "bm25Query ne peut pas être null");
+        Objects.requireNonNull(embeddingQuery, "embeddingQuery ne peut pas être null");
+        if (bm25Query.isBlank()) {
+            throw new IllegalArgumentException("bm25Query ne peut pas être vide");
+        }
+        if (embeddingQuery.isBlank()) {
+            throw new IllegalArgumentException("embeddingQuery ne peut pas être vide");
         }
         if (topK <= 0) {
             throw new IllegalArgumentException("topK doit être > 0");
         }
 
-        logger.info("Recherche avancée: query='{}', topK={}", query, topK);
+        logger.info("Recherche avancée: bm25='{}', topK={}", bm25Query, topK);
 
-        // ÉTAPE 1: Recherche hybride (BM25 + Vector + RRF)
+        // ÉTAPE 1: Recherche hybride (BM25 sur bm25Query, vector sur embeddingQuery)
         logger.debug("Étape 1/3: Hybrid Search");
-        int intermediateTopK = Math.max(topK, 10); // Au moins 10 pour expansion
-        List<EntryPoint> hybridResults = hybridSearch.findEntryPoints(query, intermediateTopK);
+        int intermediateTopK = Math.max(topK, 10);
+        List<EntryPoint> hybridResults = hybridSearch.findEntryPoints(bm25Query, embeddingQuery, intermediateTopK);
 
         if (hybridResults.isEmpty()) {
-            logger.warn("Aucun résultat hybrid search pour: {}", query);
+            logger.warn("Aucun résultat hybrid search pour: {}", bm25Query);
             return List.of();
         }
 
@@ -134,15 +168,14 @@ public class AdvancedSearchService implements GraphSearchHook {
             logger.debug("Étape 2/3: Graph Expansion désactivée");
         }
 
-        // ÉTAPE 3: Reranking LLM (optionnel)
+        // ÉTAPE 3: Reranking LLM — toujours sur la requête naturelle originale
         List<EntryPoint> finalResults = expandedResults;
         if (enableLLMReranking && llmReranker != null) {
             logger.debug("Étape 3/3: LLM Reranking");
-            finalResults = llmReranker.rerank(query, expandedResults, topK);
+            finalResults = llmReranker.rerank(bm25Query, expandedResults, topK);
             logger.debug("Après reranking: {} résultats", finalResults.size());
         } else {
             logger.debug("Étape 3/3: LLM Reranking désactivé");
-            // Juste limiter au topK
             finalResults = expandedResults.stream().limit(topK).collect(Collectors.toList());
         }
 
@@ -306,13 +339,7 @@ public class AdvancedSearchService implements GraphSearchHook {
         }
 
         return graphTraversal.fetchNodes(nodeIds, distanceMap).stream()
-            .map(node -> {
-                Map<String, Object> properties = new HashMap<>();
-                if (!node.javaDoc().isEmpty()) {
-                    properties.put("javaDoc", node.javaDoc());
-                }
-                return new EntryPoint(node.nodeId(), node.nodeType(), node.name(), node.fqn(), node.score(), properties);
-            })
+            .map(node -> new EntryPoint(node.nodeId(), node.nodeType(), node.name(), node.fqn(), node.score(), node.properties()))
             .collect(Collectors.toList());
     }
 

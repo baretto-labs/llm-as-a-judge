@@ -6,14 +6,20 @@ import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.body.TypeDeclaration;
 import dev.langchain4j.model.embedding.EmbeddingModel;
 import dev.langchain4j.model.embedding.onnx.allminilml6v2.AllMiniLmL6V2EmbeddingModel;
+import dev.langchain4j.model.ollama.OllamaEmbeddingModel;
+import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
+import org.apache.lucene.document.Field;
 import org.apache.lucene.document.KnnFloatVectorField;
 import org.apache.lucene.document.StoredField;
+import org.apache.lucene.document.TextField;
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
+import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.KnnFloatVectorQuery;
+import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.store.FSDirectory;
@@ -25,30 +31,72 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public class LuceneRagStrategy implements RagStrategy {
 
     private static final Logger logger = LoggerFactory.getLogger(LuceneRagStrategy.class);
     private static final String DEFAULT_INDEX_PATH = "./lucene-db";
-    private static final int TOP_K = 5;
-    private static final int VECTOR_DIMENSIONS = 384;
-    private static final String FIELD_CONTENT = "content";
+    private static final String FIELD_CONTENT   = "content";
+    private static final String FIELD_TEXT      = "text";      // champ BM25 (indexed, not stored)
     private static final String FIELD_EMBEDDING = "embedding";
 
-    private final Path indexPath;
+    private static final String OLLAMA_BASE_URL      = System.getProperty("rag.ollama.url",       "http://localhost:11434");
+    private static final String EMBEDDING_MODEL_NAME = System.getProperty("rag.embedding.model",  "nomic-embed-text");
+
+    private final Path           indexPath;
     private final EmbeddingModel embeddingModel;
-    private FSDirectory directory;
+    private final int            vectorDimensions;
+    private final FeatureFlags   flags;
+    private FSDirectory          directory;
 
     public LuceneRagStrategy() {
-        this(Path.of(DEFAULT_INDEX_PATH));
+        this(Path.of(DEFAULT_INDEX_PATH), FeatureFlags.hybrid());
     }
 
     public LuceneRagStrategy(Path indexPath) {
+        this(indexPath, FeatureFlags.hybrid());
+    }
+
+    /** Constructeur principal avec feature flags explicites. */
+    public LuceneRagStrategy(Path indexPath, FeatureFlags flags) {
         this.indexPath = indexPath;
-        this.embeddingModel = new AllMiniLmL6V2EmbeddingModel();
-        logger.info("Initialisation de la stratégie Lucene RAG");
+        this.flags     = flags;
+        EmbeddingModel model;
+        int dims;
+        try {
+            model = OllamaEmbeddingModel.builder()
+                .baseUrl(OLLAMA_BASE_URL)
+                .modelName(EMBEDDING_MODEL_NAME)
+                .build();
+            dims = model.embed("probe").content().vector().length;
+            logger.info("Lucene embedding model: {} ({}d)", EMBEDDING_MODEL_NAME, dims);
+        } catch (Exception e) {
+            logger.warn("Ollama indisponible, fallback AllMiniLmL6V2: {}", e.getMessage());
+            model = new AllMiniLmL6V2EmbeddingModel();
+            dims = 384;
+        }
+        this.embeddingModel   = model;
+        this.vectorDimensions = dims;
+        logger.info("Stratégie Lucene RAG initialisée (preset={})", flags.presetName());
+    }
+
+    /** Constructeur pour injection directe (tests). */
+    public LuceneRagStrategy(Path indexPath, EmbeddingModel embeddingModel, int vectorDimensions) {
+        this(indexPath, embeddingModel, vectorDimensions, FeatureFlags.hybrid());
+    }
+
+    /** Constructeur pour injection directe avec feature flags (tests, benchmark). */
+    public LuceneRagStrategy(Path indexPath, EmbeddingModel embeddingModel, int vectorDimensions, FeatureFlags flags) {
+        this.indexPath        = indexPath;
+        this.embeddingModel   = embeddingModel;
+        this.vectorDimensions = vectorDimensions;
+        this.flags            = flags;
     }
 
     @Override
@@ -61,7 +109,7 @@ public class LuceneRagStrategy implements RagStrategy {
         Files.createDirectories(indexPath);
 
         directory = FSDirectory.open(indexPath);
-        try (IndexWriter writer = new IndexWriter(directory, new IndexWriterConfig())) {
+        try (IndexWriter writer = new IndexWriter(directory, new IndexWriterConfig(new StandardAnalyzer()))) {
             Files.walk(directoryPath)
                     .filter(p -> p.toString().endsWith(".java"))
                     .forEach(javaFile -> indexFile(writer, javaFile));
@@ -79,6 +127,7 @@ public class LuceneRagStrategy implements RagStrategy {
                 float[] embedding = embeddingModel.embed(chunk).content().vector();
                 Document doc = new Document();
                 doc.add(new StoredField(FIELD_CONTENT, chunk));
+                doc.add(new TextField(FIELD_TEXT, chunk, Field.Store.NO));  // indexé pour BM25
                 doc.add(new KnnFloatVectorField(FIELD_EMBEDDING, embedding, VectorSimilarityFunction.COSINE));
                 writer.addDocument(doc);
             }
@@ -141,33 +190,91 @@ public class LuceneRagStrategy implements RagStrategy {
 
     @Override
     public List<String> retrieveContext(String query) throws Exception {
-        logger.info("Recherche de contexte avec Lucene pour la requête: {}", query);
+        logger.info("Recherche Lucene [{}] pour: {}", flags.presetName(), query);
 
         if (directory == null) {
             directory = FSDirectory.open(indexPath);
         }
 
+        int topK = flags.topK();
         float[] queryEmbedding = embeddingModel.embed(query).content().vector();
 
         try (DirectoryReader reader = DirectoryReader.open(directory)) {
             IndexSearcher searcher = new IndexSearcher(reader);
-            KnnFloatVectorQuery vectorQuery = new KnnFloatVectorQuery(FIELD_EMBEDDING, queryEmbedding, TOP_K);
-            TopDocs topDocs = searcher.search(vectorQuery, TOP_K);
+
+            if (!flags.bm25Enabled() || !flags.rrfEnabled()) {
+                // knn-only : recherche vectorielle pure
+                TopDocs knnDocs = searcher.search(
+                    new KnnFloatVectorQuery(FIELD_EMBEDDING, queryEmbedding, topK), topK);
+                List<String> results = new ArrayList<>();
+                for (ScoreDoc sd : knnDocs.scoreDocs) {
+                    String content = searcher.storedFields().document(sd.doc).get(FIELD_CONTENT);
+                    if (content != null) results.add(content);
+                }
+                return results;
+            }
+
+            // hybrid : BM25 + KNN + RRF (k=60, identique à HybridSearchService Neo4j)
+            List<Integer> bm25Results = searchBM25(searcher, query, topK);
+            logger.debug("BM25: {} résultats", bm25Results.size());
+
+            TopDocs knnDocs = searcher.search(
+                new KnnFloatVectorQuery(FIELD_EMBEDDING, queryEmbedding, topK), topK);
+            List<Integer> knnResults = Arrays.stream(knnDocs.scoreDocs)
+                .map(sd -> sd.doc)
+                .collect(Collectors.toList());
+            logger.debug("KNN: {} résultats", knnResults.size());
+
+            List<Integer> fusedDocIds = rrfFuse(List.of(bm25Results, knnResults), flags.rrfK(), topK);
 
             List<String> results = new ArrayList<>();
-            for (ScoreDoc scoreDoc : topDocs.scoreDocs) {
-                String content = searcher.storedFields().document(scoreDoc.doc).get(FIELD_CONTENT);
-                if (content != null) {
-                    results.add(content);
-                }
+            for (int docId : fusedDocIds) {
+                String content = searcher.storedFields().document(docId).get(FIELD_CONTENT);
+                if (content != null) results.add(content);
             }
             return results;
         }
     }
 
+    /**
+     * Recherche BM25 via QueryParser (StandardAnalyzer — même tokenisation qu'à l'indexation).
+     */
+    private List<Integer> searchBM25(IndexSearcher searcher, String queryText, int topK) {
+        try (StandardAnalyzer analyzer = new StandardAnalyzer()) {
+            QueryParser parser = new QueryParser(FIELD_TEXT, analyzer);
+            parser.setDefaultOperator(QueryParser.Operator.OR);
+            Query bm25Query = parser.parse(QueryParser.escape(queryText));
+            TopDocs bm25Docs = searcher.search(bm25Query, topK);
+            return Arrays.stream(bm25Docs.scoreDocs)
+                .map(sd -> sd.doc)
+                .collect(Collectors.toList());
+        } catch (Exception e) {
+            logger.debug("BM25 search failed, skipping: {}", e.getMessage());
+            return List.of();
+        }
+    }
+
+    /**
+     * Reciprocal Rank Fusion : fusionne plusieurs listes ordonnées de doc IDs.
+     * Score RRF = Σ 1 / (k + rank_i + 1) pour chaque liste où le doc apparaît.
+     */
+    private List<Integer> rrfFuse(List<List<Integer>> rankedLists, int k, int topK) {
+        Map<Integer, Double> scores = new HashMap<>();
+        for (List<Integer> list : rankedLists) {
+            for (int rank = 0; rank < list.size(); rank++) {
+                scores.merge(list.get(rank), 1.0 / (k + rank + 1), Double::sum);
+            }
+        }
+        return scores.entrySet().stream()
+            .sorted(Map.Entry.<Integer, Double>comparingByValue().reversed())
+            .limit(topK)
+            .map(Map.Entry::getKey)
+            .collect(Collectors.toList());
+    }
+
     @Override
     public String getStrategyName() {
-        return "Vectoriel (Lucene)";
+        return "Lucene/" + flags.presetName();
     }
 
     @Override

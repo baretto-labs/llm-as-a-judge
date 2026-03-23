@@ -7,7 +7,7 @@ import java.util.List;
  * Interface définissant le contrat pour les stratégies RAG (Retrieval-Augmented Generation).
  * Permet de définir différentes implémentations (Vectoriel, GraphRAG).
  */
-public interface RagStrategy {
+public interface RagStrategy extends AutoCloseable {
 
     /**
      * Indexe le contenu d'un répertoire (codebase) pour la recherche.

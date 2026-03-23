@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>RAG Benchmark Dashboard</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: system-ui, sans-serif; background: #0f1117; color: #e2e8f0; min-height: 100vh; }
+
+  header { padding: 1.5rem 2rem; border-bottom: 1px solid #2d3748; display: flex; align-items: center; gap: 1rem; }
+  header h1 { font-size: 1.25rem; font-weight: 600; }
+  header span { font-size: 0.8rem; color: #718096; }
+
+  .drop-zone {
+    margin: 1.5rem 2rem;
+    border: 2px dashed #4a5568; border-radius: 8px;
+    padding: 2rem; text-align: center; cursor: pointer;
+    transition: border-color .2s, background .2s;
+  }
+  .drop-zone:hover, .drop-zone.over { border-color: #63b3ed; background: rgba(99,179,237,.05); }
+  .drop-zone p { color: #718096; font-size: .9rem; }
+  .drop-zone strong { color: #63b3ed; }
+  #file-input { display: none; }
+  .file-list { margin: 0 2rem 1rem; font-size: .8rem; color: #68d391; }
+
+  .filters { margin: 0 2rem 1.5rem; display: flex; gap: 1.5rem; flex-wrap: wrap; align-items: center; }
+  .filters label { font-size: .82rem; color: #a0aec0; }
+  .filters select { background: #2d3748; color: #e2e8f0; border: 1px solid #4a5568; border-radius: 4px; padding: .25rem .5rem; font-size: .82rem; }
+
+  .section-header {
+    margin: 1.5rem 2rem .75rem;
+    font-size: .75rem; font-weight: 700; text-transform: uppercase; letter-spacing: .1em;
+    color: #718096; display: flex; align-items: center; gap: .75rem;
+  }
+  .section-header::after { content: ''; flex: 1; height: 1px; background: #2d3748; }
+
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; padding: 0 2rem 1rem; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1.5rem; padding: 0 2rem 1rem; }
+  .card { background: #1a202c; border: 1px solid #2d3748; border-radius: 8px; padding: 1.25rem; }
+  .card h2 { font-size: .9rem; font-weight: 600; color: #a0aec0; margin-bottom: 1rem; text-transform: uppercase; letter-spacing: .05em; }
+  .card.full { grid-column: 1 / -1; }
+  .judge-model { font-size: .72rem; color: #4a5568; font-weight: 400; margin-left: .5rem; text-transform: none; letter-spacing: 0; }
+
+  .empty { text-align: center; padding: 4rem; color: #4a5568; }
+
+  table { width: 100%; border-collapse: collapse; font-size: .82rem; }
+  th { text-align: left; padding: .5rem .75rem; color: #718096; font-weight: 600; border-bottom: 1px solid #2d3748; white-space: nowrap; }
+  td { padding: .45rem .75rem; border-bottom: 1px solid #1e2533; }
+  tr:hover td { background: #2d3748; }
+  tr.expandable { cursor: pointer; }
+  tr.expandable:hover td { background: #253046; }
+  tr.expanded td { background: #1e2a3a !important; }
+
+  .badge { display: inline-block; padding: .15rem .45rem; border-radius: 999px; font-size: .75rem; font-weight: 600; }
+  .badge.lucene { background: #2b4c7e; color: #90cdf4; }
+  .badge.neo4j  { background: #2d4a2d; color: #9ae6b4; }
+  .badge.LOCAL        { background: #2d3a4a; color: #76e4f7; }
+  .badge.STRUCTURAL   { background: #3a2d4a; color: #b794f4; }
+  .badge.CROSS_MODULE { background: #4a3a2d; color: #f6ad55; }
+  .badge.ALL          { background: #2d3748; color: #a0aec0; }
+
+  .score-bar { display: inline-block; width: 50px; height: 7px; background: #2d3748; border-radius: 4px; vertical-align: middle; margin-right: 4px; }
+  .score-fill { height: 100%; border-radius: 4px; }
+  .score-high { color: #68d391; }
+  .score-mid  { color: #f6ad55; }
+  .score-low  { color: #fc8181; }
+
+  /* Detail panel */
+  .detail-row td { padding: 0; border-bottom: 2px solid #2d5a8e; }
+  .detail-panel { padding: 1rem 1.5rem 1.25rem; background: #131a26; }
+  .detail-panel h3 { font-size: .8rem; color: #718096; font-weight: 600; text-transform: uppercase; letter-spacing: .05em; margin-bottom: .75rem; }
+  .q-cards { display: flex; flex-direction: column; gap: .75rem; }
+  .q-card { background: #1a2535; border: 1px solid #2d3748; border-radius: 6px; padding: .75rem 1rem; }
+  .q-card-header { display: flex; align-items: center; gap: .6rem; margin-bottom: .5rem; flex-wrap: wrap; }
+  .q-text { font-size: .85rem; color: #e2e8f0; font-style: italic; flex: 1; }
+  .score-pill { padding: .15rem .5rem; border-radius: 999px; font-size: .78rem; font-weight: 700; }
+  .score-pill.high { background: #1a3a2a; color: #68d391; border: 1px solid #276749; }
+  .score-pill.mid  { background: #3a2d1a; color: #f6ad55; border: 1px solid #744d1a; }
+  .score-pill.low  { background: #3a1a1a; color: #fc8181; border: 1px solid #742020; }
+  .q-body { display: grid; grid-template-columns: 1fr 2fr; gap: 1rem; margin-top: .5rem; }
+  .q-section label { display: block; font-size: .72rem; color: #4a5568; font-weight: 600; text-transform: uppercase; letter-spacing: .05em; margin-bottom: .3rem; }
+  .hint-tags { display: flex; flex-wrap: wrap; gap: .3rem; }
+  .hint-tag { background: #2d3748; color: #a0aec0; padding: .1rem .4rem; border-radius: 4px; font-size: .75rem; font-family: monospace; }
+  .hint-tag.found { background: #1a3a2a; color: #68d391; }
+  .generated-ctx { font-family: monospace; font-size: .72rem; color: #a0aec0; background: #0f1117; border: 1px solid #2d3748; border-radius: 4px; padding: .5rem; max-height: 140px; overflow-y: auto; white-space: pre-wrap; word-break: break-word; }
+  .rationale { font-size: .78rem; color: #718096; margin-top: .4rem; font-style: italic; }
+  .expand-hint { font-size: .72rem; color: #4a5568; margin-left: .25rem; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>RAG Benchmark Dashboard</h1>
+  <span>Lucene vs GraphRAG — feature flags comparison</span>
+</header>
+
+<div class="drop-zone" id="drop-zone">
+  <p>Dépose ici <strong>target/jmh-retrieval.json</strong>, <strong>target/jmh-judge.jsonl</strong> et/ou <strong>target/jmh-judge-detail.jsonl</strong></p>
+  <p style="margin-top:.5rem">ou <strong id="browse-link" style="cursor:pointer">parcourir les fichiers</strong></p>
+  <input type="file" id="file-input" multiple accept=".json,.jsonl">
+</div>
+<div class="file-list" id="file-list"></div>
+
+<div class="filters" id="filters" style="display:none">
+  <label>Scénario :
+    <select id="filter-scenario"><option value="">Tous</option></select>
+  </label>
+  <label>Taille :
+    <select id="filter-filecount"><option value="">Toutes</option></select>
+  </label>
+</div>
+
+<div id="charts-container">
+  <div class="empty" id="empty-state">Charge un fichier JMH pour commencer.</div>
+</div>
+
+<script>
+// ── Data store ───────────────────────────────────────────────────────────────
+let jmhData        = [];
+let judgeData      = [];  // jmh-judge.jsonl (synthèse)
+let judgeDetailData = []; // jmh-judge-detail.jsonl (par question)
+
+const SCENARIO_COLORS = {
+  'lucene': { bg: 'rgba(99,179,237,0.75)',  border: '#63b3ed' },
+  'neo4j':  { bg: 'rgba(104,211,145,0.75)', border: '#68d391' },
+};
+const DIFFICULTY_COLORS = {
+  'LOCAL':        { bg: 'rgba(118,228,247,0.7)', border: '#76e4f7' },
+  'STRUCTURAL':   { bg: 'rgba(183,148,244,0.7)', border: '#b794f4' },
+  'CROSS_MODULE': { bg: 'rgba(246,173,85,0.7)',  border: '#f6ad55' },
+};
+const PALETTE = ['#63b3ed','#68d391','#f6ad55','#fc8181','#b794f4','#76e4f7','#faf089'];
+
+// ── File loading ─────────────────────────────────────────────────────────────
+const dropZone   = document.getElementById('drop-zone');
+const fileInput  = document.getElementById('file-input');
+const browseLink = document.getElementById('browse-link');
+
+browseLink.onclick = () => fileInput.click();
+dropZone.onclick   = (e) => { if (e.target !== browseLink) fileInput.click(); };
+fileInput.onchange = (e) => loadFiles([...e.target.files]);
+dropZone.ondragover  = (e) => { e.preventDefault(); dropZone.classList.add('over'); };
+dropZone.ondragleave = () => dropZone.classList.remove('over');
+dropZone.ondrop = (e) => { e.preventDefault(); dropZone.classList.remove('over'); loadFiles([...e.dataTransfer.files]); };
+
+function loadFiles(files) {
+  const fileList = document.getElementById('file-list');
+  files.forEach(f => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const content = e.target.result;
+      if (f.name.endsWith('.jsonl')) {
+        const parsed = content.trim().split('\n').filter(Boolean).map(l => {
+          try { return JSON.parse(l); } catch { return null; }
+        }).filter(Boolean);
+        if (f.name.includes('detail')) {
+          judgeDetailData.push(...parsed);
+        } else {
+          judgeData.push(...parsed);
+        }
+      } else {
+        try { jmhData.push(...JSON.parse(content)); } catch(err) { alert('JSON invalide: ' + f.name); }
+      }
+      const total = jmhData.length + judgeData.length + judgeDetailData.length;
+      fileList.innerHTML += `<span>✓ ${f.name} (${total} entrées)</span>  `;
+      render();
+    };
+    reader.readAsText(f);
+  });
+}
+
+// ── Parsing helpers ───────────────────────────────────────────────────────────
+function strategyOf(benchmarkName) {
+  if (benchmarkName.endsWith('luceneRetrieval')) return 'lucene';
+  if (benchmarkName.endsWith('neo4jRetrieval'))  return 'neo4j';
+  return benchmarkName.split('.').pop();
+}
+
+function parseJmh(data) {
+  return data.map(d => ({
+    strategy:     strategyOf(d.benchmark),
+    scenario:     d.params?.scenario ?? '?',
+    fileCount:    parseInt(d.params?.fileCount ?? '0'),
+    avgTime:      d.primaryMetric?.score ?? 0,
+    errTime:      d.primaryMetric?.scoreError ?? 0,
+    unit:         d.primaryMetric?.scoreUnit ?? 'ms/op',
+    heapMB:       d.secondaryMetrics?.heapDeltaMB?.score ?? 0,
+    cpuMs:        d.secondaryMetrics?.cpuTimeMs?.score ?? 0,
+    ctxTokens:    d.secondaryMetrics?.contextTokensEstimate?.score ?? 0,
+    emptyCtx:     d.secondaryMetrics?.emptyContextCount?.score ?? 0,
+  }));
+}
+
+// ── Filters ───────────────────────────────────────────────────────────────────
+function populateFilters(rows) {
+  const scenarios  = [...new Set(rows.map(r => r.scenario))].sort();
+  const fileCounts = [...new Set(rows.map(r => r.fileCount))].sort((a,b)=>a-b);
+  const sel1 = document.getElementById('filter-scenario');
+  const sel2 = document.getElementById('filter-filecount');
+  const prev1 = sel1.value, prev2 = sel2.value;
+  sel1.innerHTML = '<option value="">Tous</option>' + scenarios.map(s=>`<option>${s}</option>`).join('');
+  sel2.innerHTML = '<option value="">Toutes</option>' + fileCounts.map(f=>`<option>${f}</option>`).join('');
+  sel1.value = prev1; sel2.value = prev2;
+  document.getElementById('filters').style.display = 'flex';
+}
+
+function filteredRows(rows) {
+  const sc = document.getElementById('filter-scenario').value;
+  const fc = document.getElementById('filter-filecount').value;
+  return rows.filter(r => (!sc || r.scenario === sc) && (!fc || r.fileCount === parseInt(fc)));
+}
+
+function filteredJudgeRows(diff) {
+  const sc = document.getElementById('filter-scenario').value;
+  const fc = document.getElementById('filter-filecount').value;
+  return judgeData.filter(r =>
+    r.difficulty === (diff || r.difficulty) &&
+    (!sc || r.scenario === sc) &&
+    (!fc || r.fileCount === parseInt(fc))
+  );
+}
+
+document.getElementById('filter-scenario').onchange  = render;
+document.getElementById('filter-filecount').onchange = render;
+
+// ── Render ────────────────────────────────────────────────────────────────────
+function render() {
+  const allRows = parseJmh(jmhData);
+  if (allRows.length === 0 && judgeData.length === 0) return;
+  document.getElementById('empty-state')?.remove();
+  populateFilters(allRows);
+  const rows = filteredRows(allRows);
+
+  const container = document.getElementById('charts-container');
+  container.innerHTML = '';
+
+  // ── Section performance
+  const perfDiv = document.createElement('div');
+  container.appendChild(perfDiv);
+  if (rows.length > 0) {
+    perfDiv.innerHTML = '<div class="section-header">Performance</div>';
+    const perfGrid = document.createElement('div');
+    perfGrid.className = 'grid';
+    perfDiv.appendChild(perfGrid);
+    renderLatencyChart(perfGrid, rows);
+    renderMemoryChart(perfGrid, rows);
+    renderContextChart(perfGrid, rows);
+  }
+
+  // ── Section LLM-as-a-judge
+  if (judgeData.length > 0) {
+    const judgeDiv = document.createElement('div');
+    container.appendChild(judgeDiv);
+    renderJudgeSection(judgeDiv);
+  }
+
+  // ── Table détaillée
+  const tableDiv = document.createElement('div');
+  container.appendChild(tableDiv);
+  if (rows.length > 0) {
+    tableDiv.innerHTML = '<div class="section-header">Résultats détaillés</div>';
+    const tableGrid = document.createElement('div');
+    tableGrid.className = 'grid';
+    tableDiv.appendChild(tableGrid);
+    renderTable(tableGrid, rows);
+  }
+}
+
+// ── Chart helpers ─────────────────────────────────────────────────────────────
+function card(title, full, subtitle) {
+  const c = document.createElement('div');
+  c.className = 'card' + (full ? ' full' : '');
+  const sub = subtitle ? `<span class="judge-model">${subtitle}</span>` : '';
+  c.innerHTML = `<h2>${title}${sub}</h2><canvas></canvas>`;
+  return c;
+}
+
+function baseChartOpts(unit) {
+  return {
+    responsive: true,
+    plugins: { legend: { labels: { color: '#a0aec0', font: { size: 11 } } } },
+    scales: {
+      x: { ticks: { color: '#718096' }, grid: { color: '#2d3748' } },
+      y: { ticks: { color: '#718096' }, grid: { color: '#2d3748' },
+           title: { display: !!unit, text: unit, color: '#718096', font: { size: 11 } } },
+    }
+  };
+}
+
+// ── Chart 1 : Latence par scénario ────────────────────────────────────────────
+function renderLatencyChart(grid, rows) {
+  const scenarios  = [...new Set(rows.map(r => r.scenario))].sort();
+  const strategies = ['lucene', 'neo4j'];
+  const fileCounts = [...new Set(rows.map(r => r.fileCount))].sort((a,b)=>a-b);
+  if (!rows.length) return;
+  fileCounts.forEach(fc => {
+    const c = card(`Latence — ${fc} fichiers (ms/op)`);
+    grid.appendChild(c);
+    const datasets = strategies.map((strat, si) => ({
+      label: strat,
+      data: scenarios.map(sc => {
+        const r = rows.find(r => r.strategy === strat && r.scenario === sc && r.fileCount === fc);
+        return r ? r.avgTime : null;
+      }),
+      backgroundColor: SCENARIO_COLORS[strat]?.bg ?? PALETTE[si],
+      borderColor:     SCENARIO_COLORS[strat]?.border ?? PALETTE[si],
+      borderWidth: 1,
+    }));
+    new Chart(c.querySelector('canvas'), { type: 'bar', data: { labels: scenarios, datasets }, options: {
+      ...baseChartOpts('ms/op'),
+      plugins: { ...baseChartOpts().plugins,
+        tooltip: { callbacks: { label: ctx => `${ctx.dataset.label}: ${ctx.parsed.y?.toFixed(1)} ms` } }
+      }
+    }});
+  });
+}
+
+// ── Chart 2 : Mémoire ─────────────────────────────────────────────────────────
+function renderMemoryChart(grid, rows) {
+  if (!rows.length) return;
+  const scenarios  = [...new Set(rows.map(r => r.scenario))].sort();
+  const strategies = ['lucene', 'neo4j'];
+  const c = card('Heap delta moyen (MB)');
+  grid.appendChild(c);
+  const datasets = strategies.map((strat, si) => ({
+    label: strat,
+    data: scenarios.map(sc => {
+      const r = rows.find(r => r.strategy === strat && r.scenario === sc);
+      return r ? r.heapMB : null;
+    }),
+    backgroundColor: SCENARIO_COLORS[strat]?.bg ?? PALETTE[si],
+    borderColor:     SCENARIO_COLORS[strat]?.border ?? PALETTE[si],
+    borderWidth: 1,
+  }));
+  new Chart(c.querySelector('canvas'), { type: 'bar', data: { labels: scenarios, datasets },
+    options: baseChartOpts('MB') });
+}
+
+// ── Chart 3 : Tokens de contexte ─────────────────────────────────────────────
+function renderContextChart(grid, rows) {
+  if (!rows.length) return;
+  const scenarios  = [...new Set(rows.map(r => r.scenario))].sort();
+  const strategies = ['lucene', 'neo4j'];
+  const c = card('Tokens contexte estimés');
+  grid.appendChild(c);
+  const datasets = strategies.map((strat, si) => ({
+    label: strat,
+    data: scenarios.map(sc => {
+      const r = rows.find(r => r.strategy === strat && r.scenario === sc);
+      return r ? r.ctxTokens : null;
+    }),
+    backgroundColor: SCENARIO_COLORS[strat]?.bg ?? PALETTE[si],
+    borderColor:     SCENARIO_COLORS[strat]?.border ?? PALETTE[si],
+    borderWidth: 1,
+  }));
+  new Chart(c.querySelector('canvas'), { type: 'bar', data: { labels: scenarios, datasets },
+    options: baseChartOpts('tokens') });
+}
+
+// ── Section LLM-as-a-judge ────────────────────────────────────────────────────
+function renderJudgeSection(container) {
+  const judgeModel = judgeData.find(r => r.judgeModel)?.judgeModel ?? '';
+  container.innerHTML = `<div class="section-header">LLM-as-a-judge${judgeModel ? ` <span style="color:#4a5568;font-size:.72rem;text-transform:none;letter-spacing:0">— modèle : ${judgeModel}</span>` : ''}</div>`;
+
+  const aggRows = filteredJudgeRows('ALL');
+  if (!aggRows.length) return;
+
+  const scenarios  = [...new Set(aggRows.map(r => r.scenario))].sort();
+  const strategies = ['lucene', 'neo4j'];
+
+  // Ligne 1 : Score | HintCoverage | UnknownRate
+  const row1 = document.createElement('div');
+  row1.className = 'grid-3';
+  container.appendChild(row1);
+
+  // Score 0-10
+  const scoreCard = card('Score moyen (0–10)');
+  row1.appendChild(scoreCard);
+  new Chart(scoreCard.querySelector('canvas'), { type: 'bar',
+    data: { labels: scenarios, datasets: strategies.map((strat, si) => ({
+      label: strat,
+      data: scenarios.map(sc => {
+        const e = aggRows.find(r => r.strategy === strat && r.scenario === sc);
+        return e ? e.avgScore : null;
+      }),
+      backgroundColor: SCENARIO_COLORS[strat]?.bg ?? PALETTE[si],
+      borderColor:     SCENARIO_COLORS[strat]?.border ?? PALETTE[si],
+      borderWidth: 1,
+    }))},
+    options: { ...baseChartOpts('/10'), scales: { ...baseChartOpts('/10').scales,
+      y: { ...baseChartOpts('/10').scales.y, min: 0, max: 10 }
+    }, plugins: { ...baseChartOpts().plugins,
+      tooltip: { callbacks: { label: ctx => `${ctx.dataset.label}: ${ctx.parsed.y?.toFixed(1)}/10` } }
+    }}
+  });
+
+  // Hint Coverage
+  const hintCard = card('Hint Coverage (%)');
+  row1.appendChild(hintCard);
+  new Chart(hintCard.querySelector('canvas'), { type: 'bar',
+    data: { labels: scenarios, datasets: strategies.map((strat, si) => ({
+      label: strat,
+      data: scenarios.map(sc => {
+        const e = aggRows.find(r => r.strategy === strat && r.scenario === sc);
+        return e != null ? (e.avgHintCoverage * 100) : null;
+      }),
+      backgroundColor: SCENARIO_COLORS[strat]?.bg ?? PALETTE[si],
+      borderColor:     SCENARIO_COLORS[strat]?.border ?? PALETTE[si],
+      borderWidth: 1,
+    }))},
+    options: { ...baseChartOpts('%'), scales: { ...baseChartOpts('%').scales,
+      y: { ...baseChartOpts('%').scales.y, min: 0, max: 100 }
+    }, plugins: { ...baseChartOpts().plugins,
+      tooltip: { callbacks: { label: ctx => `${ctx.dataset.label}: ${ctx.parsed.y?.toFixed(1)}%` } }
+    }}
+  });
+
+  // Unknown Rate
+  const unknownCard = card('Unknown Rate (%)');
+  row1.appendChild(unknownCard);
+  new Chart(unknownCard.querySelector('canvas'), { type: 'bar',
+    data: { labels: scenarios, datasets: strategies.map((strat, si) => ({
+      label: strat,
+      data: scenarios.map(sc => {
+        const e = aggRows.find(r => r.strategy === strat && r.scenario === sc);
+        return e != null ? (e.unknownRate * 100) : null;
+      }),
+      backgroundColor: SCENARIO_COLORS[strat]?.bg ?? PALETTE[si],
+      borderColor:     SCENARIO_COLORS[strat]?.border ?? PALETTE[si],
+      borderWidth: 1,
+    }))},
+    options: { ...baseChartOpts('%'), scales: { ...baseChartOpts('%').scales,
+      y: { ...baseChartOpts('%').scales.y, min: 0, max: 100 }
+    }, plugins: { ...baseChartOpts().plugins,
+      tooltip: { callbacks: { label: ctx => `${ctx.dataset.label}: ${ctx.parsed.y?.toFixed(1)}%` } }
+    }}
+  });
+
+  // Ligne 2 : Score par difficulté (grouped bar) — seulement si les données existent
+  const diffs = ['LOCAL', 'STRUCTURAL', 'CROSS_MODULE'];
+  const hasDiff = judgeData.some(r => diffs.includes(r.difficulty));
+  if (hasDiff) {
+    const row2 = document.createElement('div');
+    row2.className = 'grid';
+    container.appendChild(row2);
+    renderDifficultyChart(row2, scenarios, strategies);
+  }
+
+  // Ligne 3 : Score vs fileCount (line chart) — scalabilité qualitative
+  const fileCounts = [...new Set(judgeData.map(r => r.fileCount))].sort((a, b) => a - b);
+  if (fileCounts.length > 1) {
+    const row3 = document.createElement('div');
+    row3.className = 'grid-3';
+    container.appendChild(row3);
+    renderScoreVsFilecountChart(row3, scenarios, strategies, fileCounts);
+  }
+}
+
+function renderDifficultyChart(grid, scenarios, strategies) {
+  const diffs = ['LOCAL', 'STRUCTURAL', 'CROSS_MODULE'];
+
+  // Un chart par stratégie pour comparer les difficultés
+  strategies.forEach(strat => {
+    const c = card(`Score par difficulté — ${strat}`);
+    grid.appendChild(c);
+    const datasets = diffs.map((diff, di) => ({
+      label: diff,
+      data: scenarios.map(sc => {
+        const e = judgeData.find(r => r.strategy === strat && r.scenario === sc && r.difficulty === diff);
+        return e ? e.avgScore : null;
+      }),
+      backgroundColor: DIFFICULTY_COLORS[diff]?.bg ?? PALETTE[di],
+      borderColor:     DIFFICULTY_COLORS[diff]?.border ?? PALETTE[di],
+      borderWidth: 1,
+    }));
+    new Chart(c.querySelector('canvas'), { type: 'bar',
+      data: { labels: scenarios, datasets },
+      options: { ...baseChartOpts('/10'), scales: { ...baseChartOpts('/10').scales,
+        y: { ...baseChartOpts('/10').scales.y, min: 0, max: 10 }
+      }}
+    });
+  });
+}
+
+// ── Score vs fileCount ────────────────────────────────────────────────────────
+function renderScoreVsFilecountChart(grid, scenarios, strategies, fileCounts) {
+  // One chart per scenario showing how score evolves with corpus size
+  const fcLabels = fileCounts.map(String);
+  const LINE_COLORS = {
+    lucene: { border: 'rgba(66,153,225,0.9)', bg: 'rgba(66,153,225,0.15)' },
+    neo4j:  { border: 'rgba(72,187,120,0.9)', bg: 'rgba(72,187,120,0.15)' },
+  };
+
+  scenarios.forEach(sc => {
+    const c = card(`Score vs corpus size — ${sc}`);
+    grid.appendChild(c);
+    const datasets = strategies.map(strat => ({
+      label: strat,
+      data: fileCounts.map(fc => {
+        const e = judgeData.find(r => r.strategy === strat && r.scenario === sc
+                                   && r.fileCount === fc && r.difficulty === 'ALL');
+        return e ? e.avgScore : null;
+      }),
+      borderColor: LINE_COLORS[strat]?.border ?? 'grey',
+      backgroundColor: LINE_COLORS[strat]?.bg ?? 'transparent',
+      fill: false,
+      tension: 0.3,
+      pointRadius: 5,
+      pointHoverRadius: 7,
+    }));
+    new Chart(c.querySelector('canvas'), {
+      type: 'line',
+      data: { labels: fcLabels, datasets },
+      options: {
+        ...baseChartOpts('files'),
+        scales: {
+          x: { title: { display: true, text: 'fileCount' } },
+          y: { min: 0, max: 10, title: { display: true, text: 'avg score /10' } }
+        },
+        plugins: {
+          ...baseChartOpts().plugins,
+          tooltip: { callbacks: { label: ctx => `${ctx.dataset.label}: ${ctx.parsed.y?.toFixed(2)}/10` } }
+        }
+      }
+    });
+  });
+}
+
+// ── Table ─────────────────────────────────────────────────────────────────────
+function renderTable(grid, rows) {
+  if (!rows.length) return;
+  const hasJudge  = judgeData.length > 0;
+  const hasDetail = judgeDetailData.length > 0;
+
+  const judgeHeaders = hasJudge
+    ? '<th>Score</th><th>Hint Cov.</th><th>Unknown</th>'
+    : '';
+
+  const c = document.createElement('div');
+  c.className = 'card full';
+  c.innerHTML = `<h2>Détail des mesures${hasDetail ? ' <span style="font-size:.72rem;color:#4a5568;font-weight:400;text-transform:none">(clic pour détail par question)</span>' : ''}</h2>
+  <table>
+    <thead><tr>
+      <th>Stratégie</th><th>Scénario</th><th>Fichiers</th>
+      <th>Latence (ms/op)</th><th>Erreur</th>
+      <th>Heap Δ (MB)</th><th>CPU (ms)</th><th>Tokens ctx</th><th>Ctx vide</th>
+      ${judgeHeaders}
+    </tr></thead>
+    <tbody id="table-body"></tbody>
+  </table>`;
+  grid.appendChild(c);
+  const tbody = c.querySelector('#table-body');
+
+  rows.sort((a,b) => a.scenario.localeCompare(b.scenario) || a.fileCount - b.fileCount || a.strategy.localeCompare(b.strategy))
+    .forEach(r => {
+      const judgeEntry = hasJudge
+        ? judgeData.find(j => j.strategy === r.strategy && j.scenario === r.scenario && j.fileCount === r.fileCount && j.difficulty === 'ALL')
+        : null;
+
+      const scoreCells = hasJudge ? buildScoreCells(judgeEntry) : '';
+      const canExpand = hasDetail && judgeDetailData.some(d => d.strategy === r.strategy && d.scenario === r.scenario && d.fileCount === r.fileCount);
+
+      const tr = document.createElement('tr');
+      if (canExpand) tr.className = 'expandable';
+      tr.innerHTML = `
+        <td><span class="badge ${r.strategy}">${r.strategy}</span>${canExpand ? '<span class="expand-hint">▶</span>' : ''}</td>
+        <td>${r.scenario}</td>
+        <td>${r.fileCount}</td>
+        <td><b>${r.avgTime.toFixed(1)}</b></td>
+        <td style="color:#718096">±${r.errTime.toFixed(1)}</td>
+        <td>${r.heapMB.toFixed(1)}</td>
+        <td>${r.cpuMs.toFixed(1)}</td>
+        <td>${Math.round(r.ctxTokens)}</td>
+        <td style="color:${r.emptyCtx > 0.1 ? '#fc8181' : '#68d391'}">${(r.emptyCtx*100).toFixed(0)}%</td>
+        ${scoreCells}
+      `;
+      tbody.appendChild(tr);
+
+      if (canExpand) {
+        const colCount = 9 + (hasJudge ? 3 : 0);
+        const detailTr = document.createElement('tr');
+        detailTr.className = 'detail-row';
+        detailTr.style.display = 'none';
+        detailTr.innerHTML = `<td colspan="${colCount}"></td>`;
+        tbody.appendChild(detailTr);
+
+        tr.addEventListener('click', () => {
+          const isOpen = detailTr.style.display !== 'none';
+          detailTr.style.display = isOpen ? 'none' : 'table-row';
+          tr.classList.toggle('expanded', !isOpen);
+          const arrow = tr.querySelector('.expand-hint');
+          if (arrow) arrow.textContent = isOpen ? '▶' : '▼';
+          if (!isOpen && !detailTr.dataset.rendered) {
+            detailTr.querySelector('td').appendChild(buildDetailPanel(r));
+            detailTr.dataset.rendered = '1';
+          }
+        });
+      }
+    });
+}
+
+function buildScoreCells(j) {
+  if (!j) return '<td>—</td><td>—</td><td>—</td>';
+  const sc = j.avgScore;
+  const cls = sc >= 7 ? 'high' : sc >= 4 ? 'mid' : 'low';
+  const colorCls = sc >= 7 ? 'score-high' : sc >= 4 ? 'score-mid' : 'score-low';
+  const fillPct = Math.round(sc * 10);
+  const fillColor = sc >= 7 ? '#68d391' : sc >= 4 ? '#f6ad55' : '#fc8181';
+  const hintPct = j.avgHintCoverage != null ? (j.avgHintCoverage * 100).toFixed(0) + '%' : '—';
+  const unknownPct = j.unknownRate != null ? (j.unknownRate * 100).toFixed(0) + '%' : '—';
+  return `
+    <td>
+      <span class="score-bar"><span class="score-fill" style="width:${fillPct}%;background:${fillColor}"></span></span>
+      <span class="${colorCls}">${sc.toFixed(1)}</span>
+    </td>
+    <td>${hintPct}</td>
+    <td style="color:${j.unknownRate > 0.3 ? '#fc8181' : '#68d391'}">${unknownPct}</td>
+  `;
+}
+
+function buildDetailPanel(row) {
+  const details = judgeDetailData.filter(d =>
+    d.strategy === row.strategy && d.scenario === row.scenario && d.fileCount === row.fileCount
+  );
+
+  const panel = document.createElement('div');
+  panel.className = 'detail-panel';
+  panel.innerHTML = `<h3>Questions testées — ${row.strategy} / ${row.scenario} / ${row.fileCount} fichiers</h3>
+    <div class="q-cards" id="qcards-${row.strategy}-${row.fileCount}"></div>`;
+
+  const qcards = panel.querySelector('.q-cards');
+  details.forEach(d => {
+    const sc = d.score;
+    const pillCls = sc >= 7 ? 'high' : sc >= 4 ? 'mid' : 'low';
+
+    // Hint tags avec indicateur found/missing
+    const ctx = (d.generated || '').toLowerCase();
+    const hintTags = (d.expected || []).map(h =>
+      `<span class="hint-tag ${ctx.includes(h.toLowerCase()) ? 'found' : ''}">${h}</span>`
+    ).join('');
+
+    const qcard = document.createElement('div');
+    qcard.className = 'q-card';
+    qcard.innerHTML = `
+      <div class="q-card-header">
+        <span class="badge ${d.difficulty}">${d.difficulty}</span>
+        <span class="q-text">${escapeHtml(d.question)}</span>
+        <span class="score-pill ${pillCls}">${sc}/10</span>
+      </div>
+      <div class="q-body">
+        <div class="q-section">
+          <label>Attendu</label>
+          <div class="hint-tags">${hintTags || '<span style="color:#4a5568">—</span>'}</div>
+          ${d.rationale ? `<p class="rationale">${escapeHtml(d.rationale)}</p>` : ''}
+        </div>
+        <div class="q-section">
+          <label>Contexte généré</label>
+          <pre class="generated-ctx">${escapeHtml(d.generated || '(vide)')}</pre>
+        </div>
+      </div>
+    `;
+    qcards.appendChild(qcard);
+  });
+
+  if (!details.length) {
+    panel.innerHTML += '<p style="color:#4a5568;font-size:.8rem">Aucune donnée de détail — charge jmh-judge-detail.jsonl</p>';
+  }
+
+  return panel;
+}
+
+function escapeHtml(s) {
+  return String(s ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+</script>
+</body>
+</html>

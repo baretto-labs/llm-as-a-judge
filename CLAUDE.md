@@ -4,6 +4,22 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Write the code and comments in English, but always respond in the user's language in the chat.
 
+## Working Memory — WIP.md
+
+**Always read `WIP.md` at the start of any session before touching code.**
+
+`WIP.md` is the project's working memory. It contains:
+- The list of completed work (with the files modified and the rationale)
+- The prioritized backlog of improvements identified by the 2026 audit
+- Architecture decisions already taken (do not revisit without good reason)
+- Open questions pending user input
+
+**Consult WIP.md when:**
+- Starting a new task (check if it's already planned or done)
+- About to make an architecture decision (check if it conflicts with a prior decision)
+- Implementing anything from the backlog (follow the priority order)
+- Finishing a task (update the "Complétés" section and the last-updated date)
+
 ## Build & Run Commands
 
 ```bash

@@ -69,23 +69,44 @@ public class HybridSearchService implements GraphSearchHook {
 
     @Override
     public List<EntryPoint> findEntryPoints(String query, int topK) throws SearchException {
-        Objects.requireNonNull(query, "query ne peut pas être null");
-        if (query.isBlank()) {
-            throw new IllegalArgumentException("query ne peut pas être vide");
+        return findEntryPoints(query, query, topK);
+    }
+
+    /**
+     * Variante avec queries séparées pour BM25 et embedding.
+     * Utilisée notamment avec HyDE : bm25Query = requête naturelle originale,
+     * embeddingQuery = document hypothétique généré par le LLM.
+     * Évite de passer du code Java brut au parser Lucene (caractères spéciaux).
+     *
+     * @param bm25Query      Requête pour la recherche lexicale (langage naturel)
+     * @param embeddingQuery Requête pour la recherche vectorielle (peut être un document HyDE)
+     * @param topK           Nombre de résultats à retourner
+     */
+    public List<EntryPoint> findEntryPoints(String bm25Query, String embeddingQuery, int topK) throws SearchException {
+        Objects.requireNonNull(bm25Query, "bm25Query ne peut pas être null");
+        Objects.requireNonNull(embeddingQuery, "embeddingQuery ne peut pas être null");
+        if (bm25Query.isBlank()) {
+            throw new IllegalArgumentException("bm25Query ne peut pas être vide");
+        }
+        if (embeddingQuery.isBlank()) {
+            throw new IllegalArgumentException("embeddingQuery ne peut pas être vide");
         }
         if (topK <= 0) {
             throw new IllegalArgumentException("topK doit être > 0");
         }
 
-        logger.info("Recherche hybride: query='{}', topK={}", query, topK);
+        logger.info("Recherche hybride: bm25='{}', embedding='{}...', topK={}",
+            bm25Query,
+            embeddingQuery.substring(0, Math.min(60, embeddingQuery.length())).replace('\n', ' '),
+            topK);
 
         try {
-            // Étape A : Recherche lexicale (Full-text BM25)
-            List<Long> lexicalResults = searchLexical(query, INTERMEDIATE_TOP_K);
+            // Étape A : Recherche lexicale (Full-text BM25) — requête naturelle uniquement
+            List<Long> lexicalResults = searchLexical(bm25Query, INTERMEDIATE_TOP_K);
             logger.debug("Recherche lexicale: {} résultats", lexicalResults.size());
 
-            // Étape B : Recherche vectorielle
-            List<Long> vectorResults = searchVector(query, INTERMEDIATE_TOP_K);
+            // Étape B : Recherche vectorielle — peut utiliser un document HyDE enrichi
+            List<Long> vectorResults = searchVector(embeddingQuery, INTERMEDIATE_TOP_K);
             logger.debug("Recherche vectorielle: {} résultats", vectorResults.size());
 
             // Étape C : Fusion RRF
@@ -289,7 +310,8 @@ public class HybridSearchService implements GraphSearchHook {
 
         String cypher = """
             MATCH (n)
-            WHERE id(n) IN $nodeIds AND (n:Class OR n:Method OR n:Function OR n:Interface)
+            WHERE id(n) IN $nodeIds
+              AND (n:Class OR n:Function OR n:Interface OR n:Constructor OR n:Enum OR n:Record)
             RETURN id(n) as nodeId,
                    labels(n)[0] as nodeType,
                    n.name as name,

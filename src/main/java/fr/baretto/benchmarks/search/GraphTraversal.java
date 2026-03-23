@@ -84,7 +84,8 @@ public class GraphTraversal {
             CALL {
                 WITH initial
                 MATCH path = (initial)-[%s*1..%d]-(related)
-                WHERE related:Class OR related:Method OR related:Function OR related:Interface
+                WHERE related:Class OR related:Function OR related:Interface
+                   OR related:Constructor OR related:Enum OR related:Record
                 RETURN DISTINCT related as node, length(path) as distance
             }
             RETURN id(node) as nodeId, min(distance) as minDistance
@@ -211,11 +212,16 @@ public class GraphTraversal {
             MATCH (n)
             WHERE id(n) IN $nodeIds
             RETURN
-                id(n) as nodeId,
-                labels(n)[0] as nodeType,
-                n.name as name,
-                n.fqn as fqn,
-                coalesce(n.javaDoc, '') as javaDoc
+                id(n)          AS nodeId,
+                labels(n)[0]   AS nodeType,
+                n.name         AS name,
+                n.fqn          AS fqn,
+                n.javaDoc      AS javaDoc,
+                n.body         AS body,
+                n.signature    AS signature,
+                n.returnType   AS returnType,
+                n.visibility   AS visibility,
+                n.hierarchy    AS hierarchy
             """;
 
         try (Session session = neo4jDriver.session()) {
@@ -225,19 +231,20 @@ public class GraphTraversal {
                 .map(record -> {
                     long nodeId = record.get("nodeId").asLong();
                     int distance = expandedNodes.getOrDefault(nodeId, 0);
-
-                    // Score : plus le nœud est proche, meilleur le score
                     double score = 1.0 / (1.0 + distance);
+                    String javaDoc = record.get("javaDoc").isNull() ? "" : record.get("javaDoc").asString();
 
-                    return new SubgraphNode(
-                        nodeId,
-                        record.get("nodeType").asString(),
-                        record.get("name").asString(),
-                        record.get("fqn").asString(""),
-                        record.get("javaDoc").asString(""),
-                        distance,
-                        score
-                    );
+                    Map<String, Object> props = new HashMap<>();
+                    if (!record.get("body").isNull())       props.put("body",       record.get("body").asString());
+                    if (!record.get("signature").isNull())  props.put("signature",  record.get("signature").asString());
+                    if (!record.get("returnType").isNull()) props.put("returnType", record.get("returnType").asString());
+                    if (!record.get("visibility").isNull()) props.put("visibility", record.get("visibility").asString());
+                    if (!record.get("hierarchy").isNull())  props.put("hierarchy",  record.get("hierarchy").asString());
+                    if (!javaDoc.isBlank())                 props.put("javaDoc",    javaDoc);
+
+                    return new SubgraphNode(nodeId, record.get("nodeType").asString(),
+                        record.get("name").asString(), record.get("fqn").asString(""),
+                        javaDoc, distance, score, props);
                 })
                 .collect(Collectors.toList());
 
@@ -271,11 +278,16 @@ public class GraphTraversal {
             MATCH (n)
             WHERE id(n) IN $nodeIds
             RETURN
-                id(n) as nodeId,
-                labels(n)[0] as nodeType,
-                n.name as name,
-                n.fqn as fqn,
-                coalesce(n.javaDoc, '') as javaDoc
+                id(n)          AS nodeId,
+                labels(n)[0]   AS nodeType,
+                n.name         AS name,
+                n.fqn          AS fqn,
+                n.javaDoc      AS javaDoc,
+                n.body         AS body,
+                n.signature    AS signature,
+                n.returnType   AS returnType,
+                n.visibility   AS visibility,
+                n.hierarchy    AS hierarchy
             """;
 
         try (Session session = neo4jDriver.session()) {
@@ -286,16 +298,19 @@ public class GraphTraversal {
                     long nodeId = record.get("nodeId").asLong();
                     int distance = distanceMap.getOrDefault(nodeId, 0);
                     double score = 1.0 / (1.0 + distance);
+                    String javaDoc = record.get("javaDoc").isNull() ? "" : record.get("javaDoc").asString();
 
-                    return new SubgraphNode(
-                        nodeId,
-                        record.get("nodeType").asString(),
-                        record.get("name").asString(),
-                        record.get("fqn").asString(""),
-                        record.get("javaDoc").asString(""),
-                        distance,
-                        score
-                    );
+                    Map<String, Object> props = new HashMap<>();
+                    if (!record.get("body").isNull())       props.put("body",       record.get("body").asString());
+                    if (!record.get("signature").isNull())  props.put("signature",  record.get("signature").asString());
+                    if (!record.get("returnType").isNull()) props.put("returnType", record.get("returnType").asString());
+                    if (!record.get("visibility").isNull()) props.put("visibility", record.get("visibility").asString());
+                    if (!record.get("hierarchy").isNull())  props.put("hierarchy",  record.get("hierarchy").asString());
+                    if (!javaDoc.isBlank())                 props.put("javaDoc",    javaDoc);
+
+                    return new SubgraphNode(nodeId, record.get("nodeType").asString(),
+                        record.get("name").asString(), record.get("fqn").asString(""),
+                        javaDoc, distance, score, props);
                 })
                 .collect(Collectors.toList());
 
@@ -394,6 +409,8 @@ public class GraphTraversal {
 
     /**
      * Représente un nœud dans un sous-graphe.
+     * {@code properties} contient toutes les propriétés scalaires du nœud
+     * (body, signature, returnType, visibility, hierarchy, javaDoc…).
      */
     public record SubgraphNode(
         long nodeId,
@@ -402,8 +419,16 @@ public class GraphTraversal {
         String fqn,
         String javaDoc,
         int distance,
-        double score
+        double score,
+        Map<String, Object> properties
     ) implements Comparable<SubgraphNode> {
+
+        /** Constructeur de compatibilité (sans propriétés étendues). */
+        public SubgraphNode(long nodeId, String nodeType, String name, String fqn,
+                            String javaDoc, int distance, double score) {
+            this(nodeId, nodeType, name, fqn, javaDoc, distance, score, Map.of());
+        }
+
         @Override
         public int compareTo(SubgraphNode other) {
             return Double.compare(other.score, this.score); // Décroissant

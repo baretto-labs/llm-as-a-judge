@@ -17,8 +17,11 @@ import org.neo4j.graphdb.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import dev.langchain4j.model.chat.ChatModel;
 import dev.langchain4j.model.embedding.EmbeddingModel;
 import dev.langchain4j.model.embedding.onnx.allminilml6v2.AllMiniLmL6V2EmbeddingModel;
+import dev.langchain4j.model.ollama.OllamaChatModel;
+import dev.langchain4j.model.ollama.OllamaEmbeddingModel;
 import fr.baretto.benchmarks.search.AdvancedSearchService;
 import fr.baretto.benchmarks.search.EntryPoint;
 import fr.baretto.benchmarks.search.SearchException;
@@ -26,6 +29,7 @@ import fr.baretto.benchmarks.search.SearchException;
 import java.io.IOException;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -66,11 +70,25 @@ public class Neo4jGraphRagStrategy implements RagStrategy {
     private boolean initialized = false;
     private final String dbPath;
 
+    // Feature flags — contrôlent les optimisations actives pour ce run
+    private final FeatureFlags flags;
+
     // Pipeline de recherche hybride (bolt + embeddings)
     private Driver boltDriver;
     private EmbeddingModel embeddingModel;
+    private int embeddingDimensions = 768; // mis à jour dynamiquement à l'init
+    private ChatModel hydeModel;           // optionnel, pour HyDE query expansion
     private AdvancedSearchService advancedSearchService;
     private int boltPort = -1;
+
+    /** Nom du modèle d'embedding Ollama (configurable via -Drag.embedding.model=). */
+    private static final String OLLAMA_BASE_URL       = System.getProperty("rag.ollama.url",   "http://localhost:11434");
+    private static final String EMBEDDING_MODEL_NAME  = System.getProperty("rag.embedding.model", "nomic-embed-text");
+    private static final String HYDE_MODEL_NAME       = System.getProperty("rag.hyde.model",   "qwen2.5:7b");
+
+    /** Budget de tokens par chunk de contexte (estimation chars/4). Configurable via -Drag.context.tokens.per.chunk= */
+    private static final int TOKENS_PER_CHUNK = Integer.parseInt(System.getProperty("rag.context.tokens.per.chunk", "1500"));
+    private static final int CHARS_PER_CHUNK  = TOKENS_PER_CHUNK * 4;
 
     // Types de relations dans le graphe
     private enum RelationType implements RelationshipType {
@@ -104,15 +122,26 @@ public class Neo4jGraphRagStrategy implements RagStrategy {
     private static final String LABEL_PROJECT = "Project";
 
     public Neo4jGraphRagStrategy() {
-        this(DB_PATH);
+        this(DB_PATH, FeatureFlags.hybridGraph());
     }
 
     /**
-     * Constructeur avec chemin de base de données personnalisé (utile pour les tests).
+     * Constructeur avec chemin personnalisé (tests) — preset {@code hybrid-graph} par défaut.
      */
     public Neo4jGraphRagStrategy(String customDbPath) {
+        this(customDbPath, FeatureFlags.hybridGraph());
+    }
+
+    /**
+     * Constructeur principal avec feature flags explicites.
+     *
+     * @param customDbPath Chemin de la base Neo4j embedded
+     * @param flags        Feature flags contrôlant les optimisations actives
+     */
+    public Neo4jGraphRagStrategy(String customDbPath, FeatureFlags flags) {
         this.dbPath = customDbPath;
-        logger.info("Stratégie Neo4j GraphRAG créée avec chemin: {} (initialisation lazy)", dbPath);
+        this.flags  = flags;
+        logger.info("Stratégie Neo4j GraphRAG créée (chemin={}, preset={})", dbPath, flags.presetName());
     }
 
     /**
@@ -192,10 +221,11 @@ public class Neo4jGraphRagStrategy implements RagStrategy {
 
     /**
      * Initialise le driver bolt et les services de recherche hybride.
+     * Utilise nomic-embed-text via Ollama par défaut (768 dims, bien meilleur que AllMiniLm 384d pour le code).
+     * Fallback sur AllMiniLmL6V2 local si Ollama est indisponible.
      */
     private void initSearchPipeline() {
         try {
-            // Petit délai pour que le connector bolt soit prêt
             Thread.sleep(500);
 
             boltDriver = GraphDatabase.driver(
@@ -204,13 +234,71 @@ public class Neo4jGraphRagStrategy implements RagStrategy {
             );
             boltDriver.verifyConnectivity();
 
-            embeddingModel = new AllMiniLmL6V2EmbeddingModel();
-            advancedSearchService = new AdvancedSearchService(boltDriver, embeddingModel);
+            embeddingModel = buildEmbeddingModel(); // also sets embeddingDimensions as side-effect
 
-            logger.info("Pipeline de recherche hybride initialisé (bolt://localhost:{})", boltPort);
+            // Modèle HyDE : construit seulement si le flag le demande
+            hydeModel = flags.hydeEnabled() ? buildHydeModel() : null;
+
+            // AdvancedSearchService configuré selon les feature flags
+            advancedSearchService = new AdvancedSearchService(
+                boltDriver,
+                embeddingModel,
+                flags.rerankingEnabled() ? hydeModel : null,
+                flags.graphExpansionEnabled(),
+                flags.rerankingEnabled(),
+                flags.kHops(),
+                flags.rrfK()
+            );
+
+            logger.info("Pipeline hybride initialisé (bolt://localhost:{}, embedding={} [{}d], hyde={})",
+                boltPort, EMBEDDING_MODEL_NAME, embeddingDimensions, hydeModel != null ? HYDE_MODEL_NAME : "off");
         } catch (Exception e) {
             logger.warn("Pipeline hybride non disponible (bolt inaccessible): {}", e.getMessage());
-            // Pas fatal : retrieveContext basculera sur la recherche par mots-clés
+        }
+    }
+
+    /**
+     * Builds the embedding model and detects dimensions in a single probe call.
+     * Uses a 10-second timeout to prevent blocking startup if Ollama is slow.
+     * Sets {@link #embeddingDimensions} as a side-effect.
+     */
+    private EmbeddingModel buildEmbeddingModel() {
+        try {
+            EmbeddingModel ollama = OllamaEmbeddingModel.builder()
+                .baseUrl(OLLAMA_BASE_URL)
+                .modelName(EMBEDDING_MODEL_NAME)
+                .timeout(Duration.ofSeconds(10))
+                .build();
+            float[] probe = ollama.embed("probe").content().vector();
+            embeddingDimensions = probe.length;
+            logger.info("Embedding model: {} (Ollama, {}d)", EMBEDDING_MODEL_NAME, embeddingDimensions);
+            return ollama;
+        } catch (Exception e) {
+            logger.warn("Ollama indisponible pour les embeddings ({}), fallback AllMiniLmL6V2", e.getMessage());
+            embeddingDimensions = 384;
+            return new AllMiniLmL6V2EmbeddingModel();
+        }
+    }
+
+    /**
+     * Builds the HyDE chat model lazily — no connectivity check at init.
+     * OllamaChatModel.builder().build() is non-blocking; actual calls happen at query time
+     * where applyHyde() already handles failures gracefully.
+     * This way HyDE works even if Ollama is temporarily down at startup.
+     */
+    private ChatModel buildHydeModel() {
+        try {
+            ChatModel model = OllamaChatModel.builder()
+                .baseUrl(OLLAMA_BASE_URL)
+                .modelName(HYDE_MODEL_NAME)
+                .timeout(Duration.ofSeconds(15))
+                .temperature(0.3)
+                .build();
+            logger.info("HyDE model: {} (Ollama, lazy)", HYDE_MODEL_NAME);
+            return model;
+        } catch (Exception e) {
+            logger.warn("HyDE désactivé (impossible de construire le modèle {}: {})", HYDE_MODEL_NAME, e.getMessage());
+            return null;
         }
     }
 
@@ -224,22 +312,23 @@ public class Neo4jGraphRagStrategy implements RagStrategy {
             runIgnoreError(session, "CREATE FULLTEXT INDEX codeFullText IF NOT EXISTS FOR (n:Class) ON EACH [n.name, n.javaDoc]");
             runIgnoreError(session, "CREATE FULLTEXT INDEX codeFullTextFunction IF NOT EXISTS FOR (n:Function) ON EACH [n.name, n.javaDoc]");
             runIgnoreError(session, "CREATE FULLTEXT INDEX codeFullTextInterface IF NOT EXISTS FOR (n:Interface) ON EACH [n.name, n.javaDoc]");
+            runIgnoreError(session, "CREATE FULLTEXT INDEX codeFullTextConstructor IF NOT EXISTS FOR (n:Constructor) ON EACH [n.name, n.javaDoc]");
+            runIgnoreError(session, "CREATE FULLTEXT INDEX codeFullTextEnum IF NOT EXISTS FOR (n:Enum) ON EACH [n.name, n.javaDoc]");
+            runIgnoreError(session, "CREATE FULLTEXT INDEX codeFullTextRecord IF NOT EXISTS FOR (n:Record) ON EACH [n.name, n.javaDoc]");
 
-            runIgnoreError(session, """
-                CREATE VECTOR INDEX codeVector IF NOT EXISTS
-                FOR (n:Class) ON n.embedding
-                OPTIONS {indexConfig: {`vector.dimensions`: 384, `vector.similarity_function`: 'cosine'}}
-                """);
-            runIgnoreError(session, """
-                CREATE VECTOR INDEX codeVectorFunction IF NOT EXISTS
-                FOR (n:Function) ON n.embedding
-                OPTIONS {indexConfig: {`vector.dimensions`: 384, `vector.similarity_function`: 'cosine'}}
-                """);
-            runIgnoreError(session, """
-                CREATE VECTOR INDEX codeVectorInterface IF NOT EXISTS
-                FOR (n:Interface) ON n.embedding
-                OPTIONS {indexConfig: {`vector.dimensions`: 384, `vector.similarity_function`: 'cosine'}}
-                """);
+            int d = embeddingDimensions;
+            runIgnoreError(session, ("CREATE VECTOR INDEX codeVector IF NOT EXISTS FOR (n:Class) ON n.embedding " +
+                "OPTIONS {indexConfig: {`vector.dimensions`: %d, `vector.similarity_function`: 'cosine'}}").formatted(d));
+            runIgnoreError(session, ("CREATE VECTOR INDEX codeVectorFunction IF NOT EXISTS FOR (n:Function) ON n.embedding " +
+                "OPTIONS {indexConfig: {`vector.dimensions`: %d, `vector.similarity_function`: 'cosine'}}").formatted(d));
+            runIgnoreError(session, ("CREATE VECTOR INDEX codeVectorInterface IF NOT EXISTS FOR (n:Interface) ON n.embedding " +
+                "OPTIONS {indexConfig: {`vector.dimensions`: %d, `vector.similarity_function`: 'cosine'}}").formatted(d));
+            runIgnoreError(session, ("CREATE VECTOR INDEX codeVectorConstructor IF NOT EXISTS FOR (n:Constructor) ON n.embedding " +
+                "OPTIONS {indexConfig: {`vector.dimensions`: %d, `vector.similarity_function`: 'cosine'}}").formatted(d));
+            runIgnoreError(session, ("CREATE VECTOR INDEX codeVectorEnum IF NOT EXISTS FOR (n:Enum) ON n.embedding " +
+                "OPTIONS {indexConfig: {`vector.dimensions`: %d, `vector.similarity_function`: 'cosine'}}").formatted(d));
+            runIgnoreError(session, ("CREATE VECTOR INDEX codeVectorRecord IF NOT EXISTS FOR (n:Record) ON n.embedding " +
+                "OPTIONS {indexConfig: {`vector.dimensions`: %d, `vector.similarity_function`: 'cosine'}}").formatted(d));
 
             Thread.sleep(2000);
             logger.info("Index fulltext et vecteur créés");
@@ -258,35 +347,94 @@ public class Neo4jGraphRagStrategy implements RagStrategy {
 
     /**
      * Génère et stocke les embeddings pour tous les nœuds Class/Function/Interface.
+     *
+     * <p>Stratégie batch en 3 étapes pour éviter N sessions bolt et timeouts de curseur :</p>
+     * <ol>
+     *   <li>Lecture unique : collecte tous les (nodeId, text) en mémoire, ferme le curseur.</li>
+     *   <li>Embedding : appel {@code embedAll()} pour bénéficier du batch Ollama si disponible,
+     *       sinon fallback séquentiel.</li>
+     *   <li>Écriture batch : {@code UNWIND $batch} par tranches de {@value #EMBED_BATCH_SIZE}
+     *       pour réduire les round-trips bolt de N à N/50.</li>
+     * </ol>
      */
+    private static final int EMBED_BATCH_SIZE = 50;
+
     private void indexEmbeddings() {
         if (boltDriver == null || embeddingModel == null) return;
         logger.info("=== PHASE 5: EMBEDDING ===");
 
+        // ── Étape 1 : lire tous les nœuds (curseur ouvert puis fermé proprement) ──
+        record NodeText(long id, String text) {}
+        List<NodeText> nodes = new ArrayList<>();
+
         try (Session session = boltDriver.session()) {
             var result = session.run(
-                "MATCH (n) WHERE n:Class OR n:Function OR n:Interface " +
-                "RETURN id(n) as nodeId, n.name as name, coalesce(n.javaDoc, '') as javaDoc"
+                "MATCH (n) WHERE n:Class OR n:Function OR n:Interface OR n:Constructor OR n:Enum OR n:Record " +
+                "RETURN id(n) as nodeId, n.name as name, coalesce(n.javaDoc,'') as javaDoc, " +
+                "coalesce(n.signature,'') as signature, n.body as body"
             );
-
-            int count = 0;
             while (result.hasNext()) {
                 var record = result.next();
-                long nodeId = record.get("nodeId").asLong();
-                String text = record.get("name").asString("") + " " + record.get("javaDoc").asString("");
-
-                float[] vector = embeddingModel.embed(text).content().vector();
-
-                session.run(
-                    "MATCH (n) WHERE id(n) = $id SET n.embedding = $embedding",
-                    Map.of("id", nodeId, "embedding", vector)
-                );
-                count++;
+                long nodeId  = record.get("nodeId").asLong();
+                String name  = record.get("name").asString("");
+                String doc   = record.get("javaDoc").asString("");
+                String sig   = record.get("signature").asString("");
+                String raw   = record.get("body").isNull() ? "" : record.get("body").asString("");
+                String body  = raw.length() > 512 ? raw.substring(0, 512) : raw;
+                nodes.add(new NodeText(nodeId, (name + " " + doc + " " + sig + " " + body).strip()));
             }
-            logger.info("✅ {} embeddings générés et stockés", count);
         } catch (Exception e) {
-            logger.warn("Erreur lors de l'indexation des embeddings: {}", e.getMessage());
+            logger.warn("Erreur lecture nœuds pour embeddings: {}", e.getMessage());
+            return;
         }
+
+        if (nodes.isEmpty()) { logger.info("Aucun nœud à embedder"); return; }
+        logger.info("{} nœuds à embedder (batch={})", nodes.size(), EMBED_BATCH_SIZE);
+
+        // ── Étape 2 : embedAll() (batch Ollama si dispo) ──
+        List<dev.langchain4j.data.embedding.Embedding> embeddings;
+        try {
+            List<dev.langchain4j.data.segment.TextSegment> segments = nodes.stream()
+                .map(n -> dev.langchain4j.data.segment.TextSegment.from(n.text()))
+                .collect(Collectors.toList());
+            embeddings = embeddingModel.embedAll(segments).content();
+        } catch (Exception e) {
+            logger.warn("embedAll() non supporté ({}), fallback séquentiel", e.getMessage());
+            embeddings = new ArrayList<>();
+            for (NodeText n : nodes) {
+                try { embeddings.add(embeddingModel.embed(n.text()).content()); }
+                catch (Exception ex) { embeddings.add(null); }
+            }
+        }
+
+        // ── Étape 3 : écriture batch UNWIND par tranches ──
+        int count = 0;
+        try (Session session = boltDriver.session()) {
+            List<Map<String, Object>> batch = new ArrayList<>(EMBED_BATCH_SIZE);
+            for (int i = 0; i < nodes.size(); i++) {
+                dev.langchain4j.data.embedding.Embedding emb = embeddings.get(i);
+                if (emb == null) continue;
+                batch.add(Map.of("id", nodes.get(i).id(), "emb", emb.vector()));
+                count++;
+                if (batch.size() >= EMBED_BATCH_SIZE) {
+                    session.run(
+                        "UNWIND $batch AS item MATCH (n) WHERE id(n) = item.id SET n.embedding = item.emb",
+                        Map.of("batch", batch)
+                    );
+                    batch.clear();
+                }
+            }
+            if (!batch.isEmpty()) {
+                session.run(
+                    "UNWIND $batch AS item MATCH (n) WHERE id(n) = item.id SET n.embedding = item.emb",
+                    Map.of("batch", batch)
+                );
+            }
+        } catch (Exception e) {
+            logger.warn("Erreur écriture batch embeddings: {}", e.getMessage());
+        }
+        logger.info("✅ {} embeddings générés et stockés (batch write, {} round-trips)",
+            count, (count + EMBED_BATCH_SIZE - 1) / EMBED_BATCH_SIZE);
     }
 
     /**
@@ -1541,129 +1689,253 @@ public class Neo4jGraphRagStrategy implements RagStrategy {
     }
 
     /**
-     * Recherche hybride : BM25 fulltext + vecteur + expansion graphe K-hop.
+     * Recherche hybride : HyDE → BM25 fulltext + vecteur + expansion graphe K-hop.
+     * Si un modèle HyDE est disponible, la requête brute est transformée en document
+     * hypothétique avant d'être embedée, améliorant significativement le recall.
      */
     private List<String> retrieveContextHybrid(String query) throws SearchException {
-        List<EntryPoint> entryPoints = advancedSearchService.findEntryPoints(query, 5);
-        logger.info("Recherche hybride : {} points d'entrée trouvés", entryPoints.size());
+        // HyDE enrichit uniquement le vecteur — la query BM25 reste en langage naturel
+        // pour éviter que le code Java généré ne casse le parser Lucene/Neo4j fulltext.
+        String embeddingQuery = applyHyde(query);
+        List<EntryPoint> entryPoints = advancedSearchService.findEntryPoints(query, embeddingQuery, 5);
+        logger.info("Recherche hybride : {} points d'entrée trouvés (hyde={}, embeddingQuery={} chars)",
+            entryPoints.size(), hydeModel != null, embeddingQuery.length());
 
-        return entryPoints.stream()
-            .map(ep -> formatEntryPointAsContext(ep))
-            .collect(Collectors.toList());
+        try (Session session = boltDriver.session()) {
+            return entryPoints.stream()
+                .map(ep -> formatEntryPointAsContext(ep, session))
+                .collect(Collectors.toList());
+        }
+    }
+
+    /**
+     * HyDE (Hypothetical Document Embeddings) — Gao et al., 2022.
+     * Génère un snippet Java hypothétique qui répondrait à la question, puis l'utilise
+     * comme requête d'embedding. Comble le vocabulaire gap entre question naturelle et code.
+     * Si le modèle est indisponible ou lent, retourne la requête originale.
+     */
+    private String applyHyde(String query) {
+        if (hydeModel == null) return query;
+        try {
+            String hydePrompt = """
+                You are a Java expert. Write a short Java code snippet (class or method body, max 20 lines)
+                that would directly answer or implement the following question.
+                Do NOT explain, just output the code snippet.
+
+                Question: %s
+                """.formatted(query);
+            String hypothetical = hydeModel.chat(hydePrompt);
+            logger.debug("HyDE: generated {} chars for query '{}'", hypothetical.length(), query);
+            // Combiner la requête originale + le document hypothétique pour ne rien perdre
+            return query + "\n" + hypothetical;
+        } catch (Exception e) {
+            logger.debug("HyDE échoué, requête originale utilisée: {}", e.getMessage());
+            return query;
+        }
     }
 
     /**
      * Formate un EntryPoint comme chunk de contexte pour le LLM.
-     * Enrichit avec le contenu du fichier source si disponible.
+     * Expose toutes les relations du graphe pertinentes pour le type de nœud.
+     * La session bolt est partagée sur tous les entry points pour éviter le N+1.
+     * Le résultat est tronqué à {@link #CHARS_PER_CHUNK} caractères (token budget).
      */
-    private String formatEntryPointAsContext(EntryPoint ep) {
+    private String formatEntryPointAsContext(EntryPoint ep, Session session) {
         StringBuilder ctx = new StringBuilder();
         ctx.append(String.format("=== %s [%s] ===\n", ep.fqn(), ep.nodeType()));
 
-        String visibility = (String) ep.properties().get("visibility");
-        String returnType = (String) ep.properties().get("returnType");
-        String signature  = (String) ep.properties().get("signature");
-        String javaDoc    = (String) ep.properties().get("javaDoc");
-        String body       = (String) ep.properties().get("body");
-        String hierarchy  = (String) ep.properties().get("hierarchy");
+        appendScalarProps(ctx, ep);
 
-        if (hierarchy != null && !hierarchy.isBlank()) {
-            ctx.append("Hierarchy: ").append(hierarchy).append("\n");
-        }
-        if (visibility != null && !visibility.isBlank()) {
-            ctx.append("Visibility: ").append(visibility).append("\n");
-        }
-        if (returnType != null && !returnType.isBlank()) {
-            ctx.append("Returns: ").append(returnType).append("\n");
-        }
-        if (signature != null && !signature.isBlank()) {
-            ctx.append("Signature: ").append(signature).append("\n");
-        }
-        if (javaDoc != null && !javaDoc.isBlank()) {
-            ctx.append("Documentation: ").append(javaDoc).append("\n");
+        try {
+            if ("Function".equals(ep.nodeType()) || "Constructor".equals(ep.nodeType())) {
+                appendFunctionRelations(ctx, ep, session);
+            } else if ("Class".equals(ep.nodeType()) || "Interface".equals(ep.nodeType())
+                    || "Enum".equals(ep.nodeType()) || "Record".equals(ep.nodeType())) {
+                appendClassRelations(ctx, ep, session);
+            }
+        } catch (Exception e) {
+            logger.debug("Impossible d'enrichir le contexte pour {}: {}", ep.fqn(), e.getMessage());
         }
 
+        String result = ctx.toString();
+        if (result.length() > CHARS_PER_CHUNK) {
+            result = result.substring(0, CHARS_PER_CHUNK) + "\n[... truncated to token budget ...]\n";
+        }
+        return result;
+    }
+
+    /** Propriétés scalaires communes à tous les nœuds. */
+    private void appendScalarProps(StringBuilder ctx, EntryPoint ep) {
+        append(ctx, "Hierarchy",      ep.properties().get("hierarchy"));
+        append(ctx, "Visibility",     ep.properties().get("visibility"));
+        append(ctx, "Returns",        ep.properties().get("returnType"));
+        append(ctx, "Signature",      ep.properties().get("signature"));
+        append(ctx, "Documentation",  ep.properties().get("javaDoc"));
+
+        String body = (String) ep.properties().get("body");
         if (body != null && !body.isBlank()) {
+            // Reserve at least half the budget for graph relations written after this.
+            int bodyBudget = CHARS_PER_CHUNK / 2;
+            if (body.length() > bodyBudget) {
+                body = body.substring(0, bodyBudget) + "\n// [body truncated]";
+            }
             ctx.append("Body:\n").append(body).append("\n");
-        } else if ("Class".equals(ep.nodeType()) || "Interface".equals(ep.nodeType())) {
-            // Pour les classes : lister les méthodes déclarées via le graphe
-            try (Session session = boltDriver.session()) {
-                var result = session.run("""
-                    MATCH (n)-[:DECLARES]->(m:Function)
-                    WHERE id(n) = $id
-                    RETURN m.signature as sig, m.visibility as vis, m.returnType as ret
-                    ORDER BY m.name
-                    """, Map.of("id", ep.nodeId()));
-                List<String> methods = new ArrayList<>();
-                while (result.hasNext()) {
-                    var r = result.next();
-                    String sig = r.get("sig").asString(null);
-                    if (sig != null) methods.add("  " + sig);
-                }
-                if (!methods.isEmpty()) {
-                    ctx.append("Declared methods:\n");
-                    methods.forEach(ctx::append);
-                    ctx.append("\n");
-                }
-            } catch (Exception e) {
-                logger.debug("Impossible de récupérer les méthodes pour {}: {}", ep.fqn(), e.getMessage());
-            }
         }
-
-        // Callers : qui appelle cette méthode ?
-        if ("Function".equals(ep.nodeType())) {
-            try (Session session = boltDriver.session()) {
-                var result = session.run("""
-                    MATCH (caller:Function)-[:CALLS]->(n)
-                    WHERE id(n) = $id
-                    RETURN caller.fqn as callerFqn
-                    LIMIT 10
-                    """, Map.of("id", ep.nodeId()));
-                List<String> callers = new ArrayList<>();
-                while (result.hasNext()) {
-                    callers.add(result.next().get("callerFqn").asString("?"));
-                }
-                if (!callers.isEmpty()) {
-                    ctx.append("Called by:\n");
-                    callers.forEach(c -> ctx.append("  - ").append(c).append("\n"));
-                }
-            } catch (Exception e) {
-                logger.debug("Impossible de récupérer les callers pour {}: {}", ep.fqn(), e.getMessage());
-            }
-        }
-
-        return ctx.toString();
     }
 
     /**
-     * Fallback : recherche par mots-clés Cypher (comportement original).
+     * Pour un nœud Function/Constructor : sérialise les relations sous forme de chemins texte.
+     * Format path verbalization (G-RAG, 2024) :
+     *   caller.fqn -[CALLS]-> this.fqn  /  this.fqn -[CALLS]-> callee.fqn
+     * Les LLMs comprennent mieux ce format que des listes de propriétés séparées.
+     */
+    private void appendFunctionRelations(StringBuilder ctx, EntryPoint ep, Session session) {
+        var result = session.run("""
+            MATCH (n) WHERE id(n) = $id
+            OPTIONAL MATCH (n)-[:ANNOTATED_WITH]->(ann)
+            OPTIONAL MATCH (n)-[:HAS_PARAMETER]->(p)-[:USES]->(pt)
+            OPTIONAL MATCH (n)-[:CALLS]->(callee:Function)
+            OPTIONAL MATCH (caller:Function)-[:CALLS]->(n)
+            RETURN
+              collect(DISTINCT ann.name)                        AS annotations,
+              collect(DISTINCT p.name + ': ' + pt.name)        AS params,
+              collect(DISTINCT callee.fqn)                     AS callees,
+              collect(DISTINCT caller.fqn)                     AS callers
+            """, Map.of("id", ep.nodeId()));
+
+        if (!result.hasNext()) return;
+        var row = result.next();
+        String fqn = ep.fqn();
+
+        appendList(ctx, "Annotations", row.get("annotations").asList(v -> v.asString()));
+        appendList(ctx, "Parameters",  row.get("params").asList(v -> v.asString()));
+
+        // Path verbalization
+        List<String> callees = row.get("callees").asList(v -> v.asString())
+            .stream().filter(s -> s != null && !s.isBlank()).toList();
+        List<String> callers = row.get("callers").asList(v -> v.asString())
+            .stream().filter(s -> s != null && !s.isBlank()).toList();
+
+        if (!callees.isEmpty() || !callers.isEmpty()) {
+            ctx.append("Graph paths:\n");
+            callers.forEach(c -> ctx.append("  ").append(c).append(" -[CALLS]-> ").append(fqn).append("\n"));
+            callees.forEach(c -> ctx.append("  ").append(fqn).append(" -[CALLS]-> ").append(c).append("\n"));
+        }
+    }
+
+    /**
+     * Pour un nœud Class/Interface/Enum/Record : sérialise les relations sous forme de chemins texte.
+     * Hiérarchie d'héritage, sous-classes, membres déclarés.
+     */
+    private void appendClassRelations(StringBuilder ctx, EntryPoint ep, Session session) {
+        var result = session.run("""
+            MATCH (n) WHERE id(n) = $id
+            OPTIONAL MATCH (n)-[:ANNOTATED_WITH]->(ann)
+            OPTIONAL MATCH (n)-[:DECLARES]->(f:Property)
+            OPTIONAL MATCH (n)-[:DECLARES]->(m:Function)
+            OPTIONAL MATCH (n)-[:EXTENDS]->(parent)
+            OPTIONAL MATCH (n)-[:IMPLEMENTS]->(iface)
+            OPTIONAL MATCH (sub)-[:EXTENDS]->(n)
+            RETURN
+              collect(DISTINCT ann.name)                                AS annotations,
+              collect(DISTINCT f.visibility + ' ' + f.name)            AS fields,
+              collect(DISTINCT m.signature)                             AS methods,
+              collect(DISTINCT coalesce(parent.fqn, parent.name))      AS parents,
+              collect(DISTINCT coalesce(iface.fqn, iface.name))        AS interfaces,
+              collect(DISTINCT coalesce(sub.fqn, sub.name))            AS subclasses
+            """, Map.of("id", ep.nodeId()));
+
+        if (!result.hasNext()) return;
+        var row = result.next();
+        String fqn = ep.fqn();
+
+        appendList(ctx, "Annotations", row.get("annotations").asList(v -> v.asString()));
+
+        // Path verbalization — hiérarchie
+        List<String> parents    = row.get("parents").asList(v -> v.asString())
+            .stream().filter(s -> s != null && !s.isBlank()).toList();
+        List<String> interfaces = row.get("interfaces").asList(v -> v.asString())
+            .stream().filter(s -> s != null && !s.isBlank()).toList();
+        List<String> subclasses = row.get("subclasses").asList(v -> v.asString())
+            .stream().filter(s -> s != null && !s.isBlank()).toList();
+
+        if (!parents.isEmpty() || !interfaces.isEmpty() || !subclasses.isEmpty()) {
+            ctx.append("Inheritance paths:\n");
+            parents.forEach(p    -> ctx.append("  ").append(fqn).append(" -[EXTENDS]-> ").append(p).append("\n"));
+            interfaces.forEach(i -> ctx.append("  ").append(fqn).append(" -[IMPLEMENTS]-> ").append(i).append("\n"));
+            subclasses.forEach(s -> ctx.append("  ").append(s).append(" -[EXTENDS]-> ").append(fqn).append("\n"));
+        }
+
+        // Membres déclarés
+        appendList(ctx, "Fields",           row.get("fields").asList(v -> v.asString()));
+        appendList(ctx, "Declared methods", row.get("methods").asList(v -> v.asString()));
+    }
+
+    private void append(StringBuilder ctx, String label, Object value) {
+        if (value instanceof String s && !s.isBlank()) {
+            ctx.append(label).append(": ").append(s).append("\n");
+        }
+    }
+
+    private void appendList(StringBuilder ctx, String label, List<?> items) {
+        List<?> nonNull = items.stream().filter(i -> i != null && !i.toString().isBlank()).toList();
+        if (nonNull.isEmpty()) return;
+        ctx.append(label).append(":\n");
+        nonNull.forEach(i -> ctx.append("  - ").append(i).append("\n"));
+    }
+
+    /**
+     * Fallback : recherche par mots-clés Cypher sur les entités du graphe.
+     * Retourne le même format structuré que le chemin hybride.
      */
     private List<String> retrieveContextKeywords(String query) {
-        logger.info("Recherche par mots-clés pour: {}", query);
+        logger.info("Recherche par mots-clés (fallback graphe) pour: {}", query);
         List<String> results = new ArrayList<>();
 
         try (Transaction tx = graphDb.beginTx()) {
             List<String> keywords = extractKeywords(query);
-            String cypher = buildSearchQuery(keywords);
-            var result = tx.execute(cypher);
+            if (keywords.isEmpty()) return results;
 
+            // Construire les conditions de filtrage sur les entités (pas les fichiers)
+            List<String> conditions = new ArrayList<>();
+            for (String kw : keywords) {
+                String safe = kw.replace("'", "\\'");
+                conditions.add(String.format(
+                    "(toLower(n.name) CONTAINS toLower('%s') OR toLower(coalesce(n.javaDoc,'')) CONTAINS toLower('%s'))",
+                    safe, safe));
+            }
+            String whereClause = String.join(" OR ", conditions);
+
+            String cypher = String.format("""
+                MATCH (n)
+                WHERE (n:Class OR n:Function OR n:Interface OR n:Constructor OR n:Enum OR n:Record)
+                  AND (%s)
+                RETURN n
+                LIMIT 5
+                """, whereClause);
+
+            var result = tx.execute(cypher);
             while (result.hasNext()) {
                 var row = result.next();
-                Node fileNode = (Node) row.get("file");
-                String filePath = (String) fileNode.getProperty("path");
-                String content = (String) fileNode.getProperty("content");
-                Object scoreObj = row.get("score");
-                double score = scoreObj instanceof Long ?
-                    ((Long) scoreObj).doubleValue() : ((Number) scoreObj).doubleValue();
+                Node n = (Node) row.get("n");
 
-                results.add(String.format("=== %s (score: %.2f) ===\n%s\n", filePath, score, content));
+                String fqn  = n.hasProperty("fqn")  ? (String) n.getProperty("fqn")  : (String) n.getProperty("name", "?");
+                String type = n.getLabels().iterator().next().name();
+
+                StringBuilder ctx = new StringBuilder();
+                ctx.append(String.format("=== %s [%s] ===\n", fqn, type));
+                if (n.hasProperty("visibility"))  ctx.append("Visibility: ").append(n.getProperty("visibility")).append("\n");
+                if (n.hasProperty("hierarchy"))   ctx.append("Hierarchy: ").append(n.getProperty("hierarchy")).append("\n");
+                if (n.hasProperty("returnType"))  ctx.append("Returns: ").append(n.getProperty("returnType")).append("\n");
+                if (n.hasProperty("signature"))   ctx.append("Signature: ").append(n.getProperty("signature")).append("\n");
+                if (n.hasProperty("javaDoc"))     ctx.append("Documentation: ").append(n.getProperty("javaDoc")).append("\n");
+                if (n.hasProperty("body"))        ctx.append("Body:\n").append(n.getProperty("body")).append("\n");
+                results.add(ctx.toString());
             }
             tx.commit();
-
-            if (results.size() > 5) results = results.subList(0, 5);
-            logger.info("Trouvé {} fichiers pertinents (mots-clés)", results.size());
+            logger.info("Trouvé {} entités pertinentes (mots-clés fallback)", results.size());
         } catch (Exception e) {
-            logger.error("Erreur recherche mots-clés", e);
+            logger.error("Erreur recherche mots-clés fallback", e);
         }
 
         return results;
@@ -1795,7 +2067,7 @@ public class Neo4jGraphRagStrategy implements RagStrategy {
 
     @Override
     public String getStrategyName() {
-        return "GraphRAG (Neo4j Embedded)";
+        return "GraphRAG/" + flags.presetName();
     }
 
     @Override
@@ -3142,6 +3414,24 @@ public class Neo4jGraphRagStrategy implements RagStrategy {
 
             if (cls.modifiers != null && !cls.modifiers.isEmpty()) {
                 classNode.setProperty("modifiers", String.join(",", cls.modifiers));
+            }
+
+            // Corriger le label : le stub est toujours créé avec Class,
+            // mais la vraie entité peut être Interface/Enum/Record.
+            String correctLabel = switch (cls.type) {
+                case "interface"   -> LABEL_INTERFACE;
+                case "enum"        -> LABEL_ENUM;
+                case "record"      -> LABEL_RECORD;
+                case "@interface"  -> LABEL_ANNOTATION_TYPE;
+                default            -> LABEL_CLASS;
+            };
+            org.neo4j.graphdb.Label correct = org.neo4j.graphdb.Label.label(correctLabel);
+            if (!classNode.hasLabel(correct)) {
+                classNode.addLabel(correct);
+                // Retirer le label Class erroné si ce n'est pas une classe
+                if (!LABEL_CLASS.equals(correctLabel)) {
+                    classNode.removeLabel(org.neo4j.graphdb.Label.label(LABEL_CLASS));
+                }
             }
 
             // Enlever le marqueur stub s'il existe
