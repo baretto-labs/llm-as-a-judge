@@ -2,6 +2,8 @@ package fr.baretto.benchmarks.strategy;
 
 import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.CompilationUnit;
+import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
+import com.github.javaparser.ast.body.EnumDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.body.TypeDeclaration;
 import dev.langchain4j.model.embedding.EmbeddingModel;
@@ -155,9 +157,27 @@ public class LuceneRagStrategy implements RagStrategy {
                         ? type.getNameAsString()
                         : packageName + "." + type.getNameAsString();
 
-                // Chunk classe : résumé structurel
+                // Chunk classe : déclaration complète (kind + extends + implements) + champs + signatures
                 StringBuilder classChunk = new StringBuilder();
-                classChunk.append("Type: ").append(fqn).append("\n");
+                String kind = "class";
+                String extendsStr = "";
+                String implementsStr = "";
+                if (type instanceof ClassOrInterfaceDeclaration coid) {
+                    kind = coid.isInterface() ? "interface" : "class";
+                    if (!coid.getExtendedTypes().isEmpty())
+                        extendsStr = " extends " + coid.getExtendedTypes().stream()
+                            .map(t -> t.getNameAsString()).collect(Collectors.joining(", "));
+                    if (!coid.getImplementedTypes().isEmpty())
+                        implementsStr = " implements " + coid.getImplementedTypes().stream()
+                            .map(t -> t.getNameAsString()).collect(Collectors.joining(", "));
+                } else if (type instanceof EnumDeclaration ed) {
+                    kind = "enum";
+                    if (!ed.getImplementedTypes().isEmpty())
+                        implementsStr = " implements " + ed.getImplementedTypes().stream()
+                            .map(t -> t.getNameAsString()).collect(Collectors.joining(", "));
+                }
+                classChunk.append("Type: ").append(kind).append(" ").append(fqn)
+                          .append(extendsStr).append(implementsStr).append("\n");
                 type.getComment().ifPresent(c -> classChunk.append("Doc: ").append(c.getContent().strip()).append("\n"));
                 type.getFields().forEach(f -> classChunk.append("Field: ").append(f.toString().strip()).append("\n"));
                 type.getMethods().forEach(m -> {

@@ -7,6 +7,7 @@ import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.infra.Blackhole;
 
 import java.io.IOException;
+import java.util.Locale;
 import java.lang.management.ManagementFactory;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -352,7 +353,7 @@ public class RetrievalBenchmark {
         double avgScore    = valid.stream().mapToInt(LLMJudge.JudgementResult::score).average().orElse(-1);
         double avgCoverage = valid.stream().mapToDouble(LLMJudge.JudgementResult::hintCoverage).average().orElse(-1);
         double unknownRate = (double) valid.stream().filter(LLMJudge.JudgementResult::suggestsUnknown).count() / valid.size();
-        sb.append(String.format(
+        sb.append(String.format(Locale.ROOT,
             "{\"ts\":\"%s\",\"strategy\":\"%s\",\"scenario\":\"%s\",\"fileCount\":%d," +
             "\"difficulty\":\"%s\",\"avgScore\":%.2f,\"avgHintCoverage\":%.3f,\"unknownRate\":%.3f," +
             "\"n\":%d,\"judgeModel\":\"%s\"}%n",
@@ -390,7 +391,7 @@ public class RetrievalBenchmark {
             String expectedJson = Arrays.stream(tr.question().expectedFqnHints())
                 .map(h -> "\"" + jsonEscape(h) + "\"")
                 .collect(Collectors.joining(",", "[", "]"));
-            sb.append(String.format(
+            sb.append(String.format(Locale.ROOT,
                 "{\"ts\":\"%s\",\"strategy\":\"%s\",\"scenario\":\"%s\",\"fileCount\":%d," +
                 "\"question\":\"%s\",\"difficulty\":\"%s\",\"expected\":%s," +
                 "\"generated\":\"%s\",\"score\":%d,\"rationale\":\"%s\"," +

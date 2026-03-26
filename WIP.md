@@ -1,7 +1,7 @@
 # WIP — Work In Progress
 
 > Fichier de mémoire de travail. Mis à jour après chaque session de travail.
-> Dernière mise à jour : 2026-03-19
+> Dernière mise à jour : 2026-03-23
 
 ---
 
@@ -68,6 +68,7 @@ Code en place, fonctionnel, à mettre en avant **après** la démo si l'équipe 
 
 - **Community summarization** : générer un résumé LLM par communauté et l'indexer. `CommunityDetection.java`.
 - **Versioning schéma graphe** : nœud `Project` avec version + re-indexation forcée.
+- **Construction du graphe via bytecode** (priorité haute) : remplacer JavaParser par ASM/ByteBuddy pour parser les `.class` compilés. JavaParser rate les lambdas, méthodes de référence et classes anonymes → relations CALLS/EXTENDS incomplètes → K-hop expansion inutile. Le bytecode est non-ambigu et donne un graphe de qualité production. Le contexte retourné au LLM reste du source Java (lisible). Résultat attendu : Neo4j rattrape ou dépasse Lucene sur les questions CROSS_MODULE. `Neo4jGraphRagStrategy.java`.
 
 ### B4 — Benchmark avancé
 
