@@ -17,6 +17,7 @@ Tout le détail est dans `judge-finetune/PROTOCOLE.md`.
 - Interface shell : `Makefile` (`make help`) + `scripts/bench_variant.sh` (serveur → attente → benchmark → arrêt). Python uniquement là où il apporte quelque chose ; stdlib seule, aucune dépendance.
 - `.venv` avec mlx-lm 0.31.3. Tous les flags MLX du protocole sont vérifiés, plus par mémoire.
 - **Pipeline validée de bout en bout** sur Qwen2.5-Coder-0.5B-4bit (`make smoke-all`) : entraînement 20 itérations en 24 s, pic 2,9 Go, val loss 2,349 → 1,679, puis service avec adapter et benchmark complet. Le 0.5B sort du JSON sans `<thinking>` ni `verdict` (κ = 0) : attendu, la mécanique est validée, pas la qualité.
+- `generators/` et `verification/` versionnés : chaque lot est reproductible au bit près (`make regen`, vérifié), et chaque chiffre cité dans un `<thinking>` provient d'un script exécutable du dossier `verification/`. Les JSONL ne s'éditent jamais à la main — une frappe accidentelle dans l'IDE a déjà corrompu le lot 04, restauré par régénération.
 
 **Décisions**
 | Décision | Rationale |
@@ -44,7 +45,7 @@ Tout le détail est dans `judge-finetune/PROTOCOLE.md`.
 Benchmark RAG (Lucene vs GraphRAG-Neo4j) avec LLM-as-a-judge intégré.
 Pipeline hybride complet opérationnel. Dashboard interactif fonctionnel.
 
-**Branche active** : `main`
+**Branche active** : `feat/judge-finetune-dataset` (poussée sur origin)
 **Objectif immédiat** : démo équipe ~20 minutes
 
 ---
