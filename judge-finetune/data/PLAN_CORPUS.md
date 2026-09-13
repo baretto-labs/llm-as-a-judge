@@ -27,9 +27,18 @@ sa ligne. Les quotas viennent de `PROTOCOLE.md` §2.2, les règles d'étiquetage
 | batch_04 | 15 | b04-001 → b04-015 | ✅ fait (Java/Python/TS, sondes probe04.*) |
 | batch_05 | 15 | b05-001 → b05-015 | ✅ fait (Java/Python/SQL, sondes probe05.* + Probe05b) |
 | batch_06 | 15 | b06-001 → b06-015 | ✅ fait (Java/Python/TS, sondes probe06.*) |
-| batch_07 → batch_14 | 15 chacun | bNN-001 → bNN-015 | à produire |
+| batch_07 | 15 | b07-001 → b07-015 | ✅ fait (Java/Python/JS, sondes probe07.*) |
+| batch_08 → batch_11 | 15, 15, 15, 10 | bNN-001 → bNN-0NN | à produire — clôture des 150 `CODE_ANALYSIS` |
 
-Avancement : **80 / 200**. Distribution exactement sur les cibles (60/40 domaine, 40/40/20 cas,
+Avancement : **95 / 200** (dont 95 `CODE_ANALYSIS` sur 150). Reste 55 exemples de code — 33 `code`,
+22 `theorie` — puis les 50 RAG.
+
+⚠️ Polarité des contrôles supplémentaires : au 2026-09-13, chaque **nom** de contrôle n'apparaît qu'avec
+une seule polarité (`format_impose` toujours `false`, `aucune_dependance_externe` toujours `true`). Réutiliser
+les mêmes noms avec la polarité inverse dans les lots 08 à 11, faute de quoi le juge apprendra un raccourci
+par nom au lieu de lire la description du critère.
+
+Ancien avancement : **80 / 200**. Distribution exactement sur les cibles (60/40 domaine, 40/40/20 cas,
 12 cas verbeux à bug caché soit 15,0 %, 6 cas verbeux corrects en contrôle).
 Croisement cas × verdict : parfait 32 PASS, défaillant 32 FAIL, limite 11 PASS / 5 FAIL.
 
@@ -50,6 +59,11 @@ Familles consommées par batch_04 : `ConcurrentModificationException` intermitte
 flux réutilisé, monnaie en `double`, concaténation en boucle, `timedelta` et changement d'heure, copie superficielle,
 retour arrière catastrophique, perte de `this`, tri par défaut JS, entiers 64 bits en JSON, `==` vs `===`,
 pile et tas, idempotence REST, verrous optimistes et pessimistes.
+
+Familles consommées par batch_07 : verrous croisés (paire contrastive), initialisation paresseuse non
+synchronisée, types bruts et effacement, générateur épuisé, décorateur sans `functools.wraps`, transaction
+sqlite3 non validée, XSS par `innerHTML`, ordre micro/macro-tâches, double-checked locking, TLS et paramètres
+d'URL, limitation de débit, gestionnaires de contexte, tempête de réessais.
 
 Familles consommées par batch_06 : exceptions avalées par `CompletableFuture` (paire contrastive), paresse des flux,
 `ThreadLocal` en pool, comparaison de secret non constante, attribut de classe mutable, lecture de fichier volumineux,
