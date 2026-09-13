@@ -17,9 +17,27 @@ Ou un seul lot, ce qui est aussi la procédure de réparation :
 make validate
 ```
 
-`gen_batch_01.py` porte la fonction `example()` partagée : elle assemble le message system canonique,
-le gabarit du message user, le bloc `<thinking>` et le JSON strict, et déduit le verdict des trois
-booléens. Les autres générateurs l'importent.
+`gen_batch_01.py` porte la fonction `example()` partagée, **point de construction unique du schéma**.
+Elle assemble le message system avec son marqueur de tâche, les quatre sections du message user, le bloc
+`<thinking>` et le JSON `{verdict, checks, reason}`, et déduit le verdict des contrôles : `PASS` si et
+seulement si tous valent `true`. Les autres générateurs l'importent.
+
+Deux façons de l'appeler :
+
+```python
+# forme abrégée, tâche CODE_ANALYSIS implicite
+example(meta=..., consigne=..., reponse=..., thinking=..., exact=True, bugs=False, consignes=True, raison=...)
+
+# forme explicite, nécessaire pour les tâches RAG
+example(meta=..., task="RAG_FAITHFULNESS", contexte=..., requete=..., reponse=...,
+        checks={"affirmations_etayees": False, "absence_invention": False, "citations_exactes": True},
+        thinking=..., reason=...)
+```
+
+Les descriptions des contrôles sont centralisées dans le dictionnaire `CRITERIA`, une entrée par tâche :
+c'est là qu'on modifie un libellé, jamais dans un JSONL. Toute évolution du schéma se fait dans cette
+fonction, suivie de `make regen` — c'est ainsi que les 80 exemples ont migré vers le schéma unifié du
+2026-09-13 sans qu'aucun fichier de données soit touché à la main.
 
 ## Vérifications (`../verification/`)
 

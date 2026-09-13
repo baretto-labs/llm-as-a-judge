@@ -7,7 +7,8 @@ sa ligne. Les quotas viennent de `PROTOCOLE.md` §2.2, les règles d'étiquetage
 
 | Axe | Cible | Détail |
 |---|---|---|
-| Domaine | 120 code / 80 théorie | 60 % / 40 % |
+| **Tâche** | 150 `CODE_ANALYSIS` / 25 `RAG_CONTEXT_RELEVANCE` / 25 `RAG_FAITHFULNESS` | 75 % / 12,5 % / 12,5 % — RAG cumulé 25 % |
+| Domaine | 90 code / 60 théorie / 50 rag | le 60/40 code-théorie s'applique aux 150 `CODE_ANALYSIS` |
 | Cas | 80 parfait / 80 défaillant / 40 limite | 40 / 40 / 20 |
 | Verdict | ~100 PASS / ~100 FAIL | les 40 limites se répartissent ~20/20 |
 | Verbeux + bug caché | ≥ 25 | tous FAIL, base du test de biais de verbosité |
@@ -62,6 +63,29 @@ TCP vs UDP, codes 401 et 403, périmètre de dénormalisation.
 
 Chaque lot respecte localement la ventilation (≈ 9 code / 6 théorie, ≈ 6 parfait / 6 défaillant / 3 limite) pour
 qu'un arrêt en cours de route laisse un corpus équilibré.
+
+## Reste à produire après le lot 06
+
+80 exemples faits, tous `CODE_ANALYSIS`. Il reste **70 `CODE_ANALYSIS`** (42 code / 28 théorie) et
+**50 exemples RAG**, à répartir en 25 par passe.
+
+⚠️ Les contextes RAG doivent provenir de **récupérations réelles** via `QuestionCorpus` et les stratégies
+Lucene / Neo4j du dépôt. Un contexte inventé serait trop propre : ni bruit, ni doublons, ni troncature au
+milieu d'une méthode — donc un juge inutilisable sur les sorties réelles du moteur.
+
+### Familles RAG — passe A, `RAG_CONTEXT_RELEVANCE`
+
+récupération exacte sur question LOCAL · extraits du bon fichier mais mauvaise méthode · contexte suffisant
+noyé sous dix extraits hors sujet · question CROSS_MODULE avec un seul des deux modules récupéré ·
+extraits tronqués au milieu de la signature · doublons du même chunk occupant la fenêtre · récupération
+d'une classe homonyme dans un autre package · contexte vide ou uniquement des imports
+
+### Familles RAG — passe B, `RAG_FAITHFULNESS`
+
+réponse entièrement étayée · **affirmation vraie dans l'absolu mais absente du contexte** (cas décisif de la
+posture monde fermé) · signature de méthode inventée · nom de classe correct mais paramètres hallucinés ·
+comportement extrapolé d'un nom de méthode sans lire le corps · citation déformée d'un extrait ·
+réponse qui admet correctement ne pas savoir · mélange d'un extrait fourni et d'une connaissance externe
 
 ## Familles de scénarios
 

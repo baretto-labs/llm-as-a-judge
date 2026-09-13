@@ -4,35 +4,96 @@ import json
 import sys
 from pathlib import Path
 
-SYSTEM = (
-    "Tu es un juge d'évaluation de code expert et impartial. Rédige d'abord ton analyse pas à pas "
-    "dans une balise <thinking> en vérifiant l'exactitude technique, l'absence de bugs et le respect "
-    "des consignes. Termine obligatoirement par un objet JSON strict contenant les critères booléens "
-    "et le verdict final."
+# ── Schéma unifié (réorientation du 2026-09-13) ───────────────────────────────
+# Verdict binaire strict, contrôles booléens atomiques nommés, marqueur de tâche
+# dans le message system pour séparer les postures (monde ouvert / monde fermé).
+
+TASKS = ("CODE_ANALYSIS", "RAG_CONTEXT_RELEVANCE", "RAG_FAITHFULNESS")
+
+SYSTEM_TEMPLATE = (
+    "Tu es un juge IA ultra-rigoureux. TÂCHE: {task}. "
+    "Analyse la situation pas à pas dans <thinking> avant de rendre ton verdict JSON."
 )
 
 USER_TEMPLATE = (
-    "### CONTEXTE ET CONSIGNE\n{consigne}\n\n"
-    "### RÉPONSE DE L'ASSISTANT À ÉVALUER\n{reponse}\n\n"
-    "### CRITÈRES D'ÉVALUATION\n1. Exactitude technique\n2. Absence de bugs ou d'erreurs conceptuelles\n3. Respect des consignes"
+    "### CONTEXTE / RAG\n{contexte}\n\n"
+    "### ENTREE / REQUÊTE\n{requete}\n\n"
+    "### SORTIE À ÉVALUER\n{reponse}\n\n"
+    "### CRITÈRES DE VALIDATION\n{criteres}"
 )
 
+# Posture monde ouvert : aucun contexte fourni, le juge mobilise ses connaissances.
+NO_CONTEXT = "(aucun contexte fourni — évaluation en monde ouvert : mobilise tes connaissances techniques)"
 
-def example(meta, consigne, reponse, thinking, exact, bugs, consignes, raison):
-    verdict = "PASS" if (exact and bugs and consignes) else "FAIL"
-    judgment = {
-        "exactitude_technique": exact,
-        "absence_de_bugs": bugs,
-        "respect_consignes": consignes,
-        "verdict": verdict,
-        "raison_principale": raison,
-    }
+# Contrôles atomiques par tâche. Chaque description énonce un fait observable.
+CRITERIA = {
+    "CODE_ANALYSIS": {
+        "exactitude_technique": "Le code compile et s'exécute, les API utilisées existent, et chaque affirmation technique de la sortie est vraie.",
+        "absence_de_bugs": "Aucun bug logique, faille de sécurité, régression ni erreur conceptuelle observable dans la sortie.",
+        "respect_consignes": "Toutes les consignes obligatoires de la requête sont respectées.",
+    },
+    "RAG_CONTEXT_RELEVANCE": {
+        "contexte_pertinent": "Au moins un extrait du contexte porte directement sur les symboles ou notions visés par la requête.",
+        "contexte_suffisant": "Les extraits fournis contiennent toutes les informations nécessaires pour répondre entièrement à la requête.",
+        "bruit_maitrise": "Le contexte ne noie pas l'information utile sous des extraits hors sujet.",
+    },
+    "RAG_FAITHFULNESS": {
+        "affirmations_etayees": "Chaque affirmation de la sortie est explicitement soutenue par un extrait du contexte fourni.",
+        "absence_invention": "La sortie n'introduit aucun symbole, signature, valeur ou comportement absent du contexte, même s'il serait vrai par ailleurs.",
+        "citations_exactes": "Les extraits cités ou paraphrasés par la sortie correspondent fidèlement au contexte fourni.",
+    },
+}
+
+
+def example(meta, thinking, *, task=None, contexte=None, requete=None, reponse=None,
+            criteres=None, checks=None, reason=None,
+            consigne=None, exact=None, bugs=None, consignes=None, raison=None):
+    """Assemble un exemple au schéma unifié.
+
+    Deux façons d'appeler :
+      - explicite : task=..., contexte=..., requete=..., reponse=..., checks={nom: bool, ...}
+      - abrégée (CODE_ANALYSIS) : consigne=..., reponse=..., exact=..., bugs=..., consignes=...
+
+    Le verdict n'est jamais fourni : il vaut PASS si et seulement si tous les contrôles sont vrais.
+    """
+    task = task or meta.get("task") or "CODE_ANALYSIS"
+    if task not in TASKS:
+        raise ValueError(f"tâche inconnue : {task}")
+
+    if checks is None:
+        checks = {
+            "exactitude_technique": exact,
+            "absence_de_bugs": bugs,
+            "respect_consignes": consignes,
+        }
+    if any(v is None for v in checks.values()):
+        raise ValueError(f"contrôle non renseigné dans {meta.get('id')}: {checks}")
+
+    criteres = criteres or CRITERIA[task]
+    if list(criteres) != list(checks):
+        raise ValueError(f"critères et contrôles désalignés dans {meta.get('id')}")
+
+    verdict = "PASS" if all(checks.values()) else "FAIL"
+    judgment = {"verdict": verdict, "checks": checks, "reason": (reason or raison).strip()}
+
+    criteres_bloc = "\n".join(
+        f"{i}. {nom}: {desc}" for i, (nom, desc) in enumerate(criteres.items(), 1)
+    )
+    user = USER_TEMPLATE.format(
+        contexte=(contexte or NO_CONTEXT).strip(),
+        requete=(requete or consigne).strip(),
+        reponse=reponse.strip(),
+        criteres=criteres_bloc,
+    )
     assistant = f"<thinking>\n{thinking.strip()}\n</thinking>\n" + json.dumps(judgment, ensure_ascii=False, indent=2)
+
+    meta = dict(meta)
+    meta.setdefault("task", task)
     return {
         "meta": meta,
         "messages": [
-            {"role": "system", "content": SYSTEM},
-            {"role": "user", "content": USER_TEMPLATE.format(consigne=consigne.strip(), reponse=reponse.strip())},
+            {"role": "system", "content": SYSTEM_TEMPLATE.format(task=task)},
+            {"role": "user", "content": user},
             {"role": "assistant", "content": assistant},
         ],
     }

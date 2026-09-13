@@ -33,9 +33,14 @@ import urllib.request
 from collections import Counter
 from pathlib import Path
 
-CRITERIA = ["exactitude_technique", "absence_de_bugs", "respect_consignes"]
 LABELS = ("PASS", "FAIL")
 INVALID = "INVALID"
+
+
+def check_names(judgment):
+    """Noms des contrôles atomiques d'un jugement. Ils varient selon la tâche."""
+    checks = judgment.get("checks") if isinstance(judgment, dict) else None
+    return list(checks) if isinstance(checks, dict) else []
 
 
 # ── Golden set ────────────────────────────────────────────────────────────────
@@ -67,9 +72,12 @@ def is_strict_format(text):
         return False
     return (
         isinstance(obj, dict)
-        and set(obj) == set(CRITERIA) | {"verdict", "raison_principale"}
-        and all(isinstance(obj[k], bool) for k in CRITERIA)
+        and list(obj) == ["verdict", "checks", "reason"]
+        and isinstance(obj["checks"], dict)
+        and bool(obj["checks"])
+        and all(isinstance(v, bool) for v in obj["checks"].values())
         and obj["verdict"] in LABELS
+        and isinstance(obj["reason"], str)
     )
 
 
@@ -255,7 +263,9 @@ def evaluate(variant, golden, runs, args, rng):
 
     def decision(row):
         j = row.get("judgment")
-        return None if j is None else tuple(j.get(k) for k in CRITERIA) + (j["verdict"],)
+        if j is None:
+            return None
+        return tuple(sorted((j.get("checks") or {}).items())) + (j["verdict"],)
 
     verdict_stable = sum(1 for v in verdicts_by_item if INVALID not in v and len(set(v)) == 1)
     decision_stable = 0
@@ -265,10 +275,22 @@ def evaluate(variant, golden, runs, args, rng):
             decision_stable += 1
 
     criteria_acc = {}
-    for k in CRITERIA:
-        pairs = [(g["gold"][k], rows[g["id"]]["judgment"].get(k))
-                 for rows in runs.values() for g in golden
-                 if g["id"] in rows and rows[g["id"]]["judgment"] is not None]
+    all_names = []
+    for g in golden:
+        for name in check_names(g["gold"]):
+            if name not in all_names:
+                all_names.append(name)
+    for k in all_names:
+        pairs = []
+        for rows in runs.values():
+            for g in golden:
+                gold_checks = g["gold"].get("checks") or {}
+                if k not in gold_checks or g["id"] not in rows:
+                    continue
+                judgment = rows[g["id"]]["judgment"]
+                if judgment is None:
+                    continue
+                pairs.append((gold_checks[k], (judgment.get("checks") or {}).get(k)))
         criteria_acc[k] = sum(a == b for a, b in pairs) / len(pairs) if pairs else float("nan")
 
     verbose_fpr, n_verbose_fail = false_pass_rate(golden, runs, lambda g: g["meta"]["verbeux"])
@@ -369,10 +391,14 @@ def build_report(metrics, golden, args, rng):
                      f"[{fmt(m['kappa_ci95'][0])}, {fmt(m['kappa_ci95'][1])}] | {fmt(m['kappa_majority'])} | "
                      f"{fmt(m['f1_fail_mean'])} | {fmt(m['macro_f1_mean'])} | {fmt(m['accuracy_mean'], pct=True)} | "
                      f"{fmt(m['json_parse_rate'], pct=True)} |")
-    lines += ["", "Accord par critère booléen (sur les jugements parsables) :", "",
-              "| Variante | " + " | ".join(CRITERIA) + " |", "|---|" + "---|" * len(CRITERIA)]
-    for m in metrics:
-        lines.append(f"| {m['name']} | " + " | ".join(fmt(m['criteria_accuracy'][k], pct=True) for k in CRITERIA) + " |")
+    crit_names = list(metrics[0]["criteria_accuracy"]) if metrics else []
+    if crit_names:
+        lines += ["", "Accord par contrôle atomique (sur les jugements parsables) :", "",
+                  "| Variante | " + " | ".join(crit_names) + " |", "|---|" + "---|" * len(crit_names)]
+        for m in metrics:
+            lines.append(f"| {m['name']} | "
+                         + " | ".join(fmt(m["criteria_accuracy"].get(k, float("nan")), pct=True) for k in crit_names)
+                         + " |")
 
     lines += ["", "## 2. Résistance au biais de verbosité", "",
               "| Variante | Faux PASS verbeux+bug (n) | Faux PASS concis+bug (n) | Écart (biais) | Faux FAIL verbeux corrects (n) |",

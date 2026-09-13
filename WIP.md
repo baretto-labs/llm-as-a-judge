@@ -10,7 +10,10 @@
 Tout le détail est dans `judge-finetune/PROTOCOLE.md`.
 
 **Complété**
-- Rubrique d'annotation normative : verdict PASS ⇔ les 3 critères à `true`. La gravité des cas limites est gérée par la distinction consigne obligatoire / facultative.
+- **Réorientation du 2026-09-13** : cible unique = exactitude du juge, aucune rétrocompatibilité. Notes graduées et champs hérités (`score`, `rationale`, `suggestsUnknown`, `hintCoverage`) abandonnés, ainsi que `scripts/stats.py` et les dashboards qui les consomment.
+- Schéma unifié : system avec marqueur `TÂCHE:`, user en 4 sections (contexte RAG / requête / sortie / critères), assistant `<thinking>` puis `{verdict, checks, reason}`. Verdict PASS ⇔ tous les `checks` à `true`. Les 80 exemples ont été migrés par réécriture de `example()` + `make regen`, sans toucher un seul JSONL.
+- Trois postures séparées par marqueur de tâche : `CODE_ANALYSIS` (monde ouvert), `RAG_CONTEXT_RELEVANCE`, `RAG_FAITHFULNESS` (monde fermé strict). Cible 200 = 150 / 25 / 25.
+- La gravité des cas limites reste gérée par la distinction consigne obligatoire / facultative.
 - Lot `data/seed/batch_01.jsonl` : 5 exemples (3 code / 2 théorie ; 2 parfaits / 2 défaillants / 1 limite), faits vérifiés par exécution (Java 25, Flask 3.1).
 - `scripts/dataset_tools.py` : validate / stats / split. Le split est stratifié et groupé par `famille` (anti-fuite), exporte au format MLX sans `meta` et produit un `valid.jsonl` (obligatoire pour mlx-lm).
 - `scripts/benchmark_judges.py` : κ, F1, biais de verbosité, répétabilité sur 3 passes, RAM/latence/débit, Δκ apparié par bootstrap, règle de décision. Testé contre un serveur mock puis en réel.
