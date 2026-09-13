@@ -46,7 +46,7 @@ CRITERIA = {
 
 
 def example(meta, thinking, *, task=None, contexte=None, requete=None, reponse=None,
-            criteres=None, checks=None, reason=None,
+            criteres=None, checks=None, reason=None, extra_criteres=None, extra_checks=None,
             consigne=None, exact=None, bugs=None, consignes=None, raison=None):
     """Assemble un exemple au schéma unifié.
 
@@ -69,12 +69,21 @@ def example(meta, thinking, *, task=None, contexte=None, requete=None, reponse=N
     if any(v is None for v in checks.values()):
         raise ValueError(f"contrôle non renseigné dans {meta.get('id')}: {checks}")
 
-    criteres = criteres or CRITERIA[task]
+    criteres = dict(criteres or CRITERIA[task])
+    # Contrôles variables : quand la requête porte une contrainte explicite et vérifiable,
+    # on ajoute un contrôle dédié. Le juge doit lire la rubrique déclarée plutôt que de
+    # supposer un triplet figé par tâche.
+    if extra_criteres:
+        criteres.update(extra_criteres)
+    if extra_checks:
+        checks = {**checks, **extra_checks}
     if list(criteres) != list(checks):
         raise ValueError(f"critères et contrôles désalignés dans {meta.get('id')}")
 
+    # `checks` précède `verdict` : le modèle génère de gauche à droite, il doit donc
+    # inscrire chaque fait observable avant de sceller sa décision (« Why before What »).
     verdict = "PASS" if all(checks.values()) else "FAIL"
-    judgment = {"verdict": verdict, "checks": checks, "reason": (reason or raison).strip()}
+    judgment = {"checks": checks, "verdict": verdict, "reason": (reason or raison).strip()}
 
     criteres_bloc = "\n".join(
         f"{i}. {nom}: {desc}" for i, (nom, desc) in enumerate(criteres.items(), 1)

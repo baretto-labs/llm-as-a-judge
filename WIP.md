@@ -11,7 +11,8 @@ Tout le détail est dans `judge-finetune/PROTOCOLE.md`.
 
 **Complété**
 - **Réorientation du 2026-09-13** : cible unique = exactitude du juge, aucune rétrocompatibilité. Notes graduées et champs hérités (`score`, `rationale`, `suggestsUnknown`, `hintCoverage`) abandonnés, ainsi que `scripts/stats.py` et les dashboards qui les consomment.
-- Schéma unifié : system avec marqueur `TÂCHE:`, user en 4 sections (contexte RAG / requête / sortie / critères), assistant `<thinking>` puis `{verdict, checks, reason}`. Verdict PASS ⇔ tous les `checks` à `true`. Les 80 exemples ont été migrés par réécriture de `example()` + `make regen`, sans toucher un seul JSONL.
+- Schéma unifié : system avec marqueur `TÂCHE:`, user en 4 sections (contexte RAG / requête / sortie / critères), assistant `<thinking>` puis `{checks, verdict, reason}` — **contrôles avant verdict**, la génération étant séquentielle, le modèle pose les faits avant de trancher. Verdict PASS ⇔ tous les `checks` à `true`. Les 80 exemples ont été migrés par réécriture de `example()` + `make regen`, sans toucher un seul JSONL.
+- **Contrôles variables** : la rubrique s'enrichit d'un contrôle dédié quand la requête porte une contrainte explicite (`signature_conforme`, `format_impose`, `perimetre_respecte`…), pour empêcher le raccourci « marqueur → triplet figé ». 8 rubriques distinctes sur 80 exemples, dont 8 à quatre contrôles répartis 3 PASS / 5 FAIL — les deux polarités sont nécessaires, sinon le raccourci devient « 4ᵉ contrôle ⇒ échec ».
 - Trois postures séparées par marqueur de tâche : `CODE_ANALYSIS` (monde ouvert), `RAG_CONTEXT_RELEVANCE`, `RAG_FAITHFULNESS` (monde fermé strict). Cible 200 = 150 / 25 / 25.
 - La gravité des cas limites reste gérée par la distinction consigne obligatoire / facultative.
 - Lot `data/seed/batch_01.jsonl` : 5 exemples (3 code / 2 théorie ; 2 parfaits / 2 défaillants / 1 limite), faits vérifiés par exécution (Java 25, Flask 3.1).

@@ -78,6 +78,19 @@ RAG_FAITHFULNESS
 2. absence_invention: La sortie n'introduit aucun symbole, signature, valeur ou comportement absent du contexte, même s'il serait vrai par ailleurs.
 3. citations_exactes: Les extraits cités ou paraphrasés par la sortie correspondent fidèlement au contexte fourni.
 
+## Contrôles supplémentaires — obligatoires quand la requête l'appelle
+
+Les trois contrôles ci-dessus sont un socle, pas une liste figée. Dès que la requête porte une
+contrainte explicite et vérifiable, AJOUTE un quatrième contrôle nommé d'après cette contrainte :
+
+  signature_conforme, format_impose, dependance_autorisee, perimetre_respecte,
+  contrainte_disponibilite, aucune_dependance_externe, validation_entree, ...
+
+Deux règles :
+- environ un exemple sur cinq doit porter un contrôle supplémentaire ;
+- ce contrôle doit valoir true dans certains exemples et false dans d'autres. S'il n'était
+  false que lorsqu'il apparaît, le juge apprendrait « quatrième contrôle donc échec ».
+
 ## meta
 
 | Champ | Valeurs autorisées |
@@ -122,12 +135,12 @@ message assistant :
 3. Synthèse : justification en une ou deux phrases, terminée par PASS. ou FAIL.
 </thinking>
 {
-  "verdict": "FAIL",
   "checks": {
     "exactitude_technique": true,
     "absence_de_bugs": false,
     "respect_consignes": true
   },
+  "verdict": "FAIL",
   "reason": "une phrase nommant le motif décisif du verdict"
 }
 
@@ -135,7 +148,8 @@ message assistant :
 
 1. verdict = "PASS" si et seulement si TOUS les contrôles valent true. Sinon "FAIL". Aucune exception.
 2. Les clés de "checks" sont exactement les noms déclarés dans CRITÈRES DE VALIDATION, dans le même ordre.
-3. Clés JSON exactement verdict, checks, reason, dans cet ordre. Rien après l'accolade fermante.
+3. Clés JSON exactement checks, verdict, reason, dans cet ordre : les contrôles sont posés
+   AVANT la décision qu'ils justifient. Rien après l'accolade fermante.
 4. L'étape 3 du <thinking> se termine par le même verdict que le JSON.
 5. cas "parfait" → PASS. cas "defaillant" → FAIL. cas "limite" → selon la gravité.
 

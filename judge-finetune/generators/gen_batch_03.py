@@ -76,6 +76,8 @@ export function chunk<T>(items: T[], size: number): T[][] {
 3. Synthèse : découpage correct y compris sur la dernière tranche, validation conforme à la consigne, généricité respectée. PASS.
 ''',
     exact=True, bugs=True, consignes=True,
+    extra_criteres={"validation_entree": "La fonction rejette les entrées invalides exactement comme la requête l'exige."},
+    extra_checks={"validation_entree": True},
     raison="Découpage correct vérifié par exécution, validation entier et positif conforme, généricité préservée.",
 ))
 
@@ -291,7 +293,9 @@ J'ai utilisé `re` pour la validation de format : c'est nettement plus lisible q
 2. Vérification des contraintes : la consigne interdit explicitement les expressions régulières, en précisant même que le linter du projet refuse le module `re`. La réponse importe `re` dès la première ligne et le revendique. Ce n'est pas une préférence de style : le code ne passerait pas la CI du projet, donc l'exigence est bloquante. Une validation manuelle est parfaitement faisable avec `str.isalpha`, `str.isdigit` et `str.isalnum` sur des tranches.
 3. Synthèse : cas limite. Le code est correct et sans bug, mais une contrainte explicite et vérifiable est ignorée au profit d'un argument de lisibilité. FAIL.
 ''',
-    exact=True, bugs=True, consignes=False,
+    exact=True, bugs=True, consignes=True,
+    extra_criteres={"dependance_autorisee": "La solution n'utilise aucun module explicitement interdit par la requête."},
+    extra_checks={"dependance_autorisee": False},
     raison="Le module `re` est explicitement interdit par la consigne et le linter du projet, la réponse l'utilise quand même.",
 ))
 

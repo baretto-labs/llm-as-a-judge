@@ -72,7 +72,7 @@ def is_strict_format(text):
         return False
     return (
         isinstance(obj, dict)
-        and list(obj) == ["verdict", "checks", "reason"]
+        and list(obj) == ["checks", "verdict", "reason"]
         and isinstance(obj["checks"], dict)
         and bool(obj["checks"])
         and all(isinstance(v, bool) for v in obj["checks"].values())

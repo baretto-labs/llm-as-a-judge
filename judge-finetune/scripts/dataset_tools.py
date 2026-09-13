@@ -41,7 +41,9 @@ USER_HEADERS = (
     "\n\n### SORTIE À ÉVALUER\n",
     "\n\n### CRITÈRES DE VALIDATION\n",
 )
-JUDGMENT_KEYS = ["verdict", "checks", "reason"]
+# `checks` avant `verdict` : la génération étant séquentielle, les contrôles doivent
+# être posés avant la décision qu'ils justifient.
+JUDGMENT_KEYS = ["checks", "verdict", "reason"]
 
 META_ENUMS = {
     "task": set(TASKS),

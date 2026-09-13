@@ -361,6 +361,8 @@ Sans `structuredClone`, il reste `lodash.cloneDeep` ou une fonction récursive m
 3. Synthèse : cas limite. La réponse obligatoire est exacte, vérifiée et bien argumentée ; l'omission porte sur une demande explicitement facultative, et la verbosité seule ne justifie pas un échec. PASS.
 ''',
     exact=True, bugs=True, consignes=True,
+    extra_criteres={"aucune_dependance_externe": "La solution n'utilise que les API de la plateforme, comme l'exige la requête."},
+    extra_checks={"aucune_dependance_externe": True},
     raison="structuredClone est la bonne réponse, et les cinq pertes du clonage JSON sont vérifiées ; seul le point facultatif sur les Map manque.",
 ))
 
@@ -538,7 +540,9 @@ La coupure se limite à quelques secondes, ce qui reste acceptable pour une opé
 2. Vérification des contraintes : la marche à suivre viole frontalement la contrainte posée. La consigne exclut explicitement toute fenêtre de maintenance et toute interruption, en précisant que c'est la contrainte principale et que l'application est déployée en continu. La réponse propose une fenêtre nocturne, l'arrêt des instances, puis une remise en trafic, et conclut en qualifiant la coupure d'acceptable. Ce n'est pas un écart de forme : c'est la question posée qui reste sans réponse. La solution attendue est la migration par expansion et contraction, à savoir ajouter la nouvelle colonne, la synchroniser par déclencheur ou double écriture applicative, remplir l'historique par lots, basculer les lectures une fois les deux colonnes cohérentes, puis supprimer l'ancienne colonne une fois toutes les instances migrées.
 3. Synthèse : cas limite. Le contenu technique est exact et l'analyse du problème pertinente, mais la procédure proposée contredit la seule contrainte imposée, ce qui rend la réponse inutilisable. FAIL.
 ''',
-    exact=True, bugs=True, consignes=False,
+    exact=True, bugs=True, consignes=True,
+    extra_criteres={"contrainte_disponibilite": "La procédure proposée n'implique aucune interruption de service, conformément à la requête."},
+    extra_checks={"contrainte_disponibilite": False},
     raison="Propose une fenêtre nocturne et l'arrêt des instances alors que la consigne excluait explicitement toute interruption.",
 ))
 

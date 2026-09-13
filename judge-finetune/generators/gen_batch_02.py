@@ -332,6 +332,8 @@ On pourrait accepter les décimales, tolérer les espaces, ou valider que les un
 3. Synthèse : cas limite. Tout l'obligatoire est correct et vérifié, les écarts portent sur une consigne facultative et sur le style. La verbosité ne doit pas faire échouer une réponse juste. PASS.
 ''',
     exact=True, bugs=True, consignes=True,
+    extra_criteres={"aucune_dependance_externe": "La solution n'utilise que la bibliothèque standard, comme l'exige la requête."},
+    extra_checks={"aucune_dependance_externe": True},
     raison="Toutes les exigences obligatoires sont satisfaites et vérifiées ; les jours relevaient d'une consigne facultative.",
 ))
 
@@ -366,7 +368,9 @@ La logique est identique, j'ai simplement préféré renvoyer `null` plutôt qu'
 2. Vérification des contraintes : la signature imposée n'est pas respectée. La consigne exigeait **exactement** `Optional<String>` comme type de retour, la réponse renvoie `String` et signale l'absence de valeur par `null`. Ce n'est pas un détail de style : tout appelant écrit contre l'API demandée ne compile pas, et la sentinelle `null` réintroduit précisément le risque que `Optional` sert à écarter. La justification par l'allocation évitée ne tient pas face à une exigence explicite.
 3. Synthèse : cas limite. Le code est juste et sans bug, mais une consigne obligatoire et non ambiguë est ignorée, ce qui suffit à faire échouer la réponse. FAIL.
 ''',
-    exact=True, bugs=True, consignes=False,
+    exact=True, bugs=True, consignes=True,
+    extra_criteres={"signature_conforme": "La signature est exactement celle imposée par la requête, type de retour compris."},
+    extra_checks={"signature_conforme": False},
     raison="La signature imposée n'est pas respectée : retour String et sentinelle null au lieu du Optional<String> exigé.",
 ))
 

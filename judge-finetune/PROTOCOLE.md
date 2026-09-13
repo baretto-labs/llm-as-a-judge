@@ -72,7 +72,7 @@ Une ligne JSON par exemple dans `data/seed/*.jsonl`, avec `meta` (retiré à l'e
 {"messages": [
   {"role": "system", "content": "Tu es un juge IA ultra-rigoureux. TÂCHE: CODE_ANALYSIS. Analyse la situation pas à pas dans <thinking> avant de rendre ton verdict JSON."},
   {"role": "user", "content": "### CONTEXTE / RAG\n…\n\n### ENTREE / REQUÊTE\n…\n\n### SORTIE À ÉVALUER\n…\n\n### CRITÈRES DE VALIDATION\n1. exactitude_technique: …\n2. absence_de_bugs: …\n3. respect_consignes: …"},
-  {"role": "assistant", "content": "<thinking>\n1. …\n2. …\n3. … PASS.\n</thinking>\n{\n  \"verdict\": \"PASS\",\n  \"checks\": {\"exactitude_technique\": true, …},\n  \"reason\": \"…\"\n}"}
+  {"role": "assistant", "content": "<thinking>\n1. …\n2. …\n3. … PASS.\n</thinking>\n{\n  \"checks\": {\"exactitude_technique\": true, …},\n  \"verdict\": \"PASS\",\n  \"reason\": \"…\"\n}"}
 ]}
 ```
 
@@ -82,14 +82,27 @@ Une ligne JSON par exemple dans `data/seed/*.jsonl`, avec `meta` (retiré à l'e
 2. Les clés de `checks` sont **exactement** les critères déclarés dans la section `### CRITÈRES DE VALIDATION`,
    dans le même ordre. Le juge ne peut ni en inventer, ni en omettre.
 3. Le `<thinking>` précède toujours le JSON, en trois étapes numérotées, et se termine par le même verdict.
-4. Clés JSON exactement `verdict`, `checks`, `reason`, dans cet ordre.
+4. Clés JSON exactement `checks`, `verdict`, `reason`, dans cet ordre.
 5. `meta.cas = parfait` impose PASS, `meta.cas = defaillant` impose FAIL.
 
-> **Note sur l'ordre des clés.** `verdict` figure en tête, conformément à la spécification retenue. Comme
-> le modèle génère de gauche à droite, il émet donc son verdict avant ses contrôles : c'est le `<thinking>`
-> qui porte le raisonnement, pas l'ordre du JSON. Si l'on voulait que les contrôles conditionnent
-> explicitement le verdict, il suffirait de placer `verdict` en dernier — c'est une ligne à changer dans
-> `generators/gen_batch_01.py` suivie de `make regen`, tant que le corpus n'est pas figé.
+> **Pourquoi `checks` avant `verdict`.** Le modèle génère de gauche à droite. En plaçant les contrôles en
+> tête, il doit inscrire chaque fait observable **avant** de sceller sa décision, et le verdict est produit
+> en conditionnant sur des booléens déjà écrits. L'ordre inverse laisserait le modèle trancher d'abord puis
+> justifier après, ce qui est exactement le comportement que ce corpus cherche à éliminer.
+
+### Contrôles variables
+
+Les trois contrôles listés par tâche sont un **socle**, pas une liste figée. Dès que la requête porte une
+contrainte explicite et vérifiable, un contrôle dédié s'ajoute à la rubrique : `signature_conforme`,
+`format_impose`, `dependance_autorisee`, `perimetre_respecte`, `contrainte_disponibilite`,
+`aucune_dependance_externe`, `validation_entree`…
+
+C'est une exigence, pas une facilité. Si toutes les rubriques d'une tâche étaient identiques, le juge
+apprendrait le raccourci « marqueur de tâche → triplet figé » au lieu de lire la section
+`### CRITÈRES DE VALIDATION`. Le corpus doit donc présenter plusieurs rubriques distinctes, **avec les deux
+polarités** : un contrôle supplémentaire doit parfois valoir `true`, sinon le raccourci appris devient
+« quatrième contrôle ⇒ échec ». État au 2026-09-13 : 8 rubriques distinctes sur 80 exemples, dont 8 exemples
+à quatre contrôles répartis en 3 PASS et 5 FAIL.
 
 ### Contenu du `<thinking>`
 

@@ -588,7 +588,9 @@ Réservez le pessimiste aux cas où un conflit coûte cher à rejouer, par exemp
 2. Vérification des contraintes : la consigne impose explicitement 5 lignes maximum, en précisant l'usage, une note interne au format court. La réponse fait plus de vingt lignes, avec trois sections et un bloc de code. Ce n'est pas une préférence de style : c'est une exigence de format chiffrée et vérifiable, et le livrable demandé n'est pas utilisable tel quel. Le sujet se traite pourtant en cinq lignes, la matière essentielle tenant en une définition par mécanisme et une recommandation.
 3. Synthèse : cas limite. Le fond est juste et la recommandation pertinente, mais la seule contrainte de forme imposée, chiffrée et non ambiguë, est dépassée d'un facteur quatre. FAIL.
 ''',
-    exact=True, bugs=True, consignes=False,
+    exact=True, bugs=True, consignes=True,
+    extra_criteres={"format_impose": "La sortie respecte la limite de longueur chiffrée fixée par la requête."},
+    extra_checks={"format_impose": False},
     raison="Contenu exact mais la contrainte explicite de 5 lignes maximum est dépassée d'un facteur quatre.",
 ))
 

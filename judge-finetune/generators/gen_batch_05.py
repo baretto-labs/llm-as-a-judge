@@ -559,7 +559,9 @@ Cela dit, pour une page d'accueil, je recommanderais plutôt de sortir de Postgr
 2. Vérification des contraintes : le dernier paragraphe sort du périmètre explicitement fixé. La consigne interdisait sans ambiguïté de proposer une solution NoSQL ou un changement de moteur, en précisant même que c'était hors périmètre pour l'étude en cours. La réponse recommande pourtant Redis, puis MongoDB, et en fait sa recommandation principale, celle qui commence par « je recommanderais plutôt ». Ce n'est pas une digression marginale : c'est la conclusion du texte, et elle rend le livrable inutilisable tel quel pour l'étude demandée. Le contenu technique de ce paragraphe n'est pas faux en soi, mais la question posée était de trancher sur la dénormalisation dans PostgreSQL.
 3. Synthèse : cas limite. Le raisonnement sur la dénormalisation est correct, mais la recommandation finale viole une contrainte de périmètre explicite et non ambiguë. FAIL.
 ''',
-    exact=True, bugs=True, consignes=False,
+    exact=True, bugs=True, consignes=True,
+    extra_criteres={"perimetre_respecte": "La réponse reste dans le périmètre technique fixé par la requête, sans proposer d'outil exclu."},
+    extra_checks={"perimetre_respecte": False},
     raison="La recommandation principale propose Redis puis MongoDB, alors que la consigne excluait explicitement NoSQL et tout changement de moteur.",
 ))
 

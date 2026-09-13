@@ -19,7 +19,7 @@ make validate
 
 `gen_batch_01.py` porte la fonction `example()` partagée, **point de construction unique du schéma**.
 Elle assemble le message system avec son marqueur de tâche, les quatre sections du message user, le bloc
-`<thinking>` et le JSON `{verdict, checks, reason}`, et déduit le verdict des contrôles : `PASS` si et
+`<thinking>` et le JSON `{checks, verdict, reason}`, et déduit le verdict des contrôles : `PASS` si et
 seulement si tous valent `true`. Les autres générateurs l'importent.
 
 Deux façons de l'appeler :
@@ -34,7 +34,16 @@ example(meta=..., task="RAG_FAITHFULNESS", contexte=..., requete=..., reponse=..
         thinking=..., reason=...)
 ```
 
-Les descriptions des contrôles sont centralisées dans le dictionnaire `CRITERIA`, une entrée par tâche :
+Pour un contrôle supplémentaire lié à une contrainte explicite de la requête, deux arguments suffisent, la
+rubrique et le contrôle restant alignés automatiquement :
+
+```python
+example(..., exact=True, bugs=True, consignes=True,
+        extra_criteres={"format_impose": "La sortie respecte la limite de longueur chiffrée fixée par la requête."},
+        extra_checks={"format_impose": False}, raison=...)
+```
+
+Les descriptions des contrôles de base sont centralisées dans le dictionnaire `CRITERIA`, une entrée par tâche :
 c'est là qu'on modifie un libellé, jamais dans un JSONL. Toute évolution du schéma se fait dans cette
 fonction, suivie de `make regen` — c'est ainsi que les 80 exemples ont migré vers le schéma unifié du
 2026-09-13 sans qu'aucun fichier de données soit touché à la main.
