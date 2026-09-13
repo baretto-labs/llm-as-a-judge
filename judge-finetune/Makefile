@@ -40,6 +40,14 @@ setup:
 	$(VENV)/bin/pip install -q mlx-lm
 	@$(PY) -c "import mlx_lm; print('mlx-lm', mlx_lm.__version__, 'installé')"
 
+# Régénère les lots depuis leurs générateurs. Déterministe : sert aussi à réparer
+# un fichier corrompu, les JSONL n'étant jamais édités à la main.
+regen:
+	@for n in 01 02 03 04 05 06; do \
+	  $(PY) generators/gen_batch_$$n.py data/seed/batch_$$n.jsonl; \
+	done
+	@$(MAKE) --no-print-directory validate
+
 validate:
 	$(PY) scripts/dataset_tools.py validate $(SEED)
 
