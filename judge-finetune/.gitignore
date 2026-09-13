@@ -1,0 +1,10 @@
+.venv/
+adapters/
+results/
+results-smoke/
+data/mlx/
+data/mlx-smoke/
+# régénéré par `make split` ; à commiter délibérément une fois le corpus complet et relu
+data/golden/
+configs/variants.json
+__pycache__/

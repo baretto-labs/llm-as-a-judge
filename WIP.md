@@ -1,7 +1,41 @@
 # WIP — Work In Progress
 
 > Fichier de mémoire de travail. Mis à jour après chaque session de travail.
-> Dernière mise à jour : 2026-03-23
+> Dernière mise à jour : 2026-09-11
+
+---
+
+## Sous-projet `judge-finetune/` — fine-tuning d'un juge Qwen2.5-Coder 14B vs 32B (démarré 2026-09-11)
+
+Tout le détail est dans `judge-finetune/PROTOCOLE.md`.
+
+**Complété**
+- Rubrique d'annotation normative : verdict PASS ⇔ les 3 critères à `true`. La gravité des cas limites est gérée par la distinction consigne obligatoire / facultative.
+- Lot `data/seed/batch_01.jsonl` : 5 exemples (3 code / 2 théorie ; 2 parfaits / 2 défaillants / 1 limite), faits vérifiés par exécution (Java 25, Flask 3.1).
+- `scripts/dataset_tools.py` : validate / stats / split. Le split est stratifié et groupé par `famille` (anti-fuite), exporte au format MLX sans `meta` et produit un `valid.jsonl` (obligatoire pour mlx-lm).
+- `scripts/benchmark_judges.py` : κ, F1, biais de verbosité, répétabilité sur 3 passes, RAM/latence/débit, Δκ apparié par bootstrap, règle de décision. Testé contre un serveur mock puis en réel.
+- Interface shell : `Makefile` (`make help`) + `scripts/bench_variant.sh` (serveur → attente → benchmark → arrêt). Python uniquement là où il apporte quelque chose ; stdlib seule, aucune dépendance.
+- `.venv` avec mlx-lm 0.31.3. Tous les flags MLX du protocole sont vérifiés, plus par mémoire.
+- **Pipeline validée de bout en bout** sur Qwen2.5-Coder-0.5B-4bit (`make smoke-all`) : entraînement 20 itérations en 24 s, pic 2,9 Go, val loss 2,349 → 1,679, puis service avec adapter et benchmark complet. Le 0.5B sort du JSON sans `<thinking>` ni `verdict` (κ = 0) : attendu, la mécanique est validée, pas la qualité.
+
+**Décisions**
+| Décision | Rationale |
+|---|---|
+| Tout en local (MLX), plus de cloud GPU | Demande utilisateur ; supprime aussi le biais 4 bits vs bf16 entre les deux tailles |
+| Une variante servie à la fois | 8,3 + 8,3 + 18,4 + 18,4 Go > 36 Go de RAM ; le cache `results/runs/` permet de travailler modèle par modèle |
+| `meta` dans les lots source, retiré à l'export MLX | Nécessaire au split stratifié, à l'anti-fuite par famille et aux métriques de verbosité |
+| κ calculé par passe puis moyenné (+ κ du vote majoritaire en complément) | Reflète l'usage en production (un seul appel) |
+| Parsing tolérant pour κ, format strict mesuré à part ; INVALID = désaccord | Sépare la qualité du jugement du respect du format, sans masquer les sorties inexploitables |
+| `--max-seq-length 2048` et non 4096 | Exemples mesurés à ~1 200 tokens ; économise de la mémoire |
+| Le 32B n'est justifié que si la borne basse de l'IC95 du Δκ est > 0 et Δκ ≥ 0,05 | Avec n = 50, les écarts de κ bruts ne sont pas interprétables |
+| Génération déléguée possible, étiquetage non | La diversité des réponses à juger réduit le biais d'auto-préférence et rapproche la distribution de la production ; l'hétérogénéité des verdicts, elle, ajoute du bruit d'étiquetage qui plafonne le κ atteignable |
+| Trois catégories de `cas`, deux verdicts | `parfait` ⇒ PASS, `defaillant` ⇒ FAIL, `limite` réparti selon la gravité (11 PASS / 5 FAIL à 80 exemples) — pas de verdict intermédiaire |
+
+**Prochaines étapes**
+1. ~~Libérer du disque~~ : fait le 2026-09-12, 159 Go récupérés (caches dev, modèles Ollama, VMs UTM, VM Colima purgée). 220 Go libres.
+2. Générer les 200 exemples — **80/200 faits** (batch_01 : 5, puis 15 par lot). Prompts pour déléguer la génération à des modèles tiers : `judge-finetune/PROMPT_GENERATION.md`. Méthode par lot : sonder les comportements par exécution, écrire les exemples à partir des sorties mesurées, valider, contrôler la dérive de distribution. Plan de composition et familles dans `data/PLAN_CORPUS.md`. Le 14B a été sondé sur 20 itérations : ~11 s/itération, pic 11,08 Go, soit ~1 h 15 pour 400 itérations.
+3. Faire relire le golden set par des humains et calculer le κ inter-annotateurs, qui sert de plafond.
+4. Mesurer la faisabilité du QLoRA 32B sur 36 Go (repli : `NUM_LAYERS=8`, puis `MAXLEN=1024`).
 
 ---
 

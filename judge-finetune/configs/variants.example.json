@@ -1,0 +1,53 @@
+{
+  "_comment": "Copy to variants.json. Tout tourne en local via mlx_lm.server (une variante à la fois : voir scripts/bench_variant.sh). serve_model / serve_adapter servent au lancement du serveur, base_url / model au client. cost_per_hour_usd = coût local estimé (électricité + amortissement), à ajuster.",
+  "variants": [
+    {
+      "name": "14B-baseline",
+      "size": "14B",
+      "fine_tuned": false,
+      "base_url": "http://127.0.0.1:8080/v1",
+      "model": "mlx-community/Qwen2.5-Coder-14B-Instruct-4bit",
+      "serve_model": "mlx-community/Qwen2.5-Coder-14B-Instruct-4bit",
+      "serve_adapter": null,
+      "ram_gb": 8.3,
+      "api_key_env": null,
+      "cost_per_hour_usd": 0.05
+    },
+    {
+      "name": "14B-finetuned",
+      "size": "14B",
+      "fine_tuned": true,
+      "base_url": "http://127.0.0.1:8081/v1",
+      "model": "mlx-community/Qwen2.5-Coder-14B-Instruct-4bit",
+      "serve_model": "mlx-community/Qwen2.5-Coder-14B-Instruct-4bit",
+      "serve_adapter": "adapters/14b-judge",
+      "ram_gb": 8.3,
+      "api_key_env": null,
+      "cost_per_hour_usd": 0.05
+    },
+    {
+      "name": "32B-baseline",
+      "size": "32B",
+      "fine_tuned": false,
+      "base_url": "http://127.0.0.1:8082/v1",
+      "model": "mlx-community/Qwen2.5-Coder-32B-Instruct-4bit",
+      "serve_model": "mlx-community/Qwen2.5-Coder-32B-Instruct-4bit",
+      "serve_adapter": null,
+      "ram_gb": 18.4,
+      "api_key_env": null,
+      "cost_per_hour_usd": 0.05
+    },
+    {
+      "name": "32B-finetuned",
+      "size": "32B",
+      "fine_tuned": true,
+      "base_url": "http://127.0.0.1:8083/v1",
+      "model": "mlx-community/Qwen2.5-Coder-32B-Instruct-4bit",
+      "serve_model": "mlx-community/Qwen2.5-Coder-32B-Instruct-4bit",
+      "serve_adapter": "adapters/32b-judge",
+      "ram_gb": 18.4,
+      "api_key_env": null,
+      "cost_per_hour_usd": 0.05
+    }
+  ]
+}

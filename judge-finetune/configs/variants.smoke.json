@@ -1,0 +1,17 @@
+{
+  "_comment": "Config de validation de la pipeline (make smoke-bench). Modèle 0.5B fine-tuné 20 itérations : aucune conclusion qualité à en tirer, on vérifie seulement que serveur, adapter et client fonctionnent.",
+  "variants": [
+    {
+      "name": "smoke-0.5B",
+      "size": "0.5B",
+      "fine_tuned": true,
+      "base_url": "http://127.0.0.1:8090/v1",
+      "model": "mlx-community/Qwen2.5-Coder-0.5B-Instruct-4bit",
+      "serve_model": "mlx-community/Qwen2.5-Coder-0.5B-Instruct-4bit",
+      "serve_adapter": "adapters/smoke-0.5b",
+      "ram_gb": 0.3,
+      "api_key_env": null,
+      "cost_per_hour_usd": 0.05
+    }
+  ]
+}
