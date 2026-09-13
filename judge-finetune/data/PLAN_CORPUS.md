@@ -29,26 +29,27 @@ sa ligne. Les quotas viennent de `PROTOCOLE.md` §2.2, les règles d'étiquetage
 | batch_06 | 15 | b06-001 → b06-015 | ✅ fait (Java/Python/TS, sondes probe06.*) |
 | batch_07 | 15 | b07-001 → b07-015 | ✅ fait (Java/Python/JS, sondes probe07.*) |
 | batch_08 | 15 | b08-001 → b08-015 | ✅ fait (Python/Java/JS, sondes probe08.*) |
-| batch_09 → batch_11 | 15, 15, 10 | bNN-001 → bNN-0NN | à produire — clôture des 150 `CODE_ANALYSIS` |
+| batch_09 | 15 | b09-001 → b09-015 | ✅ fait (Python/Java/JS, sondes probe09.*) |
+| batch_10 → batch_11 | 15, 10 | bNN-001 → bNN-0NN | à produire — clôture des 150 `CODE_ANALYSIS` |
 
-Avancement : **110 / 200** (dont 110 `CODE_ANALYSIS` sur 150). Reste 40 exemples de code — 24 `code`,
-16 `theorie` — puis les 50 RAG.
+Avancement : **125 / 200** (dont 125 `CODE_ANALYSIS` sur 150). Reste 25 exemples de code — 15 `code`,
+10 `theorie` — puis les 50 RAG.
 
 ⚠️ Polarité des contrôles supplémentaires. Un contrôle qui n'apparaîtrait qu'avec une seule valeur
 apprendrait au juge un raccourci par nom, au lieu de lui faire lire la description du critère. État au
 2026-09-13, après le lot 08 :
 
-| Contrôle | Polarités observées | À produire dans les lots 09 à 11 |
+| Contrôle | Polarités observées | À produire dans les lots 10 et 11 |
 |---|---|---|
 | `aucune_dependance_externe` | les deux | — |
+| `dependance_autorisee` | les deux | — |
 | `format_impose` | les deux | — |
+| `perimetre_respecte` | les deux | — |
 | `signature_conforme` | les deux | — |
+| `signature_publique_inchangee` | les deux | — |
+| `validation_entree` | les deux | — |
 | `contrainte_disponibilite` | toujours faux | un cas **vrai** |
-| `dependance_autorisee` | toujours faux | un cas **vrai** |
-| `durabilite_garantie` | toujours faux | un cas **vrai** |
-| `perimetre_respecte` | toujours faux | un cas **vrai** |
-| `signature_publique_inchangee` | toujours vrai | un cas **faux** |
-| `validation_entree` | toujours vrai | un cas **faux** |. Distribution exactement sur les cibles (60/40 domaine, 40/40/20 cas,
+| `durabilite_garantie` | toujours faux | un cas **vrai** |. Distribution exactement sur les cibles (60/40 domaine, 40/40/20 cas,
 12 cas verbeux à bug caché soit 15,0 %, 6 cas verbeux corrects en contrôle).
 Croisement cas × verdict : parfait 32 PASS, défaillant 32 FAIL, limite 11 PASS / 5 FAIL.
 
@@ -69,6 +70,11 @@ Familles consommées par batch_04 : `ConcurrentModificationException` intermitte
 flux réutilisé, monnaie en `double`, concaténation en boucle, `timedelta` et changement d'heure, copie superficielle,
 retour arrière catastrophique, perte de `this`, tri par défaut JS, entiers 64 bits en JSON, `==` vs `===`,
 pile et tas, idempotence REST, verrous optimistes et pessimistes.
+
+Familles consommées par batch_09 : appel de commande externe (paire contrastive), appartenance à un
+ensemble, bornes de tranche, valeur nulle dans une map, rétention d'annotation, fermeture dans une boucle,
+égalité de dates, signature publique figée, `SameSite` et CSRF, liste blanche contre liste noire, pool de
+connexions, journalisation de données clients, capture d'exception trop large, bascule DNS.
 
 Familles consommées par batch_08 : persistance par `pickle` (paire contrastive), imports circulaires,
 dépendance externe interdite, clé mutable dans une table de hachage, `serialVersionUID`, pollution de
