@@ -184,6 +184,22 @@ avec des humains. Avant tout benchmark : deux annotateurs relisent `data/golden/
 on calcule le κ inter-annotateurs — c'est le **plafond** atteignable — et les désaccords sont arbitrés puis
 reportés dans le lot source.
 
+`data/golden/` et `data/mlx/` ne sont pas versionnés : ce sont des dérivés, reproductibles à l'identique
+depuis les lots et la graine du tirage. Cette reproductibilité ne tient que parce que la graine est **figée
+dans le `Makefile`** (`SPLIT_SEED ?= 3`) ; sans ce pin, deux annotateurs pourraient relire deux golden sets
+différents sans s'en apercevoir. Attention au voisinage de noms : dans le `Makefile`, `SEED` désigne la
+liste des lots JSONL, la graine du tirage est `SPLIT_SEED`.
+
+Graine 3 et non le défaut 42 du script : le tirage est glouton et groupé par famille, donc il ne peut pas
+couper une famille pour atteindre un quota, et la graine est le seul levier. Sur 15 graines essayées, 3
+donne le golden set le plus proche des cibles (cas 20/20/10 au point près, 7 cas verbeux à défaut caché
+sur 50, soit 14 % pour un plancher à 10 %) ; 42 était l'un des plus mauvais tirages. Le choix porte sur
+des métadonnées déclarées — tâche, cas, verbosité — jamais sur des résultats de modèle.
+
+Boucle de correction après relecture : toute étiquette corrigée passe par `generators/gen_batch_NN.py`
+puis `make regen`, jamais par le JSONL. Si la correction change un `verdict` ou un `cas`, les strates du
+tirage bougent : rejouer `make split` et relire le delta.
+
 ### Production d'un lot
 
 ```bash
@@ -247,11 +263,23 @@ make bench-14b && make bench-32b && make report
 
 | # | Métrique | Définition |
 |---|---|---|
-| 1 | **κ de Cohen** (principale) | Accord des verdicts avec le golden set, calculé par passe puis moyenné, avec IC95 par bootstrap. À décliner **par tâche** : un κ global masquerait un effondrement sur `RAG_FAITHFULNESS`. |
-| 1 | F1 | Classe positive `FAIL` (détection de défaut), plus macro-F1. Accord par **contrôle atomique** en diagnostic — c'est lui qui dit *quel* critère le juge rate. |
-| 2 | Biais de verbosité | Faux PASS sur défauts verbeux contre défauts concis ; l'écart est le biais. Contrôle inverse sur les sorties verbeuses correctes. |
-| 3 | Répétabilité | Part des items dont les 3 verdicts sont identiques et valides ; idem pour la décision complète (tous les contrôles + verdict). |
-| 4 | Ressources | RAM, latence p50/p95, débit, temps pour 1000 jugements. Δκ apparié par bootstrap pour l'arbitrage 14B/32B. |
+| 1 | **κ de Cohen** (principale) | Accord des verdicts avec le golden set sur les 50 items, calculé par passe puis moyenné, avec IC95 par bootstrap. C'est **la** métrique de décision. |
+| 2 | F1 | Classe positive `FAIL` (détection de défaut), plus macro-F1. Accord par **contrôle atomique** en diagnostic — c'est lui qui dit *quel* critère le juge rate. |
+| 3 | Biais de verbosité | Faux PASS sur défauts verbeux contre défauts concis ; l'écart est le biais. Contrôle inverse sur les sorties verbeuses correctes. |
+| 4 | Répétabilité | Part des items dont les 3 verdicts sont identiques et valides ; idem pour la décision complète (tous les contrôles + verdict). |
+| 5 | Ressources | RAM, latence p50/p95, débit, temps pour 1000 jugements. Δκ apparié par bootstrap pour l'arbitrage 14B/32B. |
+
+⚠️ **Le κ ne se décline pas par tâche sur ce golden set.** Le tirage y place 39 `CODE_ANALYSIS`, 5
+`RAG_CONTEXT_RELEVANCE` et 6 `RAG_FAITHFULNESS` : un κ calculé sur 5 ou 6 items a un IC95 qui couvre
+presque tout le domaine, et l'annoncer donnerait une précision que la mesure n'a pas. Il faudrait environ
+25 items par tâche, donc un golden set d'une centaine — la moitié du corpus retirée de l'entraînement, ce
+qui n'est pas soutenable à 200 exemples.
+
+La posture monde fermé se surveille donc autrement, et il faut le faire explicitement, car c'est bien elle
+que le fine-tuning vise : **rapporter les 11 items RAG en comptes bruts** (combien de verdicts corrects sur
+11, et lesquels sont ratés), jamais en κ. Les trois cas décisifs sont ceux où la sortie est vraie dans la
+codebase mais absente du contexte — ils doivent être rejetés. Un juge qui les accepte a manqué la posture,
+et cela se voit sur 3 items sans avoir besoin d'un coefficient d'accord.
 
 Parsing : tolérant pour le verdict (dernier objet JSON contenant `verdict`), strict mesuré à part comme
 condition de qualification. Une sortie non parsable vaut `INVALID` et compte comme désaccord.

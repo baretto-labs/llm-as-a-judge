@@ -15,6 +15,13 @@ MODEL_MINI := mlx-community/Qwen2.5-Coder-0.5B-Instruct-4bit
 
 # Hyperparamètres identiques pour les deux tailles (comparaison équitable).
 TEST_SIZE  ?= 50
+# Graine du tirage train/valid/test — distincte du --seed 42 de mlx_lm.lora, qui est la graine
+# d'entraînement. 3 plutôt que le défaut 42 du script : sur 15 graines essayées, c'est celle dont
+# le golden set colle le mieux aux cibles (cas 20/20/10 au point près, 7 cas verbeux à défaut
+# caché sur 50). Le tirage étant glouton et groupé par famille, il ne peut pas couper une famille
+# pour atteindre un quota : la graine est le seul levier. Choix fait sur des métadonnées déclarées
+# (tâche, cas, verbosité), jamais sur des résultats de modèle.
+SPLIT_SEED ?= 3
 ITERS      ?= 400
 NUM_LAYERS ?= 16
 LR         ?= 1e-5
@@ -32,7 +39,7 @@ help:
 	@echo "Pipeline:  make smoke-all             (fine-tuning + service + benchmark sur 0.5B, ~3 min)"
 	@echo "Training:  make train-14b | make train-32b"
 	@echo "Benchmark: make bench-14b | make bench-32b | make bench | make report"
-	@echo "Variables: TEST_SIZE=$(TEST_SIZE) ITERS=$(ITERS) NUM_LAYERS=$(NUM_LAYERS) LR=$(LR) MAXLEN=$(MAXLEN)"
+	@echo "Variables: TEST_SIZE=$(TEST_SIZE) SPLIT_SEED=$(SPLIT_SEED) ITERS=$(ITERS) NUM_LAYERS=$(NUM_LAYERS) LR=$(LR) MAXLEN=$(MAXLEN)"
 
 setup:
 	python3 -m venv $(VENV)
@@ -55,7 +62,7 @@ stats:
 	$(PY) scripts/dataset_tools.py stats $(SEED)
 
 split: validate
-	$(PY) scripts/dataset_tools.py split $(SEED) --out data --test-size $(TEST_SIZE)
+	$(PY) scripts/dataset_tools.py split $(SEED) --out data --test-size $(TEST_SIZE) --seed $(SPLIT_SEED)
 
 split-poc:
 	$(MAKE) split TEST_SIZE=10

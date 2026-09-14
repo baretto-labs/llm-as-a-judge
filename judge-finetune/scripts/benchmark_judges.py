@@ -293,6 +293,14 @@ def evaluate(variant, golden, runs, args, rng):
                 pairs.append((gold_checks[k], (judgment.get("checks") or {}).get(k)))
         criteria_acc[k] = sum(a == b for a, b in pairs) / len(pairs) if pairs else float("nan")
 
+    # Posture monde fermé, en comptes bruts. Le golden set ne porte qu'une dizaine d'items RAG :
+    # un κ calculé dessus aurait un IC95 couvrant presque tout le domaine. On rapporte donc le
+    # nombre de verdicts corrects et on nomme les items ratés, ce qui reste lisible à cette taille.
+    rag_idx = [i for i, g in enumerate(golden) if g["meta"]["task"].startswith("RAG_")]
+    rag_missed = [{"id": golden[i]["id"], "task": golden[i]["meta"]["task"],
+                   "gold": gold[i], "pred": majority_pred[i]}
+                  for i in rag_idx if majority_pred[i] != gold[i]]
+
     verbose_fpr, n_verbose_fail = false_pass_rate(golden, runs, lambda g: g["meta"]["verbeux"])
     concise_fpr, n_concise_fail = false_pass_rate(golden, runs, lambda g: not g["meta"]["verbeux"])
     verbose_pass_items = [g for g in golden if g["gold"]["verdict"] == "PASS" and g["meta"]["verbeux"]]
@@ -323,6 +331,10 @@ def evaluate(variant, golden, runs, args, rng):
         "accuracy_mean": statistics.fmean(p["accuracy"] for p in per_pass),
         "per_pass": per_pass,
         "criteria_accuracy": criteria_acc,
+        "rag_n": len(rag_idx),
+        "rag_correct": len(rag_idx) - len(rag_missed),
+        "rag_by_task": dict(Counter(golden[i]["meta"]["task"] for i in rag_idx)),
+        "rag_missed": rag_missed,
         "json_parse_rate": sum(r["judgment"] is not None for r in all_rows) / len(all_rows) if all_rows else 0.0,
         "strict_format_rate": sum(r["strict_format"] for r in all_rows) / len(all_rows) if all_rows else 0.0,
         "verdict_stability": verdict_stable / n,
@@ -399,6 +411,19 @@ def build_report(metrics, golden, args, rng):
             lines.append(f"| {m['name']} | "
                          + " | ".join(fmt(m["criteria_accuracy"].get(k, float("nan")), pct=True) for k in crit_names)
                          + " |")
+
+    if metrics and metrics[0].get("rag_n"):
+        n_rag = metrics[0]["rag_n"]
+        ventil = ", ".join(f"{k} {v}" for k, v in sorted(metrics[0]["rag_by_task"].items()))
+        lines += ["", f"Posture monde fermé — {n_rag} items RAG du golden set ({ventil}), en comptes bruts.",
+                  "Pas de κ sur ce sous-ensemble : à cette taille son IC95 couvrirait presque tout le "
+                  "domaine (voir PROTOCOLE.md, section Métriques).", "",
+                  "| Variante | Verdicts corrects (vote majoritaire) | Items ratés |",
+                  "|---|---|---|"]
+        for m in metrics:
+            missed = m.get("rag_missed") or []
+            detail = ", ".join(f"{x['id']} ({x['gold']} → {x['pred']})" for x in missed) or "—"
+            lines.append(f"| {m['name']} | {m['rag_correct']}/{n_rag} | {detail} |")
 
     lines += ["", "## 2. Résistance au biais de verbosité", "",
               "| Variante | Faux PASS verbeux+bug (n) | Faux PASS concis+bug (n) | Écart (biais) | Faux FAIL verbeux corrects (n) |",
