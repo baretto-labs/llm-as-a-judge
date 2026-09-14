@@ -1,7 +1,7 @@
 # WIP — Work In Progress
 
 > Fichier de mémoire de travail. Mis à jour après chaque session de travail.
-> Dernière mise à jour : 2026-09-11
+> Dernière mise à jour : 2026-09-14
 
 ---
 
@@ -38,10 +38,11 @@ Tout le détail est dans `judge-finetune/PROTOCOLE.md`.
 
 **Prochaines étapes**
 1. ~~Libérer du disque~~ : fait le 2026-09-12, 159 Go récupérés (caches dev, modèles Ollama, VMs UTM, VM Colima purgée). 220 Go libres.
-2. Générer les 200 exemples — **180/200 faits**. **Phase code terminée** : 150 `CODE_ANALYSIS`, exactement 90 `code` et 60 `theorie`, 0 erreur de validation, 9 contrôles supplémentaires portant tous les deux polarités. Reste les 50 exemples RAG (25 par passe), avec compensation 19/21/10 sur les cas pour retomber sur 80/80/40 — détail dans `data/PLAN_CORPUS.md`.
-3. Produire la matière RAG par extraction réelle : lancer `QuestionCorpus` contre les stratégies Lucene et Neo4j, Ollama actif pour les embeddings, et conserver les contextes tels qu'ils sortent (bruit, doublons, troncatures). Prompts pour déléguer la génération à des modèles tiers : `judge-finetune/PROMPT_GENERATION.md`. Méthode par lot : sonder les comportements par exécution, écrire les exemples à partir des sorties mesurées, valider, contrôler la dérive de distribution. Plan de composition et familles dans `data/PLAN_CORPUS.md`. Le 14B a été sondé sur 20 itérations : ~11 s/itération, pic 11,08 Go, soit ~1 h 15 pour 400 itérations.
-3. Faire relire le golden set par des humains et calculer le κ inter-annotateurs, qui sert de plafond.
-4. Mesurer la faisabilité du QLoRA 32B sur 36 Go (repli : `NUM_LAYERS=8`, puis `MAXLEN=1024`).
+2. ~~Générer les 200 exemples~~ : **fait le 2026-09-14, 200/200, 0 erreur de validation**, toutes les cibles atteintes exactement — 150 `CODE_ANALYSIS` / 25 `RAG_CONTEXT_RELEVANCE` / 25 `RAG_FAITHFULNESS`, 80 `parfait` / 80 `defaillant` / 40 `limite`, 90 `code` / 60 `theorie` / 50 `rag`, 25 verbeux à défaut caché (12,5 %) et 15 verbeux corrects, 105 PASS pour 95 FAIL. Les 9 contrôles supplémentaires portent tous les deux polarités.
+3. ~~Produire la matière RAG par extraction réelle~~ : fait. Les 50 contextes RAG viennent d'extractions réelles via `verification/ExtractRagContexts.java` (Lucene `hybrid` et Neo4j `hybrid-graph`, Ollama actif pour les embeddings), conservés tels qu'ils sortent — bruit, doublons, troncatures — et versionnés dans `judge-finetune/verification/contexts/`. **Indexer `OllamAssist/src/main/java`, jamais la racine du dépôt** : elle contient une copie de `llm-as-a-judge` sous `tmp/`, donc le corpus de questions lui-même, ce qui avait produit 100 % de couverture d'indices sur les 30 questions — un artefact. Procédure, pièges et familles : `judge-finetune/data/PLAN_CORPUS.md`.
+4. `make split` (golden set de 50, stratifié et groupé par famille), puis relecture humaine de ce golden set et calcul du κ inter-annotateurs, qui sert de plafond aux mesures.
+5. `make train-14b`, `make train-32b`, puis le benchmark. Le 14B a été sondé sur 20 itérations : ~11 s/itération, pic 11,08 Go, soit ~1 h 15 pour 400 itérations.
+6. Mesurer la faisabilité du QLoRA 32B sur 36 Go (repli : `NUM_LAYERS=8`, puis `MAXLEN=1024`).
 
 ---
 

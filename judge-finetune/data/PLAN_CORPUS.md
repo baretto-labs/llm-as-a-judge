@@ -32,32 +32,31 @@ sa ligne. Les quotas viennent de `PROTOCOLE.md` §2.2, les règles d'étiquetage
 | batch_09 | 15 | b09-001 → b09-015 | ✅ fait (Python/Java/JS, sondes probe09.*) |
 | batch_10 | 15 | b10-001 → b10-015 | ✅ fait (Java/Python/SQL/TS, sondes probe10.*) |
 | batch_11 | 10 | b11-001 → b11-010 | ✅ fait — **les 150 `CODE_ANALYSIS` sont clos** |
-| batch_12 → batch_14 | 50 au total | bNN-0NN | à produire — 25 `RAG_CONTEXT_RELEVANCE`, 25 `RAG_FAITHFULNESS` |
+| batch_12 | 15 | b12-001 → b12-015 | ✅ fait — contextes RAG réels, Lucene et Neo4j mêlés |
+| batch_13 | 15 | b13-001 → b13-015 | ✅ fait — contextes RAG réels |
+| batch_14 | 20 | b14-001 → b14-020 | ✅ fait — clôture du corpus à 200 |
 
-Avancement : **180 / 200**. La phase code est **terminée** : 150 `CODE_ANALYSIS` sur 150, répartis
-exactement en 90 `code` et 60 `theorie`. La phase RAG compte 30 exemples sur 50. Reste 20 exemples, produits par le batch_14.
+Avancement : **200 / 200, corpus clos le 2026-09-14**, 0 erreur de validation. Les 150 `CODE_ANALYSIS` se
+répartissent exactement en 90 `code` et 60 `theorie` ; les 50 exemples RAG en 25 par passe.
 
 Les contextes réellement récupérés qui servent de matière sont versionnés dans
 `verification/contexts/` : ce sont eux qui rendent les étiquettes vérifiables par un tiers.
 
-État à la clôture de la phase code : 61 `parfait` / 59 `defaillant` / 30 `limite`, soit 40,7 / 39,3 / 20,0 %,
-80 PASS pour 70 FAIL, 22 cas verbeux à défaut caché (14,7 %) et 11 verbeux corrects en contrôle.
+État final mesuré sur les 200 exemples : 80 `parfait` / 80 `defaillant` / 40 `limite`, soit 40 / 40 / 20 %
+au point près ; 105 PASS pour 95 FAIL ; 25 cas verbeux à défaut caché (12,5 %, le protocole en exige 10 %)
+et 15 verbeux corrects en contrôle. Toutes les cibles du tableau ci-dessus sont atteintes exactement.
 
-⚠️ **Compensation à appliquer aux 50 exemples RAG** : produire **19 `parfait`, 21 `defaillant`, 10 `limite`**
-pour retomber exactement sur 80 / 80 / 40 à 200 exemples. Viser aussi au moins 3 verbeux à défaut caché
-supplémentaires pour atteindre la cible de 25, et 4 verbeux corrects pour atteindre 15.
+La compensation sur les cas a été répartie au fil des lots RAG, le solde tombant sur le dernier lot ; le
+détail du calcul est conservé dans la table « Composition imposée du batch_14 » plus bas.
 
 ⚠️ Polarité des contrôles supplémentaires. Un contrôle qui n'apparaîtrait qu'avec une seule valeur
-apprendrait au juge un raccourci par nom, au lieu de lui faire lire la description du critère. État au
-2026-09-13, après le lot 08 :
+apprendrait au juge un raccourci par nom, au lieu de lui faire lire la description du critère.
 
 ✅ **Équilibrage terminé au 2026-09-13** : les 9 contrôles supplémentaires (`aucune_dependance_externe`,
 `contrainte_disponibilite`, `dependance_autorisee`, `durabilite_garantie`, `format_impose`,
 `perimetre_respecte`, `signature_conforme`, `signature_publique_inchangee`, `validation_entree`) apparaissent
 chacun avec les deux polarités. À maintenir pour tout nouveau contrôle introduit, y compris dans les lots RAG :
-un contrôle à polarité unique enseigne un raccourci par nom.. Distribution exactement sur les cibles (60/40 domaine, 40/40/20 cas,
-12 cas verbeux à bug caché soit 15,0 %, 6 cas verbeux corrects en contrôle).
-Croisement cas × verdict : parfait 32 PASS, défaillant 32 FAIL, limite 11 PASS / 5 FAIL.
+un contrôle à polarité unique enseigne un raccourci par nom.
 
 Les lots suivants peuvent être produits par des modèles tiers : voir `../PROMPT_GENERATION.md`.
 Règle retenue — la matière à juger peut venir d'ailleurs, l'étiquetage reste fait par un annotateur
@@ -115,10 +114,10 @@ TCP vs UDP, codes 401 et 403, périmètre de dénormalisation.
 Chaque lot respecte localement la ventilation (≈ 9 code / 6 théorie, ≈ 6 parfait / 6 défaillant / 3 limite) pour
 qu'un arrêt en cours de route laisse un corpus équilibré.
 
-## Reste à produire après le lot 06
+## Matière RAG : l'extraction réelle
 
-80 exemples faits, tous `CODE_ANALYSIS`. Il reste **70 `CODE_ANALYSIS`** (42 code / 28 théorie) et
-**50 exemples RAG**, à répartir en 25 par passe.
+Le corpus est clos. Les 50 contextes RAG proviennent tous d'extractions réelles ; la procédure et les
+pièges rencontrés sont consignés ici, et resteront valables pour toute extension ultérieure du corpus.
 
 ⚠️ Les contextes RAG doivent provenir de **récupérations réelles** via `QuestionCorpus` et les stratégies
 Lucene / Neo4j du dépôt. Un contexte inventé serait trop propre : ni bruit, ni doublons, ni troncature au
@@ -204,9 +203,10 @@ un juge qui n'a vu qu'une mise en forme apprendrait à la reconnaître au lieu d
 |---|---|---|
 | batch_12 | 15 | ✅ fait — 8 `RAG_CONTEXT_RELEVANCE`, 7 `RAG_FAITHFULNESS`, sources Lucene et Neo4j mêlées |
 | batch_13 | 15 | ✅ fait — 7 `RAG_CONTEXT_RELEVANCE`, 8 `RAG_FAITHFULNESS` |
-| batch_14 | 20 | à produire — clôture, la distribution finale en dépend |
+| batch_14 | 20 | ✅ fait — 10 `RAG_CONTEXT_RELEVANCE`, 10 `RAG_FAITHFULNESS`, clôture du corpus à 200 |
 
-**Composition imposée du batch_14, seule combinaison qui atteigne les cibles :**
+**Composition imposée du batch_14, seule combinaison qui atteigne les cibles — produite telle quelle,
+les compteurs finaux tombent au point près :**
 
 | Axe | Fait sur 180 | À produire sur 20 |
 |---|---|---|
@@ -218,15 +218,15 @@ un juge qui n'a vu qu'une mise en forme apprendrait à la reconnaître au lieu d
 | verbeux à défaut caché | 24 | **1** |
 | verbeux correct | 14 | **1** |
 
-Contextes déjà exploités, à ne pas réutiliser : `calculateDynamicThreshold`, `AuthenticationHelper`,
-`OllamaService`, `NewUserMessageNotifier`, `SuggestionCache`, `PrerequisiteService`,
-`LuceneEmbeddingStore implements` (Lucene) ; `AuthenticationHelper`, `OllamaService`,
-`ContextRetriever.retrieve`, `DocumentIndexingPipeline`, `BracketCallParser`, `Assistant`,
-`DocumentIngestFactory` (Neo4j). Il reste 46 couples question/moteur disponibles sur 60.
+**Contextes consommés par les trois lots RAG**, à ne pas réutiliser tels quels si le corpus est un jour
+étendu. Un même symbole extrait par les deux moteurs compte pour deux contextes distincts : les formes
+diffèrent (blocs de code contre nœuds de graphe), et le corpus les représente exprès toutes les deux.
 
-Contextes déjà exploités par batch_12, à ne pas réutiliser tels quels : `calculateDynamicThreshold` (Lucene),
-`AuthenticationHelper` (Lucene et Neo4j), `OllamaService` (Lucene et Neo4j), `ContextRetriever.retrieve`
-(Neo4j), `NewUserMessageNotifier` (Lucene).
+| Lot | Lucene `hybrid` | Neo4j `hybrid-graph` |
+|---|---|---|
+| batch_12 | `calculateDynamicThreshold`, `AuthenticationHelper`, `OllamaService`, `NewUserMessageNotifier` | `AuthenticationHelper`, `OllamaService`, `ContextRetriever.retrieve` |
+| batch_13 | `SuggestionCache`, `PrerequisiteService`, `LuceneEmbeddingStore implements` | `DocumentIndexingPipeline` (réessais), `BracketCallParser`, `Assistant`, `DocumentIngestFactory` |
+| batch_14 | `DocumentIndexingPipeline.processBatch` (corps), `ContextRetriever` (sources) | `EnhancedCompletionService`, `RefactorAction.dismiss`, implémentations de `ToolCallParser`, `FileCreator` / `FileApprovalNotifier` |
 
 ### Familles RAG — passe A, `RAG_CONTEXT_RELEVANCE`
 
