@@ -34,8 +34,8 @@ sa ligne. Les quotas viennent de `PROTOCOLE.md` §2.2, les règles d'étiquetage
 | batch_11 | 10 | b11-001 → b11-010 | ✅ fait — **les 150 `CODE_ANALYSIS` sont clos** |
 | batch_12 → batch_14 | 50 au total | bNN-0NN | à produire — 25 `RAG_CONTEXT_RELEVANCE`, 25 `RAG_FAITHFULNESS` |
 
-Avancement : **165 / 200**. La phase code est **terminée** : 150 `CODE_ANALYSIS` sur 150, répartis
-exactement en 90 `code` et 60 `theorie`. La phase RAG est amorcée avec 15 exemples. Reste 35 exemples RAG.
+Avancement : **180 / 200**. La phase code est **terminée** : 150 `CODE_ANALYSIS` sur 150, répartis
+exactement en 90 `code` et 60 `theorie`. La phase RAG compte 30 exemples sur 50. Reste 20 exemples, produits par le batch_14.
 
 Les contextes réellement récupérés qui servent de matière sont versionnés dans
 `verification/contexts/` : ce sont eux qui rendent les étiquettes vérifiables par un tiers.
@@ -203,20 +203,26 @@ un juge qui n'a vu qu'une mise en forme apprendrait à la reconnaître au lieu d
 | Lot | Exemples | Contenu |
 |---|---|---|
 | batch_12 | 15 | ✅ fait — 8 `RAG_CONTEXT_RELEVANCE`, 7 `RAG_FAITHFULNESS`, sources Lucene et Neo4j mêlées |
-| batch_13 | 15 | à produire |
-| batch_14 | 20 | clôture, ajustement final de la distribution |
+| batch_13 | 15 | ✅ fait — 7 `RAG_CONTEXT_RELEVANCE`, 8 `RAG_FAITHFULNESS` |
+| batch_14 | 20 | à produire — clôture, la distribution finale en dépend |
 
-**Restant après batch_12, chiffres à respecter exactement :**
+**Composition imposée du batch_14, seule combinaison qui atteigne les cibles :**
 
-| Axe | Fait | Reste sur 35 |
+| Axe | Fait sur 180 | À produire sur 20 |
 |---|---|---|
-| `RAG_CONTEXT_RELEVANCE` | 8 | **17** |
-| `RAG_FAITHFULNESS` | 7 | **18** |
-| `parfait` | 5 | **14** |
-| `defaillant` | 7 | **14** |
-| `limite` | 3 | **7** |
-| verbeux à défaut caché | 1 (23 au total) | ≥ 2 pour atteindre 25 |
-| verbeux correct | 1 (12 au total) | ≥ 3 pour atteindre 15 |
+| `RAG_CONTEXT_RELEVANCE` | 15 | **10** |
+| `RAG_FAITHFULNESS` | 15 | **10** |
+| `parfait` | 71 | **9** |
+| `defaillant` | 73 | **7** |
+| `limite` | 36 | **4** |
+| verbeux à défaut caché | 24 | **1** |
+| verbeux correct | 14 | **1** |
+
+Contextes déjà exploités, à ne pas réutiliser : `calculateDynamicThreshold`, `AuthenticationHelper`,
+`OllamaService`, `NewUserMessageNotifier`, `SuggestionCache`, `PrerequisiteService`,
+`LuceneEmbeddingStore implements` (Lucene) ; `AuthenticationHelper`, `OllamaService`,
+`ContextRetriever.retrieve`, `DocumentIndexingPipeline`, `BracketCallParser`, `Assistant`,
+`DocumentIngestFactory` (Neo4j). Il reste 46 couples question/moteur disponibles sur 60.
 
 Contextes déjà exploités par batch_12, à ne pas réutiliser tels quels : `calculateDynamicThreshold` (Lucene),
 `AuthenticationHelper` (Lucene et Neo4j), `OllamaService` (Lucene et Neo4j), `ContextRetriever.retrieve`
