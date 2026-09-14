@@ -121,6 +121,61 @@ qu'un arrêt en cours de route laisse un corpus équilibré.
 Lucene / Neo4j du dépôt. Un contexte inventé serait trop propre : ni bruit, ni doublons, ni troncature au
 milieu d'une méthode — donc un juge inutilisable sur les sorties réelles du moteur.
 
+### Procédure d'extraction, et les pièges rencontrés le 2026-09-14
+
+Harnais : `verification/ExtractRagContexts.java`, lancé avec le classpath Maven du projet.
+
+```bash
+mvn -q compile test-compile
+mvn -q dependency:build-classpath -Dmdep.outputFile=cp.txt -Dmdep.includeScope=test
+java -cp "target/classes:target/test-classes:$(cat cp.txt)" ExtractRagContexts.java \
+     ~/Workspaces/Labs/OllamAssist/src/main/java sortie.jsonl lucene hybrid
+```
+
+**Indexer `src/main/java`, jamais la racine du dépôt.** La racine d'OllamAssist contient une copie de
+`llm-as-a-judge` sous `tmp/`, donc `QuestionCorpus.java` lui-même, ainsi qu'un fichier
+`benchmark-results/2026-05-15_chunking.jsonl` reprenant les chaînes d'indices. Indexée en entier, la
+codebase fait remonter le corpus de questions dans le contexte : les 30 questions affichaient alors **100 %
+de couverture d'indices**, artefact pur. Le périmètre propre compte 162 fichiers contre 277 pour la racine,
+dont 83 sous `src/test`.
+
+**Ne jamais labelliser `contexte_suffisant` d'après `couverture_indices`.** Cette métrique ne mesure qu'une
+présence de sous-chaîne ; il faut lire les extraits.
+
+Trois pièges du harnais, tous corrigés mais à connaître :
+
+| Piège | Symptôme | Correctif |
+|---|---|---|
+| Presets en kebab-case | `IllegalArgumentException: Preset inconnu: 'hybridGraph'` | `knn-only`, `hybrid`, `hybrid-graph`, `hybrid-graph-hyde`, `full` |
+| `String.format` sans locale | JSON invalide, `"couverture_indices":1,000` | `Locale.ROOT` imposé |
+| Exécution via `\| grep \| tail` | code de sortie 0 malgré une exception | lire le journal, pas seulement le code |
+
+**Volume à traiter.** Lucene renvoie 10 extraits par question, médiane 665 caractères, contexte complet de
+2 823 à 33 124 caractères sur le périmètre propre — bien trop pour des exemples à `--max-seq-length 2048`.
+Chaque exemple RAG retiendra donc un **sous-ensemble d'extraits** (2 à 4), choisi pour illustrer le cas visé,
+en conservant les extraits tels quels sans les réécrire.
+
+### Récupération mesurée sur le périmètre propre (Lucene, preset `hybrid`)
+
+Une fois la contamination écartée, la couverture d'indices varie enfin : 22 questions à 100 %, et 8 en
+dessous. Ces 8 fournissent les cas `RAG_CONTEXT_RELEVANCE` en échec **sans avoir à dégrader le moteur**.
+
+| Couverture | Question | Indices absents |
+|---|---|---|
+| 0 % | `calculateDynamicThreshold` dans `LuceneEmbeddingStore` | les trois |
+| 33 % | interfaces implémentées par `OllamaService` | `Disposable`, `ModelListener` |
+| 33 % | `OllamAssistStartup` initialise `EditorListener` | `OllamAssistStartup`, `execute` |
+| 33 % | `SelectionGutterIcon` déclenche `OverlayPromptPanelFactory` | les deux classes |
+| 50 % | méthodes de l'interface `Assistant` | `refactor`, `TokenStream` |
+| 50 % | `AskFromCodeAction` notifie via `NewUserMessageNotifier` | `AskFromCodeAction` |
+| 67 % | en-tête d'authentification d'`AuthenticationHelper` | `createBasicAuthHeader` |
+| 75 % | ce qu'implémente `LuceneEmbeddingStore` | `Closeable` |
+
+⚠️ Le cas à 67 % est particulier et utile : `createBasicAuthHeader` **n'existe pas** dans OllamAssist, la
+méthode réelle étant `buildAuthorizationHeaderValue(AuthMode, String, String, String)`. L'indice attendu du
+corpus est donc lui-même erroné. C'est la matière idéale d'un exemple `RAG_FAITHFULNESS` : une réponse qui
+cite `createBasicAuthHeader` doit être rejetée comme non étayée, alors même qu'elle paraît plausible.
+
 ### Familles RAG — passe A, `RAG_CONTEXT_RELEVANCE`
 
 récupération exacte sur question LOCAL · extraits du bon fichier mais mauvaise méthode · contexte suffisant
