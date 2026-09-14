@@ -163,6 +163,20 @@ Les contextes doivent être **réellement récupérés**, pas inventés : le dé
 récupération. Un contexte synthétique produirait un juge entraîné sur des extraits trop propres, sans le
 bruit, les doublons et les troncatures que produit une vraie recherche.
 
+**Ce que ces 50 exemples visent — et ce qu'ils ne visent pas.** En production, l'évaluation RAG sera pilotée
+par le prompt : c'est lui qui fournira le contexte et la rubrique. Les exemples RAG du corpus d'entraînement
+n'ont donc pas à couvrir tous les modes de défaillance d'un moteur de recherche. Ils servent à enseigner
+deux choses, et uniquement elles :
+
+1. **La posture monde fermé**, c'est-à-dire rejeter une affirmation non étayée par le contexte, y compris
+   lorsqu'elle est vraie. Le couple décisif à couvrir est une même affirmation acceptée sous
+   `CODE_ANALYSIS` et rejetée sous `RAG_FAITHFULNESS`.
+2. **La flexibilité du schéma JSON**, en présentant des rubriques dont les contrôles diffèrent de celles de
+   `CODE_ANALYSIS`, pour que le juge lise la section `### CRITÈRES DE VALIDATION` au lieu de supposer un
+   triplet figé.
+
+Un jeu resserré et net sur ces deux points vaut mieux qu'un panorama exhaustif des pannes de récupération.
+
 ### Golden set
 
 Les étiquettes sont produites par un modèle. Sans revue humaine, le κ mesure l'accord avec ce modèle, pas
