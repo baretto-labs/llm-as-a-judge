@@ -38,7 +38,7 @@ Tout le détail est dans `judge-finetune/PROTOCOLE.md`.
 
 **Prochaines étapes**
 1. ~~Libérer du disque~~ : fait le 2026-09-12, 159 Go récupérés (caches dev, modèles Ollama, VMs UTM, VM Colima purgée). 220 Go libres.
-2. Générer les 200 exemples — **125/200 faits** (batch_01 : 5, puis 15 par lot). Reste 25 exemples de code (lots 10 et 11) avant de passer aux 50 RAG. Prompts pour déléguer la génération à des modèles tiers : `judge-finetune/PROMPT_GENERATION.md`. Méthode par lot : sonder les comportements par exécution, écrire les exemples à partir des sorties mesurées, valider, contrôler la dérive de distribution. Plan de composition et familles dans `data/PLAN_CORPUS.md`. Le 14B a été sondé sur 20 itérations : ~11 s/itération, pic 11,08 Go, soit ~1 h 15 pour 400 itérations.
+2. Générer les 200 exemples — **140/200 faits** (batch_01 : 5, puis 15 par lot). Reste 10 exemples de code (lot 11) avant de passer aux 50 RAG. Les 9 contrôles supplémentaires portent tous les deux polarités. Prompts pour déléguer la génération à des modèles tiers : `judge-finetune/PROMPT_GENERATION.md`. Méthode par lot : sonder les comportements par exécution, écrire les exemples à partir des sorties mesurées, valider, contrôler la dérive de distribution. Plan de composition et familles dans `data/PLAN_CORPUS.md`. Le 14B a été sondé sur 20 itérations : ~11 s/itération, pic 11,08 Go, soit ~1 h 15 pour 400 itérations.
 3. Faire relire le golden set par des humains et calculer le κ inter-annotateurs, qui sert de plafond.
 4. Mesurer la faisabilité du QLoRA 32B sur 36 Go (repli : `NUM_LAYERS=8`, puis `MAXLEN=1024`).
 
