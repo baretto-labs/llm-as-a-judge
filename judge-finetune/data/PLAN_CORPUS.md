@@ -31,10 +31,18 @@ sa ligne. Les quotas viennent de `PROTOCOLE.md` §2.2, les règles d'étiquetage
 | batch_08 | 15 | b08-001 → b08-015 | ✅ fait (Python/Java/JS, sondes probe08.*) |
 | batch_09 | 15 | b09-001 → b09-015 | ✅ fait (Python/Java/JS, sondes probe09.*) |
 | batch_10 | 15 | b10-001 → b10-015 | ✅ fait (Java/Python/SQL/TS, sondes probe10.*) |
-| batch_11 | 10 | b11-001 → b11-010 | à produire — clôture des 150 `CODE_ANALYSIS` |
+| batch_11 | 10 | b11-001 → b11-010 | ✅ fait — **les 150 `CODE_ANALYSIS` sont clos** |
+| batch_12 → batch_14 | 50 au total | bNN-0NN | à produire — 25 `RAG_CONTEXT_RELEVANCE`, 25 `RAG_FAITHFULNESS` |
 
-Avancement : **140 / 200** (dont 140 `CODE_ANALYSIS` sur 150). Reste 10 exemples de code — 6 `code`,
-4 `theorie` — puis les 50 RAG.
+Avancement : **150 / 200**. La phase code est **terminée** : 150 `CODE_ANALYSIS` sur 150, répartis
+exactement en 90 `code` et 60 `theorie`. Reste les 50 exemples RAG.
+
+État à la clôture de la phase code : 61 `parfait` / 59 `defaillant` / 30 `limite`, soit 40,7 / 39,3 / 20,0 %,
+80 PASS pour 70 FAIL, 22 cas verbeux à défaut caché (14,7 %) et 11 verbeux corrects en contrôle.
+
+⚠️ **Compensation à appliquer aux 50 exemples RAG** : produire **19 `parfait`, 21 `defaillant`, 10 `limite`**
+pour retomber exactement sur 80 / 80 / 40 à 200 exemples. Viser aussi au moins 3 verbeux à défaut caché
+supplémentaires pour atteindre la cible de 25, et 4 verbeux corrects pour atteindre 15.
 
 ⚠️ Polarité des contrôles supplémentaires. Un contrôle qui n'apparaîtrait qu'avec une seule valeur
 apprendrait au juge un raccourci par nom, au lieu de lui faire lire la description du critère. État au
@@ -65,6 +73,11 @@ Familles consommées par batch_04 : `ConcurrentModificationException` intermitte
 flux réutilisé, monnaie en `double`, concaténation en boucle, `timedelta` et changement d'heure, copie superficielle,
 retour arrière catastrophique, perte de `this`, tri par défaut JS, entiers 64 bits en JSON, `==` vs `===`,
 pile et tas, idempotence REST, verrous optimistes et pessimistes.
+
+Familles consommées par batch_11 : validation d'URL de rappel (paire contrastive), jointure de chemin avec
+segment absolu, `NOT IN` et `NULL`, `LocalDateTime` et changement d'heure, `encodeURI` contre
+`encodeURIComponent`, logique à trois valeurs, conversion numérique, casse et normalisation Unicode,
+durée physique contre écart d'horloge.
 
 Familles consommées par batch_10 : contrat de comparateur, comparateur par soustraction, `TreeSet` et
 `compareTo` incohérent, `__eq__` sans `__hash__`, configuration gelée, écriture durable, ordre des colonnes

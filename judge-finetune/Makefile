@@ -43,7 +43,7 @@ setup:
 # Régénère les lots depuis leurs générateurs. Déterministe : sert aussi à réparer
 # un fichier corrompu, les JSONL n'étant jamais édités à la main.
 regen:
-	@for n in 01 02 03 04 05 06 07 08 09 10; do \
+	@for n in 01 02 03 04 05 06 07 08 09 10 11; do \
 	  $(PY) generators/gen_batch_$$n.py data/seed/batch_$$n.jsonl; \
 	done
 	@$(MAKE) --no-print-directory validate
