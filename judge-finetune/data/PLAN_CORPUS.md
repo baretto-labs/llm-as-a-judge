@@ -34,8 +34,11 @@ sa ligne. Les quotas viennent de `PROTOCOLE.md` §2.2, les règles d'étiquetage
 | batch_11 | 10 | b11-001 → b11-010 | ✅ fait — **les 150 `CODE_ANALYSIS` sont clos** |
 | batch_12 → batch_14 | 50 au total | bNN-0NN | à produire — 25 `RAG_CONTEXT_RELEVANCE`, 25 `RAG_FAITHFULNESS` |
 
-Avancement : **150 / 200**. La phase code est **terminée** : 150 `CODE_ANALYSIS` sur 150, répartis
-exactement en 90 `code` et 60 `theorie`. Reste les 50 exemples RAG.
+Avancement : **165 / 200**. La phase code est **terminée** : 150 `CODE_ANALYSIS` sur 150, répartis
+exactement en 90 `code` et 60 `theorie`. La phase RAG est amorcée avec 15 exemples. Reste 35 exemples RAG.
+
+Les contextes réellement récupérés qui servent de matière sont versionnés dans
+`verification/contexts/` : ce sont eux qui rendent les étiquettes vérifiables par un tiers.
 
 État à la clôture de la phase code : 61 `parfait` / 59 `defaillant` / 30 `limite`, soit 40,7 / 39,3 / 20,0 %,
 80 PASS pour 70 FAIL, 22 cas verbeux à défaut caché (14,7 %) et 11 verbeux corrects en contrôle.
@@ -174,7 +177,50 @@ dessous. Ces 8 fournissent les cas `RAG_CONTEXT_RELEVANCE` en échec **sans avoi
 ⚠️ Le cas à 67 % est particulier et utile : `createBasicAuthHeader` **n'existe pas** dans OllamAssist, la
 méthode réelle étant `buildAuthorizationHeaderValue(AuthMode, String, String, String)`. L'indice attendu du
 corpus est donc lui-même erroné. C'est la matière idéale d'un exemple `RAG_FAITHFULNESS` : une réponse qui
-cite `createBasicAuthHeader` doit être rejetée comme non étayée, alors même qu'elle paraît plausible.
+cite `createBasicAuthHeader` doit être rejetée comme non étayée, alors même qu'elle paraît plausible. Mieux
+encore, l'extrait retenu contient la Javadoc du fichier, qui impose explicitement de passer par
+`createAuthorizationHeaderValue()` ou `authHeaders()` : le contexte **contredit** la réponse plausible.
+
+### Neo4j sur le même périmètre (preset `hybrid-graph`)
+
+Indexation des 162 fichiers en 28,8 s. Les deux sources sont complémentaires, et le graphe présente un
+avantage pratique décisif :
+
+| | Lucene `hybrid` | Neo4j `hybrid-graph` |
+|---|---|---|
+| Extraits par question | 10 | 5 |
+| Taille médiane d'un extrait | 665 car. | 287 car. |
+| Contexte complet | 2 823 – 33 124 car. | 837 – 2 886 car. |
+| Questions sous 100 % de couverture | 8 | **16** |
+| Forme des extraits | blocs de code | nœuds `=== fqn.methode(args) [Function] ===` |
+
+Le contexte Neo4j **tient directement** dans un exemple à `--max-seq-length 2048`, sans sélection d'extraits,
+et offre deux fois plus de cas de récupération partielle. Les deux formats seront représentés dans le corpus :
+un juge qui n'a vu qu'une mise en forme apprendrait à la reconnaître au lieu de lire la rubrique.
+
+### Découpage des lots RAG
+
+| Lot | Exemples | Contenu |
+|---|---|---|
+| batch_12 | 15 | ✅ fait — 8 `RAG_CONTEXT_RELEVANCE`, 7 `RAG_FAITHFULNESS`, sources Lucene et Neo4j mêlées |
+| batch_13 | 15 | à produire |
+| batch_14 | 20 | clôture, ajustement final de la distribution |
+
+**Restant après batch_12, chiffres à respecter exactement :**
+
+| Axe | Fait | Reste sur 35 |
+|---|---|---|
+| `RAG_CONTEXT_RELEVANCE` | 8 | **17** |
+| `RAG_FAITHFULNESS` | 7 | **18** |
+| `parfait` | 5 | **14** |
+| `defaillant` | 7 | **14** |
+| `limite` | 3 | **7** |
+| verbeux à défaut caché | 1 (23 au total) | ≥ 2 pour atteindre 25 |
+| verbeux correct | 1 (12 au total) | ≥ 3 pour atteindre 15 |
+
+Contextes déjà exploités par batch_12, à ne pas réutiliser tels quels : `calculateDynamicThreshold` (Lucene),
+`AuthenticationHelper` (Lucene et Neo4j), `OllamaService` (Lucene et Neo4j), `ContextRetriever.retrieve`
+(Neo4j), `NewUserMessageNotifier` (Lucene).
 
 ### Familles RAG — passe A, `RAG_CONTEXT_RELEVANCE`
 
