@@ -121,8 +121,8 @@ Décision du 2026-09-15 : **reprise ciblée avant tout fine-tuning**.
 | 1 | Purge `Synthèse : cas limite.` | 40 cibles, 1 tournure, substitution mécanique | ✅ fait |
 | 2 | Étiquettes `verbeux` fausses | `b13-007`, `b14-008` | ✅ fait |
 | 3 | Revendications d'exécution | 104 occurrences, 61 tournures — reformulation cas par cas | à faire |
-| 4 | Longueur, `CODE_ANALYSIS` | 38 FAIL sous 666 car., surtout `generation` / `refactoring` / `question_reponse` | à faire |
-| 5 | Longueur, `RAG_FAITHFULNESS` | 8 FAIL sous 410 car., face à 14 PASS de médiane 733 | à faire |
+| 4 | Longueur, `CODE_ANALYSIS` | 38 FAIL sous 666 car., surtout `generation` / `refactoring` / `question_reponse` | ✅ **clos** — 26 réécrits, voir ci-dessous |
+| 5 | Longueur, `RAG_FAITHFULNESS` | 8 FAIL sous 410 car., face à 14 PASS de 666 à 1087 | à faire — **seul chantier de longueur encore justifié** |
 | 6 | Polarité `citations_exactes` | produire la famille « citation déformée », absente du corpus | à faire |
 | 7 | Contextes RAG du golden | contextes inédits pour les items de test ; regrouper par contexte les familles qui le partagent | à faire |
 | 8 | Verbeux corrects | 13 au lieu des 15 exigés, conséquence de la correction n°2 | à faire |
@@ -139,3 +139,57 @@ trompeur (`rag-combinaison-sources-lucene-verbeux`, alors qu'il n'est plus étiq
 Principe directeur des chantiers 4 et 5 : allonger les FAIL, jamais raccourcir les PASS. Une réponse
 **verbeuse et fausse** est exactement le cas difficile que le juge doit apprendre à démasquer — le remède
 va donc dans le sens de l'objectif au lieu de le contrarier.
+
+## Clôture du chantier 4 — et une erreur de méthode dans ma propre mesure
+
+26 FAIL `CODE_ANALYSIS` ont été réécrits sur les lots 02 à 07, défauts reconduits mot pour mot et
+étiquettes vérifiées inchangées à chaque lot. Deux corrections successives de l'instrument ont été
+nécessaires avant de pouvoir conclure, et toutes deux invalidaient des chiffres que j'avais annoncés.
+
+**Première correction — la direction.** La statistique ne balayait que « long ⇒ PASS ». Après six lots,
+la médiane FAIL est passée au-dessus de la médiane PASS et le raccourci a changé de camp : « court ⇒ PASS »
+l'emportait à 60,0 % contre 59,3 %. Toutes mes réécritures avaient atterri entre 1200 et 1850 caractères
+alors que les PASS vivent entre 700 et 1400 : j'avais construit un amas de FAIL très longs. Le principe
+« allonger les FAIL » était donc trop grossier — la cible n'est pas « long », c'est que les **deux
+distributions se recouvrent**.
+
+**Seconde correction — le plancher de bruit.** Je comparais une statistique **maximisée** (meilleur seuil
+parmi 145, dans deux directions) à un simple taux de base. C'est invalide : maximiser sur ~290 hypothèses
+gonfle le résultat même sur des données sans information. Le test de permutation, 3000 tirages des verdicts
+contre les longueurs réelles, donne une **moyenne nulle de 57,4 %** et un p95 à **61,3 %**.
+
+| État | Statistique | z | Verdict |
+|---|---|---|---|
+| Avant reprise | 75,3 % | **+8,8** | signal réel et massif |
+| Après lots 02-04 | 66,7 % | +4,6 | signal réel |
+| Après lots 05-07 | 60,0 % | **+1,3** | **bruit** (p = 0,132) |
+
+**Conséquence opérationnelle : les 14 FAIL courts restants ne doivent pas être réécrits.** La simulation
+le montrait déjà — les porter à la médiane des PASS faisait *monter* la statistique à 64,0 %, les répartir
+sur les quantiles à 62,7 % — et le test de permutation explique pourquoi : ces exemples courts sont
+désormais la seule chose qui peuple le bas de la distribution côté FAIL, donc la seule qui retienne le
+raccourci inversé. Il n'y a plus de signal à supprimer.
+
+**À retenir pour la suite du projet** : tout seuil choisi a posteriori doit être comparé à une distribution
+nulle par permutation, jamais à un taux de base. Cette règle vaut aussi pour les métriques du benchmark.
+
+### Le même test, tâche par tâche
+
+Appliqué séparément à chaque posture, il montre que le défaut n'était pas uniforme — et que le chantier 5
+reste pleinement justifié :
+
+| Tâche | n | Observé | Nulle (moy / p95) | z | p | Verdict |
+|---|---|---|---|---|---|---|
+| `CODE_ANALYSIS` | 150 | 60,0 % | 57,4 / 61,3 % | +1,3 | 0,132 | bruit — chantier clos |
+| `RAG_CONTEXT_RELEVANCE` | 25 | 60,0 % | 65,8 / 76,0 % | **−1,1** | 0,983 | sous le hasard, rien à faire |
+| `RAG_FAITHFULNESS` | 25 | **84,0 %** | 66,4 / 76,0 % | **+3,5** | **0,006** | **signal réel** |
+
+Noter au passage l'ampleur du plancher de bruit à n = 25 : la statistique maximisée atteint 66 % en moyenne
+et 76 % au p95 sur des verdicts tirés au hasard. Un « 76 % » brut sur un sous-ensemble de cette taille ne
+veut donc strictement rien dire. C'est la même erreur de lecture qui m'a fait poursuivre le chantier 4 bien
+après sa fin utile.
+
+**Cible chiffrée du chantier 5.** Les 8 FAIL concernés (`b13-010` 246, `b14-015` 283, `b12-014` 289,
+`b13-012` 292, `b12-009` 324, `b13-014` 342, `b14-014` 357, `b14-017` 404) doivent rejoindre la plage des
+PASS, **666 à 1087 caractères**, sans la dépasser. Viser « long » plutôt que la distribution des PASS est
+précisément ce qui a retourné le biais côté code ; l'erreur ne doit pas être refaite ici.

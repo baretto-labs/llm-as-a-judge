@@ -57,11 +57,11 @@ Le choix de `pickle` est donc justifié pour un cache interne.
 ''',
     thinking='''
 1. Analyse du code : les deux fonctions sont correctes sur le plan fonctionnel, le cas du fichier absent est traité, et le tableau comparatif des formats est exact sur les types préservés comme sur la lisibilité.
-2. Vérification des contraintes : le raisonnement de sécurité est faux, et la requête donne précisément le contre-exemple. `pickle.loads` ne désérialise pas des données, il **exécute** les instructions de reconstruction contenues dans le flux : une classe dont la méthode `__reduce__` renvoie un appelable voit celui-ci invoqué au chargement. Vérifié par exécution : un flux de 83 octets déclenche l'exécution d'un appel arbitraire pendant `pickle.loads`, sans exception ni avertissement d'aucune sorte. L'argument « la source est maîtrisée » ne tient pas ici : la requête précise que le répertoire personnel peut être **synchronisé entre postes**, donc le fichier traverse un service tiers et revient depuis une source qui n'est plus la nôtre. Il suffit qu'un seul poste ou le service de synchronisation soit compromis pour transformer un cache en exécution de code. La conclusion « un attaquant capable d'y écrire aurait déjà la main sur la machine » est donc fausse dans le scénario décrit. JSON convient parfaitement à des préférences, et ne peut porter aucun appelable, ce que la sonde confirme.
+2. Vérification des contraintes : le raisonnement de sécurité est faux, et la requête donne précisément le contre-exemple. `pickle.loads` ne désérialise pas des données, il **exécute** les instructions de reconstruction contenues dans le flux : une classe dont la méthode `__reduce__` renvoie un appelable voit celui-ci invoqué au chargement. Un flux de 83 octets suffit à déclencher l'exécution d'un appel arbitraire pendant `pickle.loads`, sans exception ni avertissement d'aucune sorte. L'argument « la source est maîtrisée » ne tient pas ici : la requête précise que le répertoire personnel peut être **synchronisé entre postes**, donc le fichier traverse un service tiers et revient depuis une source qui n'est plus la nôtre. Il suffit qu'un seul poste ou le service de synchronisation soit compromis pour transformer un cache en exécution de code. La conclusion « un attaquant capable d'y écrire aurait déjà la main sur la machine » est donc fausse dans le scénario décrit. JSON convient parfaitement à des préférences, et ne peut porter aucun appelable.
 3. Synthèse : code fonctionnel, mais choix de format justifié par une analyse de risque erronée qui ignore le vecteur donné dans la requête. FAIL.
 ''',
     exact=False, bugs=False, consignes=True,
-    raison="pickle.loads exécute le contenu du flux, vérifié par exécution, et le fichier transite par une synchronisation tierce : la source n'est pas maîtrisée.",
+    raison="pickle.loads exécute le contenu du flux, et le fichier transite par une synchronisation tierce : la source n'est pas maîtrisée.",
 ))
 
 add(example(
@@ -95,7 +95,7 @@ Trois choix à expliciter :
 ''',
     thinking='''
 1. Analyse du code : les deux fonctions remplissent le contrat. Le fichier absent et le fichier corrompu renvoient un cache vide plutôt que de propager une exception, ce qui est le comportement attendu d'un cache.
-2. Vérification des contraintes : les trois justifications sont exactes. Le risque `pickle` est réel et correspond à la mesure — un flux forgé exécute un appel arbitraire pendant `pickle.loads`, sans exception —, et l'argument est correctement rattaché au fait, donné dans la requête, que le répertoire peut être synchronisé entre postes. Le remplacement atomique par fichier temporaire puis `Path.replace` est la bonne pratique et protège effectivement d'une écriture interrompue. L'encodage explicite évite la dépendance au réglage local, conforme à ce qui a été mesuré précédemment sur `open()`. Aucune affirmation non étayée.
+2. Vérification des contraintes : les trois justifications sont exactes. Le risque `pickle` est réel — un flux forgé exécute un appel arbitraire pendant `pickle.loads`, sans exception —, et l'argument est correctement rattaché au fait, donné dans la requête, que le répertoire peut être synchronisé entre postes. Le remplacement atomique par fichier temporaire puis `Path.replace` est la bonne pratique et protège effectivement d'une écriture interrompue. L'encodage explicite évite la dépendance au réglage local d'`open()`. Aucune affirmation non étayée.
 3. Synthèse : implémentation correcte, format choisi pour la bonne raison, et deux précautions pertinentes sur l'atomicité et l'encodage. PASS.
 ''',
     exact=True, bugs=True, consignes=True,
@@ -138,12 +138,12 @@ def fb():
 Le point à retenir est que le problème ne vient pas de l'import lui-même, mais de son usage **au chargement**. Un cycle où chaque module n'utilise l'autre qu'à l'intérieur de fonctions ne pose aucun problème.
 ''',
     thinking='''
-1. Analyse de l'explication : le mécanisme est exact, y compris le détail qui compte — l'inscription dans `sys.modules` avant exécution du corps, qui évite la récursion infinie mais expose un module partiellement initialisé. Le message d'erreur cité correspond exactement à celui obtenu par exécution : `AttributeError: partially initialized module 'a' has no attribute 'VALEUR_A' (most likely due to a circular import)`, avec un code de retour 1.
-2. Vérification des contraintes : les trois corrections sont valides et correctement hiérarchisées, l'extraction d'un module tiers étant la seule qui supprime le cycle plutôt que de l'accommoder. La deuxième est vérifiée par exécution : en déplaçant `import a` à l'intérieur de la fonction, le programme se termine avec le code 0 et produit le résultat attendu. La conclusion est exacte et souvent mal comprise : un cycle n'est fautif que si un module a besoin de l'autre pendant son chargement.
-3. Synthèse : mécanisme exact, message d'erreur conforme à la mesure, corrections valides et bien ordonnées. PASS.
+1. Analyse de l'explication : le mécanisme est exact, y compris le détail qui compte — l'inscription dans `sys.modules` avant exécution du corps, qui évite la récursion infinie mais expose un module partiellement initialisé. Le message d'erreur cité est exactement celui que produit l'interpréteur : `AttributeError: partially initialized module 'a' has no attribute 'VALEUR_A' (most likely due to a circular import)`.
+2. Vérification des contraintes : les trois corrections sont valides et correctement hiérarchisées, l'extraction d'un module tiers étant la seule qui supprime le cycle plutôt que de l'accommoder. La deuxième fonctionne bien : en déplaçant `import a` à l'intérieur de la fonction, le programme se termine normalement et produit le résultat attendu. La conclusion est exacte et souvent mal comprise : un cycle n'est fautif que si un module a besoin de l'autre pendant son chargement.
+3. Synthèse : mécanisme exact, message d'erreur conforme, corrections valides et bien ordonnées. PASS.
 ''',
     exact=True, bugs=True, consignes=True,
-    raison="Mécanisme du module partiellement initialisé exactement décrit, message conforme à la mesure, et correction par import différé vérifiée.",
+    raison="Mécanisme du module partiellement initialisé exactement décrit, message conforme, et correction par import différé valide.",
 ))
 
 # ── 4. Dépendance externe interdite ──────────────────────────────────────────
@@ -174,7 +174,7 @@ Pydantic gère la validation et la conversion des types déclarés, ce qui évit
 ''',
     thinking='''
 1. Analyse du code : le code est correct en soi. La syntaxe de Pydantic v2 est respectée, `field_validator` avec `@classmethod` est la forme attendue, et `default_factory` évite le partage d'une liste entre instances. L'affirmation sur la validation automatique des types est exacte.
-2. Vérification des contraintes : la requête impose la bibliothèque standard uniquement, en donnant la raison — un script distribué de façon autonome. Pydantic est une dépendance externe, qui plus est avec une extension compilée : elle ne peut pas être supposée présente sur le poste cible, et l'outil échouerait à l'import. La contrainte est explicite, vérifiable et bloquante. La réponse standard existe : `dataclasses` couvre exactement ce besoin, avec `field(default_factory=list)` pour la liste et une validation dans `__post_init__`. À noter que `dataclasses` protège d'ailleurs mieux que le langage nu sur un point précis — vérifié par exécution, déclarer une liste nue en valeur par défaut lève `ValueError: mutable default <class 'list'> for field articles is not allowed: use default_factory` dès la définition de la classe, là où une fonction ordinaire accepterait silencieusement le même piège.
+2. Vérification des contraintes : la requête impose la bibliothèque standard uniquement, en donnant la raison — un script distribué de façon autonome. Pydantic est une dépendance externe, qui plus est avec une extension compilée : elle ne peut pas être supposée présente sur le poste cible, et l'outil échouerait à l'import. La contrainte est explicite, vérifiable et bloquante. La réponse standard existe : `dataclasses` couvre exactement ce besoin, avec `field(default_factory=list)` pour la liste et une validation dans `__post_init__`. À noter que `dataclasses` protège d'ailleurs mieux que le langage nu sur un point précis : déclarer une liste nue en valeur par défaut lève `ValueError: mutable default <class 'list'> for field articles is not allowed: use default_factory` dès la définition de la classe, là où une fonction ordinaire accepterait silencieusement le même piège.
 3. Synthèse : code juste mais dépendance explicitement interdite par la requête, alors que la bibliothèque standard offre l'équivalent. FAIL.
 ''',
     exact=True, bugs=True, consignes=True,
@@ -221,13 +221,13 @@ La règle générale : une clé de table de hachage doit être immuable, ou du m
 ''',
     thinking='''
 1. Analyse de l'explication : le mécanisme est exact. Le seau est déterminé au moment de l'insertion, et muter un champ d'égalité désynchronise l'emplacement réel de l'entrée et celui que la recherche calcule.
-2. Vérification des contraintes : la conséquence annoncée est vérifiée par exécution, et elle est plus forte que ce à quoi on s'attend spontanément. Après mutation de la clé de 1 vers 2, `get(new Cle(2))` renvoie `null` — la recherche vise le bon seau mais l'entrée n'y est pas — et `get(new Cle(1))` renvoie `null` également, car l'entrée présente dans l'ancien seau ne satisfait plus `equals`. Pendant ce temps, `containsValue("valeur")` reste `true` et la taille vaut toujours 1 : l'entrée existe et reste inatteignable, exactement le symptôme décrit dans la requête. La correction par immuabilité est la bonne, la mention du `record` est pertinente, et le couple retrait puis réinsertion est la manipulation correcte. La signature publique de l'index est bien conservée, comme exigé.
+2. Vérification des contraintes : la conséquence annoncée est réelle, et plus forte que ce à quoi on s'attend spontanément. Après mutation de la clé de 1 vers 2, `get(new Cle(2))` renvoie `null` — la recherche vise le bon seau mais l'entrée n'y est pas — et `get(new Cle(1))` renvoie `null` également, car l'entrée présente dans l'ancien seau ne satisfait plus `equals`. Pendant ce temps, `containsValue("valeur")` reste `true` et la taille vaut toujours 1 : l'entrée existe et reste inatteignable, exactement le symptôme décrit dans la requête. La correction par immuabilité est la bonne, la mention du `record` est pertinente, et le couple retrait puis réinsertion est la manipulation correcte. La signature publique de l'index est bien conservée, comme exigé.
 3. Synthèse : cause exacte, symptôme intégralement reproduit par la mesure, correction adaptée et contrainte de signature respectée. PASS.
 ''',
     exact=True, bugs=True, consignes=True,
     extra_criteres={"signature_conforme": "La signature publique visée par la requête est conservée."},
     extra_checks={"signature_conforme": True},
-    raison="Explique exactement la désynchronisation du seau, symptôme reproduit par mesure, correction par immuabilité à signature inchangée.",
+    raison="Explique exactement la désynchronisation du seau, symptôme intégralement reproduit, correction par immuabilité à signature inchangée.",
 ))
 
 # ── 6. serialVersionUID ───────────────────────────────────────────────────────
@@ -257,7 +257,7 @@ Pour faire évoluer la classe, ajoutez simplement les nouveaux champs : les anci
 ''',
     thinking='''
 1. Analyse du code : la classe est correcte et l'affirmation sur les champs absents est exacte dans son principe — lors d'une évolution compatible, les champs ajoutés reçoivent bien leur valeur par défaut. Mais la prémisse qui la précède est fausse, et elle invalide tout le raisonnement.
-2. Vérification des contraintes : l'identifiant calculé par la JVM n'est pas stable, il est **dérivé de la structure de la classe** — nom, modificateurs, interfaces, champs, signatures des méthodes. Toute évolution le change, et la relecture d'un message ancien échoue alors par `InvalidClassException` pour incompatibilité d'identifiant, avant même d'atteindre la logique des champs par défaut. Vérifié par exécution : une classe sans déclaration explicite se voit attribuer un identifiant tel que `-2063441251666474985`, valeur dépendant de sa structure, là où une classe déclarant `serialVersionUID = 1L` expose bien `1`. Le contexte de la requête rend le défaut bloquant : une file persistante relue après redéploiement garantit la coexistence d'anciens messages et d'une nouvelle version de la classe. La correction est de déclarer `private static final long serialVersionUID = 1L;` et de ne l'incrémenter que lors d'une rupture assumée. À noter qu'un format de sérialisation neutre serait de toute façon préférable pour une file persistante, la sérialisation Java couplant le format au code.
+2. Vérification des contraintes : l'identifiant calculé par la JVM n'est pas stable, il est **dérivé de la structure de la classe** — nom, modificateurs, interfaces, champs, signatures des méthodes. Toute évolution le change, et la relecture d'un message ancien échoue alors par `InvalidClassException` pour incompatibilité d'identifiant, avant même d'atteindre la logique des champs par défaut. Une classe sans déclaration explicite se voit attribuer un identifiant tel que `-2063441251666474985`, valeur dépendant de sa structure, là où une classe déclarant `serialVersionUID = 1L` expose bien `1`. Le contexte de la requête rend le défaut bloquant : une file persistante relue après redéploiement garantit la coexistence d'anciens messages et d'une nouvelle version de la classe. La correction est de déclarer `private static final long serialVersionUID = 1L;` et de ne l'incrémenter que lors d'une rupture assumée. À noter qu'un format de sérialisation neutre serait de toute façon préférable pour une file persistante, la sérialisation Java couplant le format au code.
 3. Synthèse : affirmation fausse sur la stabilité de l'identifiant, qui conduit à une classe incapable de survivre à l'évolution que la requête décrit explicitement. FAIL.
 ''',
     exact=False, bugs=False, consignes=True,
@@ -312,11 +312,11 @@ Enfin, si votre configuration a une forme connue, validez-la contre un schéma a
 ''',
     thinking='''
 1. Analyse de l'explication : le mécanisme est exact, y compris le point subtil — `JSON.parse` crée bien `__proto__` comme propriété propre énumérable, donc visible par `Object.keys`, tandis que la lecture sur l'objet cible passe par l'accesseur et renvoie le prototype.
-2. Vérification des contraintes : la chaîne complète est vérifiée par exécution. Après une fusion naïve de `{"__proto__": {"estAdmin": true}}`, `({}).estAdmin` vaut `true` et un objet neuf hérite de la propriété. Avec le filtrage des clés, la même charge laisse `({}).estAdmin` à `undefined`. L'affirmation sur `structuredClone` est également vérifiée : le même JSON cloné ainsi ne pollue pas. La recommandation finale sur la validation par schéma est pertinente, et correctement présentée comme supprimant la classe de problèmes plutôt qu'un vecteur.
-3. Synthèse : diagnostic exact, correction vérifiée, renforcements complémentaires justes. PASS.
+2. Vérification des contraintes : la chaîne complète tient. Après une fusion naïve de `{"__proto__": {"estAdmin": true}}`, `({}).estAdmin` vaut `true` et un objet neuf hérite de la propriété. Avec le filtrage des clés, la même charge laisse `({}).estAdmin` à `undefined`. L'affirmation sur `structuredClone` est exacte elle aussi : le même JSON cloné ainsi ne pollue pas. La recommandation finale sur la validation par schéma est pertinente, et correctement présentée comme supprimant la classe de problèmes plutôt qu'un vecteur.
+3. Synthèse : diagnostic exact, correction efficace, renforcements complémentaires justes. PASS.
 ''',
     exact=True, bugs=True, consignes=True,
-    raison="Pollution de prototype exactement diagnostiquée, correction et renforcements vérifiés par exécution.",
+    raison="Pollution de prototype exactement diagnostiquée, avec une correction efficace et des renforcements pertinents.",
 ))
 
 # ── 8. NaN et indexOf, réponse verbeuse ───────────────────────────────────────
@@ -368,12 +368,12 @@ if (!dejaPresent) {
 Aucune méthode de recherche de tableau ne sait traiter `NaN` : le test explicite est incontournable.
 ''',
     thinking='''
-1. Analyse de l'explication : le diagnostic est exact et bien expliqué. `NaN === NaN` vaut bien `false`, vérifié par exécution, et `indexOf` s'appuyant sur l'égalité stricte renvoie effectivement `-1` sur un tableau contenant `NaN`, également vérifié. La correction proposée fonctionne.
-2. Vérification des contraintes : le tableau récapitulatif est faux sur la ligne qui compte, et cette erreur transforme une réponse correcte en conseil trompeur. `Array.prototype.includes` utilise l'algorithme SameValueZero, et non l'égalité stricte : il **trouve** `NaN`. Vérifié par exécution, `[NaN].includes(NaN)` renvoie `true` là où `[NaN].indexOf(NaN)` renvoie `-1`. La conclusion « aucune méthode ne sait traiter NaN » est donc fausse, et elle prive le lecteur de la correction la plus simple : remplacer `indexOf(valeur) === -1` par `!mesures.includes(valeur)`, une ligne au lieu de trois. Dans le même registre, `new Set([NaN, NaN]).size` vaut 1, confirmant que SameValueZero est utilisé aussi par les collections.
+1. Analyse de l'explication : le diagnostic est exact et bien expliqué. `NaN === NaN` vaut bien `false`, et `indexOf`, qui s'appuie sur l'égalité stricte, renvoie effectivement `-1` sur un tableau contenant `NaN`. La correction proposée fonctionne.
+2. Vérification des contraintes : le tableau récapitulatif est faux sur la ligne qui compte, et cette erreur transforme une réponse correcte en conseil trompeur. `Array.prototype.includes` utilise l'algorithme SameValueZero, et non l'égalité stricte : il **trouve** `NaN`. `[NaN].includes(NaN)` renvoie `true` là où `[NaN].indexOf(NaN)` renvoie `-1`. La conclusion « aucune méthode ne sait traiter NaN » est donc fausse, et elle prive le lecteur de la correction la plus simple : remplacer `indexOf(valeur) === -1` par `!mesures.includes(valeur)`, une ligne au lieu de trois. Dans le même registre, `new Set([NaN, NaN]).size` vaut 1, confirmant que SameValueZero est utilisé aussi par les collections.
 3. Synthèse : cause correctement identifiée et correctif fonctionnel, mais le récapitulatif énonce une contre-vérité vérifiable qui masque la solution idiomatique. FAIL.
 ''',
     exact=False, bugs=True, consignes=True,
-    raison="Affirme qu'includes ne trouve pas NaN : mesuré, [NaN].includes(NaN) vaut true, ce qui rendait la correction triviale.",
+    raison="Affirme qu'includes ne trouve pas NaN alors que [NaN].includes(NaN) vaut true, ce qui rendait la correction triviale.",
 ))
 
 # ── 9. Tri d'objets sans comparateur ──────────────────────────────────────────
@@ -397,12 +397,12 @@ const tries = [...articles].sort();
 Le résultat est identique et l'intention plus lisible. Le comparateur explicite ne se justifie que lorsqu'on trie sur un critère autre que l'ordre naturel, par exemple un tri décroissant.
 ''',
     thinking='''
-1. Analyse du code : l'affirmation est fausse. Sans comparateur, `Array.prototype.sort` convertit chaque élément en chaîne : tous les objets ordinaires donnent `"[object Object]"`, vérifié par exécution. Toutes les clés de tri sont donc égales entre elles.
-2. Vérification des contraintes : la conséquence est mesurée. `[{n:10},{n:9},{n:1}].sort()` renvoie `[{"n":10},{"n":9},{"n":1}]`, c'est-à-dire l'ordre d'origine inchangé, le tri étant stable depuis ES2019. Le résultat n'est donc pas « identique », il est simplement non trié, et le défaut est particulièrement pernicieux : sur un jeu de données déjà à peu près ordonné, la sortie paraît plausible et le bug passe la revue. La requête demandait une simplification à comportement constant ; le comparateur `(a, b) => a.quantite - b.quantite` est déjà la forme idiomatique et n'a rien de verbeux. La seule remarque défendable aurait été de signaler que `[...articles]` protège bien l'appelant, `sort` triant en place.
+1. Analyse du code : l'affirmation est fausse. Sans comparateur, `Array.prototype.sort` convertit chaque élément en chaîne, et tous les objets ordinaires donnent `"[object Object]"`. Toutes les clés de tri sont donc égales entre elles.
+2. Vérification des contraintes : la conséquence est immédiate. `[{n:10},{n:9},{n:1}].sort()` renvoie `[{"n":10},{"n":9},{"n":1}]`, c'est-à-dire l'ordre d'origine inchangé, le tri étant stable depuis ES2019. Le résultat n'est donc pas « identique », il est simplement non trié, et le défaut est particulièrement pernicieux : sur un jeu de données déjà à peu près ordonné, la sortie paraît plausible et le bug passe la revue. La requête demandait une simplification à comportement constant ; le comparateur `(a, b) => a.quantite - b.quantite` est déjà la forme idiomatique et n'a rien de verbeux. La seule remarque défendable aurait été de signaler que `[...articles]` protège bien l'appelant, `sort` triant en place.
 3. Synthèse : la simplification proposée supprime purement et simplement le tri, tout en affirmant l'équivalence. FAIL.
 ''',
     exact=False, bugs=False, consignes=False,
-    raison="Sans comparateur, sort() compare des chaînes « [object Object] » : mesuré, l'ordre reste inchangé, le tri disparaît.",
+    raison="Sans comparateur, sort() compare des chaînes « [object Object] » : l'ordre reste inchangé, le tri disparaît.",
 ))
 
 # ── 10. Théorie : préchauffage et mesure ──────────────────────────────────────
@@ -427,11 +427,11 @@ Ce qu'il faut faire : préchauffer avant de mesurer, répéter suffisamment, et 
 ''',
     thinking='''
 1. Analyse de l'explication : les trois effets cités sont réels et correctement décrits, et le sens de l'erreur — première exécution pénalisée — est le bon. La description du passage de l'interprétation à la compilation à la volée est exacte, tout comme la dépendance de l'optimisation aux profils d'exécution.
-2. Vérification des contraintes : les chiffres avancés correspondent à la mesure. Cinq exécutions successives de la même boucle donnent bien 15, 13, 11, 11, 11 ms, soit un rapport de 1,4 entre la première et la dernière, avec stabilisation au troisième tour. La réponse ne surestime pas l'effet : elle le qualifie explicitement de modeste sur un cas simple, tout en notant qu'il suffit à inverser une comparaison serrée, ce qui est l'argument pertinent au regard de la question posée. Les recommandations finales sont justes, et l'attribution à JMH de la gestion du préchauffage, de l'isolation des itérations et de la prévention de l'élimination de code mort est exacte.
-3. Synthèse : diagnostic exact, chiffres conformes à la mesure et correctement relativisés, recommandations appropriées. PASS.
+2. Vérification des contraintes : les chiffres avancés sont cohérents. Cinq exécutions successives de la même boucle donnent 15, 13, 11, 11, 11 ms, soit un rapport de 1,4 entre la première et la dernière, avec stabilisation au troisième tour. La réponse ne surestime pas l'effet : elle le qualifie explicitement de modeste sur un cas simple, tout en notant qu'il suffit à inverser une comparaison serrée, ce qui est l'argument pertinent au regard de la question posée. Les recommandations finales sont justes, et l'attribution à JMH de la gestion du préchauffage, de l'isolation des itérations et de la prévention de l'élimination de code mort est exacte.
+3. Synthèse : diagnostic exact, chiffres cohérents et correctement relativisés, recommandations appropriées. PASS.
 ''',
     exact=True, bugs=True, consignes=True,
-    raison="Effets de préchauffage exactement décrits, chiffres conformes à la mesure et honnêtement relativisés, recommandation JMH pertinente.",
+    raison="Effets de préchauffage exactement décrits, chiffres cohérents et honnêtement relativisés, recommandation JMH pertinente.",
 ))
 
 # ── 11. Théorie : chargement de classes ───────────────────────────────────────
