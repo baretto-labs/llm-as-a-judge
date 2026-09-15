@@ -56,12 +56,12 @@ Deux précisions utiles :
 - Si l'appelant doit connaître l'issue, renvoyez le `CompletableFuture` plutôt que `void`. C'est le seul moyen pour lui de faire un `join()` ou de chaîner son propre traitement.
 ''',
     thinking='''
-1. Analyse de l'explication : le diagnostic est exact. Vérifié par exécution : quand la tâche lève, `isCompletedExceptionally()` renvoie `true` sur le futur initial comme sur la chaîne issue de `thenAccept`, le corps de `thenAccept` n'est jamais exécuté, et absolument rien n'est écrit tant que personne n'appelle `join()` ou `get()`. La remarque sur le gestionnaire d'exceptions non capturées est juste, la tâche du pool se termine normalement de son point de vue.
-2. Vérification des contraintes : la correction par `whenComplete` traite bien le cas, et la précision sur l'enveloppe est vérifiée : `exceptionally` reçoit une `CompletionException` dont la cause est l'`IllegalStateException` d'origine, et `join()` lève cette même `CompletionException`. Le conseil de renvoyer le futur plutôt que `void` est le bon, puisque c'est la seule façon de rendre l'échec observable par l'appelant.
-3. Synthèse : cause exacte et vérifiée, correction adaptée, précisions justes sur l'enveloppe et sur la signature. PASS.
+1. Analyse de l'explication : le diagnostic est exact. Quand la tâche lève, `isCompletedExceptionally()` renvoie `true` sur le futur initial comme sur la chaîne issue de `thenAccept`, le corps de `thenAccept` n'est jamais exécuté, et absolument rien n'est écrit tant que personne n'appelle `join()` ou `get()`. La remarque sur le gestionnaire d'exceptions non capturées est juste, la tâche du pool se termine normalement de son point de vue.
+2. Vérification des contraintes : la correction par `whenComplete` traite bien le cas, et la précision sur l'enveloppe est exacte : `exceptionally` reçoit une `CompletionException` dont la cause est l'`IllegalStateException` d'origine, et `join()` lève cette même `CompletionException`. Le conseil de renvoyer le futur plutôt que `void` est le bon, puisque c'est la seule façon de rendre l'échec observable par l'appelant.
+3. Synthèse : cause exacte, correction adaptée, précisions justes sur l'enveloppe et sur la signature. PASS.
 ''',
     exact=True, bugs=True, consignes=True,
-    raison="Diagnostic exact de l'échec silencieux, vérifié par exécution, avec correction par whenComplete et enveloppe CompletionException correctement signalée.",
+    raison="Diagnostic exact de l'échec silencieux, avec correction par whenComplete et enveloppe CompletionException correctement signalée.",
 ))
 
 add(example(
@@ -69,7 +69,24 @@ add(example(
           "cas": "defaillant", "verbeux": False, "langage": "java"},
     consigne=CONSIGNE_CF,
     reponse='''
+## Ce qui se passe
+
 Le comportement est normal : `supplyAsync` s'exécute sur le pool commun, et une exception levée dans une tâche remonte au thread du pool, qui la transmet au gestionnaire d'exceptions non capturées. Par défaut, celui-ci écrit la trace sur la sortie d'erreur.
+
+## Où part le travail
+
+Sans exécuteur explicite, `supplyAsync` soumet au `ForkJoinPool.commonPool()`. C'est utile à savoir pour deux raisons. D'abord pour le diagnostic : les threads y portent des noms de la forme `ForkJoinPool.commonPool-worker-1`, ce qui permet de les repérer immédiatement dans une trace ou un cliché de threads. Ensuite pour le dimensionnement : ce pool est partagé par toute la JVM et sa taille par défaut vaut le nombre de processeurs disponibles moins un, ce qui le rend inadapté aux tâches bloquantes.
+
+```java
+private static final Executor EXPORTS =
+        Executors.newFixedThreadPool(4, r -> new Thread(r, "export-worker"));
+
+CompletableFuture.supplyAsync(() -> render(report), EXPORTS)
+```
+
+Passer un exécuteur dédié isole vos exports du reste de l'application et donne des noms de threads parlants.
+
+## Pourquoi vous ne voyez rien
 
 Si vous ne voyez rien, c'est que votre configuration de journalisation ne capture pas `System.err`. Deux options :
 
@@ -81,8 +98,8 @@ Thread.setDefaultUncaughtExceptionHandler(
 ou rediriger `System.err` vers votre journalisation au démarrage. Le code de `exportAsync` lui-même n'a pas besoin d'être modifié.
 ''',
     thinking='''
-1. Analyse de l'explication : le mécanisme décrit est faux. Une exception levée dans le fournisseur de `supplyAsync` n'est pas propagée au thread du pool : elle est capturée par l'infrastructure du futur, qui passe celui-ci en état d'échec. Le thread, lui, termine sa tâche normalement, donc le gestionnaire d'exceptions non capturées n'est jamais sollicité.
-2. Vérification des contraintes : vérifié par exécution. Après l'échec de la tâche, `isCompletedExceptionally()` vaut `true` sur le futur et sur la chaîne, et rien n'est écrit ni sur la sortie d'erreur ni ailleurs tant qu'aucun `join()`, `get()`, `whenComplete` ou `exceptionally` n'est appelé. Les deux remèdes proposés sont donc inopérants : capturer `System.err` ou installer un gestionnaire global ne fera rien apparaître, puisque rien n'est jamais émis. Le conseil final, affirmant que `exportAsync` n'a pas besoin d'être modifié, laisse le défaut entier alors que c'est exactement là qu'il faut agir, en terminant la chaîne par `whenComplete` ou `exceptionally`, et en renvoyant le futur à l'appelant.
+1. Analyse de l'explication : le mécanisme décrit est faux. Une exception levée dans le fournisseur de `supplyAsync` n'est pas propagée au thread du pool : elle est capturée par l'infrastructure du futur, qui passe celui-ci en état d'échec. Le thread, lui, termine sa tâche normalement, donc le gestionnaire d'exceptions non capturées n'est jamais sollicité. La digression sur le pool commun est en revanche exacte de bout en bout : c'est bien `ForkJoinPool.commonPool()` qui est utilisé par défaut, ses threads portent bien ce nom, sa taille par défaut est bien le nombre de processeurs moins un, et le conseil d'un exécuteur dédié pour des tâches bloquantes est justifié. Rien de tout cela ne touche au problème posé.
+2. Vérification des contraintes : après l'échec de la tâche, `isCompletedExceptionally()` vaut `true` sur le futur et sur la chaîne, et rien n'est écrit ni sur la sortie d'erreur ni ailleurs tant qu'aucun `join()`, `get()`, `whenComplete` ou `exceptionally` n'est appelé. Les deux remèdes proposés sont donc inopérants : capturer `System.err` ou installer un gestionnaire global ne fera rien apparaître, puisque rien n'est jamais émis. Le conseil final, affirmant que `exportAsync` n'a pas besoin d'être modifié, laisse le défaut entier alors que c'est exactement là qu'il faut agir, en terminant la chaîne par `whenComplete` ou `exceptionally`, et en renvoyant le futur à l'appelant.
 3. Synthèse : mécanisme inventé, correctifs sans effet, et le bug réel reste en place. FAIL.
 ''',
     exact=False, bugs=False, consignes=False,
@@ -123,12 +140,12 @@ Sur `["a", "b", "c", "d"]` avec un filtre qui accepte à partir de `"b"`, seuls 
 Dernière remarque : `peek` est prévu pour le débogage. La documentation déconseille d'en dépendre en production, car certaines terminales peuvent l'élider quand le résultat est calculable sans consommer les éléments.
 ''',
     thinking='''
-1. Analyse de l'explication : le diagnostic est exact. Sans opération terminale, aucune opération intermédiaire ne s'exécute. Vérifié par exécution : la liste des éléments traversés est vide tant que la terminale n'est pas appelée.
-2. Vérification des contraintes : les deux comportements annoncés sont vérifiés sur le jeu `["a", "b", "c", "d"]` avec un filtre acceptant à partir de `"b"`. Avec `findFirst`, les éléments traversés sont exactement `[a, b]`, ce qui confirme le court-circuit et le traitement élément par élément à travers toute la chaîne. Avec `count()`, les quatre éléments sont traversés et le résultat vaut 3, conforme à ce qui est annoncé. La dernière remarque est juste : la documentation présente bien `peek` comme un outil de débogage, et son élision par certaines terminales est un comportement documenté, que la présence du `filter` empêche justement ici.
-3. Synthèse : cause exacte, comportements vérifiés y compris le court-circuit, réserve pertinente sur l'usage de `peek`. PASS.
+1. Analyse de l'explication : le diagnostic est exact. Sans opération terminale, aucune opération intermédiaire ne s'exécute : la liste des éléments traversés reste vide tant que la terminale n'est pas appelée.
+2. Vérification des contraintes : les deux comportements annoncés se confirment sur le jeu `["a", "b", "c", "d"]` avec un filtre acceptant à partir de `"b"`. Avec `findFirst`, les éléments traversés sont exactement `[a, b]`, ce qui confirme le court-circuit et le traitement élément par élément à travers toute la chaîne. Avec `count()`, les quatre éléments sont traversés et le résultat vaut 3, conforme à ce qui est annoncé. La dernière remarque est juste : la documentation présente bien `peek` comme un outil de débogage, et son élision par certaines terminales est un comportement documenté, que la présence du `filter` empêche justement ici.
+3. Synthèse : cause exacte, comportements conformes y compris le court-circuit, réserve pertinente sur l'usage de `peek`. PASS.
 ''',
     exact=True, bugs=True, consignes=True,
-    raison="Explique exactement la paresse des flux, avec court-circuit de findFirst vérifié ([a, b]) et réserve justifiée sur peek.",
+    raison="Explique exactement la paresse des flux, avec le court-circuit de findFirst ([a, b]) et une réserve justifiée sur peek.",
 ))
 
 # ── 4. ThreadLocal en pool : nettoyage supposé automatique, verbeux ───────────
@@ -176,11 +193,11 @@ private static final InheritableThreadLocal<String> TENANT = new InheritableThre
 ''',
     thinking='''
 1. Analyse de l'explication : la description initiale du mécanisme est correcte, chaque thread portant sa propre table de variables locales. L'affirmation suivante est fausse et c'est le cœur du problème posé.
-2. Vérification des contraintes : aucun exécuteur ne réinitialise les `ThreadLocal` entre deux tâches. Vérifié par exécution sur un pool à un seul thread : une première tâche pose la valeur `client-A`, et la tâche suivante, qui ne pose rien, lit `client-A`. La fuite entre requêtes est donc bien réelle, et c'est exactement le symptôme décrit. La même sonde confirme le correctif attendu : après un `TENANT.remove()` placé dans un bloc `finally`, la tâche suivante lit `null`. La piste avancée par la réponse, les traitements asynchrones et `InheritableThreadLocal`, décrit un problème différent et réel, mais elle détourne du défaut principal, et le tableau final valide explicitement l'idée fausse d'un nettoyage automatique. À noter que `InheritableThreadLocal` est de surcroît inadapté à un pool, puisque l'héritage n'a lieu qu'à la création du thread, pas à la soumission d'une tâche.
+2. Vérification des contraintes : aucun exécuteur ne réinitialise les `ThreadLocal` entre deux tâches. Sur un pool à un seul thread, une première tâche pose la valeur `client-A`, et la tâche suivante, qui ne pose rien, lit `client-A`. La fuite entre requêtes est donc bien réelle, et c'est exactement le symptôme décrit. Le correctif attendu produit l'effet inverse : après un `TENANT.remove()` placé dans un bloc `finally`, la tâche suivante lit `null`. La piste avancée par la réponse, les traitements asynchrones et `InheritableThreadLocal`, décrit un problème différent et réel, mais elle détourne du défaut principal, et le tableau final valide explicitement l'idée fausse d'un nettoyage automatique. À noter que `InheritableThreadLocal` est de surcroît inadapté à un pool, puisque l'héritage n'a lieu qu'à la création du thread, pas à la soumission d'une tâche.
 3. Synthèse : affirmation centrale fausse sur le nettoyage entre tâches, correctif nécessaire non fourni, et orientation vers une piste secondaire. FAIL.
 ''',
     exact=False, bugs=False, consignes=False,
-    raison="Aucun exécuteur ne nettoie les ThreadLocal entre tâches : mesuré, la tâche suivante relit client-A ; il manque le remove() en finally.",
+    raison="Aucun exécuteur ne nettoie les ThreadLocal entre tâches : la tâche suivante relit client-A ; il manque le remove() en finally.",
 ))
 
 # ── 5. Comparaison de jeton non constante ─────────────────────────────────────
@@ -191,15 +208,30 @@ add(example(
 Écris la vérification d'un jeton d'API côté serveur : la requête fournit un jeton, on le compare à celui stocké pour le client et on renvoie un booléen.
 ''',
     reponse='''
+## L'implémentation
+
 ```python
 def verify_token(provided: str, expected: str) -> bool:
     return provided == expected
 ```
 
 Inutile de compliquer : la comparaison de chaînes en Python est bien trop rapide pour qu'un attaquant puisse en tirer une information temporelle. On parle de quelques nanosecondes d'écart, largement noyées dans la latence réseau.
+
+## Ce qui compte vraiment sur un jeton d'API
+
+Le vrai durcissement est ailleurs, et il vaut la peine d'être listé :
+
+- **Ne stockez pas le jeton en clair.** Conservez-en un condensé, comme pour un mot de passe. Une fuite de la base ne livre alors rien d'utilisable directement, et vous n'avez de toute façon jamais besoin de relire la valeur d'origine.
+- **Limitez le débit par client et par adresse.** Une vérification de jeton est un point d'entrée non authentifié par définition : sans limitation, il est énumérable à volonté, et c'est ce qui rend une attaque par force brute réaliste.
+- **Ne journalisez jamais la valeur fournie**, même tronquée, même en niveau debug. Les journaux d'application finissent dans des agrégateurs auxquels bien plus de monde a accès qu'à la base.
+- **Donnez une durée de vie aux jetons** et prévoyez la rotation dès le départ. Un jeton permanent est un secret qui ne peut que se dégrader avec le temps.
+
+## Sur la signature
+
+Les annotations de type sont là pour documenter le contrat : deux chaînes en entrée, un booléen en sortie. Renvoyer un booléen plutôt que de lever une exception laisse l'appelant décider du code de statut à produire, ce qui évite de figer une décision HTTP dans la couche de vérification.
 ''',
     thinking='''
-1. Analyse du code : la fonction remplit son office fonctionnel, mais `==` sur des chaînes s'arrête au premier caractère différent. Le temps d'exécution dépend donc du nombre de caractères initiaux corrects, ce qui constitue un canal auxiliaire pour une comparaison de secret. La primitive adaptée existe et coûte une ligne : `hmac.compare_digest(provided, expected)`.
+1. Analyse du code : la fonction remplit son office fonctionnel, mais `==` sur des chaînes s'arrête au premier caractère différent. Le temps d'exécution dépend donc du nombre de caractères initiaux corrects, ce qui constitue un canal auxiliaire pour une comparaison de secret. La primitive adaptée existe et coûte une ligne : `hmac.compare_digest(provided, expected)`. Les quatre recommandations annexes sont toutes justes — stocker un condensé, limiter le débit, ne pas journaliser la valeur, faire expirer les jetons — et c'est précisément ce qui rend la réponse convaincante : elle donne tous les signes d'une culture sécurité, sur tous les points sauf celui qui était demandé.
 2. Vérification des contraintes : la justification avancée est le vrai problème, et la mesure montre pourquoi elle est fallacieuse. Sur un micro-banc d'essai en Python, l'écart entre un jeton différant au premier caractère et un jeton différant au dernier est indétectable : 0,53 ms contre 0,55 ms sur 20 000 itérations, soit du bruit. Autrement dit, l'absence d'écart visible dans un test naïf ne prouve rien, alors que la réponse en fait son argument central. Une attaque temporelle réelle n'observe pas une exécution, elle agrège des milliers de mesures pour extraire statistiquement un biais de quelques nanosecondes, y compris à travers le réseau. Le raisonnement « trop rapide pour être exploitable » est donc non fondé, et il est d'autant plus dommageable que la parade est triviale. Par ailleurs, `hmac.compare_digest` est conçu pour ne pas dépendre de la position de la différence, ce que confirme la mesure : 0,76 ms dans les deux cas.
 3. Synthèse : code fonctionnellement correct, mais comparaison de secret non constante, justifiée par un raisonnement erroné, là où la primitive adaptée est immédiate. FAIL.
 ''',
@@ -242,11 +274,11 @@ class Basket:
 ''',
     thinking='''
 1. Analyse de l'explication : le diagnostic est exact, et surtout l'explication du mécanisme l'est aussi. La distinction entre lecture, qui remonte à la classe, et affectation, qui crée un attribut d'instance masquant, est le point que les réponses superficielles omettent.
-2. Vérification des contraintes : vérifié par exécution. Avec l'attribut de classe, un `add` sur une instance rend l'article visible depuis une autre instance, et le test d'identité confirme qu'il s'agit bien de la même liste. Avec l'initialisation dans `__init__`, les deux instances ont des listes distinctes et non partagées. La correction proposée est donc la bonne. La remarque finale est juste et évite un contresens fréquent : l'attribut de classe n'est pas fautif en soi, c'est la mutabilité partagée qui pose problème.
-3. Synthèse : cause exacte, mécanisme correctement expliqué, correction vérifiée et nuance pertinente. PASS.
+2. Vérification des contraintes : avec l'attribut de classe, un `add` sur une instance rend l'article visible depuis une autre instance, et le test d'identité confirme qu'il s'agit bien de la même liste. Avec l'initialisation dans `__init__`, les deux instances ont des listes distinctes et non partagées. La correction proposée est donc la bonne. La remarque finale est juste et évite un contresens fréquent : l'attribut de classe n'est pas fautif en soi, c'est la mutabilité partagée qui pose problème.
+3. Synthèse : cause exacte, mécanisme correctement expliqué, correction adaptée et nuance pertinente. PASS.
 ''',
     exact=True, bugs=True, consignes=True,
-    raison="Cause exacte avec la distinction lecture/affectation, correction vérifiée et nuance juste sur les attributs de classe immuables.",
+    raison="Cause exacte avec la distinction lecture/affectation, correction adaptée et nuance juste sur les attributs de classe immuables.",
 ))
 
 # ── 7. Lecture d'un gros fichier ──────────────────────────────────────────────
@@ -274,12 +306,12 @@ Un objet fichier ouvert en mode texte est déjà un itérateur de lignes : il li
 Une seule différence de comportement à connaître : l'itération conserve le caractère de fin de ligne, là où `splitlines()` le retire. Ici c'est sans effet, puisque `startswith` teste le début de la ligne. Si vous deviez comparer la fin, il faudrait ajouter un `rstrip("\\n")`.
 ''',
     thinking='''
-1. Analyse du code : le refactoring est correct et le comptage identique. Vérifié par exécution sur un fichier de 10,7 Mo : les deux versions renvoient le même résultat, et le pic mémoire passe de 31,0 Mo à 0,022 Mo, soit un rapport de plus de mille. L'ordre de grandeur du pic de la version d'origine, environ trois fois la taille du fichier, correspond bien aux deux copies simultanées que la réponse identifie.
+1. Analyse du code : le refactoring est correct et le comptage identique. Sur un fichier de 10,7 Mo, les deux versions renvoient le même résultat, et le pic mémoire passe de 31,0 Mo à 0,022 Mo, soit un rapport de plus de mille. L'ordre de grandeur du pic de la version d'origine, environ trois fois la taille du fichier, correspond bien aux deux copies simultanées que la réponse identifie.
 2. Vérification des contraintes : l'analyse des deux copies est exacte, la chaîne complète puis la liste de lignes. La différence de comportement signalée est réelle et correctement circonscrite : l'itération sur un fichier conserve le caractère de fin de ligne, contrairement à `splitlines()`, sans conséquence ici puisque le test porte sur le début de la ligne. Signaler cet écart tout en montrant qu'il est sans effet est exactement ce qu'exigeait la consigne de comportement identique.
-3. Synthèse : optimisation correcte, gain vérifié, seule différence de comportement identifiée et correctement écartée. PASS.
+3. Synthèse : optimisation correcte, gain net, seule différence de comportement identifiée et correctement écartée. PASS.
 ''',
     exact=True, bugs=True, consignes=True,
-    raison="Itération ligne à ligne équivalente, gain mémoire vérifié (31 Mo contre 0,022 Mo), et différence sur le saut de ligne correctement circonscrite.",
+    raison="Itération ligne à ligne équivalente, gain mémoire net (31 Mo contre 0,022 Mo), et différence sur le saut de ligne correctement circonscrite.",
 ))
 
 # ── 8. Analyse de dates en JavaScript ─────────────────────────────────────────
@@ -297,7 +329,11 @@ const label = `${day.getFullYear()}-${day.getMonth() + 1}-${day.getDate()}`;
 Explique et corrige.
 ''',
     reponse='''
+## Le diagnostic
+
 Le problème vient des accesseurs locaux. `new Date("2026-03-01")` construit bien le 1er mars à minuit, mais `getDate()` convertit vers le fuseau du poste, ce qui peut faire basculer d'un jour.
+
+## La correction
 
 La correction consiste à ajouter explicitement l'heure pour forcer une interprétation cohérente :
 
@@ -307,14 +343,29 @@ const label = `${day.getFullYear()}-${day.getMonth() + 1}-${day.getDate()}`;
 ```
 
 En précisant l'heure, la chaîne est analysée de la même manière partout, et les accesseurs locaux renvoient alors la bonne date sur tous les postes.
+
+## Deux pièges voisins dans la même ligne
+
+Tant que vous êtes dans ce code, deux détails méritent d'être corrigés :
+
+**`getMonth()` est indexé à partir de zéro.** Janvier vaut `0`, décembre vaut `11`. Le `+ 1` de votre gabarit est donc correct, mais c'est une source d'erreur classique dès qu'on déplace ce calcul ailleurs. `getDate()`, en revanche, est bien le quantième du mois, indexé à partir de 1, et `getDay()` désigne le jour de la semaine — trois conventions différentes dans la même API.
+
+**Le format n'est pas rempli.** `2026-3-1` au lieu de `2026-03-01` : votre étiquette n'est ni triable ni comparable à une date ISO. Ajoutez le remplissage :
+
+```ts
+const pad = (n: number) => String(n).padStart(2, "0");
+const label = `${day.getFullYear()}-${pad(day.getMonth() + 1)}-${pad(day.getDate())}`;
+```
+
+Si l'étiquette est destinée à un affichage plutôt qu'à un identifiant, `Intl.DateTimeFormat` gère la locale et le remplissage pour vous.
 ''',
     thinking='''
-1. Analyse de l'explication : le symptôme est bien identifié, mais le mécanisme est inversé et le correctif aggrave le problème. Les deux formes ne sont pas analysées de la même façon : une chaîne réduite à une date, `2026-03-01`, est interprétée comme un instant **UTC**, alors qu'une chaîne comportant une heure sans fuseau, `2026-03-01T00:00:00`, est interprétée en heure **locale**.
-2. Vérification des contraintes : vérifié par exécution sur un poste à UTC+1. `new Date("2026-03-01")` donne l'instant `2026-03-01T00:00:00.000Z`, tandis que `new Date("2026-03-01T00:00:00")` donne `2026-02-28T23:00:00.000Z`, soit un jour d'écart en UTC. Ajouter `T00:00:00` ne stabilise donc rien, cela déplace simplement l'ambiguïté et casse la valeur sur les fuseaux à l'est de Greenwich. La cause réelle du décalage est de mélanger une chaîne interprétée en UTC avec des accesseurs locaux : sur un poste à UTC−5, `getDate()` sur `2026-03-01T00:00:00Z` renvoie 28 février. Les corrections valides sont d'utiliser les accesseurs UTC, `getUTCFullYear` et suivants, ou de ne jamais convertir en `Date` une donnée qui est une date civile et de la traiter comme une chaîne, éventuellement avec `Temporal.PlainDate`.
+1. Analyse de l'explication : le symptôme est bien identifié, mais le mécanisme est inversé et le correctif aggrave le problème. Les deux formes ne sont pas analysées de la même façon : une chaîne réduite à une date, `2026-03-01`, est interprétée comme un instant **UTC**, alors qu'une chaîne comportant une heure sans fuseau, `2026-03-01T00:00:00`, est interprétée en heure **locale**. Les deux remarques annexes sont exactes et même utiles : `getMonth()` est bien indexé à partir de zéro là où `getDate()` part de 1, et l'absence de remplissage produit bien `2026-3-1`. Elles ne touchent simplement pas au décalage d'un jour, qui est l'objet de la question.
+2. Vérification des contraintes : sur un poste à UTC+1, `new Date("2026-03-01")` donne l'instant `2026-03-01T00:00:00.000Z`, tandis que `new Date("2026-03-01T00:00:00")` donne `2026-02-28T23:00:00.000Z`, soit un jour d'écart en UTC. Ajouter `T00:00:00` ne stabilise donc rien, cela déplace simplement l'ambiguïté et casse la valeur sur les fuseaux à l'est de Greenwich. La cause réelle du décalage est de mélanger une chaîne interprétée en UTC avec des accesseurs locaux : sur un poste à UTC−5, `getDate()` sur `2026-03-01T00:00:00Z` renvoie 28 février. Les corrections valides sont d'utiliser les accesseurs UTC, `getUTCFullYear` et suivants, ou de ne jamais convertir en `Date` une donnée qui est une date civile et de la traiter comme une chaîne, éventuellement avec `Temporal.PlainDate`.
 3. Synthèse : symptôme correctement repéré, mais mécanisme inversé et correctif qui introduit précisément le décalage qu'il prétend supprimer. FAIL.
 ''',
     exact=False, bugs=False, consignes=False,
-    raison="Ajouter T00:00:00 fait passer l'analyse d'UTC à l'heure locale : mesuré, 2026-03-01 devient 2026-02-28T23:00:00Z.",
+    raison="Ajouter T00:00:00 fait passer l'analyse d'UTC à l'heure locale : 2026-03-01 devient 2026-02-28T23:00:00Z.",
 ))
 
 # ── 9. Cas limite : clonage profond, réponse correcte mais verbeuse ───────────
@@ -356,14 +407,14 @@ Il ne clone pas les fonctions, ni les symboles, ni la chaîne de prototypes : un
 Sans `structuredClone`, il reste `lodash.cloneDeep` ou une fonction récursive maison, avec la gestion des cycles à la charge de l'appelant.
 ''',
     thinking='''
-1. Analyse du code : la solution proposée est la bonne et tient en une ligne. Vérifié par exécution sous Node 22 : `structuredClone` préserve bien l'instance `Date` avec sa valeur `2026-03-01T12:00:00.000Z`, et la copie est réellement profonde, une mutation du tableau imbriqué du clone laissant la source inchangée.
-2. Vérification des contraintes : les cinq pertes attribuées à l'aller-retour JSON sont toutes vérifiées : la `Date` revient en chaîne, `NaN` devient `null`, la clé de valeur `undefined` disparaît, un `BigInt` lève une `TypeError` avec le message « Do not know how to serialize a BigInt », et une référence circulaire lève également une `TypeError`. Les limites énoncées sur `structuredClone` sont exactes, notamment la perte de la chaîne de prototypes et l'échec sur les fonctions. La demande facultative sur les `Map` n'est en revanche pas traitée, alors qu'elle aurait été favorable à la réponse, l'algorithme les prenant en charge. Écart secondaire : la réponse est longue pour une question dont la solution tient en une ligne.
-3. Synthèse : la réponse obligatoire est exacte, vérifiée et bien argumentée ; l'omission porte sur une demande explicitement facultative, et la verbosité seule ne justifie pas un échec. PASS.
+1. Analyse du code : la solution proposée est la bonne et tient en une ligne. Sous Node 22, `structuredClone` préserve bien l'instance `Date` avec sa valeur `2026-03-01T12:00:00.000Z`, et la copie est réellement profonde, une mutation du tableau imbriqué du clone laissant la source inchangée.
+2. Vérification des contraintes : les cinq pertes attribuées à l'aller-retour JSON sont toutes réelles : la `Date` revient en chaîne, `NaN` devient `null`, la clé de valeur `undefined` disparaît, un `BigInt` lève une `TypeError` avec le message « Do not know how to serialize a BigInt », et une référence circulaire lève également une `TypeError`. Les limites énoncées sur `structuredClone` sont exactes, notamment la perte de la chaîne de prototypes et l'échec sur les fonctions. La demande facultative sur les `Map` n'est en revanche pas traitée, alors qu'elle aurait été favorable à la réponse, l'algorithme les prenant en charge. Écart secondaire : la réponse est longue pour une question dont la solution tient en une ligne.
+3. Synthèse : la réponse obligatoire est exacte et bien argumentée ; l'omission porte sur une demande explicitement facultative, et la verbosité seule ne justifie pas un échec. PASS.
 ''',
     exact=True, bugs=True, consignes=True,
     extra_criteres={"aucune_dependance_externe": "La solution n'utilise que les API de la plateforme, comme l'exige la requête."},
     extra_checks={"aucune_dependance_externe": True},
-    raison="structuredClone est la bonne réponse, et les cinq pertes du clonage JSON sont vérifiées ; seul le point facultatif sur les Map manque.",
+    raison="structuredClone est la bonne réponse, et les cinq pertes du clonage JSON sont réelles ; seul le point facultatif sur les Map manque.",
 ))
 
 # ── 10. Théorie : ramasse-miettes de la JVM ───────────────────────────────────
@@ -385,7 +436,7 @@ Ce qu'il faut faire à la place : dimensionner le tas, choisir un collecteur ada
     thinking='''
 1. Analyse de l'explication : les deux arguments sont exacts. `System.gc()` est bien décrit comme une suggestion, et l'option de désactivation explicite existe et porte le nom indiqué. L'analyse du coût est correcte : l'appel déclenche typiquement une collecte complète, là où le fonctionnement générationnel repose sur des collectes mineures fréquentes et brèves.
 2. Vérification des contraintes : l'hypothèse générationnelle est correctement énoncée, la plupart des objets mourant jeunes, et la conséquence sur le parcours limité à la jeune génération est juste. L'argument sur le pire moment est pertinent et répond directement à l'intention du développeur. Les recommandations finales sont sobres et exactes, sans promesse chiffrée invérifiable. La question posée, à savoir trancher et expliquer, reçoit une réponse nette dès la première ligne.
-3. Synthèse : réponse exacte, argumentation en deux temps pertinente, recommandations mesurées. PASS.
+3. Synthèse : réponse exacte, argumentation en deux temps pertinente, recommandations sobres. PASS.
 ''',
     exact=True, bugs=True, consignes=True,
     raison="Exact sur le statut de suggestion de System.gc() et sur le coût d'une collecte complète face au fonctionnement générationnel.",
@@ -415,11 +466,11 @@ class Node:
 ''',
     thinking='''
 1. Analyse de l'explication : la description du comptage de références est correcte, ainsi que le constat qu'un cycle empêche les compteurs de tomber à zéro. La conclusion qui en est tirée est fausse, car elle ignore le second mécanisme.
-2. Vérification des contraintes : CPython dispose, en plus du comptage de références, d'un ramasse-miettes générationnel dédié à la détection des cycles, actif par défaut. Un cycle sans référence externe est donc bien collecté. Vérifié par exécution : deux objets se référençant mutuellement sont détruits après le `del`, leurs méthodes `__del__` sont appelées, et un appel explicite à `gc.collect()` récupère 2 objets. La deuxième affirmation est également fausse et périmée : depuis la PEP 442, intégrée à Python 3.4, les objets d'un cycle définissant `__del__` sont collectables, ce que la sonde confirme puisque `__del__` est effectivement appelé. Il reste vrai que les références faibles sont une bonne pratique pour un lien parent, car elles évitent de dépendre du ramasse-miettes cyclique et rendent la libération immédiate, mais ce n'est pas « la seule solution » face à une fuite qui n'a pas lieu.
+2. Vérification des contraintes : CPython dispose, en plus du comptage de références, d'un ramasse-miettes générationnel dédié à la détection des cycles, actif par défaut. Un cycle sans référence externe est donc bien collecté : deux objets se référençant mutuellement sont détruits après le `del`, leurs méthodes `__del__` sont appelées, et un appel explicite à `gc.collect()` récupère 2 objets. La deuxième affirmation est également fausse et périmée : depuis la PEP 442, intégrée à Python 3.4, les objets d'un cycle définissant `__del__` sont collectables, et `__del__` est bien appelé. Il reste vrai que les références faibles sont une bonne pratique pour un lien parent, car elles évitent de dépendre du ramasse-miettes cyclique et rendent la libération immédiate, mais ce n'est pas « la seule solution » face à une fuite qui n'a pas lieu.
 3. Synthèse : le mécanisme de comptage est correctement décrit, mais la conclusion sur la fuite est fausse et l'argument sur `__del__` reprend un comportement disparu depuis Python 3.4. FAIL.
 ''',
     exact=False, bugs=False, consignes=True,
-    raison="Ignore le ramasse-miettes cyclique de CPython : mesuré, les deux objets sont collectés et __del__ est appelé (PEP 442, depuis 3.4).",
+    raison="Ignore le ramasse-miettes cyclique de CPython : les deux objets sont collectés et __del__ est appelé (PEP 442, depuis 3.4).",
 ))
 
 # ── 12. Théorie : CORS mal compris, verbeux ───────────────────────────────────

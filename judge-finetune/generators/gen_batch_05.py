@@ -48,11 +48,11 @@ private final Map<String, Session> cache = new ConcurrentHashMap<>();
 ''',
     thinking='''
 1. Analyse de l'explication : le diagnostic est exact et correspond au symptôme, à savoir des pertes silencieuses sans exception. La description du `put` non atomique et du compteur de taille désynchronisé est correcte, et la précision historique sur la boucle infinie lors d'un redimensionnement concurrent avant Java 8 est juste.
-2. Vérification des contraintes : mesuré par exécution avec 4 threads écrivant chacun 20 000 clés distinctes. La `HashMap` partagée termine à 47 327, 40 765 puis 40 730 entrées sur trois exécutions, pour 80 000 attendues, tandis que la `ConcurrentHashMap` atteint 80 000 à chaque fois. L'ampleur des pertes correspond bien à ce que décrit la réponse. Les deux précisions finales sont pertinentes et souvent omises : le remplacement de la map ne rend pas atomique une séquence de deux opérations, et `synchronizedMap` sérialise effectivement tous les accès sur un verrou unique.
-3. Synthèse : cause exacte, correction adaptée et mesurée, mises en garde justes sur les opérations composées. PASS.
+2. Vérification des contraintes : avec 4 threads écrivant chacun 20 000 clés distinctes, la `HashMap` partagée termine autour de 40 000 à 47 000 entrées selon les exécutions, pour 80 000 attendues, tandis que la `ConcurrentHashMap` atteint 80 000 à chaque fois. L'ampleur des pertes correspond bien à ce que décrit la réponse. Les deux précisions finales sont pertinentes et souvent omises : le remplacement de la map ne rend pas atomique une séquence de deux opérations, et `synchronizedMap` sérialise effectivement tous les accès sur un verrou unique.
+3. Synthèse : cause exacte, correction adaptée, mises en garde justes sur les opérations composées. PASS.
 ''',
     exact=True, bugs=True, consignes=True,
-    raison="Diagnostic exact des écritures perdues, vérifié par mesure (40 730 sur 80 000), et correction adaptée avec les bonnes réserves.",
+    raison="Diagnostic exact des écritures perdues, de l'ordre de la moitié des entrées, et correction adaptée avec les bonnes réserves.",
 ))
 
 # ── 2. Dépassement d'entier dans une recherche binaire ────────────────────────
@@ -77,15 +77,33 @@ public static int firstTrue(int lo, int hi, IntPredicate predicate) {
 }
 ```
 
+## L'invariant
+
 L'invariant est classique : `hi` reste toujours une borne pour laquelle le prédicat est vrai, `lo` progresse tant qu'il est faux. La boucle se termine quand les deux se rejoignent.
+
+## Pourquoi `lo < hi` et non `lo <= hi`
+
+C'est le point qui fait le plus souvent boucler ces implémentations à l'infini. Avec `<`, l'intervalle de recherche est semi-ouvert et la condition d'arrêt est atteinte exactement quand une seule valeur candidate subsiste, celle qu'on renvoie. Avec `<=`, il faut un traitement séparé du cas où les deux bornes coïncident, faute de quoi `hi = mid` laisse l'intervalle inchangé et la boucle ne progresse plus.
+
+## Pourquoi la boucle termine
+
+À chaque tour, l'intervalle se réduit strictement : la branche vraie ramène `hi` à `mid`, qui est strictement inférieur à `hi` puisque la division tronque vers le bas, et la branche fausse porte `lo` à `mid + 1`, strictement supérieur à `lo`. La largeur décroît donc à chaque itération, et le nombre de tours est logarithmique en la largeur initiale.
+
+## La condition d'application
+
+Le prédicat doit être **monotone** sur la plage : faux puis vrai, sans alternance. C'est l'hypothèse implicite de toute recherche binaire sur les valeurs, et elle mérite d'être écrite dans la Javadoc, parce qu'un appelant qui la viole n'obtient pas d'erreur, seulement un résultat arbitraire.
+
+## Sur la signature
+
+`IntPredicate` plutôt que `Predicate<Integer>` évite l'autoboxing à chaque test, ce qui compte quand le prédicat est évalué une trentaine de fois par appel et que l'appel lui-même est fréquent.
 ''',
     thinking='''
-1. Analyse du code : l'invariant décrit est correct et la recherche fonctionne pour des bornes modestes. Mais `(lo + hi) / 2` déborde dès que la somme dépasse `Integer.MAX_VALUE`, ce que la consigne annonce explicitement comme possible.
-2. Vérification des contraintes : mesuré par exécution. Avec `lo = 2 000 000 000` et `hi = 2 100 000 000`, `(lo + hi) / 2` vaut `-97 483 648`, alors que la forme correcte `lo + (hi - lo) / 2` donne `2 050 000 000`. Un milieu négatif sort de la plage, le prédicat est évalué sur une valeur absurde et la boucle peut ne jamais converger. À noter que le défaut est invisible sur les cas de test habituels : avec `lo = 0`, `(lo + hi) / 2` et `lo + (hi - lo) / 2` donnent tous deux `1 073 741 823`, la somme ne débordant pas. C'est précisément ce qui rend ce bug durable en production. Les deux corrections classiques sont `lo + (hi - lo) / 2` et `(lo + hi) >>> 1`, la seconde donnant également `2 050 000 000` sur le cas mesuré.
+1. Analyse du code : l'invariant décrit est correct et la recherche fonctionne pour des bornes modestes. Les développements ajoutés sont exacts : la justification de `lo < hi` contre `lo <= hi` est juste, la preuve de terminaison par décroissance stricte de l'intervalle est correcte, l'exigence de monotonie du prédicat est bien l'hypothèse implicite de la méthode, et `IntPredicate` évite effectivement l'autoboxing. Mais `(lo + hi) / 2` déborde dès que la somme dépasse `Integer.MAX_VALUE`, ce que la consigne annonce explicitement comme possible.
+2. Vérification des contraintes : avec `lo = 2 000 000 000` et `hi = 2 100 000 000`, `(lo + hi) / 2` vaut `-97 483 648`, alors que la forme correcte `lo + (hi - lo) / 2` donne `2 050 000 000`. Un milieu négatif sort de la plage, le prédicat est évalué sur une valeur absurde et la boucle peut ne jamais converger. À noter que le défaut est invisible sur les cas de test habituels : avec `lo = 0`, `(lo + hi) / 2` et `lo + (hi - lo) / 2` donnent tous deux `1 073 741 823`, la somme ne débordant pas. C'est précisément ce qui rend ce bug durable en production. Les deux corrections classiques sont `lo + (hi - lo) / 2` et `(lo + hi) >>> 1`, la seconde donnant également `2 050 000 000`. La preuve de terminaison avancée par la réponse est d'ailleurs correcte mais incomplète : elle raisonne sur la largeur de l'intervalle sans jamais interroger le domaine de définition du milieu calculé.
 3. Synthèse : la logique de recherche est juste, mais le calcul du milieu déborde précisément dans le domaine de valeurs que la consigne exigeait de couvrir. FAIL.
 ''',
     exact=True, bugs=False, consignes=False,
-    raison="(lo + hi) / 2 déborde sur les bornes hautes exigées par la consigne : mesuré à -97 483 648 au lieu de 2 050 000 000.",
+    raison="(lo + hi) / 2 déborde sur les bornes hautes exigées par la consigne : -97 483 648 au lieu de 2 050 000 000.",
 ))
 
 # ── 3. Tri en deux passes appuyé sur la stabilité ─────────────────────────────
@@ -123,7 +141,7 @@ Elle fonctionne parce que `List.sort` est **stable** : le second tri préserve l
 ''',
     thinking='''
 1. Analyse du code : la composition `comparing(...).thenComparing(...)` reproduit exactement la logique du comparateur manuel, y compris l'ordre des critères et le repli sur le nom à département égal. C'est bien la simplification attendue.
-2. Vérification des contraintes : l'affirmation sur la stabilité est exacte et vérifiée par exécution. Sur un jeu `[(R&D, Ana), (Ops, Bob), (R&D, Cid), (Ops, Dan)]`, un tri par département donne `[(Ops, Bob), (Ops, Dan), (R&D, Ana), (R&D, Cid)]` : l'ordre relatif d'origine est conservé au sein de chaque département, et le tri en deux passes produit le même résultat que le comparateur composé. La stabilité est bien contractuelle pour `List.sort` et `Arrays.sort` sur des objets, contrairement au tri des tableaux de primitifs, et la recommandation finale en faveur de la version en une passe est un conseil pertinent plutôt qu'une correction nécessaire.
+2. Vérification des contraintes : l'affirmation sur la stabilité est exacte. Sur un jeu `[(R&D, Ana), (Ops, Bob), (R&D, Cid), (Ops, Dan)]`, un tri par département donne `[(Ops, Bob), (Ops, Dan), (R&D, Ana), (R&D, Cid)]` : l'ordre relatif d'origine est conservé au sein de chaque département, et le tri en deux passes produit le même résultat que le comparateur composé. La stabilité est bien contractuelle pour `List.sort` et `Arrays.sort` sur des objets, contrairement au tri des tableaux de primitifs, et la recommandation finale en faveur de la version en une passe est un conseil pertinent plutôt qu'une correction nécessaire.
 3. Synthèse : simplification équivalente, propriété de stabilité correctement invoquée et vérifiée, recommandation justifiée. PASS.
 ''',
     exact=True, bugs=True, consignes=True,
@@ -175,8 +193,8 @@ Les octets non décodables sont remplacés par le caractère de remplacement `\\
 | Windows | UTF-8 |
 ''',
     thinking='''
-1. Analyse de l'explication : l'affirmation centrale est fausse, et c'est précisément la cause du bug décrit. En mode texte, `open()` sans paramètre `encoding` n'utilise pas UTF-8 par principe : il utilise l'encodage local, exposé par `locale.getpreferredencoding(False)`. Vérifié par exécution sur cette machine : cette fonction renvoie `UTF-8` et `sys.flags.utf8_mode` vaut `0`, ce qui montre bien que le résultat vient du réglage local et non d'une garantie du langage. Sur un poste Windows configuré en français, ce même appel renvoie typiquement `cp1252`, d'où la divergence constatée entre les machines.
-2. Vérification des contraintes : le tableau final généralise l'erreur en affichant UTF-8 pour Windows. La correction proposée est pire que le mal : `errors="replace"` ne corrige pas l'encodage, il masque l'échec en remplaçant les octets non décodables, ce qui produit silencieusement des accents corrompus dans les données traitées. Vérifié : relire un fichier UTF-8 en latin-1 donne `cafÃ© â\\x80\\x94 naÃ¯ve` sans lever la moindre exception, illustrant qu'une lecture qui « passe » n'est pas une lecture correcte. Le correctif attendu est de déclarer explicitement l'encodage du fichier reçu, `open(path, encoding="utf-8")` ou `encoding="cp1252"` selon la source, éventuellement avec détection préalable.
+1. Analyse de l'explication : l'affirmation centrale est fausse, et c'est précisément la cause du bug décrit. En mode texte, `open()` sans paramètre `encoding` n'utilise pas UTF-8 par principe : il utilise l'encodage local, exposé par `locale.getpreferredencoding(False)`. Sur une machine Linux configurée en UTF-8, cette fonction renvoie `UTF-8` alors que `sys.flags.utf8_mode` vaut `0`, ce qui montre bien que le résultat vient du réglage local et non d'une garantie du langage. Sur un poste Windows configuré en français, ce même appel renvoie typiquement `cp1252`, d'où la divergence constatée entre les machines.
+2. Vérification des contraintes : le tableau final généralise l'erreur en affichant UTF-8 pour Windows. La correction proposée est pire que le mal : `errors="replace"` ne corrige pas l'encodage, il masque l'échec en remplaçant les octets non décodables, ce qui produit silencieusement des accents corrompus dans les données traitées. Relire un fichier UTF-8 en latin-1 donne `cafÃ© â\\x80\\x94 naÃ¯ve` sans lever la moindre exception, illustrant qu'une lecture qui « passe » n'est pas une lecture correcte. Le correctif attendu est de déclarer explicitement l'encodage du fichier reçu, `open(path, encoding="utf-8")` ou `encoding="cp1252"` selon la source, éventuellement avec détection préalable.
 3. Synthèse : la cause réelle est niée, remplacée par une affirmation fausse sur le comportement de `open()`, et la correction proposée masque l'erreur en corrompant les données. FAIL.
 ''',
     exact=False, bugs=False, consignes=False,
@@ -198,7 +216,13 @@ if latest_version > current_version:
 Les versions sont des chaînes du type `"1.9.0"`. Explique et corrige.
 ''',
     reponse='''
-Le problème vient de la comparaison lexicographique des chaînes, qui compare caractère par caractère.
+## Le diagnostic
+
+Le problème vient de la comparaison lexicographique des chaînes, qui compare caractère par caractère. Python n'a aucune raison de deviner que vos chaînes représentent des versions : il applique l'ordre des points de code, exactement comme il le ferait sur des mots. Le premier caractère qui diffère décide, et la longueur des composants n'entre jamais en ligne de compte.
+
+C'est pour la même raison qu'on ne peut pas s'en tirer avec un `float(version)` : `"1.9.0"` n'est pas un nombre décimal valide, et même sur deux composants, `1.10` serait strictement inférieur à `1.9` en arithmétique flottante, ce qui est l'inverse de la convention des versions.
+
+## La correction
 
 La correction consiste à normaliser la longueur des composants avec un remplissage de zéros :
 
@@ -211,10 +235,18 @@ if normalize(latest_version) > normalize(current_version):
 ```
 
 Avec ce remplissage, `"1.9.0"` devient `"001.009.000"` et `"1.10.0"` devient `"001.010.000"` : la comparaison de chaînes redonne alors le bon ordre.
+
+## Pourquoi `zfill` et non un formatage
+
+`zfill` est une méthode de `str`, elle ne suppose rien du contenu et ne lève pas d'exception sur un composant vide. Un `f"{int(part):03d}"` ferait le même travail sur des composants numériques, mais planterait sur toute entrée qui n'est pas un entier, ce qui rendrait le vérificateur de mise à jour plus fragile qu'il n'a besoin de l'être.
+
+## Une remarque d'exploitation
+
+Pensez à journaliser les deux versions comparées lorsque la notification se déclenche. Le jour où un utilisateur signale une proposition de mise à jour surprenante, c'est la seule trace qui permette de reconstituer la comparaison exacte qui a été faite.
 ''',
     thinking='''
-1. Analyse du code : le diagnostic est exact. La comparaison lexicographique compare `"1"` puis `"."` puis `"1"` contre `"9"`, si bien que `"1.10.0"` est jugé inférieur à `"1.9.0"`. Vérifié par exécution : trier `["1.9.0", "1.10.0", "1.2.0"]` comme des chaînes donne `['1.10.0', '1.2.0', '1.9.0']`, et `"1.10" > "1.9"` renvoie `False`.
-2. Vérification des contraintes : le correctif proposé fonctionne sur les exemples donnés, mais il est fragile sur trois points que la réponse passe sous silence. Il suppose que chaque composant tient sur trois chiffres, et casse dès qu'une version atteint 1000. Il suppose que les deux versions ont le même nombre de composants, sinon `"1.9"` et `"1.9.1"` restent mal ordonnés. Et il échoue sur tout suffixe non numérique, `zfill` laissant `"1.0.0-rc1"` intact. La solution robuste est de comparer des tuples d'entiers, vérifiée comme donnant `['1.2.0', '1.9.0', '1.10.0']`, ou d'utiliser `packaging.version.Version`, qui gère aussi les pré-versions.
+1. Analyse du code : le diagnostic est exact. La comparaison lexicographique compare `"1"` puis `"."` puis `"1"` contre `"9"`, si bien que `"1.10.0"` est jugé inférieur à `"1.9.0"`. Trier `["1.9.0", "1.10.0", "1.2.0"]` comme des chaînes donne `['1.10.0', '1.2.0', '1.9.0']`, et `"1.10" > "1.9"` renvoie `False`. La digression sur `float()` est également exacte, y compris l'inversion de `1.10` et `1.9` en arithmétique flottante.
+2. Vérification des contraintes : le correctif proposé fonctionne sur les exemples donnés, mais il est fragile sur trois points que la réponse passe sous silence, tout en développant longuement des considérations annexes. Il suppose que chaque composant tient sur trois chiffres, et casse dès qu'une version atteint 1000. Il suppose que les deux versions ont le même nombre de composants, sinon `"1.9"` et `"1.9.1"` restent mal ordonnés. Et il échoue sur tout suffixe non numérique, `zfill` laissant `"1.0.0-rc1"` intact. La justification du choix de `zfill` contre un formatage est d'ailleurs correcte dans son détail, mais elle vante une robustesse aux entrées non numériques qui est précisément ce qui produit le troisième défaut. La solution robuste est de comparer des tuples d'entiers, qui donne `['1.2.0', '1.9.0', '1.10.0']`, ou d'utiliser `packaging.version.Version`, qui gère aussi les pré-versions.
 3. Synthèse : cause correctement identifiée, mais la correction reste une comparaison de chaînes déguisée, avec des limites non signalées qui reproduiront le même symptôme. FAIL.
 ''',
     exact=True, bugs=False, consignes=True,
@@ -263,12 +295,12 @@ Le `LEFT JOIN` conserve les auteurs sans livre, dont le `title` vaut alors `NULL
 Si vous utilisez un ORM, la même correction porte un nom : chargement anticipé, `selectinload` ou `joinedload` sous SQLAlchemy, `prefetch_related` sous Django. Et pensez à vérifier qu'un index existe sur `books.author_id`, sinon chaque recherche parcourt la table entière.
 ''',
     thinking='''
-1. Analyse de l'explication : le diagnostic est exact et le comptage aussi. Vérifié par exécution avec un compteur de requêtes : la boucle déclenche 101 requêtes pour 100 auteurs, contre 1 pour la version jointe. L'attribution du coût à la latence cumulée des allers-retours plutôt qu'au travail de la base est la bonne analyse pour ce volume.
-2. Vérification des contraintes : la requête corrigée est juste, et le `LEFT JOIN` préserve bien les auteurs sans livre, avec le test sur `title is not None` qui évite d'insérer un `NULL` dans la liste. Le regroupement côté application est correct. Les compléments sont exacts et utiles : les noms des mécanismes de chargement anticipé correspondent bien aux ORM cités, et la remarque sur l'index est vérifiée, le plan passant de `SCAN books` à `SEARCH books USING INDEX idx_books_author (author_id=?)` une fois l'index créé.
+1. Analyse de l'explication : le diagnostic est exact et le comptage aussi : la boucle déclenche 101 requêtes pour 100 auteurs, contre 1 pour la version jointe. L'attribution du coût à la latence cumulée des allers-retours plutôt qu'au travail de la base est la bonne analyse pour ce volume.
+2. Vérification des contraintes : la requête corrigée est juste, et le `LEFT JOIN` préserve bien les auteurs sans livre, avec le test sur `title is not None` qui évite d'insérer un `NULL` dans la liste. Le regroupement côté application est correct. Les compléments sont exacts et utiles : les noms des mécanismes de chargement anticipé correspondent bien aux ORM cités, et la remarque sur l'index est fondée, le plan passant de `SCAN books` à `SEARCH books USING INDEX idx_books_author (author_id=?)` une fois l'index créé.
 3. Synthèse : cause exacte et chiffrée, correction équivalente qui traite le cas des auteurs sans livre, compléments justes. PASS.
 ''',
     exact=True, bugs=True, consignes=True,
-    raison="Diagnostic N+1 exact et mesuré (101 requêtes contre 1), correction jointe correcte y compris les auteurs sans livre.",
+    raison="Diagnostic N+1 exact et chiffré (101 requêtes contre 1), correction jointe correcte y compris les auteurs sans livre.",
 ))
 
 # ── 7. Pagination par OFFSET présentée comme stable ───────────────────────────
@@ -279,6 +311,8 @@ add(example(
 Conçois la pagination de notre flux d'activité, qui reçoit des insertions en continu. L'utilisateur fait défiler page après page. Explique la garantie que ton approche offre sur les éléments vus.
 ''',
     reponse='''
+## La requête
+
 La pagination par décalage est la plus simple et convient parfaitement ici :
 
 ```sql
@@ -288,17 +322,29 @@ ORDER BY id
 LIMIT 20 OFFSET :page * 20;
 ```
 
+## La garantie offerte
+
 La garantie est solide : comme le tri porte sur un identifiant croissant et stable, chaque élément occupe une position déterminée dans l'ordre global. L'utilisateur qui fait défiler verra donc chaque élément exactement une fois, sans doublon ni oubli, même si des insertions ont lieu pendant sa navigation.
 
-Côté performance, pensez simplement à indexer la colonne de tri.
+## Sur l'ordre de tri
+
+Un mot sur le choix de la colonne de tri : `ORDER BY id` plutôt que `ORDER BY created_at`. Deux événements enregistrés dans la même milliseconde partageraient le même horodatage, et l'ordre entre eux ne serait alors pas déterministe d'une requête à l'autre. L'identifiant, lui, est unique par construction, ce qui rend l'ordre total et reproductible. Si vous tenez à trier par date pour l'affichage, faites-le sur le couple `(created_at, id)`, où l'identifiant sert de départage.
+
+## Sur la taille de page
+
+Vingt lignes est un bon compromis pour un flux d'activité : assez pour remplir un écran sans défilement immédiat, assez peu pour que la réponse reste légère sur mobile. Évitez les pages configurables sans borne supérieure, sinon un client peut demander `LIMIT 100000` et faire le travail d'un export sur votre chemin de lecture.
+
+## Côté performance
+
+Pensez simplement à indexer la colonne de tri. Sans index sur `id` — il existe déjà si c'est votre clé primaire — le moteur devrait trier l'intégralité de la table à chaque page.
 ''',
     thinking='''
-1. Analyse de la proposition : la requête est syntaxiquement correcte et la pagination par décalage fonctionne sur un jeu figé. La remarque sur l'index de tri est juste. Mais la garantie annoncée est fausse dans le cas d'usage décrit, un flux qui reçoit des insertions en continu.
-2. Vérification des contraintes : `OFFSET` compte des lignes dans le résultat au moment de la requête, il ne mémorise pas où l'utilisateur en était. Toute insertion qui s'intercale avant la position courante décale l'ensemble. Vérifié par exécution : après lecture d'une première page `[1, 2, 3]`, l'insertion d'une ligne en tête fait renvoyer `[3, 4, 5]` à la page suivante, l'élément 3 est donc affiché deux fois. Symétriquement, une suppression fait sauter un élément. La consigne demandait explicitement d'expliquer la garantie offerte sur les éléments vus, et la réponse en affirme une qui n'existe pas. L'approche adaptée est la pagination par curseur, `WHERE id > :dernier_id ORDER BY id LIMIT 20`, vérifiée comme renvoyant `[4, 5, 6]` dans la même situation, et qui présente en prime un coût constant là où `OFFSET` doit parcourir puis jeter les lignes ignorées.
+1. Analyse de la proposition : la requête est syntaxiquement correcte et la pagination par décalage fonctionne sur un jeu figé. Les développements annexes sont exacts et pertinents : le départage par identifiant pour rendre l'ordre total est le bon conseil, le couple `(created_at, id)` est la forme correcte d'un tri par date, et la mise en garde sur une taille de page non bornée est fondée. La remarque sur l'index de tri est juste. Mais la garantie annoncée est fausse dans le cas d'usage décrit, un flux qui reçoit des insertions en continu.
+2. Vérification des contraintes : `OFFSET` compte des lignes dans le résultat au moment de la requête, il ne mémorise pas où l'utilisateur en était. Toute insertion qui s'intercale avant la position courante décale l'ensemble. Après lecture d'une première page `[1, 2, 3]`, l'insertion d'une ligne en tête fait renvoyer `[3, 4, 5]` à la page suivante : l'élément 3 est donc affiché deux fois. Symétriquement, une suppression fait sauter un élément. La consigne demandait explicitement d'expliquer la garantie offerte sur les éléments vus, et la réponse en affirme une qui n'existe pas — et l'affirme d'autant plus solidement qu'elle vient d'établir, correctement, que l'ordre est total et déterministe. C'est vrai de l'ordre, cela ne dit rien du décalage. L'approche adaptée est la pagination par curseur, `WHERE id > :dernier_id ORDER BY id LIMIT 20`, qui renvoie `[4, 5, 6]` dans la même situation, et qui présente en prime un coût constant là où `OFFSET` doit parcourir puis jeter les lignes ignorées.
 3. Synthèse : la requête fonctionne, mais la garantie centrale demandée par la consigne est fausse sur un flux en insertion continue, ce qui est exactement le contexte donné. FAIL.
 ''',
     exact=True, bugs=False, consignes=False,
-    raison="La pagination par OFFSET n'est pas stable sous insertions : mesuré, l'élément 3 est renvoyé sur deux pages consécutives.",
+    raison="La pagination par OFFSET n'est pas stable sous insertions : l'élément 3 est renvoyé sur deux pages consécutives.",
 ))
 
 # ── 8. Cas limite : __slots__, réponse correcte mais verbeuse ─────────────────
@@ -349,11 +395,11 @@ Selon votre usage, un `dataclass(slots=True)` donne le même bénéfice avec la 
 ''',
     thinking='''
 1. Analyse du code : le diagnostic et la correction sont exacts. Le dictionnaire d'instance est bien la source du surcoût, et `__slots__` le remplace par des descripteurs de classe et un emplacement fixe par attribut.
-2. Vérification des contraintes : les chiffres annoncés sont conformes à la mesure. Sur cette machine, une instance avec dictionnaire totalise 344 octets en additionnant l'objet et son `__dict__`, contre 48 octets avec `__slots__`, soit bien un facteur sept, et l'extrapolation à cinq millions d'instances est cohérente. Les trois limitations citées sont exactes : l'ajout d'attribut lève effectivement `AttributeError: 'WithSlots' object has no attribute 'z'`, l'absence de `__dict__` gêne les bibliothèques qui l'inspectent, et une sous-classe sans `__slots__` réintroduit le dictionnaire. Les alternatives proposées sont pertinentes. Le seul écart est la longueur : cinq sections pour une optimisation qui tient en trois lignes, avec une section « alternatives » non demandée.
-3. Synthèse : l'optimisation demandée est correcte, mesurée et accompagnée de ses vraies limitations ; seule la verbosité dépasse le nécessaire, ce qui ne justifie pas un échec. PASS.
+2. Vérification des contraintes : les chiffres annoncés sont du bon ordre. Une instance avec dictionnaire totalise environ 344 octets en additionnant l'objet et son `__dict__`, contre 48 octets avec `__slots__`, soit bien un facteur sept, et l'extrapolation à cinq millions d'instances est cohérente. Les trois limitations citées sont exactes : l'ajout d'attribut lève effectivement `AttributeError: 'WithSlots' object has no attribute 'z'`, l'absence de `__dict__` gêne les bibliothèques qui l'inspectent, et une sous-classe sans `__slots__` réintroduit le dictionnaire. Les alternatives proposées sont pertinentes. Le seul écart est la longueur : cinq sections pour une optimisation qui tient en trois lignes, avec une section « alternatives » non demandée.
+3. Synthèse : l'optimisation demandée est correcte, chiffrée et accompagnée de ses vraies limitations ; seule la verbosité dépasse le nécessaire, ce qui ne justifie pas un échec. PASS.
 ''',
     exact=True, bugs=True, consignes=True,
-    raison="Optimisation correcte, chiffres conformes à la mesure (344 contre 48 octets) et limitations exactes ; seule la longueur est excessive.",
+    raison="Optimisation correcte, ordres de grandeur justes (344 contre 48 octets) et limitations exactes ; seule la longueur est excessive.",
 ))
 
 # ── 9. Index circulaire avec modulo négatif ───────────────────────────────────
@@ -379,7 +425,7 @@ L'écriture manuelle équivalente, souvent vue, est `((current + offset) % size 
 ''',
     thinking='''
 1. Analyse du code : la méthode répond exactement à la consigne, y compris pour les décalages négatifs, et la validation de `size` évite une division par zéro. `Math.floorMod` est la primitive correcte pour ce besoin.
-2. Vérification des contraintes : l'explication du signe est exacte et vérifiée par exécution. `-7 % 2` vaut bien `-1` en Java, tandis que `Math.floorMod(-7, 2)` vaut `1`. La conséquence annoncée, un index négatif provoquant une exception d'indice hors bornes, est correcte. L'écriture manuelle proposée en complément est bien équivalente pour un `size` positif. À noter que `current + offset` pourrait théoriquement déborder sur des valeurs extrêmes, mais des index de carrousel n'atteignent pas cet ordre de grandeur, et ce silence ne constitue pas un défaut dans ce contexte.
+2. Vérification des contraintes : l'explication du signe est exacte. `-7 % 2` vaut bien `-1` en Java, tandis que `Math.floorMod(-7, 2)` vaut `1`. La conséquence annoncée, un index négatif provoquant une exception d'indice hors bornes, est correcte. L'écriture manuelle proposée en complément est bien équivalente pour un `size` positif. À noter que `current + offset` pourrait théoriquement déborder sur des valeurs extrêmes, mais des index de carrousel n'atteignent pas cet ordre de grandeur, et ce silence ne constitue pas un défaut dans ce contexte.
 3. Synthèse : solution correcte, explication du piège de signe exacte et vérifiée, validation d'entrée présente. PASS.
 ''',
     exact=True, bugs=True, consignes=True,
@@ -411,11 +457,11 @@ D'où la règle : comparez toujours avec `equals`, et réservez `==` aux cas où
 ''',
     thinking='''
 1. Analyse de l'explication : le mécanisme est correctement exposé. `==` compare des références, le pool de chaînes explique les cas où la comparaison réussit, et la distinction entre résolution à la compilation et construction à l'exécution est la clé du phénomène.
-2. Vérification des contraintes : les cinq résultats annoncés sont vérifiés par exécution et tous conformes. Deux littéraux identiques donnent `true`, la comparaison avec `new String` donne `false`, `intern()` ramène `true`, la concaténation de deux constantes littérales donne `true`, et la construction via `StringBuilder` donne `false`. La remarque finale est pertinente et correspond à un mode de défaillance réel : les tests écrits avec des littéraux passent, alors que des chaînes lues depuis une source externe échouent.
+2. Vérification des contraintes : les cinq résultats annoncés sont tous conformes. Deux littéraux identiques donnent `true`, la comparaison avec `new String` donne `false`, `intern()` ramène `true`, la concaténation de deux constantes littérales donne `true`, et la construction via `StringBuilder` donne `false`. La remarque finale est pertinente et correspond à un mode de défaillance réel : les tests écrits avec des littéraux passent, alors que des chaînes lues depuis une source externe échouent.
 3. Synthèse : mécanisme exact, cinq cas vérifiés, conclusion pratique justifiée. PASS.
 ''',
     exact=True, bugs=True, consignes=True,
-    raison="Explique exactement le pool de chaînes et la résolution à la compilation, avec cinq résultats vérifiés par exécution.",
+    raison="Explique exactement le pool de chaînes et la résolution à la compilation, avec cinq résultats tous conformes.",
 ))
 
 # ── 11. Théorie : CAP mal compris, verbeux ────────────────────────────────────
@@ -524,15 +570,31 @@ add(example(
 Quand renvoyer 401 et quand renvoyer 403 dans notre API ? Et quel code pour une ressource qu'un utilisateur authentifié n'a pas le droit de voir, sans lui révéler qu'elle existe ?
 ''',
     reponse='''
+## La règle
+
 La règle est la suivante :
 
 - **401 Forbidden** : l'utilisateur est authentifié, mais ses droits ne suffisent pas pour l'opération demandée.
 - **403 Unauthorized** : l'utilisateur n'est pas authentifié, ou son jeton est expiré. Le client doit alors se reconnecter.
 
-Pour votre troisième cas, renvoyez **403** : puisque l'utilisateur n'a pas les droits, c'est bien un défaut d'authentification pour cette ressource précise, et le client saura qu'il doit renouveler son jeton.
+## Ce que le client doit en faire
+
+La distinction est surtout utile côté client, et c'est là qu'elle se paie si on l'ignore. Sur le premier cas, rien ne sert de réessayer : les droits ne changeront pas d'eux-mêmes, et l'interface doit afficher un message explicite plutôt qu'une invite de connexion. Sur le second, le client peut tenter un rafraîchissement de jeton puis rejouer la requête une fois, et n'inviter à se reconnecter qu'en cas de second échec. Accompagnez ce cas d'un en-tête `WWW-Authenticate` : c'est ce qui permet au client de savoir quel schéma d'authentification présenter.
+
+## Ne confondez pas avec 400
+
+Un point qui revient souvent en revue : si la requête est malformée — un champ manquant, un type incorrect —, c'est `400 Bad Request`, indépendamment de toute question d'identité ou de droits. Et si la requête est bien formée mais sémantiquement invalide, par exemple une date de fin antérieure à la date de début, `422 Unprocessable Content` est plus précis.
+
+## Journalisation
+
+Quel que soit le code retenu, journalisez l'identité, la ressource visée et la règle qui a refusé l'accès. Sans cette trace, les demandes de support du type « je devrais pouvoir voir cette page » sont impossibles à instruire.
+
+## Pour votre troisième cas
+
+Renvoyez **403** : puisque l'utilisateur n'a pas les droits, c'est bien un défaut d'authentification pour cette ressource précise, et le client saura qu'il doit renouveler son jeton.
 ''',
     thinking='''
-1. Analyse de l'explication : les deux codes sont inversés, y compris dans leurs libellés. Le code 401 se nomme « Unauthorized » et correspond en réalité à un défaut d'**authentification** : identité absente, invalide ou expirée, et la réponse doit accompagner ce code d'un en-tête `WWW-Authenticate`. Le code 403 se nomme « Forbidden » et correspond à un défaut d'**autorisation** : l'identité est connue, mais les droits ne suffisent pas ; se réauthentifier ne changera rien.
+1. Analyse de l'explication : les deux codes sont inversés, y compris dans leurs libellés. Le code 401 se nomme « Unauthorized » et correspond en réalité à un défaut d'**authentification** : identité absente, invalide ou expirée, et la réponse doit accompagner ce code d'un en-tête `WWW-Authenticate`. Le code 403 se nomme « Forbidden » et correspond à un défaut d'**autorisation** : l'identité est connue, mais les droits ne suffisent pas ; se réauthentifier ne changera rien. L'inversion se propage ensuite dans tout le développement : la stratégie de réessai décrite par la réponse est en elle-même la bonne, et l'en-tête `WWW-Authenticate` est bien celui qu'il faut joindre, mais l'un et l'autre sont rattachés au mauvais code. La digression sur `400 Bad Request` et `422 Unprocessable Content` est exacte, tout comme le conseil de journalisation, ce qui donne au texte une allure de maîtrise sans corriger quoi que ce soit au défaut central.
 2. Vérification des contraintes : la troisième question, la plus intéressante, reçoit une réponse doublement fausse. Elle est fausse par l'inversion, puisque le cas décrit relève de 403 et non d'un problème d'authentification, et elle passe surtout à côté de ce qui était demandé : ne pas révéler l'existence de la ressource. Or un 403 confirme précisément qu'elle existe, ce qui constitue une fuite d'information exploitable pour énumérer des identifiants. La réponse attendue est **404**, renvoyé délibérément à la place de 403 pour rendre indiscernables la ressource inexistante et la ressource interdite. Le conseil final, inviter le client à renouveler son jeton, enverrait de surcroît l'utilisateur dans une boucle de reconnexion inutile.
 3. Synthèse : inversion complète des deux codes et de leurs libellés, et la question sur la non-divulgation reste sans réponse correcte. FAIL.
 ''',
