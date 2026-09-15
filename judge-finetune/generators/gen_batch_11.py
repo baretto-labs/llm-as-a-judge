@@ -53,7 +53,7 @@ Une résolution DNS préalable permettrait de refuser aussi les noms publics poi
 ''',
     thinking='''
 1. Analyse du code : les deux contrôles sont contournables, et la justification qui les accompagne est fausse sur le point décisif.
-2. Vérification des contraintes : `netloc` inclut l'information utilisateur, pas seulement l'hôte. Vérifié par exécution : pour `https://evil.example.net@interne.example.com/api`, `netloc` vaut `'evil.example.net@interne.example.com'` — donc absent de la liste, donc accepté — alors que `hostname` vaut `'interne.example.com'`, c'est-à-dire l'hôte réellement contacté. Le filtre laisse ainsi passer exactement l'attaque qu'il prétend bloquer. Deuxième défaut mesuré : `netloc` conserve la casse, `'https://INTERNE.example.com/api'` donnant `'INTERNE.example.com'`, là où `hostname` normalise en minuscules ; une simple variation de casse suffit donc à contourner la liste. L'affirmation selon laquelle tester le préfixe équivaudrait à inspecter `scheme` est par ailleurs inexacte pour une entrée hostile : une URL protocole-relative comme `//evil.example.net/api` a un `scheme` vide, et la comparaison `hostname` reste le seul contrôle fiable. Enfin, une liste noire d'hôtes est structurellement insuffisante contre le détournement de requête côté serveur : il faut résoudre le nom et refuser les adresses privées, de bouclage et de lien local, revérifier après redirection, et refuser les redirections vers ces plages — ce que la réponse relègue à plus tard alors que c'est le cœur de l'exigence.
+2. Vérification des contraintes : `netloc` inclut l'information utilisateur, pas seulement l'hôte. Pour `https://evil.example.net@interne.example.com/api`, `netloc` vaut `'evil.example.net@interne.example.com'` — donc absent de la liste, donc accepté — alors que `hostname` vaut `'interne.example.com'`, c'est-à-dire l'hôte réellement contacté. Le filtre laisse ainsi passer exactement l'attaque qu'il prétend bloquer. Deuxième défaut : `netloc` conserve la casse, `'https://INTERNE.example.com/api'` donnant `'INTERNE.example.com'`, là où `hostname` normalise en minuscules ; une simple variation de casse suffit donc à contourner la liste. L'affirmation selon laquelle tester le préfixe équivaudrait à inspecter `scheme` est par ailleurs inexacte pour une entrée hostile : une URL protocole-relative comme `//evil.example.net/api` a un `scheme` vide, et la comparaison `hostname` reste le seul contrôle fiable. Enfin, une liste noire d'hôtes est structurellement insuffisante contre le détournement de requête côté serveur : il faut résoudre le nom et refuser les adresses privées, de bouclage et de lien local, revérifier après redirection, et refuser les redirections vers ces plages — ce que la réponse relègue à plus tard alors que c'est le cœur de l'exigence.
 3. Synthèse : validation contournable par information utilisateur ou par casse, justification fausse sur `netloc`, et exigence principale de la requête non satisfaite. FAIL.
 ''',
     exact=False, bugs=False, consignes=True,
@@ -102,7 +102,7 @@ Quatre points, dans l'ordre où ils comptent.
 ''',
     thinking='''
 1. Analyse du code : la fonction remplit le contrat et chaque contrôle porte sur le champ pertinent.
-2. Vérification des contraintes : les deux affirmations d'analyse sont vérifiées par exécution. Pour `https://evil.example.net@interne.example.com/api`, `hostname` renvoie bien `'interne.example.com'` quand `netloc` renvoie `'evil.example.net@interne.example.com'` ; et `https://INTERNE.example.com/api` donne un `hostname` normalisé en minuscules. Le cas protocole-relatif est également confirmé : `//evil.example.net/api` a un `scheme` vide, donc rejeté par la comparaison de champ là où un test de préfixe se contenterait d'échouer sans distinguer. Le filtrage sur l'adresse résolue est la bonne parade au détournement de requête côté serveur, l'itération sur toutes les adresses renvoyées évite le cas d'un nom résolvant à la fois vers une adresse publique et une adresse privée, et la réserve finale sur les redirections est exacte : la validation à l'enregistrement ne protège pas l'appel.
+2. Vérification des contraintes : les deux affirmations d'analyse sont exactes. Pour `https://evil.example.net@interne.example.com/api`, `hostname` renvoie bien `'interne.example.com'` quand `netloc` renvoie `'evil.example.net@interne.example.com'` ; et `https://INTERNE.example.com/api` donne un `hostname` normalisé en minuscules. Le cas protocole-relatif est également confirmé : `//evil.example.net/api` a un `scheme` vide, donc rejeté par la comparaison de champ là où un test de préfixe se contenterait d'échouer sans distinguer. Le filtrage sur l'adresse résolue est la bonne parade au détournement de requête côté serveur, l'itération sur toutes les adresses renvoyées évite le cas d'un nom résolvant à la fois vers une adresse publique et une adresse privée, et la réserve finale sur les redirections est exacte : la validation à l'enregistrement ne protège pas l'appel.
 3. Synthèse : validation correcte sur le bon champ, filtrage des plages internes après résolution, et limite de la validation à l'enregistrement explicitement signalée. PASS.
 ''',
     exact=True, bugs=True, consignes=True,
@@ -141,12 +141,12 @@ return cible.read_bytes()
 La résolution est indispensable : elle normalise les segments `..` et suit les liens symboliques, deux vecteurs que la seule vérification du nom laisserait passer.
 ''',
     thinking='''
-1. Analyse de l'explication : le comportement décrit est exact et vérifié. `os.path.join('/srv/data', '/etc/passwd')` renvoie `/etc/passwd` : le segment absolu écrase bien la base. L'opérateur de `Path` se comporte de la même façon, ce que la sonde confirme.
-2. Vérification des contraintes : la correction traite les deux vecteurs. Vérifié sur les trois cas : un nom ordinaire résout sous la racine et passe le contrôle ; `../etc/passwd` résout en `/srv/etc/passwd`, hors racine, donc rejeté ; `/etc/passwd` résout hors racine, donc rejeté. La nécessité de la résolution est correctement justifiée, `normpath` sur `/srv/data/../etc/passwd` donnant `/srv/etc/passwd`, ce qui montre qu'un simple contrôle du nom fourni ne suffirait pas. La comparaison couvre le cas où la cible est la racine elle-même, ce que `in cible.parents` seul manquerait.
-3. Synthèse : cause exacte et vérifiée, correction qui couvre les segments relatifs comme les liens symboliques. PASS.
+1. Analyse de l'explication : le comportement décrit est exact. `os.path.join('/srv/data', '/etc/passwd')` renvoie `/etc/passwd` : le segment absolu écrase bien la base. L'opérateur de `Path` se comporte de la même façon.
+2. Vérification des contraintes : la correction traite les deux vecteurs. Les trois cas se départagent ainsi : un nom ordinaire résout sous la racine et passe le contrôle ; `../etc/passwd` résout en `/srv/etc/passwd`, hors racine, donc rejeté ; `/etc/passwd` résout hors racine, donc rejeté. La nécessité de la résolution est correctement justifiée, `normpath` sur `/srv/data/../etc/passwd` donnant `/srv/etc/passwd`, ce qui montre qu'un simple contrôle du nom fourni ne suffirait pas. La comparaison couvre le cas où la cible est la racine elle-même, ce que `in cible.parents` seul manquerait.
+3. Synthèse : cause exacte, correction qui couvre les segments relatifs comme les liens symboliques. PASS.
 ''',
     exact=True, bugs=True, consignes=True,
-    raison="Comportement de join sur segment absolu exactement décrit et vérifié, correction par résolution et contrôle d'appartenance.",
+    raison="Comportement de join sur segment absolu exactement décrit, correction par résolution et contrôle d'appartenance.",
 ))
 
 # ── 4. NOT IN et NULL ─────────────────────────────────────────────────────────
@@ -184,11 +184,11 @@ WHERE id NOT IN (SELECT parrain_id FROM clients WHERE parrain_id IS NOT NULL);
 ''',
     thinking='''
 1. Analyse de l'explication : le mécanisme est exact. Le développement de `NOT IN` en conjonction d'inégalités et la propagation de l'inconnu sont correctement décrits.
-2. Vérification des contraintes : le comportement et les deux corrections sont vérifiés par exécution. Sur une table dont la colonne de parrainage contient `[None, 1, 2, None]`, la requête d'origine renvoie **zéro ligne**, la variante `NOT EXISTS` renvoie `[(3, 'Cid'), (4, 'Dan')]`, et la variante filtrant les nuls renvoie le même résultat. Les expressions citées sont également confirmées : `2 NOT IN (1, NULL)` s'évalue à `NULL`, tandis que `1 IN (1, NULL)` vaut vrai — ce qui étaye exactement la dissymétrie énoncée en conclusion entre `IN` et `NOT IN`.
-3. Synthèse : cause exacte, deux corrections vérifiées, et la dissymétrie finale correctement formulée. PASS.
+2. Vérification des contraintes : le comportement et les deux corrections sont conformes. Sur une table dont la colonne de parrainage contient `[None, 1, 2, None]`, la requête d'origine renvoie **zéro ligne**, la variante `NOT EXISTS` renvoie `[(3, 'Cid'), (4, 'Dan')]`, et la variante filtrant les nuls renvoie le même résultat. Les expressions citées sont également confirmées : `2 NOT IN (1, NULL)` s'évalue à `NULL`, tandis que `1 IN (1, NULL)` vaut vrai — ce qui étaye exactement la dissymétrie énoncée en conclusion entre `IN` et `NOT IN`.
+3. Synthèse : cause exacte, deux corrections valides, et la dissymétrie finale correctement formulée. PASS.
 ''',
     exact=True, bugs=True, consignes=True,
-    raison="Neutralisation de NOT IN par un NULL exactement expliquée, avec zéro ligne contre deux vérifié pour NOT EXISTS.",
+    raison="Neutralisation de NOT IN par un NULL exactement expliquée, avec zéro ligne contre deux pour NOT EXISTS.",
 ))
 
 # ── 5. LocalDateTime et changement d'heure, verbeux ──────────────────────────
@@ -228,12 +228,12 @@ LocalDateTime rappel = LocalDateTime.of(jour, heure).plusDays(1);
 `plusDays` raisonne en jours civils et consulte la base de fuseaux, ce qui règle les deux symptômes d'un coup.
 ''',
     thinking='''
-1. Analyse de l'explication : deux affirmations centrales sont fausses. Un `LocalDateTime` ne porte **aucun** fuseau, ni explicite ni implicite : c'est précisément sa définition, un couple date-heure sans référence à un instant. Vérifié par exécution, le même `LocalDateTime` de `2026-03-29T01:30` associé à Paris puis à UTC produit deux instants différents, ce qui montre qu'il n'en désignait aucun par lui-même.
-2. Vérification des contraintes : la seconde erreur est la plus grave, car elle invente un mécanisme de protection inexistant. Une heure locale supprimée par le changement ne lève rien : vérifié, `LocalDateTime.of(2026, 3, 29, 2, 30)` associé à Paris renvoie `2026-03-29T03:30+02:00`, silencieusement décalée. Rien n'a donc été capturé plus haut, la valeur anormale a simplement été enregistrée. La correction proposée est en outre inopérante sur un `LocalDateTime`, puisque `plusDays` y opère aussi sur le calendrier civil sans consulter aucune base de fuseaux — il n'y a pas de fuseau à consulter. La distinction n'apparaît que sur un `ZonedDateTime`, où la mesure la confirme : depuis le 28 mars 20:00 à Paris, `plusHours(24)` donne 21:00 et `plusDays(1)` donne 20:00, soit une heure d'écart. La correction attendue est donc de travailler en `ZonedDateTime`, d'y appliquer `plusDays(1)`, et de traiter explicitement le cas de l'heure inexistante.
+1. Analyse de l'explication : deux affirmations centrales sont fausses. Un `LocalDateTime` ne porte **aucun** fuseau, ni explicite ni implicite : c'est précisément sa définition, un couple date-heure sans référence à un instant. Le même `LocalDateTime` de `2026-03-29T01:30` associé à Paris puis à UTC produit deux instants différents, ce qui montre qu'il n'en désignait aucun par lui-même.
+2. Vérification des contraintes : la seconde erreur est la plus grave, car elle invente un mécanisme de protection inexistant. Une heure locale supprimée par le changement ne lève rien : `LocalDateTime.of(2026, 3, 29, 2, 30)` associé à Paris renvoie `2026-03-29T03:30+02:00`, silencieusement décalée. Rien n'a donc été capturé plus haut, la valeur anormale a simplement été enregistrée. La correction proposée est en outre inopérante sur un `LocalDateTime`, puisque `plusDays` y opère aussi sur le calendrier civil sans consulter aucune base de fuseaux — il n'y a pas de fuseau à consulter. La distinction n'apparaît que sur un `ZonedDateTime`, où la mesure la confirme : depuis le 28 mars 20:00 à Paris, `plusHours(24)` donne 21:00 et `plusDays(1)` donne 20:00, soit une heure d'écart. La correction attendue est donc de travailler en `ZonedDateTime`, d'y appliquer `plusDays(1)`, et de traiter explicitement le cas de l'heure inexistante.
 3. Synthèse : mécanisme inventé sur le fuseau implicite et sur une exception qui n'existe pas, avec un correctif sans effet sur le type utilisé. FAIL.
 ''',
     exact=False, bugs=False, consignes=True,
-    raison="LocalDateTime ne porte aucun fuseau et ne lève rien sur une heure inexistante : mesuré, 02:30 devient 03:30 en silence.",
+    raison="LocalDateTime ne porte aucun fuseau et ne lève rien sur une heure inexistante : 02:30 devient 03:30 en silence.",
 ))
 
 # ── 6. encodeURI contre encodeURIComponent ────────────────────────────────────
@@ -269,7 +269,7 @@ La règle tient en une phrase : `encodeURI` pour une URL complète, `encodeURICo
 ''',
     thinking='''
 1. Analyse de l'explication : la distinction est exacte et le diagnostic correspond au symptôme décrit.
-2. Vérification des contraintes : vérifié par exécution sur la valeur `a&b=c/d?e f#g`. Avec `encodeURI`, la chaîne produite conserve `&`, `=`, `/` et `#`, et le paramètre relu via `URL.searchParams.get("q")` vaut `'a'` — la troncature signalée est donc exactement reproduite. Avec `encodeURIComponent`, la même lecture renvoie la valeur complète `a&b=c/d?e f#g`. La solution par `searchParams` est également vérifiée et produit un encodage correct, l'espace y étant représenté par `+`, forme admise dans une chaîne de requête et correctement décodée en lecture. La règle finale résume exactement la différence de domaine d'application des deux fonctions.
+2. Vérification des contraintes : la valeur `a&b=c/d?e f#g` est parlante. Avec `encodeURI`, la chaîne produite conserve `&`, `=`, `/` et `#`, et le paramètre relu via `URL.searchParams.get("q")` vaut `'a'` — la troncature signalée est donc exactement reproduite. Avec `encodeURIComponent`, la même lecture renvoie la valeur complète `a&b=c/d?e f#g`. La solution par `searchParams` produit elle aussi un encodage correct, l'espace y étant représenté par `+`, forme admise dans une chaîne de requête et correctement décodée en lecture. La règle finale résume exactement la différence de domaine d'application des deux fonctions.
 3. Synthèse : cause exacte, symptôme reproduit par la mesure, deux corrections valides dont une qui supprime le choix. PASS.
 ''',
     exact=True, bugs=True, consignes=True,
@@ -299,12 +299,12 @@ Quatre conséquences pratiques.
 La parade générale est de décider à la conception si une colonne peut être inconnue, et d'expliciter le traitement avec `COALESCE` partout où la réponse est non.
 ''',
     thinking='''
-1. Analyse de l'explication : le fondement est exact. `NULL` marque l'absence d'information, les comparaisons renvoient inconnu, et `NULL = NULL` est inconnu et non vrai — vérifié par exécution, l'expression renvoie bien une valeur nulle alors que `NULL IS NULL` renvoie vrai.
-2. Vérification des contraintes : les quatre conséquences sont vérifiées. Le cas `NOT IN` est confirmé, `2 NOT IN (1, NULL)` s'évaluant à inconnu et la requête correspondante ne renvoyant aucune ligne. Les agrégats se comportent comme décrit : sur deux lignes dont un montant nul, `SUM` et `AVG` valent 30,0 en ignorant le nul, `COUNT(colonne)` vaut 1 contre 2 pour `COUNT(*)`, et le recalcul `SUM / COUNT(*)` donne 15,0, soit un résultat différent de la moyenne — l'écart annoncé est donc réel. Sur un ensemble vide, `SUM` renvoie une valeur nulle et `COUNT` renvoie 0, comme énoncé. Enfin, une colonne sous contrainte d'unicité accepte bien plusieurs nuls, la table de test en contenant deux, tandis qu'un doublon non nul est refusé par une erreur d'intégrité.
-3. Synthèse : fondement exact et quatre conséquences toutes vérifiées, avec une parade de conception pertinente. PASS.
+1. Analyse de l'explication : le fondement est exact. `NULL` marque l'absence d'information, les comparaisons renvoient inconnu, et `NULL = NULL` est inconnu et non vrai — l'expression renvoie bien une valeur nulle alors que `NULL IS NULL` renvoie vrai.
+2. Vérification des contraintes : les quatre conséquences sont exactes. Le cas `NOT IN` est confirmé, `2 NOT IN (1, NULL)` s'évaluant à inconnu et la requête correspondante ne renvoyant aucune ligne. Les agrégats se comportent comme décrit : sur deux lignes dont un montant nul, `SUM` et `AVG` valent 30,0 en ignorant le nul, `COUNT(colonne)` vaut 1 contre 2 pour `COUNT(*)`, et le recalcul `SUM / COUNT(*)` donne 15,0, soit un résultat différent de la moyenne — l'écart annoncé est donc réel. Sur un ensemble vide, `SUM` renvoie une valeur nulle et `COUNT` renvoie 0, comme énoncé. Enfin, une colonne sous contrainte d'unicité accepte bien plusieurs nuls, la table de test en contenant deux, tandis qu'un doublon non nul est refusé par une erreur d'intégrité.
+3. Synthèse : fondement exact et quatre conséquences toutes exactes, avec une parade de conception pertinente. PASS.
 ''',
     exact=True, bugs=True, consignes=True,
-    raison="Logique à trois valeurs exactement exposée, avec les quatre conséquences vérifiées par exécution, agrégats et unicité compris.",
+    raison="Logique à trois valeurs exactement exposée, avec les quatre conséquences exactes, agrégats et unicité compris.",
 ))
 
 # ── 8. Théorie : parseInt présenté comme la solution sûre ─────────────────────
@@ -322,12 +322,12 @@ La base explicite est le point essentiel : sans elle, une saisie commençant par
 `Number()` est à éviter pour une saisie utilisateur : il est plus permissif et accepte des formes que l'on ne veut généralement pas, comme les chaînes vides ou les notations exotiques. `parseInt` avec base explicite reste la conversion sûre et lisible.
 ''',
     thinking='''
-1. Analyse de l'explication : l'argument sur la base est exact et vérifié — `parseInt("0x1f")` renvoie 31 sans base, contre 0 avec la base 10. Mais la conclusion générale est fausse, et le raisonnement sur `Number` est inversé.
-2. Vérification des contraintes : `parseInt` est le plus permissif des deux, pas l'inverse, car il s'arrête au premier caractère non conforme et ignore silencieusement le reste. Vérifié : `parseInt("12px", 10)` renvoie 12 quand `Number("12px")` renvoie `NaN`, et `parseInt("1,5", 10)` renvoie 1 quand `Number("1,5")` renvoie `NaN`. Pour une saisie utilisateur, accepter `12px` comme valant 12 est précisément le comportement dangereux. Deuxième erreur mesurée : `parseInt("1e3", 10)` renvoie **1**, la notation scientifique étant tronquée, là où `Number("1e3")` renvoie 1000 ; une saisie légitime est donc silencieusement corrompue. Le reproche fait à `Number` sur la chaîne vide est en revanche réel, `Number("")` valant 0 alors que `parseInt("")` vaut `NaN`, mais il se traite par un contrôle explicite du vide. La réponse correcte consiste à valider la forme attendue puis à convertir avec `Number`, en rejetant le résultat avec `Number.isFinite`, ou à s'appuyer sur une expression régulière ancrée pour un entier.
+1. Analyse de l'explication : l'argument sur la base est exact — `parseInt("0x1f")` renvoie 31 sans base, contre 0 avec la base 10. Mais la conclusion générale est fausse, et le raisonnement sur `Number` est inversé.
+2. Vérification des contraintes : `parseInt` est le plus permissif des deux, pas l'inverse, car il s'arrête au premier caractère non conforme et ignore silencieusement le reste. `parseInt("12px", 10)` renvoie 12 quand `Number("12px")` renvoie `NaN`, et `parseInt("1,5", 10)` renvoie 1 quand `Number("1,5")` renvoie `NaN`. Pour une saisie utilisateur, accepter `12px` comme valant 12 est précisément le comportement dangereux. Deuxième erreur : `parseInt("1e3", 10)` renvoie **1**, la notation scientifique étant tronquée, là où `Number("1e3")` renvoie 1000 ; une saisie légitime est donc silencieusement corrompue. Le reproche fait à `Number` sur la chaîne vide est en revanche réel, `Number("")` valant 0 alors que `parseInt("")` vaut `NaN`, mais il se traite par un contrôle explicite du vide. La réponse correcte consiste à valider la forme attendue puis à convertir avec `Number`, en rejetant le résultat avec `Number.isFinite`, ou à s'appuyer sur une expression régulière ancrée pour un entier.
 3. Synthèse : un argument exact sur la base sert à recommander la fonction la plus laxiste, avec une caractérisation inversée de `Number` et une troncature silencieuse démontrée. FAIL.
 ''',
     exact=False, bugs=False, consignes=True,
-    raison="parseInt est le plus permissif : mesuré, « 12px » donne 12 et « 1e3 » donne 1, là où Number renvoie NaN et 1000.",
+    raison="parseInt est le plus permissif : « 12px » donne 12 et « 1e3 » donne 1, là où Number renvoie NaN et 1000.",
 ))
 
 # ── 9. Cas limite : casse et normalisation, verbeux ───────────────────────────
@@ -364,11 +364,11 @@ Un identifiant devrait être normalisé et replié une fois, à l'entrée, puis 
 ''',
     thinking='''
 1. Analyse de l'explication : les deux problèmes sont correctement distingués, et chacun est exact. La dépendance de la mise en minuscules à la locale est réelle, et l'exemple turc est le cas d'école.
-2. Vérification des contraintes : les affirmations chiffrables sont vérifiées. Le pliage de casse replie bien `ß` vers `ss` là où la mise en minuscules ne le fait pas — mesuré, `'ß'.casefold() == 'ss'` est vrai alors que `'ß'.lower() == 'ss'` est faux. Le cas turc est confirmé dans les deux langages : `'ADMİN'` mis en minuscules ne vaut pas `'admin'`. Les deux formes de représentation sont également mesurées : composée et décomposée ne sont pas égales, leurs longueurs valent respectivement 1 et 2, et l'égalité est rétablie après normalisation commune. L'ordre des opérations recommandé est correct. En revanche, la demande facultative sur les identifiants réservés n'est pas traitée, alors qu'elle prolongeait naturellement le propos. La réponse est par ailleurs longue, avec cinq sections pour un sujet qui en appelait deux.
-3. Synthèse : l'obligatoire est exact et vérifié, l'omission porte sur une demande explicitement facultative, et la verbosité seule ne justifie pas un échec. PASS.
+2. Vérification des contraintes : les affirmations chiffrables sont exactes. Le pliage de casse replie bien `ß` vers `ss` là où la mise en minuscules ne le fait pas : `'ß'.casefold() == 'ss'` est vrai alors que `'ß'.lower() == 'ss'` est faux. Le cas turc est confirmé dans les deux langages : `'ADMİN'` mis en minuscules ne vaut pas `'admin'`. Les deux formes de représentation se distinguent de même : composée et décomposée ne sont pas égales, leurs longueurs valent respectivement 1 et 2, et l'égalité est rétablie après normalisation commune. L'ordre des opérations recommandé est correct. En revanche, la demande facultative sur les identifiants réservés n'est pas traitée, alors qu'elle prolongeait naturellement le propos. La réponse est par ailleurs longue, avec cinq sections pour un sujet qui en appelait deux.
+3. Synthèse : l'obligatoire est exact, l'omission porte sur une demande explicitement facultative, et la verbosité seule ne justifie pas un échec. PASS.
 ''',
     exact=True, bugs=True, consignes=True,
-    raison="Casse et normalisation exactement distinguées et vérifiées ; seuls les identifiants réservés, facultatifs, manquent.",
+    raison="Casse et normalisation exactement distinguées ; seuls les identifiants réservés, facultatifs, manquent.",
 ))
 
 # ── 10. Cas limite : format imposé non respecté ───────────────────────────────
@@ -390,12 +390,12 @@ Retenez qu'il faut choisir selon la question posée : « combien de temps s'est-
     thinking='''
 1. Analyse de l'explication : le contenu est exact. La distinction entre durée physique et écart d'horloge est la bonne réponse, et l'exemple du changement d'heure l'illustre correctement. La mesure confirme l'écart annoncé : entre le 28 mars 23:00 et le 29 mars 04:00 à Paris, l'écart calculé en heures vaut 4 alors que la différence des heures affichées vaut 5.
 2. Vérification des contraintes : la requête impose deux phrases, en précisant l'usage, une infobulle. La réponse en compte huit, réparties en quatre paragraphes. Ce n'est pas une préférence de style : c'est une contrainte chiffrée et vérifiable, et le texte produit ne tient pas dans le support visé. Le sujet était pourtant traitable dans la limite, les deux premières phrases suffisant presque à elles seules. À noter par ailleurs une imprécision mineure dans le détail Java : `Duration` s'applique aussi à des objets datés avec fuseau, et c'est bien l'unité employée qui détermine le raisonnement — mais cette nuance ne change pas le fond de la réponse.
-3. Synthèse : l'explication est juste et vérifiée, mais la seule contrainte de forme imposée est dépassée d'un facteur quatre. FAIL.
+3. Synthèse : l'explication est juste, mais la seule contrainte de forme imposée est dépassée d'un facteur quatre. FAIL.
 ''',
     exact=True, bugs=True, consignes=True,
     extra_criteres={"format_impose": "La sortie respecte la limite de longueur chiffrée fixée par la requête."},
     extra_checks={"format_impose": False},
-    raison="Explication exacte et vérifiée, mais huit phrases là où la requête en imposait deux pour une infobulle.",
+    raison="Explication exacte, mais huit phrases là où la requête en imposait deux pour une infobulle.",
 ))
 
 
