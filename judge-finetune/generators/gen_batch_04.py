@@ -58,11 +58,11 @@ for (Iterator<String> it = items.iterator(); it.hasNext(); ) {
 ''',
     thinking='''
 1. Analyse de l'explication : le mécanisme décrit correspond au code réel d'`ArrayList.Itr`. Le contrôle `checkForComodification` est bien dans `next()`, et `hasNext()` se limite à `cursor != size`. La conséquence annoncée est donc exacte.
-2. Vérification des contraintes : vérifié par exécution. Sur une liste de quatre éléments dont on retire le deuxième, `ConcurrentModificationException` est levée. Sur une liste `["a", "b"]` dont on retire `"a"`, c'est-à-dire l'avant-dernier, aucune exception n'est levée et la liste finale vaut `[b]` : la boucle s'est arrêtée sans examiner le dernier élément, exactement comme décrit. Les deux corrections proposées sont valides, `removeIf` donnant `[a, c, d]` sur le cas à quatre éléments. La remarque sur la boucle silencieusement incomplète est le point important, souvent oublié dans les réponses à cette question.
+2. Vérification des contraintes : sur une liste de quatre éléments dont on retire le deuxième, `ConcurrentModificationException` est levée. Sur une liste `["a", "b"]` dont on retire `"a"`, c'est-à-dire l'avant-dernier, aucune exception n'est levée et la liste finale vaut `[b]` : la boucle s'est arrêtée sans examiner le dernier élément, exactement comme décrit. Les deux corrections proposées sont valides, `removeIf` donnant `[a, c, d]` sur le cas à quatre éléments. La remarque sur la boucle silencieusement incomplète est le point important, souvent oublié dans les réponses à cette question.
 3. Synthèse : explication exacte du mécanisme, cas intermittent correctement expliqué, corrections valides. PASS.
 ''',
     exact=True, bugs=True, consignes=True,
-    raison="Explique exactement le quirk hasNext()/next() vérifié par exécution, y compris la boucle silencieusement incomplète.",
+    raison="Explique exactement le quirk hasNext()/next(), y compris la boucle silencieusement incomplète.",
 ))
 
 # ── 2. Arrays.asList : affirmation d'immuabilité fausse ───────────────────────
@@ -87,10 +87,24 @@ public List<String> allowedHosts() {
 }
 ```
 
+## La garantie obtenue
+
 `Arrays.asList` renvoie une liste immuable : toute tentative de modification par l'appelant, que ce soit `add`, `remove` ou `set`, lève une `UnsupportedOperationException`. La liste interne est donc totalement protégée, et on évite au passage la copie défensive de la version actuelle.
+
+## Sur le `toArray(new String[0])`
+
+Le tableau de taille zéro passé en argument peut surprendre. C'est pourtant la forme recommandée : la JVM alloue elle-même un tableau de la bonne taille, et les mesures publiées sur le sujet montrent que cette variante est plus rapide que `toArray(new String[hosts.size()])`, où le tableau pré-dimensionné doit d'abord être rempli de valeurs nulles avant d'être réécrit.
+
+## Pourquoi pas un simple `return hosts`
+
+Renvoyer directement le champ exposerait la structure interne : l'appelant obtiendrait une référence sur la collection vivante de votre service, et la moindre modification de sa part se répercuterait partout, sans trace. C'est le défaut que les analyseurs statiques signalent sous le nom d'exposition de la représentation interne.
+
+## Et la version actuelle
+
+`new ArrayList<>(hosts)` fonctionne, mais recopie l'intégralité du contenu à chaque appel. Sur une méthode sollicitée à chaque requête — un filtre d'autorisation, typiquement — cette allocation finit par peser inutilement.
 ''',
     thinking='''
-1. Analyse du code : l'affirmation d'immuabilité est fausse. `Arrays.asList` renvoie une vue de taille fixe, pas une liste immuable : `add` et `remove` lèvent bien `UnsupportedOperationException`, mais `set` est parfaitement autorisé et écrit dans le tableau sous-jacent. Vérifié par exécution : `Arrays.asList("a", "b").set(0, "z")` réussit et la liste devient `[z, b]`, là où `List.of("a", "b").set(0, "z")` lève bien `UnsupportedOperationException`.
+1. Analyse du code : l'affirmation d'immuabilité est fausse. `Arrays.asList` renvoie une vue de taille fixe, pas une liste immuable : `add` et `remove` lèvent bien `UnsupportedOperationException`, mais `set` est parfaitement autorisé et écrit dans le tableau sous-jacent. `Arrays.asList("a", "b").set(0, "z")` réussit et la liste devient `[z, b]`, là où `List.of("a", "b").set(0, "z")` lève bien `UnsupportedOperationException`. Les trois développements annexes sont pourtant exacts : l'idiome `toArray(new String[0])` est bien le plus rapide, l'exposition de la représentation interne est bien le défaut que signalerait un analyseur sur un `return hosts`, et la copie systématique de `new ArrayList<>` a bien un coût.
 2. Vérification des contraintes : la consigne demandait d'empêcher l'appelant de modifier la liste et d'expliquer la garantie obtenue. La garantie annoncée n'existe pas : un appelant peut remplacer n'importe quel élément. Le fait que le tableau soit ici fraîchement créé par `toArray` limite les dégâts au seul appelant, mais la réponse affirme explicitement une protection totale, y compris contre `set`, ce qui est faux et pourrait justifier de supprimer une copie défensive ailleurs. Les solutions correctes sont `List.copyOf(hosts)` ou `Collections.unmodifiableList`, cette dernière restant une vue sur la liste source.
 3. Synthèse : le code compile et bloque `add` et `remove`, mais la garantie centrale annoncée est fausse et la consigne d'immuabilité n'est pas satisfaite. FAIL.
 ''',
@@ -134,7 +148,7 @@ long count = all.size();   // ou un Collectors.teeing si les deux résultats vie
 ```
 ''',
     thinking='''
-1. Analyse de l'explication : le diagnostic est exact. Un flux est consommé par sa première opération terminale et ne peut pas être réutilisé. Vérifié par exécution : un second appel à `count()` sur le même flux lève bien `IllegalStateException` avec le message « stream has already been operated upon or closed », cité correctement dans la réponse.
+1. Analyse de l'explication : le diagnostic est exact. Un flux est consommé par sa première opération terminale et ne peut pas être réutilisé. Un second appel à `count()` sur le même flux lève `IllegalStateException` avec le message « stream has already been operated upon or closed », cité correctement dans la réponse.
 2. Vérification des contraintes : la première correction est la bonne dans le cas présent, puisque `findAll()` renvoie une collection : `size()` évite même de parcourir quoi que ce soit. La mention de `Collectors.teeing` est pertinente pour le cas où la source ne serait parcourable qu'une fois, comme un flux d'entrée. La distinction rappelée entre flux et collection est juste et répond à l'incompréhension exprimée dans la question.
 3. Synthèse : cause exacte, message d'erreur correctement cité, corrections adaptées aux deux situations. PASS.
 ''',
@@ -161,11 +175,25 @@ public static double total(List<Line> lines, double discountPercent) {
 }
 ```
 
+## Le déroulé
+
+1. **Somme des lignes.** Chaque ligne contribue pour `unitPrice × quantity`, la boucle accumule dans `sum`.
+2. **Application de la remise.** `discountPercent` est exprimé en pourcentage, d'où la division par 100 avant de retrancher de 1 : une remise de 20 % donne un facteur `0.8`.
+3. **Arrondi de présentation.** `Math.round(x * 100) / 100.0` est l'idiome habituel pour ramener à deux décimales : on décale de deux rangs, on arrondit à l'entier le plus proche, on redivise.
+
+## Sur le mode d'arrondi
+
+`Math.round` arrondit au plus proche et départage les cas d'égalité vers le haut, ce qui correspond à la convention commerciale attendue sur une facture. Attention toutefois si vous manipulez des avoirs : le départage se faisant toujours vers le haut, il se fait vers zéro pour les valeurs négatives, ce qui n'est pas forcément la convention de votre comptabilité.
+
+## Sur la signature
+
+Le pourcentage est pris en `double` plutôt qu'en entier pour accepter les remises fractionnaires, par exemple 2,5 % sur un accord cadre. La méthode est statique parce qu'elle ne dépend d'aucun état de l'instance, ce qui la rend triviale à tester isolément.
+
 L'arrondi final à deux décimales par `Math.round` élimine les imprécisions du calcul en virgule flottante, le montant affiché sur la facture sera donc exact.
 ''',
     thinking='''
-1. Analyse du code : la logique de calcul est correcte, mais le type l'est pas pour de la monnaie. `double` est binaire : il ne représente pas exactement les décimales usuelles. Vérifié par exécution : additionner dix fois `0.1` donne `0.9999999999999999`, différent de `1.0`, et `0.1 + 0.2` donne `0.30000000000000004`. Sur un panier de plusieurs lignes, l'erreur s'accumule avant l'arrondi.
-2. Vérification des contraintes : l'affirmation finale est fausse. `Math.round` n'élimine pas l'imprécision, il la masque au dernier moment : le total intermédiaire reste faux, et une valeur qui tombe juste sur un demi-centime peut basculer du mauvais côté selon l'erreur accumulée. C'est aussi une divergence classique avec le calcul de TVA fait ailleurs dans le système, qui produit des factures qui ne s'équilibrent pas au centime. Pour de la monnaie destinée à une facture, il faut `BigDecimal` avec un mode d'arrondi explicite, vérifié comme exact : `new BigDecimal("0.10").multiply(BigDecimal.valueOf(3))` donne `0.30`, et l'arrondi `HALF_UP` de `0.615` à deux décimales donne bien `0.62`. Une alternative acceptable est de compter en centimes avec des entiers longs.
+1. Analyse du code : la logique de calcul est correcte, mais le type ne l'est pas pour de la monnaie. `double` est binaire : il ne représente pas exactement les décimales usuelles. Additionner dix fois `0.1` donne `0.9999999999999999`, différent de `1.0`, et `0.1 + 0.2` donne `0.30000000000000004`. Sur un panier de plusieurs lignes, l'erreur s'accumule avant l'arrondi. Les explications ajoutées sont exactes prises isolément, y compris la remarque sur le départage vers le haut de `Math.round` et son effet vers zéro sur les négatifs.
+2. Vérification des contraintes : l'affirmation finale est fausse. `Math.round` n'élimine pas l'imprécision, il la masque au dernier moment : le total intermédiaire reste faux, et une valeur qui tombe juste sur un demi-centime peut basculer du mauvais côté selon l'erreur accumulée. C'est aussi une divergence classique avec le calcul de TVA fait ailleurs dans le système, qui produit des factures qui ne s'équilibrent pas au centime. Pour de la monnaie destinée à une facture, il faut `BigDecimal` avec un mode d'arrondi explicite : `new BigDecimal("0.10").multiply(BigDecimal.valueOf(3))` donne `0.30`, et l'arrondi `HALF_UP` de `0.615` à deux décimales donne bien `0.62`. Une alternative acceptable est de compter en centimes avec des entiers longs. Le soin apporté au détail du mode d'arrondi rend la conclusion d'autant plus convaincante, alors qu'elle porte sur le mauvais problème.
 3. Synthèse : le calcul paraît juste et l'arrondi rassure, mais le type choisi est inadapté à un montant facturé et l'explication affirme une exactitude qui n'existe pas. FAIL.
 ''',
     exact=False, bugs=False, consignes=True,
@@ -227,12 +255,12 @@ Sur 20 000 concaténations, l'écart est déjà d'un ordre de grandeur en faveur
 Si vous générez beaucoup de lignes, pensez à pré-dimensionner le tampon avec `new StringBuilder(estimation)`, à réutiliser un même `StringBuilder` entre les lignes, ou à écrire directement dans un `Writer` bufferisé plutôt que de construire la chaîne en mémoire.
 ''',
     thinking='''
-1. Analyse du code : le diagnostic et la correction sont exacts. L'immuabilité des `String` rend la concaténation en boucle quadratique, `StringBuilder` la ramène à un coût amorti linéaire par doublement du tampon, et la remarque sur l'optimisation du compilateur, valable pour une concaténation isolée mais pas à travers une boucle, est correcte. Vérifié par exécution sur 20 000 itérations : 15 ms pour la version `+=` contre moins d'une milliseconde pour `StringBuilder`, ce qui correspond bien à l'ordre de grandeur annoncé.
+1. Analyse du code : le diagnostic et la correction sont exacts. L'immuabilité des `String` rend la concaténation en boucle quadratique, `StringBuilder` la ramène à un coût amorti linéaire par doublement du tampon, et la remarque sur l'optimisation du compilateur, valable pour une concaténation isolée mais pas à travers une boucle, est correcte. Sur 20 000 itérations, l'écart est de l'ordre de 15 ms pour la version `+=` contre moins d'une milliseconde pour `StringBuilder`, ce qui correspond bien à l'ordre de grandeur annoncé.
 2. Vérification des contraintes : la version proposée préserve exactement le comportement d'origine, séparateur final compris. La réponse signale d'ailleurs d'elle-même que `String.join` n'est pas équivalent sur ce point précis, ce qui évite un piège réel. Deux écarts mineurs : la réponse est nettement plus longue que ce qu'appelait la demande, avec une variante Stream et une section « autres pistes » non sollicitées. Rien de faux, rien qui masque le correctif.
-3. Synthèse : l'optimisation demandée est correcte, mesurée et sans changement de comportement ; seule la longueur dépasse le nécessaire, ce qui ne justifie pas un échec. PASS.
+3. Synthèse : l'optimisation demandée est correcte et sans changement de comportement ; seule la longueur dépasse le nécessaire, ce qui ne justifie pas un échec. PASS.
 ''',
     exact=True, bugs=True, consignes=True,
-    raison="Optimisation correcte et mesurée, comportement préservé y compris le séparateur final ; seule la verbosité est excessive.",
+    raison="Optimisation correcte, comportement préservé y compris le séparateur final ; seule la verbosité est excessive.",
 ))
 
 # ── 6. Changement d'heure : arithmétique sur datetime aware, verbeux ──────────
@@ -282,7 +310,7 @@ reminder_at = scheduled_at + timedelta(hours=1)
 3. Synthèse : contexte correctement posé, mais le diagnostic est inversé, le bug réel est attribué aux données d'entrée et la correction proposée laisse le défaut intact. FAIL.
 ''',
     exact=False, bugs=False, consignes=False,
-    raison="Affirme à tort que l'addition d'un timedelta recalcule le décalage : mesuré, 01:30+01:00 + 1h donne 02:30+01:00, heure inexistante.",
+    raison="Affirme à tort que l'addition d'un timedelta recalcule le décalage : 01:30+01:00 + 1h donne 02:30+01:00, heure inexistante.",
 ))
 
 # ── 7. Copie superficielle présentée comme une isolation ──────────────────────
@@ -300,15 +328,35 @@ def with_extra_tag(config, tag):
     return new_config
 ```
 
+## Le principe
+
 `dict(config)` crée un nouveau dictionnaire indépendant de l'original, on peut donc modifier son contenu sans risque pour l'appelant.
+
+## Pourquoi pas `copy.deepcopy`
+
+La copie profonde recopierait récursivement toute la structure, y compris des objets qui n'ont aucune raison d'être dupliqués : une connexion, un client HTTP, un enregistreur de journaux rangés dans la configuration. C'est coûteux dès que la configuration s'étoffe, et cela casse l'identité des objets partagés, ce qui produit des surprises partout où du code compare avec `is`.
+
+## Variantes d'écriture
+
+`dict(config)` et `config.copy()` sont strictement équivalents ici, et `{**config}` donne le même résultat avec une syntaxe plus moderne. Le choix relève du style de la base de code, pas du comportement.
+
+## Si vous typez le module
+
+La signature gagnerait à être annotée, ce qui documente le contrat de retour aussi bien pour le lecteur que pour l'analyseur :
+
+```python
+def with_extra_tag(config: dict[str, Any], tag: str) -> dict[str, Any]:
+```
+
+Les génériques natifs `dict[str, Any]` demandent Python 3.9 ou plus récent, sans quoi il faut passer par `typing.Dict`.
 ''',
     thinking='''
-1. Analyse du code : `dict(config)` crée bien un nouveau dictionnaire, mais c'est une copie **superficielle** : les valeurs sont partagées, et la clé `tags` référence la même liste que l'original. L'`append` modifie donc la liste de l'appelant.
-2. Vérification des contraintes : vérifié par exécution. Avec `original = {"tags": ["a", "b"], "n": 1}`, un `append` sur la copie superficielle laisse `original` à `{"tags": ["a", "b", "c"], "n": 1}` : la mutation a bien traversé la copie, et `dict(original)["tags"] is original["tags"]` renvoie `True`. La consigne exigeait explicitement de ne pas modifier la configuration reçue, ce n'est donc pas respecté, et l'explication affirme le contraire de ce qui se produit. La correction tient en une ligne sans copie profonde : `{**config, "tags": [*config["tags"], tag]}`, qui ne recopie que ce qui est modifié.
+1. Analyse du code : `dict(config)` crée bien un nouveau dictionnaire, mais c'est une copie **superficielle** : les valeurs sont partagées, et la clé `tags` référence la même liste que l'original. L'`append` modifie donc la liste de l'appelant. Les développements annexes sont exacts — `deepcopy` recopie bien récursivement et casse l'identité des objets partagés, les trois formes d'écriture citées sont bien équivalentes, et les génériques natifs demandent bien Python 3.9 — mais aucun ne porte sur le point qui décide du résultat.
+2. Vérification des contraintes : avec `original = {"tags": ["a", "b"], "n": 1}`, un `append` sur la copie superficielle laisse `original` à `{"tags": ["a", "b", "c"], "n": 1}` : la mutation a bien traversé la copie, et `dict(original)["tags"] is original["tags"]` renvoie `True`. La consigne exigeait explicitement de ne pas modifier la configuration reçue, ce n'est donc pas respecté, et l'explication affirme le contraire de ce qui se produit. La correction tient en une ligne sans copie profonde : `{**config, "tags": [*config["tags"], tag]}`, qui ne recopie que ce qui est modifié. Ironie du texte : la section qui écarte `deepcopy` frôle le sujet sans jamais voir que c'est précisément le partage des valeurs qui casse la fonction.
 3. Synthèse : la fonction renvoie bien un nouveau dictionnaire, mais mute la liste de l'appelant, ce que la consigne interdisait explicitement. FAIL.
 ''',
     exact=False, bugs=False, consignes=False,
-    raison="dict() est une copie superficielle : l'append modifie la liste de l'appelant, vérifié par exécution.",
+    raison="dict() est une copie superficielle : l'append modifie la liste de l'appelant.",
 ))
 
 # ── 8. Retour arrière catastrophique corrigé ──────────────────────────────────
@@ -337,7 +385,7 @@ Deux garde-fous complémentaires : validez une longueur maximale d'entrée avant
 ''',
     thinking='''
 1. Analyse de l'explication : le diagnostic est exact. `^(\\w+\\s?)+$` combine bien une quantification imbriquée, source classique d'explosion combinatoire lors du retour arrière, et la qualification en risque de déni de service est appropriée puisque l'entrée vient des utilisateurs.
-2. Vérification des contraintes : les chiffres cités sont conformes à la mesure. Sur `^(a+)+$`, une entrée non conforme donne 0,008 s pour 18 caractères, 0,113 s pour 22 et 0,454 s pour 24, soit bien un doublement par caractère ajouté, et le motif linéaire `^a+$` traite 100 000 caractères en 0,0003 s. La correction proposée est juste : `^\\w+(?: \\w+)*$` rend le découpage déterministe, chaque espace n'appartenant qu'à une seule alternative. À noter que cette réécriture n'accepte plus l'espace optionnel en fin de chaîne que tolérait `\\s?`, un durcissement conforme à l'intention décrite dans la consigne. Les deux garde-fous complémentaires sont pertinents.
+2. Vérification des contraintes : les ordres de grandeur cités sont cohérents. Sur `^(a+)+$`, une entrée non conforme demande 0,008 s pour 18 caractères, 0,113 s pour 22 et 0,454 s pour 24, soit bien un doublement par caractère ajouté, et le motif linéaire `^a+$` traite 100 000 caractères en 0,0003 s. La correction proposée est juste : `^\\w+(?: \\w+)*$` rend le découpage déterministe, chaque espace n'appartenant qu'à une seule alternative. À noter que cette réécriture n'accepte plus l'espace optionnel en fin de chaîne que tolérait `\\s?`, un durcissement conforme à l'intention décrite dans la consigne. Les deux garde-fous complémentaires sont pertinents.
 3. Synthèse : cause exacte, mesures conformes, correction qui supprime réellement l'imbrication. PASS.
 ''',
     exact=True, bugs=True, consignes=True,
@@ -387,7 +435,7 @@ La deuxième option a un coût : la fonction est stockée par instance et non su
 ''',
     thinking='''
 1. Analyse de l'explication : le diagnostic est exact. La valeur de `this` dépend du site d'appel, et détacher la méthode de son receveur la perd. La précision selon laquelle le corps d'une classe est toujours en mode strict est correcte, et c'est bien elle qui explique `undefined` plutôt que l'objet global.
-2. Vérification des contraintes : vérifié par exécution. Une méthode détachée puis appelée lève `TypeError: Cannot read properties of undefined (reading 'count')`, exactement le message signalé. Le champ fléché détaché fonctionne, tout comme la version liée par `bind` : les trois corrections proposées sont donc valides. La réserve sur le champ fléché est juste, la fonction est bien créée par instance au lieu d'être partagée sur le prototype, avec les conséquences annoncées sur la mémoire et la substitution en sous-classe.
+2. Vérification des contraintes : une méthode détachée puis appelée lève `TypeError: Cannot read properties of undefined (reading 'count')`, exactement le message signalé. Le champ fléché détaché fonctionne, tout comme la version liée par `bind` : les trois corrections proposées sont donc valides. La réserve sur le champ fléché est juste, la fonction est bien créée par instance au lieu d'être partagée sur le prototype, avec les conséquences annoncées sur la mémoire et la substitution en sous-classe.
 3. Synthèse : cause exacte, message d'erreur reproduit, trois corrections valides et compromis correctement énoncés. PASS.
 ''',
     exact=True, bugs=True, consignes=True,
@@ -414,8 +462,8 @@ Deux précisions utiles :
 - Depuis ES2019, le tri est garanti stable, donc l'ordre relatif des éléments jugés égaux est préservé.
 ''',
     thinking='''
-1. Analyse de l'explication : la cause est exacte. Sans comparateur, `sort` convertit chaque élément en chaîne et compare les unités de code UTF-16, ce qui place `"10"` et `"20"` avant `"9"`. Vérifié par exécution : `[10, 9, 1, 20].sort()` renvoie bien `[1, 10, 20, 9]` et la version avec comparateur renvoie `[1, 9, 10, 20]`.
-2. Vérification des contraintes : les deux précisions sont exactes et pertinentes. Le tri en place est confirmé par exécution, le tableau d'origine étant modifié et la valeur de retour étant la même référence. La stabilité garantie depuis ES2019 est correcte. La réponse tient en quelques lignes, comme demandé.
+1. Analyse de l'explication : la cause est exacte. Sans comparateur, `sort` convertit chaque élément en chaîne et compare les unités de code UTF-16, ce qui place `"10"` et `"20"` avant `"9"`. `[10, 9, 1, 20].sort()` renvoie bien `[1, 10, 20, 9]` et la version avec comparateur renvoie `[1, 9, 10, 20]`.
+2. Vérification des contraintes : les deux précisions sont exactes et pertinentes. Le tri en place se constate directement, le tableau d'origine étant modifié et la valeur de retour étant la même référence. La stabilité garantie depuis ES2019 est correcte. La réponse tient en quelques lignes, comme demandé.
 3. Synthèse : cause exacte, exemples vérifiés, précisions justes et format concis. PASS.
 ''',
     exact=True, bugs=True, consignes=True,
@@ -459,8 +507,8 @@ Vous pouvez manipuler vos identifiants tels quels. Par prudence, ajoutez simplem
 ''',
     thinking='''
 1. Analyse de l'explication : le cadrage initial est exact. Les nombres JavaScript sont des flottants double précision, la mantisse de 53 bits fixe `Number.MAX_SAFE_INTEGER` à `9007199254740991`, valeur correctement citée.
-2. Vérification des contraintes : la conclusion est fausse, et le raisonnement qui la soutient est un piège. `JSON.parse` produit un `Number`, donc la valeur est arrondie dès l'analyse. Vérifié par exécution : `JSON.parse('{"id": 9007199254740993}')` renvoie `9007199254740992`, l'identifiant est bien corrompu. Le test proposé renvoie effectivement `true`, mais pour une raison qui invalide la démonstration : le littéral `9007199254740993` écrit dans le code source subit exactement le même arrondi, on compare donc deux valeurs également fausses. C'est le pire des cas, un contrôle qui passe alors que la donnée est déjà perdue, et la réponse le recommande comme garde-fou en intégration. La solution correcte est de transporter ces identifiants en chaînes de caractères dans le JSON, ou d'utiliser un analyseur qui produit des `BigInt`.
-3. Synthèse : bases exactes, mais la conclusion affirme l'inverse du comportement mesuré et le test proposé donne une fausse assurance. FAIL.
+2. Vérification des contraintes : la conclusion est fausse, et le raisonnement qui la soutient est un piège. `JSON.parse` produit un `Number`, donc la valeur est arrondie dès l'analyse : `JSON.parse('{"id": 9007199254740993}')` renvoie `9007199254740992`, l'identifiant est bien corrompu. Le test proposé renvoie effectivement `true`, mais pour une raison qui invalide la démonstration : le littéral `9007199254740993` écrit dans le code source subit exactement le même arrondi, on compare donc deux valeurs également fausses. C'est le pire des cas, un contrôle qui passe alors que la donnée est déjà perdue, et la réponse le recommande comme garde-fou en intégration. La solution correcte est de transporter ces identifiants en chaînes de caractères dans le JSON, ou d'utiliser un analyseur qui produit des `BigInt`.
+3. Synthèse : bases exactes, mais la conclusion affirme l'inverse du comportement réel et le test proposé donne une fausse assurance. FAIL.
 ''',
     exact=False, bugs=False, consignes=True,
     raison="JSON.parse arrondit l'identifiant (…993 devient …992) ; le test d'égalité proposé passe car le littéral subit le même arrondi.",
@@ -492,7 +540,7 @@ Les trois premières lignes montrent que `==` n'est même pas transitif : `""` �
 **La règle** : utilisez `===` partout. La seule exception admise est `x == null`, qui teste en une fois `null` et `undefined`, précisément parce que ces deux valeurs sont mutuellement égales avec `==` et avec rien d'autre.
 ''',
     thinking='''
-1. Analyse de l'explication : la distinction est exacte et les six résultats cités sont conformes. Vérifié par exécution : `"" == 0` et `"0" == 0` renvoient `true`, `"" == "0"` renvoie `false`, `null == undefined` renvoie `true`, `null == 0` renvoie `false`, et `[] == false` renvoie `true`.
+1. Analyse de l'explication : la distinction est exacte et les six résultats cités sont conformes. `"" == 0` et `"0" == 0` renvoient `true`, `"" == "0"` renvoie `false`, `null == undefined` renvoie `true`, `null == 0` renvoie `false`, et `[] == false` renvoie `true`.
 2. Vérification des contraintes : l'observation sur la non-transitivité est correctement construite à partir des trois premiers cas, et c'est l'argument le plus parlant contre `==`. La règle pratique proposée est celle recommandée par les guides de style courants, et l'exception `x == null` est correctement justifiée : `null` et `undefined` ne sont mutuellement égaux qu'entre eux avec `==`. Les deux demandes obligatoires, la différence et la règle pratique, sont satisfaites. En revanche, `Object.is` n'est pas mentionné du tout, alors que la consigne le demandait — mais en le présentant explicitement comme facultatif (« si tu as le temps »).
 3. Synthèse : tout l'obligatoire est exact et vérifié, l'unique omission porte sur une demande explicitement facultative, ce qui ne justifie pas un échec. PASS.
 ''',
