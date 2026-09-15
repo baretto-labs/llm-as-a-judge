@@ -225,7 +225,7 @@ Method: fr.baretto.ollamassist.completion.MultiSuggestionManager#getCurrentSugge
 # ══ RAG_CONTEXT_RELEVANCE (8) ════════════════════════════════════════════════
 
 add(example(
-    meta={"id": "b12-001", "famille": "rag-seuil-dynamique-lucene", "task": "RAG_CONTEXT_RELEVANCE",
+    meta={"id": "b12-001", "famille": "rag-ctx-seuil-dynamique-lucene", "task": "RAG_CONTEXT_RELEVANCE",
           "domaine": "rag", "tache": "retrieval", "cas": "defaillant", "verbeux": False, "langage": "java"},
     task="RAG_CONTEXT_RELEVANCE",
     contexte=CTX_LUCENE_SEUIL,
@@ -241,7 +241,7 @@ add(example(
 ))
 
 add(example(
-    meta={"id": "b12-002", "famille": "rag-interfaces-service-neo4j", "task": "RAG_CONTEXT_RELEVANCE",
+    meta={"id": "b12-002", "famille": "rag-ctx-ollamaservice-interfaces-neo4j", "task": "RAG_CONTEXT_RELEVANCE",
           "domaine": "rag", "tache": "retrieval", "cas": "parfait", "verbeux": False, "langage": "java"},
     task="RAG_CONTEXT_RELEVANCE",
     contexte=CTX_NEO4J_SERVICE,
@@ -257,7 +257,7 @@ add(example(
 ))
 
 add(example(
-    meta={"id": "b12-003", "famille": "rag-auth-header-neo4j", "task": "RAG_CONTEXT_RELEVANCE",
+    meta={"id": "b12-003", "famille": "rag-ctx-auth-header-neo4j", "task": "RAG_CONTEXT_RELEVANCE",
           "domaine": "rag", "tache": "retrieval", "cas": "defaillant", "verbeux": False, "langage": "java"},
     task="RAG_CONTEXT_RELEVANCE",
     contexte=CTX_NEO4J_AUTH,
@@ -273,7 +273,7 @@ add(example(
 ))
 
 add(example(
-    meta={"id": "b12-004", "famille": "rag-auth-header-lucene", "task": "RAG_CONTEXT_RELEVANCE",
+    meta={"id": "b12-004", "famille": "rag-ctx-auth-header-lucene", "task": "RAG_CONTEXT_RELEVANCE",
           "domaine": "rag", "tache": "retrieval", "cas": "limite", "verbeux": False, "langage": "java"},
     task="RAG_CONTEXT_RELEVANCE",
     contexte=CTX_LUCENE_AUTH,
@@ -289,7 +289,7 @@ add(example(
 ))
 
 add(example(
-    meta={"id": "b12-005", "famille": "rag-interfaces-service-lucene", "task": "RAG_CONTEXT_RELEVANCE",
+    meta={"id": "b12-005", "famille": "rag-ctx-ollamaservice-interfaces-lucene", "task": "RAG_CONTEXT_RELEVANCE",
           "domaine": "rag", "tache": "retrieval", "cas": "defaillant", "verbeux": False, "langage": "java"},
     task="RAG_CONTEXT_RELEVANCE",
     contexte=CTX_LUCENE_SERVICE,
@@ -305,7 +305,7 @@ add(example(
 ))
 
 add(example(
-    meta={"id": "b12-006", "famille": "rag-notifier-lucene", "task": "RAG_CONTEXT_RELEVANCE",
+    meta={"id": "b12-006", "famille": "rag-ctx-notifier-lucene", "task": "RAG_CONTEXT_RELEVANCE",
           "domaine": "rag", "tache": "retrieval", "cas": "defaillant", "verbeux": False, "langage": "java"},
     task="RAG_CONTEXT_RELEVANCE",
     contexte=CTX_LUCENE_NOTIFIER,
@@ -321,7 +321,7 @@ add(example(
 ))
 
 add(example(
-    meta={"id": "b12-007", "famille": "rag-contextretriever-neo4j", "task": "RAG_CONTEXT_RELEVANCE",
+    meta={"id": "b12-007", "famille": "rag-ctx-contextretriever-retrieve-neo4j", "task": "RAG_CONTEXT_RELEVANCE",
           "domaine": "rag", "tache": "retrieval", "cas": "parfait", "verbeux": False, "langage": "java"},
     task="RAG_CONTEXT_RELEVANCE",
     contexte=CTX_NEO4J_RETRIEVE,
@@ -337,7 +337,7 @@ add(example(
 ))
 
 add(example(
-    meta={"id": "b12-008", "famille": "rag-contextretriever-neo4j-bruit", "task": "RAG_CONTEXT_RELEVANCE",
+    meta={"id": "b12-008", "famille": "rag-ctx-contextretriever-retrieve-neo4j", "task": "RAG_CONTEXT_RELEVANCE",
           "domaine": "rag", "tache": "retrieval", "cas": "limite", "verbeux": False, "langage": "java"},
     task="RAG_CONTEXT_RELEVANCE",
     contexte=CTX_NEO4J_RETRIEVE,
@@ -355,7 +355,7 @@ add(example(
 # ══ RAG_FAITHFULNESS (7) ═════════════════════════════════════════════════════
 
 add(example(
-    meta={"id": "b12-009", "famille": "rag-fidelite-auth-methode-inventee", "task": "RAG_FAITHFULNESS",
+    meta={"id": "b12-009", "famille": "rag-ctx-auth-header-lucene", "task": "RAG_FAITHFULNESS",
           "domaine": "rag", "tache": "synthese", "cas": "defaillant", "verbeux": False, "langage": "java"},
     task="RAG_FAITHFULNESS",
     contexte=CTX_LUCENE_AUTH,
@@ -387,7 +387,7 @@ C'est cette méthode que les appelants utilisent pour authentifier leurs requêt
 ))
 
 add(example(
-    meta={"id": "b12-010", "famille": "rag-fidelite-auth-etayee", "task": "RAG_FAITHFULNESS",
+    meta={"id": "b12-010", "famille": "rag-ctx-auth-header-lucene", "task": "RAG_FAITHFULNESS",
           "domaine": "rag", "tache": "synthese", "cas": "parfait", "verbeux": False, "langage": "java"},
     task="RAG_FAITHFULNESS",
     contexte=CTX_LUCENE_AUTH,
@@ -413,7 +413,7 @@ Le détail de la construction de la valeur n'est pas visible : l'extrait est tro
 ))
 
 add(example(
-    meta={"id": "b12-011", "famille": "rag-fidelite-retrieve-vrai-non-etaye", "task": "RAG_FAITHFULNESS",
+    meta={"id": "b12-011", "famille": "rag-ctx-contextretriever-retrieve-neo4j", "task": "RAG_FAITHFULNESS",
           "domaine": "rag", "tache": "synthese", "cas": "defaillant", "verbeux": True, "langage": "java"},
     task="RAG_FAITHFULNESS",
     contexte=CTX_NEO4J_RETRIEVE,
@@ -447,7 +447,7 @@ Une agrégation concurrente de trois sources, robuste aux pannes partielles, ave
 ))
 
 add(example(
-    meta={"id": "b12-012", "famille": "rag-fidelite-retrieve-etayee", "task": "RAG_FAITHFULNESS",
+    meta={"id": "b12-012", "famille": "rag-ctx-contextretriever-retrieve-neo4j", "task": "RAG_FAITHFULNESS",
           "domaine": "rag", "tache": "synthese", "cas": "parfait", "verbeux": False, "langage": "java"},
     task="RAG_FAITHFULNESS",
     contexte=CTX_NEO4J_RETRIEVE,
@@ -471,7 +471,7 @@ En revanche, le contexte ne contient aucun corps de méthode : il ne permet pas 
 ))
 
 add(example(
-    meta={"id": "b12-013", "famille": "rag-fidelite-interfaces-etayee", "task": "RAG_FAITHFULNESS",
+    meta={"id": "b12-013", "famille": "rag-ctx-ollamaservice-interfaces-neo4j", "task": "RAG_FAITHFULNESS",
           "domaine": "rag", "tache": "synthese", "cas": "parfait", "verbeux": False, "langage": "java"},
     task="RAG_FAITHFULNESS",
     contexte=CTX_NEO4J_SERVICE,
@@ -494,7 +494,7 @@ La classe est par ailleurs annotée `@Service` et `@Slf4j`.
 ))
 
 add(example(
-    meta={"id": "b12-014", "famille": "rag-fidelite-interfaces-inventee", "task": "RAG_FAITHFULNESS",
+    meta={"id": "b12-014", "famille": "rag-ctx-ollamaservice-interfaces-neo4j", "task": "RAG_FAITHFULNESS",
           "domaine": "rag", "tache": "synthese", "cas": "defaillant", "verbeux": False, "langage": "java"},
     task="RAG_FAITHFULNESS",
     contexte=CTX_NEO4J_SERVICE,
@@ -528,7 +528,7 @@ L'ensemble dessine un service à durée de vie longue, abonné à des événemen
 ))
 
 add(example(
-    meta={"id": "b12-015", "famille": "rag-fidelite-aveu-ignorance", "task": "RAG_FAITHFULNESS",
+    meta={"id": "b12-015", "famille": "rag-ctx-notifier-lucene", "task": "RAG_FAITHFULNESS",
           "domaine": "rag", "tache": "synthese", "cas": "limite", "verbeux": True, "langage": "java"},
     task="RAG_FAITHFULNESS",
     contexte=CTX_LUCENE_NOTIFIER,

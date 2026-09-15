@@ -152,7 +152,10 @@ C'est la convention qui tranche les cas limites, et elle vaut pour les trois tâ
 | **RAG cumulé** | **50** | **25 %** |
 
 Transversalement, sur l'ensemble du corpus : 40 % `parfait`, 40 % `defaillant`, 20 % `limite` ;
-verdicts proches de 50/50 ; au moins 25 cas verbeux à défaut caché et 15 cas verbeux corrects en contrôle.
+verdicts proches de 50/50 ; au moins 25 cas verbeux à défaut caché et 13 cas verbeux corrects en contrôle. La cible du groupe
+de contrôle a été ramenée de 15 à 13 le 2026-09-15 : les deux exemples manquants auraient dû être
+fabriqués en rembourrant des réponses correctes, c'est-à-dire par le mécanisme même qui avait produit
+le biais de longueur que l'audit a fait retirer. Détail dans `AUDIT.md`, chantier 8.
 
 `train` + `valid` = 150 (dont 15 de validation, **obligatoire** pour `mlx_lm.lora --train`), `test` = 50.
 
@@ -186,15 +189,24 @@ reportés dans le lot source.
 
 `data/golden/` et `data/mlx/` ne sont pas versionnés : ce sont des dérivés, reproductibles à l'identique
 depuis les lots et la graine du tirage. Cette reproductibilité ne tient que parce que la graine est **figée
-dans le `Makefile`** (`SPLIT_SEED ?= 3`) ; sans ce pin, deux annotateurs pourraient relire deux golden sets
+dans le `Makefile`** (`SPLIT_SEED ?= 11`) ; sans ce pin, deux annotateurs pourraient relire deux golden sets
 différents sans s'en apercevoir. Attention au voisinage de noms : dans le `Makefile`, `SEED` désigne la
 liste des lots JSONL, la graine du tirage est `SPLIT_SEED`.
 
-Graine 3 et non le défaut 42 du script : le tirage est glouton et groupé par famille, donc il ne peut pas
-couper une famille pour atteindre un quota, et la graine est le seul levier. Sur 15 graines essayées, 3
-donne le golden set le plus proche des cibles (cas 20/20/10 au point près, 7 cas verbeux à défaut caché
-sur 50, soit 14 % pour un plancher à 10 %) ; 42 était l'un des plus mauvais tirages. Le choix porte sur
-des métadonnées déclarées — tâche, cas, verbosité — jamais sur des résultats de modèle.
+Graine 11 et non le défaut 42 du script : le tirage est glouton et groupé par famille, donc il ne peut pas
+couper une famille pour atteindre un quota, et la graine est le seul levier. Sur 17 graines essayées, 11
+donne le golden set le plus utile — 38 `CODE_ANALYSIS`, 6 `RAG_CONTEXT_RELEVANCE`, 6 `RAG_FAITHFULNESS`,
+cas 19/21/10, et 8 cas verbeux à défaut caché sur 50, soit 16 % pour un plancher à 10 %.
+
+Le critère de départage n'est pas l'écart global aux cibles, sur lequel quatre graines sont à égalité,
+mais la **couverture de `RAG_FAITHFULNESS`** : ces items sont le seul instrument de surveillance de la
+posture monde fermé (voir la section Métriques), et la graine 11 en retient 6 là où d'autres n'en
+retiennent que 4 ou 5. Le choix porte sur des métadonnées déclarées — tâche, cas, verbosité — jamais sur
+des résultats de modèle.
+
+La graine précédente, 3, avait été retenue pour une structure où chaque exemple RAG portait sa propre
+famille. Le regroupement par contexte d'extraction a rendu ce choix caduc : elle figure désormais parmi
+les plus mauvais tirages, avec 4 items de fidélité seulement.
 
 Boucle de correction après relecture : toute étiquette corrigée passe par `generators/gen_batch_NN.py`
 puis `make regen`, jamais par le JSONL. Si la correction change un `verdict` ou un `cas`, les strates du

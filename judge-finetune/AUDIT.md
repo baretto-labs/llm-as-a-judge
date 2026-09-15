@@ -124,13 +124,49 @@ Décision du 2026-09-15 : **reprise ciblée avant tout fine-tuning**.
 | 4 | Longueur, `CODE_ANALYSIS` | 38 FAIL sous 666 car., surtout `generation` / `refactoring` / `question_reponse` | ✅ **clos** — 26 réécrits, voir ci-dessous |
 | 5 | Longueur, `RAG_FAITHFULNESS` | 8 FAIL sous 410 car., face à 14 PASS de 666 à 1087 | ✅ clos — 84,0 % → 76,0 % (p 0,006 → 0,076), voir ci-dessous |
 | 6 | Polarité `citations_exactes` | produire la famille « citation déformée », absente du corpus | à faire |
-| 7 | Contextes RAG du golden | contextes inédits pour les items de test ; regrouper par contexte les familles qui le partagent | à faire |
-| 8 | Verbeux corrects | 13 au lieu des 15 exigés, conséquence de la correction n°2 | à faire |
+| 7 | Contextes RAG du golden | contextes inédits pour les items de test ; regrouper par contexte les familles qui le partagent | ✅ clos — fuite 9/11 → **0/12**, voir ci-dessous |
+| 8 | Verbeux corrects | 13 au lieu des 15 exigés, conséquence de la correction n°2 | ✅ clos — cible ramenée à 13, voir ci-dessous |
 
 Le chantier 8 découle du 2 : `b13-007` et `b14-008` étaient comptés à tort parmi les verbeux corrects. La
-cible de 15 n'a donc **jamais** été réellement atteinte ; il manque deux exemples verbeux et corrects, à
-produire de préférence en `parfait` — sur les 13 restants, 11 sont des `limite`, ce qui déséquilibre le
-contrôle inverse du test de verbosité.
+cible de 15 n'a donc **jamais** été réellement atteinte.
+
+**Décision du 2026-09-15 : la cible est ramenée à 13, et le chantier est clos sans production.** Les
+candidats à une promotion en verbeux sont longs — 1295 à 1635 caractères — mais comptent **zéro section**
+et ne présentent ni préambule ni digression finale : ils sont étoffés, pas verbeux. Les réétiqueter
+reproduirait exactement l'erreur trouvée sur `b13-007` et `b14-008`, en sens inverse. Et les rendre
+verbeux supposerait de **rembourrer délibérément deux réponses correctes** pour satisfaire un compteur,
+c'est-à-dire d'employer le mécanisme même qui a produit le biais de longueur que les chantiers 4 et 5
+viennent de retirer. Un compteur atteint par un procédé que le corpus condamne ne vaut pas mieux qu'un
+compteur manqué.
+
+## Clôture du chantier 7 — une famille par contexte d'extraction
+
+Le diagnostic tenait en un chiffre : **50 exemples RAG pour seulement 20 contextes d'extraction
+distincts**, chacun décliné sous une famille différente. Le mécanisme anti-fuite du split, qui groupe par
+`famille`, ne pouvait donc rien empêcher — il séparait allègrement des exemples bâtis sur le même
+contexte récupéré. Le golden set en portait la trace : 9 items sur 11 avec un contexte déjà vu en
+entraînement, 8 avec contexte **et** requête identiques, et trois paires de jumeaux à l'intérieur même du
+golden (`b14-006`/`b14-020`, `b12-004`/`b12-009`, `b13-002`/`b13-010`).
+
+Correction : **une famille par contexte**, ce qui est ce que le champ `famille` était censé désigner
+depuis le début — un scénario, pas une rédaction. Les 50 exemples RAG passent de 50 familles à 20, de
+tailles 1 (×6), 2 (×2), 3 (×8) et 4 (×4). Aucun contenu n'a été écrit ni modifié, seul `meta.famille`
+change, ce qui laisse les étiquettes, les longueurs et les tests de permutation intacts.
+
+| | avant | après |
+|---|---|---|
+| Familles RAG | 50 | **20** |
+| Golden : contexte déjà vu en entraînement | 9 / 11 | **0 / 12** |
+| Golden : contexte **et** requête déjà vus | 8 / 11 | **0 / 12** |
+
+**La garantie est structurelle, pas fortuite.** Un balayage de 17 graines de tirage donne une fuite nulle
+sur les 17 : dès lors qu'une famille se déplace en bloc, aucun tirage ne peut placer deux exemples du même
+contexte de part et d'autre. C'est vérifié graine par graine, pas déduit.
+
+Conséquence assumée : le tirage change de nature, et la graine 3 — choisie pour une structure en
+singletons — n'a plus de sens. Elle donnait 4 items de fidélité RAG sur 50 ; la graine 11, retenue après
+balayage, en donne 6. Le critère de départage a été la couverture de `RAG_FAITHFULNESS` plutôt que l'écart
+global aux cibles, ces items étant le seul instrument de surveillance de la posture monde fermé.
 
 Le chantier 7 doit aussi corriger un effet de bord visible : quatre exemples partageant le contexte
 `CTX_LUCENE_COMBINE` vivent sous quatre familles distinctes, et l'un d'eux garde un nom de famille

@@ -12,7 +12,7 @@ sa ligne. Les quotas viennent de `PROTOCOLE.md` §2.2, les règles d'étiquetage
 | Cas | 80 parfait / 80 défaillant / 40 limite | 40 / 40 / 20 |
 | Verdict | ~100 PASS / ~100 FAIL | les 40 limites se répartissent ~20/20 |
 | Verbeux + bug caché | ≥ 25 | tous FAIL, base du test de biais de verbosité |
-| Verbeux + correct | ≥ 15 | contrôle inverse, tous PASS |
+| Verbeux + correct | **13** | contrôle inverse, tous PASS — cible ramenée de 15 le 2026-09-15, voir `../AUDIT.md` |
 | Tâches (code) | 45 génération / 35 refactoring / 40 débogage | |
 | Tâches (théorie) | 50 explication / 30 question_reponse | |
 | Langages | ~70 java, ~60 python, ~35 typescript, ~20 sql, ~15 autres | ajusté aux outils vérifiables |
@@ -44,7 +44,7 @@ Les contextes réellement récupérés qui servent de matière sont versionnés 
 
 État mesuré sur les 200 exemples : 80 `parfait` / 80 `defaillant` / 40 `limite`, soit 40 / 40 / 20 % au
 point près ; 105 PASS pour 95 FAIL ; 25 cas verbeux à défaut caché (12,5 %, le protocole en exige 10 %)
-et **13** verbeux corrects en contrôle — **sous la cible de 15**.
+et **13** verbeux corrects en contrôle, effectif désormais retenu comme cible.
 
 ⚠️ Ces compteurs décrivent la **composition**, pas ce que le corpus enseigne. L'audit du 2026-09-15
 (`../AUDIT.md`) montre que toutes ces cibles pouvaient être atteintes tout en apprenant au juge un raccourci

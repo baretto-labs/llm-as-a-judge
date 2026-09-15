@@ -234,7 +234,7 @@ Type: class fr.baretto.ollamassist.notification.storage.PersistentNotificationSt
 # ══ RAG_CONTEXT_RELEVANCE (7) ════════════════════════════════════════════════
 
 add(example(
-    meta={"id": "b13-001", "famille": "rag-pipeline-reessais-neo4j", "task": "RAG_CONTEXT_RELEVANCE",
+    meta={"id": "b13-001", "famille": "rag-ctx-pipeline-reessais-neo4j", "task": "RAG_CONTEXT_RELEVANCE",
           "domaine": "rag", "tache": "retrieval", "cas": "defaillant", "verbeux": False, "langage": "java"},
     task="RAG_CONTEXT_RELEVANCE",
     contexte=CTX_NEO4J_PIPELINE,
@@ -250,7 +250,7 @@ add(example(
 ))
 
 add(example(
-    meta={"id": "b13-002", "famille": "rag-parser-neo4j", "task": "RAG_CONTEXT_RELEVANCE",
+    meta={"id": "b13-002", "famille": "rag-ctx-bracketparser-neo4j", "task": "RAG_CONTEXT_RELEVANCE",
           "domaine": "rag", "tache": "retrieval", "cas": "parfait", "verbeux": False, "langage": "java"},
     task="RAG_CONTEXT_RELEVANCE",
     contexte=CTX_NEO4J_PARSER,
@@ -266,7 +266,7 @@ add(example(
 ))
 
 add(example(
-    meta={"id": "b13-003", "famille": "rag-assistant-couverture-trompeuse", "task": "RAG_CONTEXT_RELEVANCE",
+    meta={"id": "b13-003", "famille": "rag-ctx-assistant-neo4j", "task": "RAG_CONTEXT_RELEVANCE",
           "domaine": "rag", "tache": "retrieval", "cas": "defaillant", "verbeux": False, "langage": "java"},
     task="RAG_CONTEXT_RELEVANCE",
     contexte=CTX_NEO4J_ASSISTANT,
@@ -282,7 +282,7 @@ add(example(
 ))
 
 add(example(
-    meta={"id": "b13-004", "famille": "rag-cache-cles-lucene", "task": "RAG_CONTEXT_RELEVANCE",
+    meta={"id": "b13-004", "famille": "rag-ctx-cache-cles-lucene", "task": "RAG_CONTEXT_RELEVANCE",
           "domaine": "rag", "tache": "retrieval", "cas": "parfait", "verbeux": False, "langage": "java"},
     task="RAG_CONTEXT_RELEVANCE",
     contexte=CTX_LUCENE_CACHE,
@@ -298,7 +298,7 @@ add(example(
 ))
 
 add(example(
-    meta={"id": "b13-005", "famille": "rag-store-interfaces-lucene", "task": "RAG_CONTEXT_RELEVANCE",
+    meta={"id": "b13-005", "famille": "rag-ctx-store-interfaces-lucene", "task": "RAG_CONTEXT_RELEVANCE",
           "domaine": "rag", "tache": "retrieval", "cas": "defaillant", "verbeux": False, "langage": "java"},
     task="RAG_CONTEXT_RELEVANCE",
     contexte=CTX_LUCENE_STORE,
@@ -314,7 +314,7 @@ add(example(
 ))
 
 add(example(
-    meta={"id": "b13-006", "famille": "rag-ingest-fallback-neo4j", "task": "RAG_CONTEXT_RELEVANCE",
+    meta={"id": "b13-006", "famille": "rag-ctx-ingest-fallback-neo4j", "task": "RAG_CONTEXT_RELEVANCE",
           "domaine": "rag", "tache": "retrieval", "cas": "limite", "verbeux": False, "langage": "java"},
     task="RAG_CONTEXT_RELEVANCE",
     contexte=CTX_NEO4J_INGEST,
@@ -330,7 +330,7 @@ add(example(
 ))
 
 add(example(
-    meta={"id": "b13-007", "famille": "rag-prerequis-lucene", "task": "RAG_CONTEXT_RELEVANCE",
+    meta={"id": "b13-007", "famille": "rag-ctx-prerequis-lucene", "task": "RAG_CONTEXT_RELEVANCE",
           "domaine": "rag", "tache": "retrieval", "cas": "parfait", "verbeux": False, "langage": "java"},
     task="RAG_CONTEXT_RELEVANCE",
     contexte=CTX_LUCENE_PREREQ,
@@ -348,7 +348,7 @@ add(example(
 # ══ RAG_FAITHFULNESS (8) ═════════════════════════════════════════════════════
 
 add(example(
-    meta={"id": "b13-008", "famille": "rag-fidelite-reessais-chiffre-invente", "task": "RAG_FAITHFULNESS",
+    meta={"id": "b13-008", "famille": "rag-ctx-pipeline-reessais-neo4j", "task": "RAG_FAITHFULNESS",
           "domaine": "rag", "tache": "synthese", "cas": "defaillant", "verbeux": True, "langage": "java"},
     task="RAG_FAITHFULNESS",
     contexte=CTX_NEO4J_PIPELINE,
@@ -378,7 +378,7 @@ Le pipeline traite les documents par lots de 10 en mode asynchrone, et de 100 en
 ))
 
 add(example(
-    meta={"id": "b13-009", "famille": "rag-fidelite-reessais-etayee", "task": "RAG_FAITHFULNESS",
+    meta={"id": "b13-009", "famille": "rag-ctx-pipeline-reessais-neo4j", "task": "RAG_FAITHFULNESS",
           "domaine": "rag", "tache": "synthese", "cas": "parfait", "verbeux": False, "langage": "java"},
     task="RAG_FAITHFULNESS",
     contexte=CTX_NEO4J_PIPELINE,
@@ -400,7 +400,7 @@ Ce qu'il n'établit pas : aucun corps de méthode n'est fourni, et aucune foncti
 ))
 
 add(example(
-    meta={"id": "b13-010", "famille": "rag-fidelite-parser-portee-inventee", "task": "RAG_FAITHFULNESS",
+    meta={"id": "b13-010", "famille": "rag-ctx-bracketparser-neo4j", "task": "RAG_FAITHFULNESS",
           "domaine": "rag", "tache": "synthese", "cas": "defaillant", "verbeux": False, "langage": "java"},
     task="RAG_FAITHFULNESS",
     contexte=CTX_NEO4J_PARSER,
@@ -424,7 +424,7 @@ La classe implémente `ToolCallParser` et redéfinit `parse(String)`, comme l'in
 ))
 
 add(example(
-    meta={"id": "b13-011", "famille": "rag-fidelite-parser-etayee", "task": "RAG_FAITHFULNESS",
+    meta={"id": "b13-011", "famille": "rag-ctx-bracketparser-neo4j", "task": "RAG_FAITHFULNESS",
           "domaine": "rag", "tache": "synthese", "cas": "parfait", "verbeux": False, "langage": "java"},
     task="RAG_FAITHFULNESS",
     contexte=CTX_NEO4J_PARSER,
@@ -449,7 +449,7 @@ La valeur du motif n'est pas fournie, donc la syntaxe exacte reconnue et les com
 ))
 
 add(example(
-    meta={"id": "b13-012", "famille": "rag-fidelite-assistant-invente", "task": "RAG_FAITHFULNESS",
+    meta={"id": "b13-012", "famille": "rag-ctx-assistant-neo4j", "task": "RAG_FAITHFULNESS",
           "domaine": "rag", "tache": "synthese", "cas": "defaillant", "verbeux": False, "langage": "java"},
     task="RAG_FAITHFULNESS",
     contexte=CTX_NEO4J_ASSISTANT,
@@ -480,7 +480,7 @@ Séparer l'invite système du message utilisateur, plutôt que de les concaténe
 ))
 
 add(example(
-    meta={"id": "b13-013", "famille": "rag-fidelite-assistant-aveu", "task": "RAG_FAITHFULNESS",
+    meta={"id": "b13-013", "famille": "rag-ctx-assistant-neo4j", "task": "RAG_FAITHFULNESS",
           "domaine": "rag", "tache": "synthese", "cas": "limite", "verbeux": True, "langage": "java"},
     task="RAG_FAITHFULNESS",
     contexte=CTX_NEO4J_ASSISTANT,
@@ -515,7 +515,7 @@ Il faudrait relancer la recherche sur le nœud de l'interface elle-même pour ob
 ))
 
 add(example(
-    meta={"id": "b13-014", "famille": "rag-fidelite-ingest-repli-invente", "task": "RAG_FAITHFULNESS",
+    meta={"id": "b13-014", "famille": "rag-ctx-ingest-fallback-neo4j", "task": "RAG_FAITHFULNESS",
           "domaine": "rag", "tache": "synthese", "cas": "defaillant", "verbeux": False, "langage": "java"},
     task="RAG_FAITHFULNESS",
     contexte=CTX_NEO4J_INGEST,
@@ -543,7 +543,7 @@ DJL embarque des bibliothèques natives dont la disponibilité dépend de la pla
 ))
 
 add(example(
-    meta={"id": "b13-015", "famille": "rag-fidelite-ingest-etayee", "task": "RAG_FAITHFULNESS",
+    meta={"id": "b13-015", "famille": "rag-ctx-ingest-fallback-neo4j", "task": "RAG_FAITHFULNESS",
           "domaine": "rag", "tache": "synthese", "cas": "limite", "verbeux": False, "langage": "java"},
     task="RAG_FAITHFULNESS",
     contexte=CTX_NEO4J_INGEST,

@@ -237,7 +237,7 @@ Type: class fr.baretto.ollamassist.chat.rag.HybridRetriever implements ContentRe
 # ══ RAG_CONTEXT_RELEVANCE (10) ═══════════════════════════════════════════════
 
 add(example(
-    meta={"id": "b14-001", "famille": "rag-completion-nettoyage-neo4j", "task": "RAG_CONTEXT_RELEVANCE",
+    meta={"id": "b14-001", "famille": "rag-ctx-completion-nettoyage-neo4j", "task": "RAG_CONTEXT_RELEVANCE",
           "domaine": "rag", "tache": "retrieval", "cas": "defaillant", "verbeux": False, "langage": "java"},
     task="RAG_CONTEXT_RELEVANCE", contexte=CTX_NEO4J_COMPLETION,
     requete="How does EnhancedCompletionService clean up raw LLM suggestions?",
@@ -252,7 +252,7 @@ add(example(
 ))
 
 add(example(
-    meta={"id": "b14-002", "famille": "rag-refactor-dismiss-neo4j", "task": "RAG_CONTEXT_RELEVANCE",
+    meta={"id": "b14-002", "famille": "rag-ctx-refactor-dismiss-neo4j", "task": "RAG_CONTEXT_RELEVANCE",
           "domaine": "rag", "tache": "retrieval", "cas": "parfait", "verbeux": False, "langage": "java"},
     task="RAG_CONTEXT_RELEVANCE", contexte=CTX_NEO4J_REFACTOR,
     requete="What does the dismiss method do in RefactorAction?",
@@ -267,7 +267,7 @@ add(example(
 ))
 
 add(example(
-    meta={"id": "b14-003", "famille": "rag-implementations-parser-neo4j", "task": "RAG_CONTEXT_RELEVANCE",
+    meta={"id": "b14-003", "famille": "rag-ctx-toolcallparser-neo4j", "task": "RAG_CONTEXT_RELEVANCE",
           "domaine": "rag", "tache": "retrieval", "cas": "defaillant", "verbeux": False, "langage": "java"},
     task="RAG_CONTEXT_RELEVANCE", contexte=CTX_NEO4J_PARSERS,
     requete="Which classes implement the ToolCallParser interface?",
@@ -282,7 +282,7 @@ add(example(
 ))
 
 add(example(
-    meta={"id": "b14-004", "famille": "rag-approbation-fichier-neo4j", "task": "RAG_CONTEXT_RELEVANCE",
+    meta={"id": "b14-004", "famille": "rag-ctx-approbation-fichier-neo4j", "task": "RAG_CONTEXT_RELEVANCE",
           "domaine": "rag", "tache": "retrieval", "cas": "limite", "verbeux": False, "langage": "java"},
     task="RAG_CONTEXT_RELEVANCE", contexte=CTX_NEO4J_APPROVAL,
     requete="How does FileCreator request user approval via FileApprovalNotifier?",
@@ -297,7 +297,7 @@ add(example(
 ))
 
 add(example(
-    meta={"id": "b14-005", "famille": "rag-constantes-lot-lucene", "task": "RAG_CONTEXT_RELEVANCE",
+    meta={"id": "b14-005", "famille": "rag-ctx-pipeline-lots-lucene", "task": "RAG_CONTEXT_RELEVANCE",
           "domaine": "rag", "tache": "retrieval", "cas": "parfait", "verbeux": False, "langage": "java"},
     task="RAG_CONTEXT_RELEVANCE", contexte=CTX_LUCENE_BATCH,
     requete="How does DocumentIndexingPipeline process documents in batches?",
@@ -312,7 +312,7 @@ add(example(
 ))
 
 add(example(
-    meta={"id": "b14-006", "famille": "rag-combinaison-sources-lucene", "task": "RAG_CONTEXT_RELEVANCE",
+    meta={"id": "b14-006", "famille": "rag-ctx-contextretriever-sources-lucene", "task": "RAG_CONTEXT_RELEVANCE",
           "domaine": "rag", "tache": "retrieval", "cas": "parfait", "verbeux": False, "langage": "java"},
     task="RAG_CONTEXT_RELEVANCE", contexte=CTX_LUCENE_COMBINE,
     requete="Which sources does ContextRetriever fetch context from?",
@@ -327,7 +327,7 @@ add(example(
 ))
 
 add(example(
-    meta={"id": "b14-007", "famille": "rag-valeur-constante-lucene", "task": "RAG_CONTEXT_RELEVANCE",
+    meta={"id": "b14-007", "famille": "rag-ctx-pipeline-lots-lucene", "task": "RAG_CONTEXT_RELEVANCE",
           "domaine": "rag", "tache": "retrieval", "cas": "defaillant", "verbeux": False, "langage": "java"},
     task="RAG_CONTEXT_RELEVANCE", contexte=CTX_LUCENE_BATCH,
     requete="What are the values of BATCH_SIZE and SYNCHRONOUS_BATCH_SIZE in DocumentIndexingPipeline?",
@@ -342,7 +342,7 @@ add(example(
 ))
 
 add(example(
-    meta={"id": "b14-008", "famille": "rag-combinaison-sources-lucene-verbeux", "task": "RAG_CONTEXT_RELEVANCE",
+    meta={"id": "b14-008", "famille": "rag-ctx-contextretriever-sources-lucene", "task": "RAG_CONTEXT_RELEVANCE",
           "domaine": "rag", "tache": "retrieval", "cas": "parfait", "verbeux": False, "langage": "java"},
     task="RAG_CONTEXT_RELEVANCE", contexte=CTX_LUCENE_COMBINE,
     requete="Is DuckDuckGo search integrated into the context retrieval, and through which class?",
@@ -357,7 +357,7 @@ add(example(
 ))
 
 add(example(
-    meta={"id": "b14-009", "famille": "rag-refactor-classe-parente-neo4j", "task": "RAG_CONTEXT_RELEVANCE",
+    meta={"id": "b14-009", "famille": "rag-ctx-refactor-dismiss-neo4j", "task": "RAG_CONTEXT_RELEVANCE",
           "domaine": "rag", "tache": "retrieval", "cas": "parfait", "verbeux": False, "langage": "java"},
     task="RAG_CONTEXT_RELEVANCE", contexte=CTX_NEO4J_REFACTOR,
     requete="What class does RefactorAction extend, and what does RefactoringInlayRenderer implement?",
@@ -372,7 +372,7 @@ add(example(
 ))
 
 add(example(
-    meta={"id": "b14-010", "famille": "rag-detecteur-outils-neo4j", "task": "RAG_CONTEXT_RELEVANCE",
+    meta={"id": "b14-010", "famille": "rag-ctx-toolcallparser-neo4j", "task": "RAG_CONTEXT_RELEVANCE",
           "domaine": "rag", "tache": "retrieval", "cas": "limite", "verbeux": False, "langage": "java"},
     task="RAG_CONTEXT_RELEVANCE", contexte=CTX_NEO4J_PARSERS,
     requete="Does ToolCallDetector hold several parsers?",
@@ -389,7 +389,7 @@ add(example(
 # ══ RAG_FAITHFULNESS (10) ════════════════════════════════════════════════════
 
 add(example(
-    meta={"id": "b14-011", "famille": "rag-fidelite-nettoyage-invente", "task": "RAG_FAITHFULNESS",
+    meta={"id": "b14-011", "famille": "rag-ctx-completion-nettoyage-neo4j", "task": "RAG_FAITHFULNESS",
           "domaine": "rag", "tache": "synthese", "cas": "defaillant", "verbeux": True, "langage": "java"},
     task="RAG_FAITHFULNESS", contexte=CTX_NEO4J_COMPLETION,
     requete="How does EnhancedCompletionService clean up raw LLM suggestions?",
@@ -417,7 +417,7 @@ Un modèle de complétion répond comme s'il rédigeait un extrait autonome. San
 ))
 
 add(example(
-    meta={"id": "b14-012", "famille": "rag-fidelite-completion-etayee", "task": "RAG_FAITHFULNESS",
+    meta={"id": "b14-012", "famille": "rag-ctx-completion-nettoyage-neo4j", "task": "RAG_FAITHFULNESS",
           "domaine": "rag", "tache": "synthese", "cas": "parfait", "verbeux": False, "langage": "java"},
     task="RAG_FAITHFULNESS", contexte=CTX_NEO4J_COMPLETION,
     requete="How does EnhancedCompletionService clean up raw LLM suggestions?",
@@ -438,7 +438,7 @@ Une mise en garde : le contexte contient `MessageCleaner.clean(String)`, dont le
 ))
 
 add(example(
-    meta={"id": "b14-013", "famille": "rag-fidelite-dismiss-etayee", "task": "RAG_FAITHFULNESS",
+    meta={"id": "b14-013", "famille": "rag-ctx-refactor-dismiss-neo4j", "task": "RAG_FAITHFULNESS",
           "domaine": "rag", "tache": "synthese", "cas": "parfait", "verbeux": False, "langage": "java"},
     task="RAG_FAITHFULNESS", contexte=CTX_NEO4J_REFACTOR,
     requete="What does the dismiss method do in RefactorAction?",
@@ -461,7 +461,7 @@ Le corps de la méthode n'est pas fourni. Ce que le contexte permet de dire, c'e
 ))
 
 add(example(
-    meta={"id": "b14-014", "famille": "rag-fidelite-dismiss-detaillee", "task": "RAG_FAITHFULNESS",
+    meta={"id": "b14-014", "famille": "rag-ctx-refactor-dismiss-neo4j", "task": "RAG_FAITHFULNESS",
           "domaine": "rag", "tache": "synthese", "cas": "defaillant", "verbeux": False, "langage": "java"},
     task="RAG_FAITHFULNESS", contexte=CTX_NEO4J_REFACTOR,
     requete="What does the dismiss method do in RefactorAction?",
@@ -484,7 +484,7 @@ La méthode est privée et ne renvoie rien : c'est un utilitaire interne, pas un
 ))
 
 add(example(
-    meta={"id": "b14-015", "famille": "rag-fidelite-approbation-mauvaise-classe", "task": "RAG_FAITHFULNESS",
+    meta={"id": "b14-015", "famille": "rag-ctx-approbation-fichier-neo4j", "task": "RAG_FAITHFULNESS",
           "domaine": "rag", "tache": "synthese", "cas": "defaillant", "verbeux": False, "langage": "java"},
     task="RAG_FAITHFULNESS", contexte=CTX_NEO4J_APPROVAL,
     requete="How does FileCreator request user approval via FileApprovalNotifier?",
@@ -515,7 +515,7 @@ Le chemin et le contenu permettent à l'interface d'afficher ce qui va être éc
 ))
 
 add(example(
-    meta={"id": "b14-016", "famille": "rag-fidelite-approbation-etayee", "task": "RAG_FAITHFULNESS",
+    meta={"id": "b14-016", "famille": "rag-ctx-approbation-fichier-neo4j", "task": "RAG_FAITHFULNESS",
           "domaine": "rag", "tache": "synthese", "cas": "parfait", "verbeux": False, "langage": "java"},
     task="RAG_FAITHFULNESS", contexte=CTX_NEO4J_APPROVAL,
     requete="How does FileCreator request user approval via FileApprovalNotifier?",
@@ -541,7 +541,7 @@ Rien n'établit en revanche que `FileCreator` passe par ce chemin, ni comment la
 ))
 
 add(example(
-    meta={"id": "b14-017", "famille": "rag-fidelite-constante-chiffree", "task": "RAG_FAITHFULNESS",
+    meta={"id": "b14-017", "famille": "rag-ctx-pipeline-lots-lucene", "task": "RAG_FAITHFULNESS",
           "domaine": "rag", "tache": "synthese", "cas": "defaillant", "verbeux": False, "langage": "java"},
     task="RAG_FAITHFULNESS", contexte=CTX_LUCENE_BATCH,
     requete="How does DocumentIndexingPipeline process documents in batches?",
@@ -570,7 +570,7 @@ L'ordre des opérations mérite attention. La garde d'entrée sort immédiatemen
 ))
 
 add(example(
-    meta={"id": "b14-018", "famille": "rag-fidelite-lot-borne", "task": "RAG_FAITHFULNESS",
+    meta={"id": "b14-018", "famille": "rag-ctx-pipeline-lots-lucene", "task": "RAG_FAITHFULNESS",
           "domaine": "rag", "tache": "synthese", "cas": "limite", "verbeux": False, "langage": "java"},
     task="RAG_FAITHFULNESS", contexte=CTX_LUCENE_BATCH,
     requete="How does DocumentIndexingPipeline process documents in batches?",
@@ -594,7 +594,7 @@ La valeur de `BATCH_SIZE` n'est pas visible : la constante est utilisée, jamais
 ))
 
 add(example(
-    meta={"id": "b14-019", "famille": "rag-fidelite-sources-etayee", "task": "RAG_FAITHFULNESS",
+    meta={"id": "b14-019", "famille": "rag-ctx-contextretriever-sources-lucene", "task": "RAG_FAITHFULNESS",
           "domaine": "rag", "tache": "synthese", "cas": "parfait", "verbeux": False, "langage": "java"},
     task="RAG_FAITHFULNESS", contexte=CTX_LUCENE_COMBINE,
     requete="Which sources does ContextRetriever fetch context from?",
@@ -618,7 +618,7 @@ Le contexte ne montre pas comment ces sources sont combinées, ni dans quel ordr
 ))
 
 add(example(
-    meta={"id": "b14-020", "famille": "rag-fidelite-hybride-borne", "task": "RAG_FAITHFULNESS",
+    meta={"id": "b14-020", "famille": "rag-ctx-contextretriever-sources-lucene", "task": "RAG_FAITHFULNESS",
           "domaine": "rag", "tache": "synthese", "cas": "limite", "verbeux": False, "langage": "java"},
     task="RAG_FAITHFULNESS", contexte=CTX_LUCENE_COMBINE,
     requete="What is the role of HybridRetriever relative to ContextRetriever?",
