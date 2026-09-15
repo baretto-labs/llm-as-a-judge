@@ -375,12 +375,12 @@ On pourrait accepter les décimales, tolérer les espaces, ou valider que les un
     thinking='''
 1. Analyse du code : l'expression régulière capture les paires nombre/unité et la somme pondérée est juste. `'1h30m'` donne 5400, `'45s'` donne 45, `'2h'` donne 7200. La vérification par reconstruction fait son travail : `'1h 30m'`, `'1h!!'`, `'abc'`, `''` et une entrée non textuelle lèvent bien `ValueError`, alors qu'un simple `findall` aurait accepté les trois premiers en silence. L'explication de ce mécanisme est exacte.
 2. Vérification des contraintes : les exigences obligatoires sont satisfaites, à savoir la conversion, la levée de `ValueError` sur entrée invalide et l'absence de dépendance externe. Deux écarts mineurs : les jours ne sont pas gérés, mais la consigne les présentait comme facultatifs (« si tu as le temps »), et `'2d'` lève proprement `ValueError` plutôt que de produire un résultat faux ; par ailleurs la réponse est verbeuse, avec une section « pour aller plus loin » non demandée.
-3. Synthèse : tout l'obligatoire est correct et vérifié, les écarts portent sur une consigne facultative et sur le style. La verbosité ne doit pas faire échouer une réponse juste. PASS.
+3. Synthèse : tout l'obligatoire est correct, les écarts portent sur une consigne facultative et sur le style. La verbosité ne doit pas faire échouer une réponse juste. PASS.
 ''',
     exact=True, bugs=True, consignes=True,
     extra_criteres={"aucune_dependance_externe": "La solution n'utilise que la bibliothèque standard, comme l'exige la requête."},
     extra_checks={"aucune_dependance_externe": True},
-    raison="Toutes les exigences obligatoires sont satisfaites et vérifiées ; les jours relevaient d'une consigne facultative.",
+    raison="Toutes les exigences obligatoires sont satisfaites ; les jours relevaient d'une consigne facultative.",
 ))
 
 # ── 9. Cas limite : signature imposée non respectée ───────────────────────────

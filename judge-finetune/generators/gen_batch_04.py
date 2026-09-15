@@ -439,7 +439,7 @@ La deuxième option a un coût : la fonction est stockée par instance et non su
 3. Synthèse : cause exacte, message d'erreur reproduit, trois corrections valides et compromis correctement énoncés. PASS.
 ''',
     exact=True, bugs=True, consignes=True,
-    raison="Diagnostic exact de la perte de receveur, message d'erreur reproduit et trois corrections vérifiées.",
+    raison="Diagnostic exact de la perte de receveur, message d'erreur reproduit et trois corrections valides.",
 ))
 
 # ── 10. Théorie : tri par défaut en JavaScript ────────────────────────────────
@@ -464,10 +464,10 @@ Deux précisions utiles :
     thinking='''
 1. Analyse de l'explication : la cause est exacte. Sans comparateur, `sort` convertit chaque élément en chaîne et compare les unités de code UTF-16, ce qui place `"10"` et `"20"` avant `"9"`. `[10, 9, 1, 20].sort()` renvoie bien `[1, 10, 20, 9]` et la version avec comparateur renvoie `[1, 9, 10, 20]`.
 2. Vérification des contraintes : les deux précisions sont exactes et pertinentes. Le tri en place se constate directement, le tableau d'origine étant modifié et la valeur de retour étant la même référence. La stabilité garantie depuis ES2019 est correcte. La réponse tient en quelques lignes, comme demandé.
-3. Synthèse : cause exacte, exemples vérifiés, précisions justes et format concis. PASS.
+3. Synthèse : cause exacte, exemples conformes, précisions justes et format concis. PASS.
 ''',
     exact=True, bugs=True, consignes=True,
-    raison="Cause exacte (comparaison de chaînes UTF-16), exemples vérifiés et précisions justes sur le tri en place et la stabilité.",
+    raison="Cause exacte (comparaison de chaînes UTF-16), exemples conformes et précisions justes sur le tri en place et la stabilité.",
 ))
 
 # ── 11. Théorie : précision des entiers JSON, erreur cachée, verbeux ──────────
@@ -542,10 +542,10 @@ Les trois premières lignes montrent que `==` n'est même pas transitif : `""` �
     thinking='''
 1. Analyse de l'explication : la distinction est exacte et les six résultats cités sont conformes. `"" == 0` et `"0" == 0` renvoient `true`, `"" == "0"` renvoie `false`, `null == undefined` renvoie `true`, `null == 0` renvoie `false`, et `[] == false` renvoie `true`.
 2. Vérification des contraintes : l'observation sur la non-transitivité est correctement construite à partir des trois premiers cas, et c'est l'argument le plus parlant contre `==`. La règle pratique proposée est celle recommandée par les guides de style courants, et l'exception `x == null` est correctement justifiée : `null` et `undefined` ne sont mutuellement égaux qu'entre eux avec `==`. Les deux demandes obligatoires, la différence et la règle pratique, sont satisfaites. En revanche, `Object.is` n'est pas mentionné du tout, alors que la consigne le demandait — mais en le présentant explicitement comme facultatif (« si tu as le temps »).
-3. Synthèse : tout l'obligatoire est exact et vérifié, l'unique omission porte sur une demande explicitement facultative, ce qui ne justifie pas un échec. PASS.
+3. Synthèse : tout l'obligatoire est exact, l'unique omission porte sur une demande explicitement facultative, ce qui ne justifie pas un échec. PASS.
 ''',
     exact=True, bugs=True, consignes=True,
-    raison="Distinction exacte et six résultats de coercition vérifiés ; seule la mention d'Object.is, explicitement facultative, manque.",
+    raison="Distinction exacte et six résultats de coercition exacts ; seule la mention d'Object.is, explicitement facultative, manque.",
 ))
 
 # ── 13. Théorie Java : pile et tas ────────────────────────────────────────────

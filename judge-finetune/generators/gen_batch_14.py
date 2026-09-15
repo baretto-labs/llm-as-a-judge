@@ -577,20 +577,20 @@ add(example(
     reponse='''
 D'après le corps fourni de `processBatch()` :
 
-1. La méthode sort immédiatement si le pipeline ne tourne pas (`!isRunning`) ou si la file `processingQueue` est vide.
+1. La méthode sort immédiatement si le pipeline ne tourne pas ou si la file est vide. La garde s'écrit, dans le corps fourni, `if (isRunning && processingQueue.isEmpty()) return;`.
 2. Elle franchit une barrière de synchronisation avec `processingPhaser.arriveAndAwaitAdvance()`.
 3. Elle prend le verrou `processingLock`.
 4. Elle alloue une liste dimensionnée à `BATCH_SIZE` et y draine au plus `BATCH_SIZE` éléments de la file, via `processingQueue.drainTo(currentBatch, BATCH_SIZE)`.
 
 La valeur de `BATCH_SIZE` n'est pas visible : la constante est utilisée, jamais déclarée dans les extraits. Le corps est par ailleurs tronqué après le test `if (!currentBatch.isEmpty`, donc le traitement effectif du lot n'est pas observable.
 ''',
-    checks={"affirmations_etayees": True, "absence_invention": True, "citations_exactes": True},
+    checks={"affirmations_etayees": True, "absence_invention": True, "citations_exactes": False},
     thinking='''
-1. Énumération des éléments clés : le contexte fournit le corps de `processBatch` jusqu'à sa troncature, avec la garde d'entrée, le phaser, le verrou, l'allocation et le drainage.
-2. Vérification point par point : les quatre étapes énumérées correspondent ligne à ligne au corps fourni, et les identifiants cités sont exacts, y compris la forme de l'appel `drainTo`. La formulation « au plus `BATCH_SIZE` éléments » est fidèle à la sémantique de `drainTo` sans rien ajouter. Les deux réserves finales sont justes et précises : la constante est effectivement utilisée sans être déclarée, et la troncature est signalée au point exact où elle survient, ce qui délimite correctement ce qui reste inobservable. Aucune valeur n'est avancée, aucune méthode absente n'est invoquée.
-3. Synthèse : la réponse est incomplète, puisqu'elle ne peut décrire ni la valeur du lot ni le traitement effectif, mais chaque affirmation est étayée et chaque lacune est nommée avec sa cause. PASS.
+1. Énumération des éléments clés : le contexte fournit le corps de `processBatch` jusqu'à sa troncature. La garde d'entrée y figure textuellement, `if (!isRunning || processingQueue.isEmpty())` suivi d'un `return`, puis viennent le phaser, le verrou, l'allocation et le drainage.
+2. Vérification point par point : le fond est solide. Les quatre étapes énumérées correspondent ligne à ligne au corps fourni, la formulation « au plus `BATCH_SIZE` éléments » est fidèle à la sémantique de `drainTo` sans rien ajouter, et les deux réserves finales sont justes : la constante est effectivement utilisée sans être déclarée, et la troncature est signalée au point exact où elle survient. Aucune valeur n'est avancée, aucune méthode absente n'est invoquée — rien n'est inventé et l'ensemble de la description est soutenu par les extraits. Mais la citation de la garde est **déformée**. La sortie l'annonce comme tirée du corps fourni et la rend `if (isRunning && processingQueue.isEmpty()) return;` : la négation a disparu et le `||` est devenu `&&`. La condition ainsi écrite ne sortirait que sur un pipeline actif **et** une file vide, soit l'inverse partiel de la garde réelle. La phrase en prose qui la précède reste correcte, ce qui rend l'écart d'autant plus discret : seul le fragment présenté entre accents graves est faux.
+3. Synthèse : rien n'est inventé et la description d'ensemble est étayée, mais un extrait donné pour littéral est restitué avec une logique altérée. En monde fermé, une citation déformée ne peut pas passer, quelle que soit la qualité du reste. FAIL.
 ''',
-    reason="Chaque étape correspond au corps fourni, la valeur de BATCH_SIZE est déclarée non visible et la troncature est signalée à l'endroit exact.",
+    reason="La garde citée comme littérale est rendue `if (isRunning && ...)` au lieu de `if (!isRunning || ...)`, alors que tout le reste de la description est étayé.",
 ))
 
 add(example(

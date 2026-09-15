@@ -142,10 +142,10 @@ Elle fonctionne parce que `List.sort` est **stable** : le second tri préserve l
     thinking='''
 1. Analyse du code : la composition `comparing(...).thenComparing(...)` reproduit exactement la logique du comparateur manuel, y compris l'ordre des critères et le repli sur le nom à département égal. C'est bien la simplification attendue.
 2. Vérification des contraintes : l'affirmation sur la stabilité est exacte. Sur un jeu `[(R&D, Ana), (Ops, Bob), (R&D, Cid), (Ops, Dan)]`, un tri par département donne `[(Ops, Bob), (Ops, Dan), (R&D, Ana), (R&D, Cid)]` : l'ordre relatif d'origine est conservé au sein de chaque département, et le tri en deux passes produit le même résultat que le comparateur composé. La stabilité est bien contractuelle pour `List.sort` et `Arrays.sort` sur des objets, contrairement au tri des tableaux de primitifs, et la recommandation finale en faveur de la version en une passe est un conseil pertinent plutôt qu'une correction nécessaire.
-3. Synthèse : simplification équivalente, propriété de stabilité correctement invoquée et vérifiée, recommandation justifiée. PASS.
+3. Synthèse : simplification équivalente, propriété de stabilité correctement invoquée, recommandation justifiée. PASS.
 ''',
     exact=True, bugs=True, consignes=True,
-    raison="Composition de comparateurs équivalente, et l'argument de stabilité invoqué pour la variante est exact et vérifié.",
+    raison="Composition de comparateurs équivalente, et l'argument de stabilité invoqué pour la variante est exact.",
 ))
 
 # ── 4. Encodage : « Python 3 lit toujours en UTF-8 », verbeux ─────────────────
@@ -426,10 +426,10 @@ L'écriture manuelle équivalente, souvent vue, est `((current + offset) % size 
     thinking='''
 1. Analyse du code : la méthode répond exactement à la consigne, y compris pour les décalages négatifs, et la validation de `size` évite une division par zéro. `Math.floorMod` est la primitive correcte pour ce besoin.
 2. Vérification des contraintes : l'explication du signe est exacte. `-7 % 2` vaut bien `-1` en Java, tandis que `Math.floorMod(-7, 2)` vaut `1`. La conséquence annoncée, un index négatif provoquant une exception d'indice hors bornes, est correcte. L'écriture manuelle proposée en complément est bien équivalente pour un `size` positif. À noter que `current + offset` pourrait théoriquement déborder sur des valeurs extrêmes, mais des index de carrousel n'atteignent pas cet ordre de grandeur, et ce silence ne constitue pas un défaut dans ce contexte.
-3. Synthèse : solution correcte, explication du piège de signe exacte et vérifiée, validation d'entrée présente. PASS.
+3. Synthèse : solution correcte, explication du piège de signe exacte, validation d'entrée présente. PASS.
 ''',
     exact=True, bugs=True, consignes=True,
-    raison="Math.floorMod traite correctement les décalages négatifs, et l'explication du signe de % est exacte et vérifiée.",
+    raison="Math.floorMod traite correctement les décalages négatifs, et l'explication du signe de % est exacte.",
 ))
 
 # ── 10. Théorie : == et equals sur les chaînes ────────────────────────────────
@@ -458,7 +458,7 @@ D'où la règle : comparez toujours avec `equals`, et réservez `==` aux cas où
     thinking='''
 1. Analyse de l'explication : le mécanisme est correctement exposé. `==` compare des références, le pool de chaînes explique les cas où la comparaison réussit, et la distinction entre résolution à la compilation et construction à l'exécution est la clé du phénomène.
 2. Vérification des contraintes : les cinq résultats annoncés sont tous conformes. Deux littéraux identiques donnent `true`, la comparaison avec `new String` donne `false`, `intern()` ramène `true`, la concaténation de deux constantes littérales donne `true`, et la construction via `StringBuilder` donne `false`. La remarque finale est pertinente et correspond à un mode de défaillance réel : les tests écrits avec des littéraux passent, alors que des chaînes lues depuis une source externe échouent.
-3. Synthèse : mécanisme exact, cinq cas vérifiés, conclusion pratique justifiée. PASS.
+3. Synthèse : mécanisme exact, cinq cas conformes, conclusion pratique justifiée. PASS.
 ''',
     exact=True, bugs=True, consignes=True,
     raison="Explique exactement le pool de chaînes et la résolution à la compilation, avec cinq résultats tous conformes.",

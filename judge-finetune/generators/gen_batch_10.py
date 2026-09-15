@@ -46,7 +46,7 @@ Trois règles pour ce genre de comparateur :
     thinking='''
 1. Analyse de l'explication : le diagnostic est exact. Un comparateur qui renvoie toujours une valeur non nulle est non antisymétrique, ce qui viole le contrat documenté de `Comparator`.
 2. Vérification des contraintes : l'explication du seuil est le point qui répond vraiment à la question posée. Sur un jeu comportant de nombreux ex æquo, le tri se termine sans exception à 16 et à 32 éléments, puis lève `IllegalArgumentException: Comparison method violates its general contract!` à 100 et à 1 000 éléments. Cela correspond bien au basculement de TimSort vers le tri par insertion sous 32 éléments, et explique pourquoi des tests unitaires de petite taille ne détectent rien. La correction par `Comparator.comparingDouble` trie sans erreur les 1 000 éléments. Les trois règles sont justes, y compris la mise en garde sur la soustraction : `Integer.MAX_VALUE - 1` moins `-10` donne `-2147483640`, de signe inverse au résultat attendu.
-3. Synthèse : cause exacte, explication du caractère intermittent conforme à la mesure, correction et règles pertinentes. PASS.
+3. Synthèse : cause exacte, explication du caractère intermittent juste, correction et règles pertinentes. PASS.
 ''',
     exact=True, bugs=True, consignes=True,
     raison="Violation d'antisymétrie exactement diagnostiquée, avec le seuil TimSort correctement situé (aucune exception à 32, levée à 100).",
@@ -170,7 +170,7 @@ Si la classe est un simple porteur de données, `@dataclass(frozen=True)` fait t
     thinking='''
 1. Analyse de l'explication : le mécanisme est exact. Sur une classe définissant `__eq__` sans `__hash__`, l'attribut `__hash__` de la classe vaut bien `None`, et l'insertion dans un ensemble lève `TypeError: unhashable type: 'PointNu'`, exactement le message rapporté. La justification donnée est la bonne : conserver le hachage par identité produirait des objets égaux de hachages différents.
 2. Vérification des contraintes : la correction fonctionne, un ensemble contenant deux points égaux dotés de ce `__hash__` a bien une taille de 1. La mise en garde sur la mutation est juste et rejoint le même piège que les clés mutables en Java. La suggestion finale est exacte : une `dataclass(frozen=True)` est hachable et compare par valeur, tandis qu'une `dataclass(eq=True)` non gelée voit son `__hash__` mis à `None` et lève le même `TypeError` — même règle, appliquée automatiquement.
-3. Synthèse : cause exacte, correction vérifiée, réserves pertinentes sur la mutabilité et alternative correcte. PASS.
+3. Synthèse : cause exacte, correction adaptée, réserves pertinentes sur la mutabilité et alternative correcte. PASS.
 ''',
     exact=True, bugs=True, consignes=True,
     raison="Explique exactement la mise à None de __hash__ par __eq__, avec un message d'erreur conforme et une correction adaptée.",
@@ -378,7 +378,7 @@ Si vous voulez des sens opposés, deux solutions : négocier la clé numérique,
     thinking='''
 1. Analyse de l'explication : les deux approches sont correctes et la justification par la stabilité est exacte. La recommandation en faveur de la clé composite est raisonnable et correctement motivée.
 2. Vérification des contraintes : les résultats annoncés se confirment sur un jeu comportant des ex æquo. Le tri par quantité seule donne `[('a', 1), ('d', 1), ('b', 2), ('c', 2)]` et la clé composite donne le même résultat, ce qui confirme l'équivalence sur ce jeu. Le comportement de `reverse=True` est confirmé et c'est le point que la question visait : avec la clé composite, le résultat est `[('c', 2), ('b', 2), ('d', 1), ('a', 1)]`, où les noms sont bien décroissants à quantité égale — l'inversion porte sur l'ordre global, pas sur le seul premier critère. Les deux solutions proposées pour des sens opposés sont correctes, la négation n'étant applicable qu'à une clé numérique, ce que la réponse précise.
-3. Synthèse : équivalence exacte, recommandation justifiée, et effet global de `reverse` correctement décrit et vérifié. PASS.
+3. Synthèse : équivalence exacte, recommandation justifiée, et effet global de `reverse` correctement décrit. PASS.
 ''',
     exact=True, bugs=True, consignes=True,
     raison="Stabilité et clé composite exactement expliquées, avec l'effet global de reverse=True correctement décrit sur un jeu à ex æquo.",
@@ -426,7 +426,7 @@ Deux conséquences pratiques. Ajouter une colonne à un index pour le rendre cou
     thinking='''
 1. Analyse de l'explication : la définition est exacte, y compris la précision importante que la propriété qualifie un couple index-requête et non un index en soi.
 2. Vérification des contraintes : l'exemple de diagnostic se confirme sur un index `(tenant_id, cree_le)`. La requête d'agrégation filtrée sur le locataire produit `SEARCH evenements USING COVERING INDEX idx_tenant_date (tenant_id=?)`, tandis que la sélection d'une colonne absente de l'index produit `SEARCH evenements USING INDEX idx_tenant_date (tenant_id=?)`, sans la mention de couverture. Le plan distingue donc bien les deux cas, exactement comme l'annonce la réponse. Les deux conséquences pratiques sont justes : l'élargissement d'un index est un arbitrage lecture contre écriture et volume, et sélectionner toutes les colonnes suffit à perdre la couverture.
-3. Synthèse : définition exacte, méthode de diagnostic vérifiée sur les deux cas, arbitrages correctement énoncés. PASS.
+3. Synthèse : définition exacte, méthode de diagnostic valable sur les deux cas, arbitrages correctement énoncés. PASS.
 ''',
     exact=True, bugs=True, consignes=True,
     raison="Définition exacte du couple index-requête, avec la distinction COVERING INDEX contre INDEX lisible sur les deux plans.",
@@ -499,7 +499,7 @@ En pratique, validez la charge contre un schéma à la frontière, et laissez le
     thinking='''
 1. Analyse de l'explication : la distinction est exacte. `any` neutralise la vérification, `unknown` la conserve en exigeant un rétrécissement préalable, et la remarque sur l'assignabilité — `unknown` n'est assignable qu'à `unknown` et `any` — est correcte.
 2. Vérification des contraintes : les deux comportements se constatent à la compilation. Sur une valeur typée `any`, l'appel d'une méthode inexistante et l'affectation à un `number` passent sans erreur ; sur la même valeur typée `unknown`, les deux sont refusés, et le rétrécissement par `typeof` débloque bien l'accès. La recommandation pour une réponse d'API est justifiée par le bon argument, à savoir que la forme d'une donnée externe est une hypothèse, et le conseil final de valider à la frontière puis de laisser le type découler de la validation est la pratique correcte. La réponse est concise comme demandé.
-3. Synthèse : distinction exacte, comportements vérifiés à la compilation, recommandation correctement motivée. PASS.
+3. Synthèse : distinction exacte, comportements constatés à la compilation, recommandation correctement motivée. PASS.
 ''',
     exact=True, bugs=True, consignes=True,
     raison="Distinction exacte entre neutralisation et rétrécissement, avec la bonne recommandation pour une donnée externe.",

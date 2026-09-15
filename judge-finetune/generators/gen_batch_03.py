@@ -560,7 +560,7 @@ Préférez une classe classique quand vous avez besoin d'un état mutable, d'une
 3. Synthèse : critère exact, limites correctement énoncées, exemple compilé et conforme à ce qui en est dit. PASS.
 ''',
     exact=True, bugs=True, consignes=True,
-    raison="Critère et limites des records exacts, avec un constructeur compact vérifié, y compris la réaffectation de paramètre.",
+    raison="Critère et limites des records exacts, avec un constructeur compact correct, y compris la réaffectation de paramètre.",
 ))
 
 # ── 14. Théorie Python : asyncio et cœurs, erreur cachée, verbeux ─────────────

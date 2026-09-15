@@ -510,19 +510,21 @@ add(example(
 
 ## Ce que le reste du nœud indique
 
+Le nœud porte d'ailleurs l'arête `fr.baretto.ollamassist.chat.service.OllamaService -[IMPLEMENTS]-> PersistentStateComponent<OllamaService.State>`, ce qui confirme la troisième interface.
+
 La classe porte deux annotations : `@Service`, qui en fait un composant géré par la plateforme et instancié à la demande, et `@Slf4j`, qui lui injecte un enregistreur de journaux.
 
 Ses champs éclairent son rôle. `chatMemory` conserve l'historique de conversation, ce qui explique le besoin de persistance. `messageBusConnection` est la souscription au bus de messages d'IntelliJ — et c'est aussi ce qui rend `Disposable` nécessaire, une connexion au bus devant être libérée explicitement pour ne pas fuir à la fermeture du projet.
 
 L'ensemble dessine un service à durée de vie longue, abonné à des événements et porteur d'un état à conserver.
 ''',
-    checks={"affirmations_etayees": False, "absence_invention": False, "citations_exactes": True},
+    checks={"affirmations_etayees": False, "absence_invention": False, "citations_exactes": False},
     thinking='''
 1. Énumération des éléments clés : le nœud `OllamaService` porte exactement deux arêtes `IMPLEMENTS`, vers `fr.baretto.ollamassist.setting.ModelListener` et vers `Disposable`. Un extrait distinct montre `fr.baretto.ollamassist.setting.OllamaSettings -[IMPLEMENTS]-> PersistentStateComponent<OllamaSettings.State>`.
-2. Vérification point par point : les deux premières interfaces citées sont étayées. La troisième ne l'est pas : `PersistentStateComponent` est rattachée par le contexte à `OllamaSettings`, une **autre classe**, et aucune arête ne la relie à `OllamaService`. La sortie attribue donc à une classe une interface qui appartient à sa voisine — exactement le piège que tendait ce contexte, où deux types au préfixe commun se suivent. Le dénombrement « trois interfaces » est faux pour la même raison. La seconde moitié de la réponse est en revanche correctement ancrée : les annotations `@Service` et `@Slf4j` figurent bien au nœud, ainsi que les champs `chatMemory` et `messageBusConnection`. Le rattachement de `Disposable` à la libération de la connexion au bus est une déduction, mais une déduction dont les deux prémisses sont dans l'extrait. Les justifications fonctionnelles avancées pour chaque interface ne figurent pas davantage dans le contexte, mais elles restent secondaires face à l'erreur d'attribution. Les éléments effectivement repris ne sont pas déformés.
+2. Vérification point par point : les deux premières interfaces citées sont étayées. La troisième ne l'est pas : `PersistentStateComponent` est rattachée par le contexte à `OllamaSettings`, une **autre classe**, et aucune arête ne la relie à `OllamaService`. La sortie attribue donc à une classe une interface qui appartient à sa voisine — exactement le piège que tendait ce contexte, où deux types au préfixe commun se suivent. Le dénombrement « trois interfaces » est faux pour la même raison. Plus grave, la sortie ne se contente pas d'attribuer : elle **fabrique une citation** à l'appui, en donnant pour une arête du nœud `OllamaService -[IMPLEMENTS]-> PersistentStateComponent<OllamaService.State>`, forme qui ne figure nulle part. L'arête réelle porte `OllamaSettings` des deux côtés, y compris dans le paramètre de type. Une attribution erronée devient ainsi une citation déformée, présentée comme une preuve tirée du contexte — c'est le degré au-dessus de l'invention simple, puisque le lecteur est invité à vérifier et croit trouver confirmation. Le reste de la réponse est en revanche correctement ancré : les annotations `@Service` et `@Slf4j` figurent bien au nœud, ainsi que les champs `chatMemory` et `messageBusConnection`. Le rattachement de `Disposable` à la libération de la connexion au bus est une déduction, mais une déduction dont les deux prémisses sont dans l'extrait. Les justifications fonctionnelles avancées pour chaque interface ne figurent pas davantage dans le contexte, mais elles restent secondaires face à l'erreur d'attribution et à la citation fabriquée qui la maquille en preuve.
 3. Synthèse : une interface de plus est attribuée à la classe, en réalité portée par un type voisin du contexte. FAIL.
 ''',
-    reason="PersistentStateComponent est rattachée par le contexte à OllamaSettings, pas à OllamaService : l'interface est attribuée à tort.",
+    reason="PersistentStateComponent est rattachée par le contexte à OllamaSettings, et la citation produite à l'appui réécrit l'arête au nom d'OllamaService.",
 ))
 
 add(example(
