@@ -493,7 +493,7 @@ Chaque étape doit être rejouable sans effet supplémentaire, puisqu'un message
     thinking='''
 1. Analyse de l'explication : le contenu est exact. La perte de l'atomicité multi-bases, les réserves sur la validation en deux phases — coordinateur en point de défaillance, verrous tenus pendant le protocole —, la définition de la saga comme suite de transactions locales compensables, et l'exemple appliqué au découpage décrit sont tous corrects.
 2. Vérification des contraintes : les deux propriétés énoncées sont justes et bien choisies, en particulier la distinction entre compensation et retour arrière, qui est le point que les réponses superficielles manquent. L'exigence d'idempotence est correctement motivée par la possibilité d'une double livraison. La section « le point difficile » identifie exactement le problème de la double écriture entre base et courtier de messages — mais s'arrête là, alors que la demande facultative portait précisément sur la boîte d'envoi transactionnelle, qui est la réponse standard à ce problème. L'omission est donc d'autant plus visible que le texte y conduit. La consigne la présentait toutefois comme facultative. La réponse est par ailleurs longue, avec cinq sections là où trois auraient suffi.
-3. Synthèse : cas limite. Tout l'obligatoire est exact et pertinent, l'omission porte sur une demande explicitement facultative, et la verbosité seule ne justifie pas un échec. PASS.
+3. Synthèse : tout l'obligatoire est exact et pertinent, l'omission porte sur une demande explicitement facultative, et la verbosité seule ne justifie pas un échec. PASS.
 ''',
     exact=True, bugs=True, consignes=True,
     raison="Saga et compensation exactement décrites ; la boîte d'envoi transactionnelle, explicitement facultative, n'est pas traitée.",
@@ -515,7 +515,7 @@ Faut-il activer HTTP/3 sur notre passerelle, déjà en HTTP/2 ? **Réponds en qu
     thinking='''
 1. Analyse de l'explication : les quatre points sont exacts. Le blocage en tête de file au niveau TCP affecte bien tous les flux multiplexés d'une connexion HTTP/2, l'isolation des flux par QUIC est correctement présentée comme le gain principal, la fusion des poignées de main transport et TLS ainsi que la reprise en zéro aller-retour sont justes, et la réserve sur UDP filtré par certains pare-feux est réelle.
 2. Vérification des contraintes : la contrainte de forme, quatre puces au maximum, est respectée à la lettre — exactement quatre puces, sans introduction ni conclusion qui la contourneraient. La réponse tranche la question posée en distinguant les cas d'usage plutôt qu'en donnant un avis général, ce qui est adapté. En revanche, la demande facultative sur `Alt-Svc` n'est pas traitée, alors qu'elle aurait complété utilement le propos, la bascule vers HTTP/3 reposant précisément sur cet en-tête. La consigne la présentait explicitement comme facultative.
-3. Synthèse : cas limite. Le fond est exact, la contrainte de format est respectée, et l'unique omission porte sur une demande explicitement facultative. PASS.
+3. Synthèse : le fond est exact, la contrainte de format est respectée, et l'unique omission porte sur une demande explicitement facultative. PASS.
 ''',
     exact=True, bugs=True, consignes=True,
     extra_criteres={"format_impose": "La sortie respecte la limite de longueur chiffrée fixée par la requête."},
@@ -567,7 +567,7 @@ Cela dit, dans un service applicatif, le levier le plus rentable reste souvent e
     thinking='''
 1. Analyse de l'explication : le contenu technique est exact. Les trois conditions énoncées — déterminisme, clé fiable, coût de calcul supérieur au coût de gestion — sont les bonnes, la distinction entre calcul pur et dépendance à un état externe est pertinente, et les trois pièges cités sont réels, en particulier l'exhaustivité de la clé et le bornage de la mémoire.
 2. Vérification des contraintes : le dernier paragraphe viole une exclusion explicite. La requête interdit sans ambiguïté d'aborder le cache HTTP et le CDN, en précisant que le sujet est traité ailleurs dans le document. La réponse les introduit tous les deux, et en fait sa recommandation finale, celle par laquelle elle conseille de commencer. Ce n'est pas une digression marginale : c'est la conclusion du texte, et elle rend le passage inutilisable tel quel dans le document visé, en plus de faire doublon avec une autre section. Le reste de la réponse traitait pourtant la question posée de façon complète.
-3. Synthèse : cas limite. Le fond est exact et répond à la demande, mais le périmètre explicitement exclu est franchi, précisément dans la recommandation finale. FAIL.
+3. Synthèse : le fond est exact et répond à la demande, mais le périmètre explicitement exclu est franchi, précisément dans la recommandation finale. FAIL.
 ''',
     exact=True, bugs=True, consignes=True,
     extra_criteres={"perimetre_respecte": "La réponse reste dans le périmètre fixé par la requête, sans aborder les sujets explicitement exclus."},

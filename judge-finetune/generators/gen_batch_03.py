@@ -291,7 +291,7 @@ J'ai utilisé `re` pour la validation de format : c'est nettement plus lisible q
     thinking='''
 1. Analyse du code : la logique est juste. La réorganisation, qui déplace les quatre premiers caractères à la fin, puis la conversion des lettres en nombres via la base 36 et le test `% 97 == 1` correspondent exactement à la norme ISO 13616. Vérifié par exécution : `GB82WEST12345698765432` renvoie `True`, et la même chaîne avec un chiffre altéré renvoie `False`. Le format est correctement contraint, bornes 11 à 30 comprises.
 2. Vérification des contraintes : la consigne interdit explicitement les expressions régulières, en précisant même que le linter du projet refuse le module `re`. La réponse importe `re` dès la première ligne et le revendique. Ce n'est pas une préférence de style : le code ne passerait pas la CI du projet, donc l'exigence est bloquante. Une validation manuelle est parfaitement faisable avec `str.isalpha`, `str.isdigit` et `str.isalnum` sur des tranches.
-3. Synthèse : cas limite. Le code est correct et sans bug, mais une contrainte explicite et vérifiable est ignorée au profit d'un argument de lisibilité. FAIL.
+3. Synthèse : le code est correct et sans bug, mais une contrainte explicite et vérifiable est ignorée au profit d'un argument de lisibilité. FAIL.
 ''',
     exact=True, bugs=True, consignes=True,
     extra_criteres={"dependance_autorisee": "La solution n'utilise aucun module explicitement interdit par la requête."},
@@ -455,7 +455,7 @@ Et si vous devez republier une branche rebasée après un `push`, utilisez `--fo
     thinking='''
 1. Analyse de l'explication : tout ce qui est affirmé est exact. Le commit de fusion à deux parents, la réécriture des commits par `rebase` avec de nouveaux identifiants dérivés du parent, la linéarisation de l'historique, la résolution de conflits potentiellement répétée à chaque commit rejoué : la description correspond au comportement réel de Git. La règle d'or sur les branches partagées est correctement énoncée et correctement justifiée.
 2. Vérification des contraintes : la question principale reçoit une recommandation claire et cohérente avec un workflow de pull requests, rebase local puis intégration côté serveur. La précision sur `--force-with-lease` est exacte, cette variante vérifie que la référence distante est bien celle attendue. Deux écarts mineurs : la demande explicitement facultative sur `git rebase --onto` n'est pas traitée, et la réponse est longue avec des sections que la question n'appelait pas.
-3. Synthèse : cas limite. L'obligatoire est exact et complet, l'omission ne porte que sur une demande présentée comme facultative, et la verbosité seule ne justifie pas un échec. PASS.
+3. Synthèse : l'obligatoire est exact et complet, l'omission ne porte que sur une demande présentée comme facultative, et la verbosité seule ne justifie pas un échec. PASS.
 ''',
     exact=True, bugs=True, consignes=True,
     raison="Explication exacte et recommandation cohérente ; seule la partie explicitement facultative sur rebase --onto manque.",
@@ -557,7 +557,7 @@ Il vous faut une fonction **lente et à coût paramétrable**, conçue pour le s
     thinking='''
 1. Analyse de l'explication : le raisonnement est exact. Le rôle du sel est correctement circonscrit, à savoir empêcher les tables précalculées et la mutualisation d'attaque, sans rien changer au coût unitaire d'un essai. Le diagnostic sur SHA-256 est juste, c'est bien sa rapidité qui le disqualifie, et les trois algorithmes cités sont ceux recommandés pour cet usage.
 2. Vérification des contraintes : les trois points de mise en œuvre sont corrects et opérationnels, y compris l'ordre de grandeur du calibrage et la stratégie de migration au fil des connexions, qui est la méthode standard pour éviter une réinitialisation générale. La question obligatoire, comment stocker les mots de passe, reçoit une réponse complète. En revanche, la comparaison entre bcrypt et argon2 n'est pas faite : les deux sont cités côte à côte sans qu'on départage leurs caractéristiques. La consigne la présentait comme facultative (« si possible »).
-3. Synthèse : cas limite. Tout l'obligatoire est exact et actionnable, l'omission porte uniquement sur la partie explicitement facultative. PASS.
+3. Synthèse : tout l'obligatoire est exact et actionnable, l'omission porte uniquement sur la partie explicitement facultative. PASS.
 ''',
     exact=True, bugs=True, consignes=True,
     raison="Diagnostic et recommandations exacts et actionnables ; seule la comparaison bcrypt/argon2, explicitement facultative, manque.",

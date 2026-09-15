@@ -283,7 +283,7 @@ add(example(
     thinking='''
 1. Énumération des éléments clés : le premier extrait est le fichier `AuthenticationHelper.java` lui-même, avec sa documentation ; le deuxième est l'énumération `AuthMode` et sa documentation détaillée. Suivent deux extraits sans rapport direct, `PrerequisiteService#readAuthenticated` et `OllamaGutterIconRenderer#hashCode`.
 2. Vérification point par point : la classe visée est présente, le contexte est donc pertinent. Sur la suffisance, la documentation répond à la question posée : deux schémas mutuellement exclusifs sélectionnés par `AuthMode`, Basic avec `username:password` encodé en Base64, et Bearer pour un jeton ou une clé d'API, les deux reposant sur l'unique en-tête `Authorization`. La documentation nomme en outre les points d'entrée obligatoires, `createAuthorizationHeaderValue()` et `authHeaders()`. C'est suffisant pour répondre entièrement. Deux réserves : le premier extrait est tronqué en pleine phrase, ce qui prive du détail de construction de la valeur, et le dernier extrait est franchement hors sujet. Ni l'un ni l'autre n'empêche de répondre, et l'information utile occupe les deux premiers extraits.
-3. Synthèse : cas limite. La troncature et un extrait parasite ne suffisent pas à disqualifier un contexte qui contient la classe visée et la description complète des deux schémas. PASS.
+3. Synthèse : la troncature et un extrait parasite ne suffisent pas à disqualifier un contexte qui contient la classe visée et la description complète des deux schémas. PASS.
 ''',
     reason="Le fichier AuthenticationHelper et l'énumération AuthMode répondent entièrement à la requête, malgré une troncature et un extrait parasite.",
 ))
@@ -347,7 +347,7 @@ add(example(
     thinking='''
 1. Énumération des éléments clés : la requête comporte deux volets, la liste des classes déléguées et **l'ordre de fusion** de leurs résultats. Le contexte donne le nœud `ContextRetriever.retrieve(Query)` avec une arête `CALLS` vers `WorkspaceContextRetriever.get()`, le nœud de classe `ContextRetriever` avec ses champs `contentRetriever`, `duckDuckGoContentRetriever`, `workspaceContextProvider` et `executor`, ainsi que `HybridRetriever.retrieve(Query)`.
 2. Vérification point par point : le premier volet est couvert, les champs et l'arête `CALLS` identifiant les collaborateurs. Le second ne l'est pas : le contexte expose la structure du graphe — qui appelle qui — mais aucun corps de méthode, donc rien sur la façon dont les résultats sont combinés, ni sur un ordre, une déduplication ou un filtrage. La présence du champ `executor` suggère un traitement concurrent, mais le déduire serait une inférence, pas une lecture. Le bruit reste maîtrisé, les deux nœuds vides étant très courts.
-3. Synthèse : cas limite. Le contexte est nettement pertinent et répond à la moitié de la requête, mais l'ordre de fusion demandé n'y figure pas, et la suffisance porte sur la requête entière. FAIL.
+3. Synthèse : le contexte est nettement pertinent et répond à la moitié de la requête, mais l'ordre de fusion demandé n'y figure pas, et la suffisance porte sur la requête entière. FAIL.
 ''',
     reason="Les collaborateurs sont identifiables, mais aucun corps de méthode n'est fourni : l'ordre de fusion demandé reste absent du contexte.",
 ))
@@ -534,7 +534,7 @@ Répondre à la question posée exigerait le code de `AskFromCodeAction`, absent
     thinking='''
 1. Énumération des éléments clés : le contexte fournit l'interface `NewUserMessageNotifier` avec son champ `TOPIC` — dont la construction `Topic.create("New user message", NewUserMessageNotifier.class)` est citée textuellement — et sa méthode `newUserMessage(String message)`, ainsi que `PluginNotifier` et `MessagesPanel#addUserMessage`.
 2. Vérification point par point : chaque affirmation de la première partie est étayée, et la citation du champ `TOPIC` est exacte, littérale. La lecture du bus de messages est une déduction raisonnable à partir du type `Topic`, et elle est présentée comme telle. L'hypothèse d'un abonné côté interface est explicitement donnée pour une suggestion, non pour un fait. La seconde partie énonce correctement l'absence de `AskFromCodeAction`, ce qui est vérifiable dans les extraits, et refuse de combler le manque. C'est exactement la posture attendue en monde fermé : la sortie s'abstient plutôt que de produire une réponse plausible. Deux réserves de forme seulement : la réponse est longue pour ce qu'elle établit, et elle ne répond pas à la question posée — mais parce que le contexte ne le permet pas, ce qui n'est pas imputable à la sortie.
-3. Synthèse : cas limite. La sortie n'apporte pas la réponse attendue, mais tout ce qu'elle avance est étayé, elle n'invente rien et délimite explicitement ce que le contexte ne couvre pas. PASS.
+3. Synthèse : la sortie n'apporte pas la réponse attendue, mais tout ce qu'elle avance est étayé, elle n'invente rien et délimite explicitement ce que le contexte ne couvre pas. PASS.
 ''',
     reason="Tout ce qui est avancé vient des extraits, et l'absence d'AskFromCodeAction est explicitement constatée plutôt que comblée.",
 ))

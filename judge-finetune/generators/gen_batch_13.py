@@ -324,14 +324,14 @@ add(example(
     thinking='''
 1. Énumération des éléments clés : la requête porte sur `createEmbeddingModel` et sur le repli de DJL vers Ollama. Le contexte donne le nœud de classe `DocumentIngestFactory`, avec le champ `FALLBACK_EMBEDDING_MODEL`, puis la fonction `create(EmbeddingStore<TextSegment>, Project)`, et trois extraits sur `OllamaSettings`, `DefaultJsonCodecFactory` et `OllamaService`.
 2. Vérification point par point : la classe visée est présente et le champ `FALLBACK_EMBEDDING_MODEL` touche directement au sujet du repli, donc la pertinence est acquise. La suffisance ne l'est pas : la fonction demandée, `createEmbeddingModel`, ne figure pas dans le contexte — seule `create(...)`, de signature et de rôle différents, est fournie. Rien ne montre le modèle DJL, ni l'exception qui déclenche le repli, ni le modèle Ollama de remplacement. Le nom du champ **suggère** un repli sans en révéler le mécanisme ; c'est précisément le genre d'indice qui invite à extrapoler. Le bruit reste maîtrisé, les trois extraits hors sujet étant courts et clairement identifiés.
-3. Synthèse : cas limite. Le contexte est authentiquement pertinent et nomme le repli, mais la fonction interrogée en est absente, donc il ne permet pas de répondre. FAIL.
+3. Synthèse : le contexte est authentiquement pertinent et nomme le repli, mais la fonction interrogée en est absente, donc il ne permet pas de répondre. FAIL.
 ''',
     reason="Le champ FALLBACK_EMBEDDING_MODEL évoque le repli, mais createEmbeddingModel est absente : seule create(...) figure au contexte.",
 ))
 
 add(example(
     meta={"id": "b13-007", "famille": "rag-prerequis-lucene", "task": "RAG_CONTEXT_RELEVANCE",
-          "domaine": "rag", "tache": "retrieval", "cas": "parfait", "verbeux": True, "langage": "java"},
+          "domaine": "rag", "tache": "retrieval", "cas": "parfait", "verbeux": False, "langage": "java"},
     task="RAG_CONTEXT_RELEVANCE",
     contexte=CTX_LUCENE_PREREQ,
     requete="How does PrerequisiteService fall back from local DJL embedding to Ollama?",
@@ -495,7 +495,7 @@ Il faudrait relancer la recherche sur le nœud de l'interface elle-même pour ob
     thinking='''
 1. Énumération des éléments clés : le contexte contient `ConversationMessage.assistant(String)`, `LightModelService.handleSuggestion(Editor)`, le nœud `AnAction` et deux `getAuthMode()`.
 2. Vérification point par point : l'inventaire dressé par la sortie correspond exactement aux cinq extraits, sans omission ni ajout. Le constat central — l'absence de l'interface `Assistant` — est vérifiable et exact. L'identification de `ConversationMessage.assistant(String)` comme homonyme trompeur est juste et constitue le point important : c'est le seul extrait susceptible d'induire une réponse fabriquée. La sortie n'énonce aucune méthode de l'interface, donc n'invente rien, et ne déforme aucun extrait. Deux réserves de forme : la réponse est longue au regard de ce qu'elle établit, et elle ne répond pas à la question posée — mais cette seconde réserve n'est pas imputable à la sortie, le contexte ne le permettant pas.
-3. Synthèse : cas limite. La question reste sans réponse, mais tout ce qui est avancé est étayé, l'absence est correctement diagnostiquée et l'homonyme est explicitement écarté. PASS.
+3. Synthèse : la question reste sans réponse, mais tout ce qui est avancé est étayé, l'absence est correctement diagnostiquée et l'homonyme est explicitement écarté. PASS.
 ''',
     reason="Inventaire exact des extraits, absence de l'interface correctement constatée, et homonyme explicitement écarté au lieu d'être exploité.",
 ))
@@ -535,7 +535,7 @@ Ce qu'il ne montre pas : la méthode `createEmbeddingModel` n'est pas dans les e
     thinking='''
 1. Énumération des éléments clés : le contexte donne le nœud de classe avec ses trois annotations et le champ `FALLBACK_EMBEDDING_MODEL`, ainsi que la fonction `create(EmbeddingStore<TextSegment>, Project)` renvoyant `EmbeddingStoreIngestor`, avec un chemin d'appel impliquant `DocumentIndexingPipeline.handleCorruption()`.
 2. Vérification point par point : chaque élément avancé figure dans les extraits, annotations et signature comprises, et le chemin d'appel est repris fidèlement. La lecture du champ est correctement bornée : la sortie dit que le nom atteste l'existence d'un repli, et explicite ensuite que cela ne dit ni la cible ni la condition — c'est exactement la limite de ce qu'autorise une liste de champs. Aucune classe de modèle, aucun type d'erreur, aucun nom de modèle n'est introduit. La délimitation finale est juste et nomme précisément l'absence décisive, celle de `createEmbeddingModel`.
-3. Synthèse : cas limite. La question posée reste sans réponse, mais chaque affirmation est étayée, l'inférence tirée du nom de champ est explicitement bornée, et l'absence décisive est identifiée. PASS.
+3. Synthèse : la question posée reste sans réponse, mais chaque affirmation est étayée, l'inférence tirée du nom de champ est explicitement bornée, et l'absence décisive est identifiée. PASS.
 ''',
     reason="Tout est tiré des extraits, l'inférence sur FALLBACK_EMBEDDING_MODEL est bornée à l'existence d'un repli, et l'absence de createEmbeddingModel est nommée.",
 ))

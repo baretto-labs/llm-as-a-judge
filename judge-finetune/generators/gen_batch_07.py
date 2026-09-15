@@ -407,7 +407,7 @@ On pourrait ajouter une variante annulable renvoyant un jeton, ou une file de pr
     thinking='''
 1. Analyse du code : `queueMicrotask` répond exactement à la contrainte. La distinction entre file de micro-tâches et file de macro-tâches est correctement exposée, et le classement de `setTimeout` parmi les secondes est juste.
 2. Vérification des contraintes : l'ordre annoncé est vérifié par exécution sous Node — la trace obtenue est bien `1 synchrone`, `2 synchrone`, `3 microtâche .then`, `4 queueMicrotask`, `5 setTimeout 0`. L'équivalence d'ordonnancement avec `Promise.resolve().then` est exacte, et la mise en garde sur la famine par récursion de micro-tâches est réelle et pertinente. Aucune dépendance externe n'est utilisée, conformément à la contrainte. Deux écarts mineurs : la demande facultative sur la différence Node contre navigateur n'est pas traitée — l'occasion manquée d'évoquer `process.nextTick`, prioritaire sur les micro-tâches en Node — et la réponse est longue, avec une section « pour aller plus loin » non sollicitée pour une fonction d'une ligne.
-3. Synthèse : cas limite. La solution obligatoire est exacte et vérifiée, les écarts portent sur une demande explicitement facultative et sur la longueur, ce qui ne justifie pas un échec. PASS.
+3. Synthèse : la solution obligatoire est exacte et vérifiée, les écarts portent sur une demande explicitement facultative et sur la longueur, ce qui ne justifie pas un échec. PASS.
 ''',
     exact=True, bugs=True, consignes=True,
     extra_criteres={"aucune_dependance_externe": "La solution n'utilise que les API de la plateforme, comme l'exige la requête."},
@@ -468,7 +468,7 @@ Le double-checked locking est correct en Java **à condition** que le champ soit
     thinking='''
 1. Analyse de l'explication : le contenu technique est exact de bout en bout. La condition posée d'emblée — correct si et seulement si le champ est `volatile` — est la bonne réponse. La décomposition de `new Holder()` en allocation, construction puis affectation est juste, le risque de publication d'une référence vers un objet partiellement construit est réel, et l'attribution de la garantie à la JSR-133 depuis Java 5 est correcte. L'idiome de la classe interne est effectivement l'alternative recommandée, la sûreté venant du chargeur de classes.
 2. Vérification des contraintes : la requête impose « trois points maximum », en précisant l'usage, une fiche de revue de code. La réponse en compte cinq. Ce n'est pas une préférence de style mais une exigence chiffrée et vérifiable, et le livrable demandé n'est pas utilisable tel quel. Le sujet tient d'ailleurs en trois points sans rien perdre d'essentiel : le motif, le rôle de `volatile`, et le signe à chercher en revue.
-3. Synthèse : cas limite. Le fond est exact et directement utile, mais la seule contrainte de forme imposée est dépassée. FAIL.
+3. Synthèse : le fond est exact et directement utile, mais la seule contrainte de forme imposée est dépassée. FAIL.
 ''',
     exact=True, bugs=True, consignes=True,
     extra_criteres={"format_impose": "La sortie respecte la limite de longueur chiffrée fixée par la requête."},
@@ -571,7 +571,7 @@ Deux garde-fous complémentaires : ne réessayez que ce qui est idempotent, sans
     thinking='''
 1. Analyse de l'explication : le diagnostic est exact et bien nommé. Des réessais à intervalle fixe synchronisent effectivement les clients, et le service reçoit des vagues périodiques pendant sa fenêtre de rétablissement.
 2. Vérification des contraintes : les deux corrections sont correctes et, surtout, correctement articulées. Le point souvent manqué est traité explicitement : l'attente exponentielle seule espace les vagues sans les désynchroniser, c'est la gigue qui étale la charge, et le tirage uniforme entre zéro et le plafond courant est bien la forme recommandée. Les deux garde-fous sont justes, la restriction aux opérations idempotentes comme le plafonnement du délai et du nombre de tentatives. En revanche, la demande facultative sur le disjoncteur n'est pas traitée, alors qu'elle complétait naturellement le propos en évitant d'émettre des appels voués à l'échec. La consigne la présentait explicitement comme facultative.
-3. Synthèse : cas limite. La question obligatoire reçoit une réponse exacte et complète, l'unique omission porte sur une demande explicitement facultative. PASS.
+3. Synthèse : la question obligatoire reçoit une réponse exacte et complète, l'unique omission porte sur une demande explicitement facultative. PASS.
 ''',
     exact=True, bugs=True, consignes=True,
     raison="Tempête de réessais correctement expliquée, avec l'articulation exacte entre exponentielle et gigue ; seul le disjoncteur, facultatif, manque.",

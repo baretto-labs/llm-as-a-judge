@@ -350,7 +350,7 @@ Selon votre usage, un `dataclass(slots=True)` donne le même bénéfice avec la 
     thinking='''
 1. Analyse du code : le diagnostic et la correction sont exacts. Le dictionnaire d'instance est bien la source du surcoût, et `__slots__` le remplace par des descripteurs de classe et un emplacement fixe par attribut.
 2. Vérification des contraintes : les chiffres annoncés sont conformes à la mesure. Sur cette machine, une instance avec dictionnaire totalise 344 octets en additionnant l'objet et son `__dict__`, contre 48 octets avec `__slots__`, soit bien un facteur sept, et l'extrapolation à cinq millions d'instances est cohérente. Les trois limitations citées sont exactes : l'ajout d'attribut lève effectivement `AttributeError: 'WithSlots' object has no attribute 'z'`, l'absence de `__dict__` gêne les bibliothèques qui l'inspectent, et une sous-classe sans `__slots__` réintroduit le dictionnaire. Les alternatives proposées sont pertinentes. Le seul écart est la longueur : cinq sections pour une optimisation qui tient en trois lignes, avec une section « alternatives » non demandée.
-3. Synthèse : cas limite. L'optimisation demandée est correcte, mesurée et accompagnée de ses vraies limitations ; seule la verbosité dépasse le nécessaire, ce qui ne justifie pas un échec. PASS.
+3. Synthèse : l'optimisation demandée est correcte, mesurée et accompagnée de ses vraies limitations ; seule la verbosité dépasse le nécessaire, ce qui ne justifie pas un échec. PASS.
 ''',
     exact=True, bugs=True, consignes=True,
     raison="Optimisation correcte, chiffres conformes à la mesure (344 contre 48 octets) et limitations exactes ; seule la longueur est excessive.",
@@ -479,7 +479,7 @@ En pratique, deux atténuations valent mieux qu'un débat sur le numéro :
     thinking='''
 1. Analyse de l'explication : la réponse est exacte. La spécification du versionnage sémantique fait bien de la compatibilité ascendante le critère, et non la nature ou l'intention du changement : une correction qui modifie le comportement observable d'une API publique est une rupture et appelle un incrément majeur.
 2. Vérification des contraintes : le raisonnement est correctement conduit et les deux atténuations proposées sont des pratiques courantes et pertinentes, en particulier la livraison derrière une option pour étaler la migration. La question principale reçoit une réponse nette dès la première ligne, ce qui convient à la forme de la demande. En revanche, la partie sur les versions `0.x` n'est pas traitée du tout, alors qu'elle est intéressante ici, puisque la spécification y suspend justement ces garanties. La consigne la présentait explicitement comme facultative.
-3. Synthèse : cas limite. La question obligatoire reçoit une réponse exacte et bien argumentée, l'unique omission porte sur une demande explicitement facultative. PASS.
+3. Synthèse : la question obligatoire reçoit une réponse exacte et bien argumentée, l'unique omission porte sur une demande explicitement facultative. PASS.
 ''',
     exact=True, bugs=True, consignes=True,
     raison="Réponse exacte sur le critère de compatibilité ; seule la mention des versions 0.x, explicitement facultative, manque.",
@@ -557,7 +557,7 @@ Cela dit, pour une page d'accueil, je recommanderais plutôt de sortir de Postgr
     thinking='''
 1. Analyse de l'explication : les deux premiers paragraphes sont exacts et bien ordonnés. Mesurer avant de dénormaliser, vérifier le plan d'exécution et les index d'abord, puis assumer le coût de maintien de la cohérence en cas de duplication : c'est le raisonnement attendu, et la mention de la fenêtre d'incohérence est juste.
 2. Vérification des contraintes : le dernier paragraphe sort du périmètre explicitement fixé. La consigne interdisait sans ambiguïté de proposer une solution NoSQL ou un changement de moteur, en précisant même que c'était hors périmètre pour l'étude en cours. La réponse recommande pourtant Redis, puis MongoDB, et en fait sa recommandation principale, celle qui commence par « je recommanderais plutôt ». Ce n'est pas une digression marginale : c'est la conclusion du texte, et elle rend le livrable inutilisable tel quel pour l'étude demandée. Le contenu technique de ce paragraphe n'est pas faux en soi, mais la question posée était de trancher sur la dénormalisation dans PostgreSQL.
-3. Synthèse : cas limite. Le raisonnement sur la dénormalisation est correct, mais la recommandation finale viole une contrainte de périmètre explicite et non ambiguë. FAIL.
+3. Synthèse : le raisonnement sur la dénormalisation est correct, mais la recommandation finale viole une contrainte de périmètre explicite et non ambiguë. FAIL.
 ''',
     exact=True, bugs=True, consignes=True,
     extra_criteres={"perimetre_respecte": "La réponse reste dans le périmètre technique fixé par la requête, sans proposer d'outil exclu."},

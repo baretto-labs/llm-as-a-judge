@@ -371,7 +371,7 @@ Envelopper le paramètre dans un `Optional` rend l'absence explicite dans la sig
     thinking='''
 1. Analyse du code : la logique de repli est correcte, `orElseGet(List::of)` fournissant bien une liste vide dont la somme vaut zéro, et le style est défendable dans l'absolu.
 2. Vérification des contraintes : la requête pose une contrainte explicite et motivée — signature publique figée, applications tierces déjà compilées. Or changer le type du paramètre de `List<Integer>` à `Optional<List<Integer>>` casse à la fois la compatibilité **source**, tout appel existant cessant de compiler, et la compatibilité **binaire**, la signature de la méthode faisant partie de sa référence dans le bytecode appelant : les applications tierces échoueraient à l'exécution sur un `NoSuchMethodError`. Le conseil de rendre l'absence explicite est par ailleurs contraire à l'usage recommandé d'`Optional`, prévu pour les valeurs de retour plutôt que pour les paramètres. La correction attendue tient dans le corps de la méthode, sans toucher à la signature : `if (valeurs == null) return 0;`, ou `Objects.requireNonNullElse(valeurs, List.of())`.
-3. Synthèse : cas limite. Le comportement demandé est bien obtenu, mais au prix d'une rupture de compatibilité que la requête interdisait explicitement, alors qu'une correction interne suffisait. FAIL.
+3. Synthèse : le comportement demandé est bien obtenu, mais au prix d'une rupture de compatibilité que la requête interdisait explicitement, alors qu'une correction interne suffisait. FAIL.
 ''',
     exact=True, bugs=True, consignes=True,
     extra_criteres={"signature_publique_inchangee": "La signature publique de la méthode est inchangée, comme l'exige la requête."},
@@ -485,7 +485,7 @@ La trace d'une exception embarque souvent les arguments de la méthode, et les o
     thinking='''
 1. Analyse de l'explication : le contenu est exact et bien hiérarchisé. Les trois catégories citées sont les bonnes, l'observation sur l'audience plus large des journaux que de la base est juste, et le rappel qu'un journal contenant des données personnelles constitue lui-même un traitement est correct.
 2. Vérification des contraintes : les trois dispositifs proposés sont pertinents et opérationnels, en particulier le test automatisé, qui est effectivement le seul à ne pas dépendre de la vigilance individuelle. Le piège des traces d'exception et de `toString` est réel et rarement mentionné. Le périmètre imposé est scrupuleusement respecté : ni chiffrement de la base ni sauvegardes ne sont abordés, alors que le sujet y conduisait naturellement. En revanche, la demande facultative sur la durée de rétention n'est pas traitée. La réponse est par ailleurs longue, avec un niveau de détail que la question n'exigeait pas.
-3. Synthèse : cas limite. Tout l'obligatoire est exact et la contrainte de périmètre est respectée ; l'omission porte sur une demande explicitement facultative et la verbosité seule ne justifie pas un échec. PASS.
+3. Synthèse : tout l'obligatoire est exact et la contrainte de périmètre est respectée ; l'omission porte sur une demande explicitement facultative et la verbosité seule ne justifie pas un échec. PASS.
 ''',
     exact=True, bugs=True, consignes=True,
     extra_criteres={"perimetre_respecte": "La réponse reste dans le périmètre fixé par la requête, sans aborder les sujets explicitement exclus."},
@@ -552,7 +552,7 @@ En espérant que cela vous aide dans votre migration.
     thinking='''
 1. Analyse de l'explication : le contenu technique est exact. La mise en cache à plusieurs niveaux de la chaîne de résolution est correctement décrite, le fait que la durée de vie publiée ne soit pas toujours honorée est réel, la précaution sur le cache de résolution de la JVM est pertinente, et surveiller le trafic résiduel est effectivement le seul signal fiable de fin de bascule. Les quatre lignes du tableau sont justes et bien appariées.
 2. Vérification des contraintes : la requête impose un format sans ambiguïté — un tableau à deux colonnes, précaution et raison, **rien d'autre**. La réponse fait précéder le tableau de quatre paragraphes d'explication et le fait suivre d'une formule de politesse. Le tableau lui-même est conforme, mais l'exigence portait sur la totalité de la sortie, et le livrable n'est pas utilisable tel quel. Le contenu des paragraphes préliminaires est d'ailleurs largement redondant avec les raisons figurant dans le tableau, ce qui montre que la contrainte était tenable.
-3. Synthèse : cas limite. Le fond est exact et les précautions sont les bonnes, mais la seule contrainte de forme imposée, explicite et vérifiable, n'est pas respectée. FAIL.
+3. Synthèse : le fond est exact et les précautions sont les bonnes, mais la seule contrainte de forme imposée, explicite et vérifiable, n'est pas respectée. FAIL.
 ''',
     exact=True, bugs=True, consignes=True,
     extra_criteres={"format_impose": "La sortie respecte exactement le format imposé par la requête, sans contenu supplémentaire."},

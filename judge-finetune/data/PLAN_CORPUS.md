@@ -42,9 +42,19 @@ répartissent exactement en 90 `code` et 60 `theorie` ; les 50 exemples RAG en 2
 Les contextes réellement récupérés qui servent de matière sont versionnés dans
 `verification/contexts/` : ce sont eux qui rendent les étiquettes vérifiables par un tiers.
 
-État final mesuré sur les 200 exemples : 80 `parfait` / 80 `defaillant` / 40 `limite`, soit 40 / 40 / 20 %
-au point près ; 105 PASS pour 95 FAIL ; 25 cas verbeux à défaut caché (12,5 %, le protocole en exige 10 %)
-et 15 verbeux corrects en contrôle. Toutes les cibles du tableau ci-dessus sont atteintes exactement.
+État mesuré sur les 200 exemples : 80 `parfait` / 80 `defaillant` / 40 `limite`, soit 40 / 40 / 20 % au
+point près ; 105 PASS pour 95 FAIL ; 25 cas verbeux à défaut caché (12,5 %, le protocole en exige 10 %)
+et **13** verbeux corrects en contrôle — **sous la cible de 15**.
+
+⚠️ Ces compteurs décrivent la **composition**, pas ce que le corpus enseigne. L'audit du 2026-09-15
+(`../AUDIT.md`) montre que toutes ces cibles pouvaient être atteintes tout en apprenant au juge un raccourci
+de surface : la longueur du contenu évalué prédit le verdict à 75 % sur `CODE_ANALYSIS` et 84 % sur
+`RAG_FAITHFULNESS`. Une reprise ciblée est en cours ; ne pas lancer d'entraînement avant sa fin.
+
+Le compte de 13 verbeux corrects vient de cet audit : `b13-007` et `b14-008` étaient étiquetés `verbeux`
+alors que leur sortie évaluée est le placeholder constant de 126 caractères — la verbosité était dans le
+contexte, pas dans la sortie. Le compte annoncé de 15 était donc faux depuis l'origine, et non dégradé par
+la correction.
 
 La compensation sur les cas a été répartie au fil des lots RAG, le solde tombant sur le dernier lot ; le
 détail du calcul est conservé dans la table « Composition imposée du batch_14 » plus bas.

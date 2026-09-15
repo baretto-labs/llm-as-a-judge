@@ -203,7 +203,7 @@ Deux points sur les exigences.
     thinking='''
 1. Analyse du code : la classe répond aux deux exigences obligatoires. Vérifié par exécution : une dataclass gelée est hachable, son égalité porte sur les valeurs, et l'affectation d'un attribut lève `FrozenInstanceError: cannot assign to field 'port'`.
 2. Vérification des contraintes : le point le plus fin est correctement traité. L'immuabilité déclarée ne suffit pas à rendre l'instance hachable si un champ contient une structure mutable, d'où le choix du `tuple` — l'explication est exacte et c'est précisément le piège de ce genre de classe. Le contraste avec une dataclass non gelée est cohérent avec la mesure, son `__hash__` étant mis à `None` dès que l'égalité est générée. En revanche, la demande facultative sur la validation du port n'est pas traitée : rien n'empêche un port hors plage, alors qu'un `__post_init__` s'en serait chargé en trois lignes. La consigne la présentait explicitement comme facultative.
-3. Synthèse : cas limite. Les deux exigences obligatoires sont satisfaites et correctement justifiées, l'unique omission porte sur une demande explicitement facultative. PASS.
+3. Synthèse : les deux exigences obligatoires sont satisfaites et correctement justifiées, l'unique omission porte sur une demande explicitement facultative. PASS.
 ''',
     exact=True, bugs=True, consignes=True,
     raison="Immuabilité et hachabilité correctes, avec le tuple justement justifié ; seule la validation du port, facultative, manque.",
@@ -463,7 +463,7 @@ Le découpage lui-même n'est pas fiable à cent pour cent — particules, noms 
     thinking='''
 1. Analyse de l'explication : la méthode est exacte et complète. L'ordre des cinq étapes est le bon, et surtout chaque étape maintient la compatibilité entre le schéma et les versions de code susceptibles de coexister pendant un déploiement progressif, ce qui est la condition même de l'absence d'interruption.
 2. Vérification des contraintes : les justifications techniques sont justes. L'ajout d'une colonne nullable est effectivement une opération de catalogue sur les moteurs courants, le remplissage par lots évite de tenir des verrous prolongés sur une table sollicitée, et l'étape de bascule des lectures est bien le point réversible puisque la double écriture maintient l'ancienne colonne à jour. La contrainte principale, aucune interruption, est respectée de bout en bout. Le point de vigilance sur le découpage des noms est pertinent et souvent oublié. En revanche, la demande facultative sur le retour arrière n'est traitée qu'incidemment, à l'étape 4, sans jamais aborder le cas plus délicat du retour après contraction. La consigne la présentait explicitement comme facultative.
-3. Synthèse : cas limite. La contrainte obligatoire est pleinement satisfaite et la méthode est exacte, l'omission ne porte que sur une demande facultative, et la verbosité seule ne justifie pas un échec. PASS.
+3. Synthèse : la contrainte obligatoire est pleinement satisfaite et la méthode est exacte, l'omission ne porte que sur une demande facultative, et la verbosité seule ne justifie pas un échec. PASS.
 ''',
     exact=True, bugs=True, consignes=True,
     extra_criteres={"contrainte_disponibilite": "La procédure proposée n'implique aucune interruption de service, conformément à la requête."},
@@ -530,7 +530,7 @@ Le troisième est l'inscription sur la liste de préchargement des navigateurs, 
     thinking='''
 1. Analyse de l'explication : le contenu technique est exact. La description du mécanisme est juste, y compris la suppression de la fenêtre de redirection initiale, qui est l'intérêt réel de l'en-tête. Les trois pièges cités sont réels et bien choisis : la durée mémorisée et non révocable à distance, l'extension aux sous-domaines oubliés, et le caractère durable de l'inscription sur la liste de préchargement.
 2. Vérification des contraintes : la requête impose un format sans ambiguïté — prose uniquement, aucun bloc de code ni exemple d'en-tête — en précisant la raison, le document cible n'en acceptant pas. La réponse insère pourtant un bloc de code contenant exactement l'exemple d'en-tête proscrit. Ce n'est pas un détail de style : le livrable n'est pas intégrable tel quel dans le document visé, et l'information qu'il porte était par ailleurs exprimable en prose, la suite du texte le démontrant en décrivant la durée et la directive de sous-domaines sans les citer.
-3. Synthèse : cas limite. Le fond est exact et les pièges pertinents, mais la seule contrainte de forme imposée, explicite et vérifiable, est enfreinte. FAIL.
+3. Synthèse : le fond est exact et les pièges pertinents, mais la seule contrainte de forme imposée, explicite et vérifiable, est enfreinte. FAIL.
 ''',
     exact=True, bugs=True, consignes=True,
     extra_criteres={"format_impose": "La sortie respecte exactement le format imposé par la requête, sans contenu proscrit."},

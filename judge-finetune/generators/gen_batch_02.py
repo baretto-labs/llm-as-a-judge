@@ -329,7 +329,7 @@ On pourrait accepter les décimales, tolérer les espaces, ou valider que les un
     thinking='''
 1. Analyse du code : l'expression régulière capture les paires nombre/unité et la somme pondérée est juste. Vérifié par exécution : `'1h30m'` donne 5400, `'45s'` donne 45, `'2h'` donne 7200. La vérification par reconstruction fait son travail : `'1h 30m'`, `'1h!!'`, `'abc'`, `''` et une entrée non textuelle lèvent bien `ValueError`, alors qu'un simple `findall` aurait accepté les trois premiers en silence. L'explication de ce mécanisme est exacte.
 2. Vérification des contraintes : les exigences obligatoires sont satisfaites, à savoir la conversion, la levée de `ValueError` sur entrée invalide et l'absence de dépendance externe. Deux écarts mineurs : les jours ne sont pas gérés, mais la consigne les présentait comme facultatifs (« si tu as le temps »), et `'2d'` lève proprement `ValueError` plutôt que de produire un résultat faux ; par ailleurs la réponse est verbeuse, avec une section « pour aller plus loin » non demandée.
-3. Synthèse : cas limite. Tout l'obligatoire est correct et vérifié, les écarts portent sur une consigne facultative et sur le style. La verbosité ne doit pas faire échouer une réponse juste. PASS.
+3. Synthèse : tout l'obligatoire est correct et vérifié, les écarts portent sur une consigne facultative et sur le style. La verbosité ne doit pas faire échouer une réponse juste. PASS.
 ''',
     exact=True, bugs=True, consignes=True,
     extra_criteres={"aucune_dependance_externe": "La solution n'utilise que la bibliothèque standard, comme l'exige la requête."},
@@ -366,7 +366,7 @@ La logique est identique, j'ai simplement préféré renvoyer `null` plutôt qu'
     thinking='''
 1. Analyse du code : la logique de sélection est correcte. `isBlank()` couvre bien la chaîne vide et les chaînes composées d'espaces, le `null` de la liste est écarté avant l'appel, et le parcours renvoie le premier élément valide. Vérifié par exécution sur une liste `[null, "  ", "", "premier", "second"]` : la valeur retournée est `"premier"`.
 2. Vérification des contraintes : la signature imposée n'est pas respectée. La consigne exigeait **exactement** `Optional<String>` comme type de retour, la réponse renvoie `String` et signale l'absence de valeur par `null`. Ce n'est pas un détail de style : tout appelant écrit contre l'API demandée ne compile pas, et la sentinelle `null` réintroduit précisément le risque que `Optional` sert à écarter. La justification par l'allocation évitée ne tient pas face à une exigence explicite.
-3. Synthèse : cas limite. Le code est juste et sans bug, mais une consigne obligatoire et non ambiguë est ignorée, ce qui suffit à faire échouer la réponse. FAIL.
+3. Synthèse : le code est juste et sans bug, mais une consigne obligatoire et non ambiguë est ignorée, ce qui suffit à faire échouer la réponse. FAIL.
 ''',
     exact=True, bugs=True, consignes=True,
     extra_criteres={"signature_conforme": "La signature est exactement celle imposée par la requête, type de retour compris."},
@@ -518,7 +518,7 @@ Dans PostgreSQL, quelle est la différence entre un index B-tree et un index has
     thinking='''
 1. Analyse de l'explication : les faits sont exacts. Le B-tree est ordonné et couvre égalité, comparaisons, tris et préfixes ; l'index hash ne gère que l'égalité stricte. La précision historique est juste : les index hash ne sont journalisés dans le WAL, donc sûrs en cas d'incident et répliqués, que depuis PostgreSQL 10.
 2. Vérification des contraintes : la question principale reçoit une réponse claire et correctement justifiée, le B-tree, parce que seul l'ordre permet de traiter un prédicat de plage. La consigne facultative sur les index partiels (« si tu as le temps ») n'est en revanche pas traitée du tout, sans même une mention. La réponse est par ailleurs concise et n'appelle aucune réserve de forme.
-3. Synthèse : cas limite. Tout l'obligatoire est exact et complet, l'omission ne porte que sur une demande explicitement présentée comme facultative, ce qui ne justifie pas un échec. PASS.
+3. Synthèse : tout l'obligatoire est exact et complet, l'omission ne porte que sur une demande explicitement présentée comme facultative, ce qui ne justifie pas un échec. PASS.
 ''',
     exact=True, bugs=True, consignes=True,
     raison="Comparaison exacte et choix du B-tree correctement justifié ; seule la partie explicitement facultative sur les index partiels manque.",

@@ -229,7 +229,7 @@ Si vous générez beaucoup de lignes, pensez à pré-dimensionner le tampon avec
     thinking='''
 1. Analyse du code : le diagnostic et la correction sont exacts. L'immuabilité des `String` rend la concaténation en boucle quadratique, `StringBuilder` la ramène à un coût amorti linéaire par doublement du tampon, et la remarque sur l'optimisation du compilateur, valable pour une concaténation isolée mais pas à travers une boucle, est correcte. Vérifié par exécution sur 20 000 itérations : 15 ms pour la version `+=` contre moins d'une milliseconde pour `StringBuilder`, ce qui correspond bien à l'ordre de grandeur annoncé.
 2. Vérification des contraintes : la version proposée préserve exactement le comportement d'origine, séparateur final compris. La réponse signale d'ailleurs d'elle-même que `String.join` n'est pas équivalent sur ce point précis, ce qui évite un piège réel. Deux écarts mineurs : la réponse est nettement plus longue que ce qu'appelait la demande, avec une variante Stream et une section « autres pistes » non sollicitées. Rien de faux, rien qui masque le correctif.
-3. Synthèse : cas limite. L'optimisation demandée est correcte, mesurée et sans changement de comportement ; seule la longueur dépasse le nécessaire, ce qui ne justifie pas un échec. PASS.
+3. Synthèse : l'optimisation demandée est correcte, mesurée et sans changement de comportement ; seule la longueur dépasse le nécessaire, ce qui ne justifie pas un échec. PASS.
 ''',
     exact=True, bugs=True, consignes=True,
     raison="Optimisation correcte et mesurée, comportement préservé y compris le séparateur final ; seule la verbosité est excessive.",
@@ -494,7 +494,7 @@ Les trois premières lignes montrent que `==` n'est même pas transitif : `""` �
     thinking='''
 1. Analyse de l'explication : la distinction est exacte et les six résultats cités sont conformes. Vérifié par exécution : `"" == 0` et `"0" == 0` renvoient `true`, `"" == "0"` renvoie `false`, `null == undefined` renvoie `true`, `null == 0` renvoie `false`, et `[] == false` renvoie `true`.
 2. Vérification des contraintes : l'observation sur la non-transitivité est correctement construite à partir des trois premiers cas, et c'est l'argument le plus parlant contre `==`. La règle pratique proposée est celle recommandée par les guides de style courants, et l'exception `x == null` est correctement justifiée : `null` et `undefined` ne sont mutuellement égaux qu'entre eux avec `==`. Les deux demandes obligatoires, la différence et la règle pratique, sont satisfaites. En revanche, `Object.is` n'est pas mentionné du tout, alors que la consigne le demandait — mais en le présentant explicitement comme facultatif (« si tu as le temps »).
-3. Synthèse : cas limite. Tout l'obligatoire est exact et vérifié, l'unique omission porte sur une demande explicitement facultative, ce qui ne justifie pas un échec. PASS.
+3. Synthèse : tout l'obligatoire est exact et vérifié, l'unique omission porte sur une demande explicitement facultative, ce qui ne justifie pas un échec. PASS.
 ''',
     exact=True, bugs=True, consignes=True,
     raison="Distinction exacte et six résultats de coercition vérifiés ; seule la mention d'Object.is, explicitement facultative, manque.",
@@ -586,7 +586,7 @@ Réservez le pessimiste aux cas où un conflit coûte cher à rejouer, par exemp
     thinking='''
 1. Analyse de l'explication : le contenu technique est exact. Le verrou pessimiste posé dès la lecture avec `SELECT ... FOR UPDATE`, la sérialisation des accès et le risque d'interblocage, le contrôle de version en optimiste avec le `UPDATE ... WHERE version = ?` qui affecte zéro ligne en cas de conflit : tout est correct, y compris la requête donnée en exemple. La recommandation finale est cohérente avec le contexte décrit, et l'argument sur les verrous tenus pendant le temps de réflexion humain est le bon.
 2. Vérification des contraintes : la consigne impose explicitement 5 lignes maximum, en précisant l'usage, une note interne au format court. La réponse fait plus de vingt lignes, avec trois sections et un bloc de code. Ce n'est pas une préférence de style : c'est une exigence de format chiffrée et vérifiable, et le livrable demandé n'est pas utilisable tel quel. Le sujet se traite pourtant en cinq lignes, la matière essentielle tenant en une définition par mécanisme et une recommandation.
-3. Synthèse : cas limite. Le fond est juste et la recommandation pertinente, mais la seule contrainte de forme imposée, chiffrée et non ambiguë, est dépassée d'un facteur quatre. FAIL.
+3. Synthèse : le fond est juste et la recommandation pertinente, mais la seule contrainte de forme imposée, chiffrée et non ambiguë, est dépassée d'un facteur quatre. FAIL.
 ''',
     exact=True, bugs=True, consignes=True,
     extra_criteres={"format_impose": "La sortie respecte la limite de longueur chiffrée fixée par la requête."},

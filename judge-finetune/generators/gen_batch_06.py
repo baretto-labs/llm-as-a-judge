@@ -358,7 +358,7 @@ Sans `structuredClone`, il reste `lodash.cloneDeep` ou une fonction récursive m
     thinking='''
 1. Analyse du code : la solution proposée est la bonne et tient en une ligne. Vérifié par exécution sous Node 22 : `structuredClone` préserve bien l'instance `Date` avec sa valeur `2026-03-01T12:00:00.000Z`, et la copie est réellement profonde, une mutation du tableau imbriqué du clone laissant la source inchangée.
 2. Vérification des contraintes : les cinq pertes attribuées à l'aller-retour JSON sont toutes vérifiées : la `Date` revient en chaîne, `NaN` devient `null`, la clé de valeur `undefined` disparaît, un `BigInt` lève une `TypeError` avec le message « Do not know how to serialize a BigInt », et une référence circulaire lève également une `TypeError`. Les limites énoncées sur `structuredClone` sont exactes, notamment la perte de la chaîne de prototypes et l'échec sur les fonctions. La demande facultative sur les `Map` n'est en revanche pas traitée, alors qu'elle aurait été favorable à la réponse, l'algorithme les prenant en charge. Écart secondaire : la réponse est longue pour une question dont la solution tient en une ligne.
-3. Synthèse : cas limite. La réponse obligatoire est exacte, vérifiée et bien argumentée ; l'omission porte sur une demande explicitement facultative, et la verbosité seule ne justifie pas un échec. PASS.
+3. Synthèse : la réponse obligatoire est exacte, vérifiée et bien argumentée ; l'omission porte sur une demande explicitement facultative, et la verbosité seule ne justifie pas un échec. PASS.
 ''',
     exact=True, bugs=True, consignes=True,
     extra_criteres={"aucune_dependance_externe": "La solution n'utilise que les API de la plateforme, comme l'exige la requête."},
@@ -481,7 +481,7 @@ Un point à connaître avec SSE en HTTP/1.1 : chaque flux occupe une connexion, 
     thinking='''
 1. Analyse de l'explication : les faits avancés sont exacts. Les *Server-Sent Events* reposent sur une réponse HTTP maintenue ouverte, la reconnexion automatique et l'identifiant de dernier événement font bien partie de la spécification, `EventSource` est l'API navigateur correspondante, et l'absence de support binaire natif est correcte. Le critère de choix proposé, le sens et la fréquence des échanges, est le bon.
 2. Vérification des contraintes : la limite de connexions par domaine en HTTP/1.1 et sa disparition avec le multiplexage HTTP/2 sont exactes, et c'est un piège réel en production. La recommandation répond directement à la question posée. En revanche, la demande facultative sur le passage à l'échelle derrière un répartiteur de charge n'est pas traitée : rien n'est dit sur l'affinité de session, la diffusion d'un événement à des instances multiples ou le recours à un bus de messages. La consigne la présentait explicitement comme facultative.
-3. Synthèse : cas limite. La question obligatoire reçoit une réponse exacte et bien argumentée, l'unique omission porte sur une demande explicitement facultative. PASS.
+3. Synthèse : la question obligatoire reçoit une réponse exacte et bien argumentée, l'unique omission porte sur une demande explicitement facultative. PASS.
 ''',
     exact=True, bugs=True, consignes=True,
     raison="Choix SSE correctement argumenté et faits exacts ; seule la partie facultative sur le passage à l'échelle manque.",
@@ -538,7 +538,7 @@ La coupure se limite à quelques secondes, ce qui reste acceptable pour une opé
     thinking='''
 1. Analyse de l'explication : la partie technique initiale est exacte. `ALTER TABLE ... RENAME COLUMN` modifie effectivement le catalogue sans réécrire les lignes, l'opération est quasi instantanée, et l'analyse du problème réel, l'absence de coexistence des deux noms pendant un déploiement continu, est correcte et bien vue.
 2. Vérification des contraintes : la marche à suivre viole frontalement la contrainte posée. La consigne exclut explicitement toute fenêtre de maintenance et toute interruption, en précisant que c'est la contrainte principale et que l'application est déployée en continu. La réponse propose une fenêtre nocturne, l'arrêt des instances, puis une remise en trafic, et conclut en qualifiant la coupure d'acceptable. Ce n'est pas un écart de forme : c'est la question posée qui reste sans réponse. La solution attendue est la migration par expansion et contraction, à savoir ajouter la nouvelle colonne, la synchroniser par déclencheur ou double écriture applicative, remplir l'historique par lots, basculer les lectures une fois les deux colonnes cohérentes, puis supprimer l'ancienne colonne une fois toutes les instances migrées.
-3. Synthèse : cas limite. Le contenu technique est exact et l'analyse du problème pertinente, mais la procédure proposée contredit la seule contrainte imposée, ce qui rend la réponse inutilisable. FAIL.
+3. Synthèse : le contenu technique est exact et l'analyse du problème pertinente, mais la procédure proposée contredit la seule contrainte imposée, ce qui rend la réponse inutilisable. FAIL.
 ''',
     exact=True, bugs=True, consignes=True,
     extra_criteres={"contrainte_disponibilite": "La procédure proposée n'implique aucune interruption de service, conformément à la requête."},

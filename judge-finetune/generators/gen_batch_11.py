@@ -365,7 +365,7 @@ Un identifiant devrait être normalisé et replié une fois, à l'entrée, puis 
     thinking='''
 1. Analyse de l'explication : les deux problèmes sont correctement distingués, et chacun est exact. La dépendance de la mise en minuscules à la locale est réelle, et l'exemple turc est le cas d'école.
 2. Vérification des contraintes : les affirmations chiffrables sont vérifiées. Le pliage de casse replie bien `ß` vers `ss` là où la mise en minuscules ne le fait pas — mesuré, `'ß'.casefold() == 'ss'` est vrai alors que `'ß'.lower() == 'ss'` est faux. Le cas turc est confirmé dans les deux langages : `'ADMİN'` mis en minuscules ne vaut pas `'admin'`. Les deux formes de représentation sont également mesurées : composée et décomposée ne sont pas égales, leurs longueurs valent respectivement 1 et 2, et l'égalité est rétablie après normalisation commune. L'ordre des opérations recommandé est correct. En revanche, la demande facultative sur les identifiants réservés n'est pas traitée, alors qu'elle prolongeait naturellement le propos. La réponse est par ailleurs longue, avec cinq sections pour un sujet qui en appelait deux.
-3. Synthèse : cas limite. L'obligatoire est exact et vérifié, l'omission porte sur une demande explicitement facultative, et la verbosité seule ne justifie pas un échec. PASS.
+3. Synthèse : l'obligatoire est exact et vérifié, l'omission porte sur une demande explicitement facultative, et la verbosité seule ne justifie pas un échec. PASS.
 ''',
     exact=True, bugs=True, consignes=True,
     raison="Casse et normalisation exactement distinguées et vérifiées ; seuls les identifiants réservés, facultatifs, manquent.",
@@ -390,7 +390,7 @@ Retenez qu'il faut choisir selon la question posée : « combien de temps s'est-
     thinking='''
 1. Analyse de l'explication : le contenu est exact. La distinction entre durée physique et écart d'horloge est la bonne réponse, et l'exemple du changement d'heure l'illustre correctement. La mesure confirme l'écart annoncé : entre le 28 mars 23:00 et le 29 mars 04:00 à Paris, l'écart calculé en heures vaut 4 alors que la différence des heures affichées vaut 5.
 2. Vérification des contraintes : la requête impose deux phrases, en précisant l'usage, une infobulle. La réponse en compte huit, réparties en quatre paragraphes. Ce n'est pas une préférence de style : c'est une contrainte chiffrée et vérifiable, et le texte produit ne tient pas dans le support visé. Le sujet était pourtant traitable dans la limite, les deux premières phrases suffisant presque à elles seules. À noter par ailleurs une imprécision mineure dans le détail Java : `Duration` s'applique aussi à des objets datés avec fuseau, et c'est bien l'unité employée qui détermine le raisonnement — mais cette nuance ne change pas le fond de la réponse.
-3. Synthèse : cas limite. L'explication est juste et vérifiée, mais la seule contrainte de forme imposée est dépassée d'un facteur quatre. FAIL.
+3. Synthèse : l'explication est juste et vérifiée, mais la seule contrainte de forme imposée est dépassée d'un facteur quatre. FAIL.
 ''',
     exact=True, bugs=True, consignes=True,
     extra_criteres={"format_impose": "La sortie respecte la limite de longueur chiffrée fixée par la requête."},

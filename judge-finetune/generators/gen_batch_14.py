@@ -291,7 +291,7 @@ add(example(
     thinking='''
 1. Énumération des éléments clés : la requête porte sur le couple `FileCreator` et `FileApprovalNotifier`. Le contexte fournit `Consumer<FileApprovalNotifier.ApprovalDecision>`, la fonction `ToolApprovalHelper.requestApproval(String, String, String)` renvoyant une `ApprovalDecision`, `ApprovalTimeoutException`, la case à cocher `getAutoApproveFileCreationCheckbox()` et `ConversationMessage.user(String)`.
 2. Vérification point par point : le mécanisme d'approbation est largement couvert — le type de décision, la fonction qui la demande avec ses trois paramètres dont le chemin et le contenu, l'exception de délai dépassé, et jusqu'au réglage d'approbation automatique. La pertinence est donc forte. Mais `FileCreator` **n'apparaît dans aucun extrait**, et la fonction `requestApproval` fournie appartient à `ToolApprovalHelper`, une autre classe. Le contexte montre donc comment une approbation est demandée dans le projet, sans établir que `FileCreator` passe par ce chemin ni comment. La requête portant explicitement sur cette classe, la suffisance n'est pas atteinte. Le bruit reste faible et thématiquement cohérent.
-3. Synthèse : cas limite. Le contexte est riche et directement sur le sujet de l'approbation, mais la classe interrogée en est absente, et l'attribuer serait une inférence. FAIL.
+3. Synthèse : le contexte est riche et directement sur le sujet de l'approbation, mais la classe interrogée en est absente, et l'attribuer serait une inférence. FAIL.
 ''',
     reason="Le mécanisme d'approbation est bien couvert, mais FileCreator est absent : requestApproval y appartient à ToolApprovalHelper.",
 ))
@@ -343,7 +343,7 @@ add(example(
 
 add(example(
     meta={"id": "b14-008", "famille": "rag-combinaison-sources-lucene-verbeux", "task": "RAG_CONTEXT_RELEVANCE",
-          "domaine": "rag", "tache": "retrieval", "cas": "parfait", "verbeux": True, "langage": "java"},
+          "domaine": "rag", "tache": "retrieval", "cas": "parfait", "verbeux": False, "langage": "java"},
     task="RAG_CONTEXT_RELEVANCE", contexte=CTX_LUCENE_COMBINE,
     requete="Is DuckDuckGo search integrated into the context retrieval, and through which class?",
     reponse=SORTIE_RELEVANCE,
@@ -381,7 +381,7 @@ add(example(
     thinking='''
 1. Énumération des éléments clés : la requête est étroite — `ToolCallDetector` détient-il plusieurs parseurs ? Le contexte fournit le nœud de classe `ToolCallDetector`, dont l'unique champ listé est `parsers`, ainsi que le type `java.util.List<fr.baretto.ollamassist.chat.tools.ToolCallParser>`.
 2. Vérification point par point : la classe visée est présente, donc le contexte est pertinent. Sur la suffisance, la question appelle une réponse simple, et les deux extraits la portent : le champ au pluriel et la présence, dans le même contexte, du type liste paramétré par `ToolCallParser` établissent que le détecteur en détient une collection. C'est assez pour répondre à cette question précise, là où la question plus large des implémentations resterait, elle, sans réponse. En revanche le bruit n'est pas maîtrisé : trois extraits sur cinq — un panneau Swing, une aide à l'approbation, une méthode d'affichage — n'ont de rapport que le préfixe `Tool`, et l'information utile tient dans deux lignes noyées au milieu.
-3. Synthèse : cas limite. Le contexte répond à la question posée, mais la majorité de son volume est hors sujet. FAIL.
+3. Synthèse : le contexte répond à la question posée, mais la majorité de son volume est hors sujet. FAIL.
 ''',
     reason="Le champ parsers et le type List<ToolCallParser> répondent à la question, mais trois extraits sur cinq ne tiennent qu'au préfixe Tool.",
 ))
@@ -558,7 +558,7 @@ La valeur de `BATCH_SIZE` n'est pas visible : la constante est utilisée, jamais
     thinking='''
 1. Énumération des éléments clés : le contexte fournit le corps de `processBatch` jusqu'à sa troncature, avec la garde d'entrée, le phaser, le verrou, l'allocation et le drainage.
 2. Vérification point par point : les quatre étapes énumérées correspondent ligne à ligne au corps fourni, et les identifiants cités sont exacts, y compris la forme de l'appel `drainTo`. La formulation « au plus `BATCH_SIZE` éléments » est fidèle à la sémantique de `drainTo` sans rien ajouter. Les deux réserves finales sont justes et précises : la constante est effectivement utilisée sans être déclarée, et la troncature est signalée au point exact où elle survient, ce qui délimite correctement ce qui reste inobservable. Aucune valeur n'est avancée, aucune méthode absente n'est invoquée.
-3. Synthèse : cas limite. La réponse est incomplète, puisqu'elle ne peut décrire ni la valeur du lot ni le traitement effectif, mais chaque affirmation est étayée et chaque lacune est nommée avec sa cause. PASS.
+3. Synthèse : la réponse est incomplète, puisqu'elle ne peut décrire ni la valeur du lot ni le traitement effectif, mais chaque affirmation est étayée et chaque lacune est nommée avec sa cause. PASS.
 ''',
     reason="Chaque étape correspond au corps fourni, la valeur de BATCH_SIZE est déclarée non visible et la troncature est signalée à l'endroit exact.",
 ))
@@ -603,7 +603,7 @@ Ce qui ne l'est pas : aucun extrait ne montre de relation directe entre les deux
     thinking='''
 1. Énumération des éléments clés : le contexte donne `ContextRetriever implements ContentRetriever` avec sa documentation, et `HybridRetriever implements ContentRetriever`. Aucun extrait ne relie les deux classes.
 2. Vérification point par point : les deux relations d'implémentation citées figurent explicitement, et la phrase de documentation est reprise littéralement, guillemets compris. Le point délicat est l'hypothèse formulée dans le dernier paragraphe : la sortie l'énonce, en indique la cohérence, puis dit explicitement qu'elle **n'est pas établie** par le contexte, en donnant la raison — aucun champ ni corps de `ContextRetriever` n'est fourni. Une hypothèse présentée comme telle, avec sa limite, ne constitue pas une invention ; l'aurait été une affirmation du même contenu au présent de l'indicatif. Aucune citation n'est déformée.
-3. Synthèse : cas limite. La réponse n'établit pas grand-chose, mais tout ce qu'elle avance est étayé, et l'hypothèse avancée est explicitement marquée comme non établie. PASS.
+3. Synthèse : la réponse n'établit pas grand-chose, mais tout ce qu'elle avance est étayé, et l'hypothèse avancée est explicitement marquée comme non établie. PASS.
 ''',
     reason="Les deux relations d'implémentation sont exactes, la citation est littérale, et l'hypothèse sur le rôle est explicitement donnée pour non établie.",
 ))
