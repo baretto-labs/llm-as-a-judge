@@ -44,6 +44,18 @@ CRITERIA = {
     },
 }
 
+# Quand un contrôle dédié couvre une contrainte précise, celle-ci sort du périmètre de
+# `respect_consignes`, qui n'évalue alors que les consignes restantes. Sans ce découpage écrit
+# noir sur blanc, l'étiquetage retenu (contrôle dédié faux, `respect_consignes` vrai) contredirait
+# la description lue par le juge : on lui enseignerait qu'une règle tacite gouverne la rubrique,
+# alors que tout le dispositif repose sur le fait qu'il l'applique telle qu'elle est écrite.
+# Relecture humaine du golden set, 2026-09-15 (b03-007, b04-015) : l'annotateur marquait les deux
+# contrôles faux, lecture littérale et juste de l'ancienne description.
+RESPECT_CONSIGNES_PERIMETRE_REDUIT = (
+    "Toutes les consignes obligatoires de la requête sont respectées, à l'exception de celles "
+    "couvertes par un contrôle dédié ci-dessous, qui les évalue séparément."
+)
+
 
 def example(meta, thinking, *, task=None, contexte=None, requete=None, reponse=None,
             criteres=None, checks=None, reason=None, extra_criteres=None, extra_checks=None,
@@ -74,6 +86,8 @@ def example(meta, thinking, *, task=None, contexte=None, requete=None, reponse=N
     # on ajoute un contrôle dédié. Le juge doit lire la rubrique déclarée plutôt que de
     # supposer un triplet figé par tâche.
     if extra_criteres:
+        if "respect_consignes" in criteres:
+            criteres["respect_consignes"] = RESPECT_CONSIGNES_PERIMETRE_REDUIT
         criteres.update(extra_criteres)
     if extra_checks:
         checks = {**checks, **extra_checks}
