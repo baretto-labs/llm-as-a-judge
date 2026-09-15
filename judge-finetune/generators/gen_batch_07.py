@@ -59,12 +59,12 @@ Deux points d'attention :
 - Pour diagnostiquer en production, `ThreadMXBean.findDeadlockedThreads()` identifie les threads concernés, et un `jstack` affiche le cycle d'attente.
 ''',
     thinking='''
-1. Analyse du code : le diagnostic est exact. La méthode acquiert les verrous dans l'ordre des arguments, donc deux appels croisés produisent un cycle d'attente. Vérifié par exécution : avec deux threads prenant les verrous en ordre inverse, les deux se retrouvent à l'état `BLOCKED` après deux secondes, et `ThreadMXBean.findDeadlockedThreads()` en signale 2. L'absence d'exception et de consommation CPU correspond bien au symptôme rapporté.
-2. Vérification des contraintes : la correction proposée est la bonne. Un ordre total fondé sur l'identifiant garantit que tous les threads acquièrent les verrous dans la même séquence, ce qui casse la condition d'attente circulaire. La remarque sur `from == to` est pertinente, et la réentrance de `synchronized` est correctement invoquée : le double verrouillage du même moniteur ne bloque pas. L'outil de diagnostic cité existe et fait bien ce qui est annoncé, comme la sonde le confirme.
-3. Synthèse : cause exacte et vérifiée, correction qui supprime réellement la condition d'interblocage, conseils de diagnostic justes. PASS.
+1. Analyse du code : le diagnostic est exact. La méthode acquiert les verrous dans l'ordre des arguments, donc deux appels croisés produisent un cycle d'attente. Avec deux threads prenant les verrous en ordre inverse, les deux se retrouvent à l'état `BLOCKED` après deux secondes, et `ThreadMXBean.findDeadlockedThreads()` en signale 2. L'absence d'exception et de consommation CPU correspond bien au symptôme rapporté.
+2. Vérification des contraintes : la correction proposée est la bonne. Un ordre total fondé sur l'identifiant garantit que tous les threads acquièrent les verrous dans la même séquence, ce qui casse la condition d'attente circulaire. La remarque sur `from == to` est pertinente, et la réentrance de `synchronized` est correctement invoquée : le double verrouillage du même moniteur ne bloque pas. L'outil de diagnostic cité existe et fait bien ce qui est annoncé.
+3. Synthèse : cause exacte, correction qui supprime réellement la condition d'interblocage, conseils de diagnostic justes. PASS.
 ''',
     exact=True, bugs=True, consignes=True,
-    raison="Interblocage par ordre d'acquisition correctement diagnostiqué, vérifié par exécution, et corrigé par un ordre total sur les verrous.",
+    raison="Interblocage par ordre d'acquisition correctement diagnostiqué et corrigé par un ordre total sur les verrous.",
 ))
 
 add(example(
@@ -72,7 +72,11 @@ add(example(
           "cas": "defaillant", "verbeux": False, "langage": "java"},
     consigne=CONSIGNE_DEADLOCK,
     reponse='''
+## Le diagnostic
+
 Le problème vient de `synchronized`, qui est un mécanisme trop rustique : il ne propose ni équité, ni délai d'attente, et sous forte charge la contention finit par figer les threads.
+
+## La correction
 
 Remplacez-le par `ReentrantLock`, conçu pour ces situations :
 
@@ -91,9 +95,21 @@ void transfer(Account from, Account to, long amount) {
 ```
 
 Le mode équitable garantit que les threads sont servis dans l'ordre d'arrivée, ce qui élimine les famines et donc le gel observé.
+
+## Ce que `ReentrantLock` apporte d'autre
+
+Une fois la migration faite, trois capacités deviennent accessibles, qu'un bloc `synchronized` ne peut pas offrir :
+
+- **`tryLock(long, TimeUnit)`** échoue proprement après un délai au lieu d'attendre indéfiniment. C'est le moyen de transformer une attente invisible en erreur diagnosticable, avec une trace qui nomme le verrou et l'appelant.
+- **`lockInterruptibly()`** permet d'annuler un thread bloqué en attente, ce qui rend l'arrêt propre du service possible même sous charge.
+- **Les objets `Condition`** remplacent `wait`/`notify` et autorisent plusieurs files d'attente distinctes sur un même verrou, là où un moniteur n'en a qu'une.
+
+## Le `finally` est obligatoire
+
+Notez la structure : `lock()` est appelé **avant** le `try`, et `unlock()` dans le `finally`. C'est le seul agencement correct. Placer le `lock()` à l'intérieur du `try` libérerait un verrou jamais acquis si l'acquisition elle-même échouait, et omettre le `finally` laisserait le verrou définitivement pris à la première exception — panne bien plus difficile à diagnostiquer que celle que vous observez.
 ''',
     thinking='''
-1. Analyse du code : le diagnostic est faux. Le gel décrit n'est pas de la contention ni de la famine, mais un interblocage par ordre d'acquisition inversé, vérifié par exécution : deux threads prenant deux verrous en ordre opposé restent à l'état `BLOCKED`, et `findDeadlockedThreads()` en signale 2. Un verrou équitable ne change rien à un cycle d'attente : il ordonne les prétendants à un même verrou, il ne supprime pas la dépendance croisée entre deux verrous distincts.
+1. Analyse du code : le diagnostic est faux. Le gel décrit n'est pas de la contention ni de la famine, mais un interblocage par ordre d'acquisition inversé : deux threads prenant deux verrous en ordre opposé restent à l'état `BLOCKED`, et `findDeadlockedThreads()` en signale 2. Un verrou équitable ne change rien à un cycle d'attente : il ordonne les prétendants à un même verrou, il ne supprime pas la dépendance croisée entre deux verrous distincts. Tout le développement sur les capacités de `ReentrantLock` est en revanche exact — `tryLock` avec délai, `lockInterruptibly`, les objets `Condition` —, de même que l'insistance sur l'agencement `lock()` hors du `try` et `unlock()` dans le `finally`, qui est bien la seule forme correcte.
 2. Vérification des contraintes : le code proposé, lui, ne présente effectivement plus d'interblocage — mais pour une raison que la réponse n'identifie pas et qui introduit une régression majeure. En remplaçant les verrous par instance par un **unique verrou partagé**, il sérialise tous les virements du service, y compris ceux portant sur des comptes sans rapport. Le débit s'effondre exactement sous la charge qui motivait la question. Le mode équitable aggrave encore le coût, chaque transmission passant par la file d'attente. La correction attendue était un ordre total d'acquisition, qui conserve le parallélisme entre comptes distincts.
 3. Synthèse : cause mal identifiée, explication fausse sur le rôle de l'équité, et remède qui échange un interblocage contre un goulot d'étranglement global. FAIL.
 ''',
@@ -142,7 +158,7 @@ J'ai vérifié le comportement avec quatre threads appelant `cache()` simultané
 Si un jour la construction devient coûteuse, ou si le cache doit être invalidé à chaud, il sera temps de passer à `ConcurrentHashMap` ou à un verrou. Tant que l'objet est construit une fois au démarrage effectif du service, ajouter de la synchronisation reviendrait à payer un coût pour un problème qui ne se produit pas.
 ''',
     thinking='''
-1. Analyse du code : le code compile et la mesure rapportée n'est pas fausse. J'ai reproduit la sonde : quatre threads appelant la méthode simultanément, sur deux cents itérations, obtiennent la même instance dans **100 % des essais**, zéro divergence. Le raisonnement construit sur cette observation est en revanche entièrement faux.
+1. Analyse du code : le code compile et l'observation rapportée n'est pas fausse. Quatre threads appelant la méthode simultanément, sur deux cents itérations, obtiennent effectivement la même instance dans la quasi-totalité des essais. Le raisonnement construit sur cette observation est en revanche entièrement faux.
 2. Vérification des contraintes : l'absence de manifestation ne prouve pas l'absence de course. Le motif test-puis-affectation n'est pas atomique : deux threads peuvent lire `cache == null` avant que l'un des deux n'affecte, et construire alors deux maps, la seconde écrasant la première. Des appelants détiendraient des instances distinctes, et des écritures seraient perdues en silence. Plus grave, l'absence de barrière mémoire ne garantit pas la visibilité de l'affectation aux autres threads, ni même que la map soit vue entièrement construite — c'est le défaut classique de publication non sûre. L'atomicité de l'affectation d'une référence, correctement invoquée, ne couvre que l'écriture elle-même, jamais la séquence test-puis-affectation. Le fait que la fenêtre soit étroite est précisément ce qui rend le défaut dangereux : il traverse les tests et se manifeste en production sous charge. Les corrections sûres sont l'initialisation à la déclaration, un bloc `synchronized`, le double-checked locking avec un champ `volatile`, ou le langage de l'initialisation à la demande via une classe interne.
 3. Synthèse : le code est bogué et l'argumentaire s'appuie sur une mesure réelle pour en tirer une conclusion inverse de la bonne, ce qui est plus nuisible qu'une simple erreur. FAIL.
 ''',
@@ -192,7 +208,7 @@ L'échec se produit désormais à l'entrée, avec un message qui nomme le type f
 Si la signature pouvait évoluer, `List<User>` en paramètre serait évidemment préférable : le contrôle passerait à la compilation et ce code deviendrait inutile. À défaut, une surcharge générique `register(List<User>)` conservée à côté de l'ancienne permettrait de migrer les appelants progressivement.
 ''',
     thinking='''
-1. Analyse du code : le diagnostic est exact et vérifié par exécution. Un type brut accepte `add(42)` sur une `List<String>` sans le moindre avertissement à l'exécution, la liste contient bien `[42]`, et l'exception ne surgit qu'à la lecture typée : `class java.lang.Integer cannot be cast to class java.lang.String`. C'est bien le transtypage inséré par le compilateur au site de lecture qui échoue, ce qui explique la distance entre la faute et le symptôme.
+1. Analyse du code : le diagnostic est exact. Un type brut accepte `add(42)` sur une `List<String>` sans le moindre avertissement à l'exécution, la liste contient bien `[42]`, et l'exception ne surgit qu'à la lecture typée : `class java.lang.Integer cannot be cast to class java.lang.String`. C'est bien le transtypage inséré par le compilateur au site de lecture qui échoue, ce qui explique la distance entre la faute et le symptôme.
 2. Vérification des contraintes : la signature publique est conservée, comme exigé. Le contrôle explicite déplace l'échec au point d'entrée avec un message nommant le type fautif, ce qui répond au vrai problème. L'usage de `@SuppressWarnings("unchecked")` est ici légitime puisqu'il suit une vérification effective, et non un simple masquage d'avertissement. La réserve finale est juste : le paramètre générique serait supérieur, et la surcharge de migration est une voie réaliste, présentée comme telle sans contredire la contrainte.
 3. Synthèse : cause exacte, correction qui rétablit la vérification tout en respectant la contrainte de signature, et suppression d'avertissement justifiée par un contrôle réel. PASS.
 ''',
@@ -244,12 +260,12 @@ for ligne in lignes_valides(fichier):
 Le symptôme est d'autant plus déroutant que rien ne signale l'épuisement : un générateur consommé se comporte comme une séquence vide. À noter aussi que `len()` ne fonctionne pas sur un générateur, ce qui explique le `sum(1 for _ in ...)` de la version d'origine.
 ''',
     thinking='''
-1. Analyse du code : le diagnostic est exact. Vérifié par exécution : un générateur construit sur cinq entrées produit 3 éléments au premier parcours, puis `[]` au second, sans lever d'exception. C'est bien la cause du rapport vide.
-2. Vérification des contraintes : les deux corrections sont valides et le critère de choix, la tenue en mémoire, est le bon. La version liste est reparcourable et renvoie bien les mêmes 3 éléments, et la version en une passe conserve le caractère paresseux quand le volume l'exige. La remarque finale est exacte et vérifiée : `len()` sur un générateur lève `TypeError: object of type 'generator' has no len()`, ce qui justifie effectivement la forme `sum(1 for _ in ...)` du code d'origine.
-3. Synthèse : cause exacte et vérifiée, deux corrections adaptées avec un critère de choix pertinent, remarques justes. PASS.
+1. Analyse du code : le diagnostic est exact. Un générateur construit sur cinq entrées produit 3 éléments au premier parcours, puis `[]` au second, sans lever d'exception. C'est bien la cause du rapport vide.
+2. Vérification des contraintes : les deux corrections sont valides et le critère de choix, la tenue en mémoire, est le bon. La version liste est reparcourable et renvoie bien les mêmes 3 éléments, et la version en une passe conserve le caractère paresseux quand le volume l'exige. La remarque finale est exacte : `len()` sur un générateur lève `TypeError: object of type 'generator' has no len()`, ce qui justifie effectivement la forme `sum(1 for _ in ...)` du code d'origine.
+3. Synthèse : cause exacte, deux corrections adaptées avec un critère de choix pertinent, remarques justes. PASS.
 ''',
     exact=True, bugs=True, consignes=True,
-    raison="Épuisement du générateur correctement diagnostiqué et vérifié, avec deux corrections adaptées au volume de données.",
+    raison="Épuisement du générateur correctement diagnostiqué, avec deux corrections adaptées au volume de données.",
 ))
 
 # ── 6. Décorateur sans functools.wraps ────────────────────────────────────────
@@ -260,6 +276,8 @@ add(example(
 Écris un décorateur `chrono` qui mesure le temps d'exécution d'une fonction et le journalise. Il sera appliqué à des routes exposées par notre framework web, qui les enregistre par leur nom.
 ''',
     reponse='''
+## Le décorateur
+
 ```python
 import time
 import logging
@@ -274,11 +292,23 @@ def chrono(fn):
     return wrapper
 ```
 
+## Les choix de mise en œuvre
+
+**`perf_counter` et non `time.time`.** C'est une horloge monotone, de plus haute résolution, et surtout insensible aux ajustements de l'horloge système. Avec `time.time()`, une synchronisation NTP survenant pendant la requête peut produire une durée négative — anomalie rare, impossible à reproduire, et qui pollue durablement les tableaux de bord.
+
+**Le `finally` plutôt qu'un simple enchaînement.** La durée est journalisée même lorsque la fonction lève, et c'est précisément le cas qui vous intéresse le plus : une route qui échoue après cinq secondes est une information plus utile qu'une route qui réussit en trente millisecondes.
+
+**Le formatage différé.** Les paramètres sont passés à `logging.info` plutôt qu'interpolés dans une f-chaîne. L'interpolation n'a lieu que si le niveau `INFO` est effectivement actif, ce qui évite de payer le formatage sur chaque appel lorsque la journalisation est réglée plus haut en production.
+
+**L'unité.** Les millisecondes avec une décimale conviennent à des routes web ; pour du code plus fin, basculez en microsecondes plutôt que d'accumuler les zéros.
+
+## Transparence
+
 Le décorateur est totalement transparent pour l'appelant : il se contente d'envelopper la fonction, sans rien changer à sa signature ni à son identité. Le `finally` garantit que la durée est journalisée même en cas d'exception.
 ''',
     thinking='''
-1. Analyse du code : la mesure elle-même est correcte. `time.perf_counter` est le bon choix pour une durée, le `finally` journalise bien même en cas d'exception, et `fn.__name__` référence la fonction d'origine, donc le message de journalisation affiche le bon nom.
-2. Vérification des contraintes : l'affirmation de transparence est fausse, et elle est bloquante compte tenu du contexte annoncé. Sans `functools.wraps`, la fonction renvoyée conserve son identité propre. Vérifié par exécution : la fonction décorée expose `__name__ = 'wrapper'` et `__doc__ = None`, contre `'calculer_tva_ok'` et sa docstring d'origine lorsque `@functools.wraps(fn)` est appliqué. Or la requête précise que le framework enregistre les routes **par leur nom** : toutes les routes décorées s'enregistreraient sous `wrapper`, et se masqueraient les unes les autres. Les mêmes attributs perdus cassent la documentation générée et l'introspection. Le correctif tient en une ligne, `@functools.wraps(fn)` au-dessus de `wrapper`.
+1. Analyse du code : la mesure elle-même est correcte. `time.perf_counter` est le bon choix pour une durée, le `finally` journalise bien même en cas d'exception, et `fn.__name__` référence la fonction d'origine, donc le message de journalisation affiche le bon nom. Les quatre justifications ajoutées sont exactes : l'horloge monotone protège bien d'un recalage NTP, le formatage différé de `logging` évite bien l'interpolation quand le niveau est inactif, et le choix de l'unité est correctement discuté.
+2. Vérification des contraintes : l'affirmation de transparence est fausse, et elle est bloquante compte tenu du contexte annoncé. Sans `functools.wraps`, la fonction renvoyée conserve son identité propre : la fonction décorée expose `__name__ = 'wrapper'` et `__doc__ = None`, contre `'calculer_tva_ok'` et sa docstring d'origine lorsque `@functools.wraps(fn)` est appliqué. La réponse consacre une section entière au soin apporté à l'enveloppe sans jamais examiner l'identité de l'objet qu'elle renvoie. Or la requête précise que le framework enregistre les routes **par leur nom** : toutes les routes décorées s'enregistreraient sous `wrapper`, et se masqueraient les unes les autres. Les mêmes attributs perdus cassent la documentation générée et l'introspection. Le correctif tient en une ligne, `@functools.wraps(fn)` au-dessus de `wrapper`.
 3. Synthèse : la mesure fonctionne, mais l'oubli de `functools.wraps` casse précisément le mécanisme d'enregistrement décrit dans la requête, sous couvert d'une transparence affirmée à tort. FAIL.
 ''',
     exact=False, bugs=False, consignes=True,
@@ -293,6 +323,8 @@ add(example(
 Écris la fonction qui enregistre une commande en base SQLite. **Contrainte : l'écriture doit être durable dès le retour de la fonction**, le processus pouvant être arrêté juste après.
 ''',
     reponse='''
+## La fonction
+
 ```python
 def enregistrer_commande(chemin_db, commande):
     conn = sqlite3.connect(chemin_db)
@@ -305,17 +337,27 @@ def enregistrer_commande(chemin_db, commande):
         conn.close()
 ```
 
-La requête est paramétrée, donc pas d'injection possible, et le `finally` garantit que la connexion est refermée quoi qu'il arrive. La fermeture propre de la connexion écrit les données sur disque.
+## Les points d'attention
+
+**Les paramètres liés.** Les valeurs passent par des marqueurs `?` et non par interpolation dans la chaîne SQL. Le pilote les transmet hors du texte de la requête : aucune injection n'est possible, et une référence contenant une apostrophe passe sans traitement particulier, là où une concaténation lèverait une `OperationalError`.
+
+**Le `finally`.** La connexion est refermée quoi qu'il arrive, y compris si l'insertion lève. Sans cela, un processus qui traite beaucoup de commandes finirait par épuiser les descripteurs de fichiers, panne qui se manifeste loin de sa cause et sous charge seulement.
+
+**Le type des montants.** Si `montant` est un flottant, envisagez de stocker des centimes en entier : SQLite n'a pas de type décimal, et un montant facturé mérite mieux qu'une approximation binaire.
+
+**L'index.** Si vous recherchez ensuite les commandes par référence, un index sur cette colonne évite un parcours intégral. À l'inverse, n'indexez pas ce que vous ne lisez jamais : chaque index ralentit l'écriture, qui est précisément le chemin critique ici.
+
+La fermeture propre de la connexion écrit les données sur disque.
 ''',
     thinking='''
-1. Analyse du code : la requête paramétrée est correcte et le `finally` ferme effectivement la connexion. Mais l'affirmation finale est fausse : fermer une connexion ne valide pas la transaction en cours, elle l'abandonne.
-2. Vérification des contraintes : vérifié par exécution. Un `INSERT` suivi d'un `close()` sans `commit()` laisse **0 ligne** en base, alors que le même `INSERT` suivi d'un `commit()` en laisse bien 1. Le module `sqlite3` ouvre implicitement une transaction avant une instruction de modification — son `isolation_level` vaut `''` par défaut, et non `None` qui donnerait le mode autocommit — si bien que rien n'est durable sans validation explicite. La contrainte de la requête, la durabilité dès le retour de la fonction, n'est donc pas respectée, et l'échec est silencieux : aucune exception, une commande simplement perdue. La forme robuste est le gestionnaire de contexte `with conn:`, qui valide en sortie et annule en cas d'exception, vérifié comme laissant le solde inchangé après une erreur au milieu de la transaction.
-3. Synthèse : requête bien écrite mais jamais validée, et l'explication affirme l'inverse du comportement mesuré, sur la contrainte même que la requête mettait en avant. FAIL.
+1. Analyse du code : la requête paramétrée est correcte et le `finally` ferme effectivement la connexion. Les quatre points d'attention sont exacts : les marqueurs `?` neutralisent bien l'injection et gèrent les apostrophes, la fermeture systématique évite bien l'épuisement des descripteurs, SQLite n'a bien pas de type décimal, et un index accélère la lecture au prix de l'écriture. Mais l'affirmation finale est fausse : fermer une connexion ne valide pas la transaction en cours, elle l'abandonne.
+2. Vérification des contraintes : un `INSERT` suivi d'un `close()` sans `commit()` laisse **0 ligne** en base, alors que le même `INSERT` suivi d'un `commit()` en laisse bien 1. Le module `sqlite3` ouvre implicitement une transaction avant une instruction de modification — son `isolation_level` vaut `''` par défaut, et non `None` qui donnerait le mode autocommit — si bien que rien n'est durable sans validation explicite. La contrainte de la requête, la durabilité dès le retour de la fonction, n'est donc pas respectée, et l'échec est silencieux : aucune exception, une commande simplement perdue. La forme robuste est le gestionnaire de contexte `with conn:`, qui valide en sortie et annule en cas d'exception, laissant le solde inchangé après une erreur au milieu de la transaction. Le détail des quatre précautions listées rend l'omission d'autant plus difficile à voir : la réponse soigne l'injection, les descripteurs, le typage et l'indexation, et laisse tomber la seule exigence que la requête avait posée.
+3. Synthèse : requête bien écrite mais jamais validée, et l'explication affirme l'inverse du comportement réel, sur la contrainte même que la requête mettait en avant. FAIL.
 ''',
     exact=False, bugs=False, consignes=True,
     extra_criteres={"durabilite_garantie": "L'écriture est validée en base avant le retour de la fonction, comme l'exige la requête."},
     extra_checks={"durabilite_garantie": False},
-    raison="close() sans commit() abandonne la transaction : mesuré, 0 ligne persistée là où un commit en laisse 1.",
+    raison="close() sans commit() abandonne la transaction : 0 ligne persistée là où un commit en laisse 1.",
 ))
 
 # ── 8. XSS par innerHTML, réponse verbeuse ────────────────────────────────────
@@ -355,7 +397,7 @@ Ajoutez une politique de sécurité de contenu (`Content-Security-Policy`) pour 
 ''',
     thinking='''
 1. Analyse de l'explication : le mécanisme d'`innerHTML` est correctement décrit, et l'affirmation sur les balises `<script>` est exacte — la spécification prévoit bien qu'un `<script>` inséré par `innerHTML` ne s'exécute pas. C'est le seul point juste du raisonnement, et il sert à justifier une conclusion fausse.
-2. Vérification des contraintes : l'immense majorité des charges XSS n'utilise pas `<script>` mais un **gestionnaire d'événement sur une balise ordinaire**. Vérifié par exécution avec jsdom : affecter `<img src=x onerror="...">` à `innerHTML` crée bien l'élément `img` avec son attribut `onerror` présent dans le DOM ; il suffit que le chargement de l'image échoue, ce qui est le principe même de la charge, pour que le gestionnaire s'exécute dans un vrai navigateur. Le filtre proposé, une expression régulière ciblant `<script>`, ne retire donc rien à cette charge et donne une fausse assurance ; filtrer du HTML par expression régulière est de toute façon un contre-modèle connu. La correction attendue est `container.textContent = user.displayName`, ou la construction du nœud puis l'affectation de son texte : vérifié, `textContent` crée **zéro** balise et échappe la charge en `&lt;img src=x onerror=...&gt;`. La politique de sécurité de contenu est un complément utile, pas un correctif.
+2. Vérification des contraintes : l'immense majorité des charges XSS n'utilise pas `<script>` mais un **gestionnaire d'événement sur une balise ordinaire**. Avec jsdom, affecter `<img src=x onerror="...">` à `innerHTML` crée bien l'élément `img` avec son attribut `onerror` présent dans le DOM ; il suffit que le chargement de l'image échoue, ce qui est le principe même de la charge, pour que le gestionnaire s'exécute dans un vrai navigateur. Le filtre proposé, une expression régulière ciblant `<script>`, ne retire donc rien à cette charge et donne une fausse assurance ; filtrer du HTML par expression régulière est de toute façon un contre-modèle connu. La correction attendue est `container.textContent = user.displayName`, ou la construction du nœud puis l'affectation de son texte : `textContent` crée **zéro** balise et échappe la charge en `&lt;img src=x onerror=...&gt;`. La politique de sécurité de contenu est un complément utile, pas un correctif.
 3. Synthèse : présentation soignée s'appuyant sur un fait exact pour minimiser la faille, avec un correctif inopérant contre le vecteur réellement employé. La faille reste ouverte. FAIL.
 ''',
     exact=False, bugs=False, consignes=True,
@@ -406,13 +448,13 @@ On pourrait ajouter une variante annulable renvoyant un jeton, ou une file de pr
 ''',
     thinking='''
 1. Analyse du code : `queueMicrotask` répond exactement à la contrainte. La distinction entre file de micro-tâches et file de macro-tâches est correctement exposée, et le classement de `setTimeout` parmi les secondes est juste.
-2. Vérification des contraintes : l'ordre annoncé est vérifié par exécution sous Node — la trace obtenue est bien `1 synchrone`, `2 synchrone`, `3 microtâche .then`, `4 queueMicrotask`, `5 setTimeout 0`. L'équivalence d'ordonnancement avec `Promise.resolve().then` est exacte, et la mise en garde sur la famine par récursion de micro-tâches est réelle et pertinente. Aucune dépendance externe n'est utilisée, conformément à la contrainte. Deux écarts mineurs : la demande facultative sur la différence Node contre navigateur n'est pas traitée — l'occasion manquée d'évoquer `process.nextTick`, prioritaire sur les micro-tâches en Node — et la réponse est longue, avec une section « pour aller plus loin » non sollicitée pour une fonction d'une ligne.
-3. Synthèse : la solution obligatoire est exacte et vérifiée, les écarts portent sur une demande explicitement facultative et sur la longueur, ce qui ne justifie pas un échec. PASS.
+2. Vérification des contraintes : l'ordre annoncé est bien celui que produit Node — la trace obtenue est `1 synchrone`, `2 synchrone`, `3 microtâche .then`, `4 queueMicrotask`, `5 setTimeout 0`. L'équivalence d'ordonnancement avec `Promise.resolve().then` est exacte, et la mise en garde sur la famine par récursion de micro-tâches est réelle et pertinente. Aucune dépendance externe n'est utilisée, conformément à la contrainte. Deux écarts mineurs : la demande facultative sur la différence Node contre navigateur n'est pas traitée — l'occasion manquée d'évoquer `process.nextTick`, prioritaire sur les micro-tâches en Node — et la réponse est longue, avec une section « pour aller plus loin » non sollicitée pour une fonction d'une ligne.
+3. Synthèse : la solution obligatoire est exacte, les écarts portent sur une demande explicitement facultative et sur la longueur, ce qui ne justifie pas un échec. PASS.
 ''',
     exact=True, bugs=True, consignes=True,
     extra_criteres={"aucune_dependance_externe": "La solution n'utilise que les API de la plateforme, comme l'exige la requête."},
     extra_checks={"aucune_dependance_externe": True},
-    raison="queueMicrotask répond exactement à la contrainte, ordre vérifié par exécution ; seul le point facultatif Node/navigateur manque.",
+    raison="queueMicrotask répond exactement à la contrainte, avec le bon ordre d'ordonnancement ; seul le point facultatif Node/navigateur manque.",
 ))
 
 # ── 10. Théorie : effacement de type ──────────────────────────────────────────
@@ -438,11 +480,11 @@ La contrepartie de ce choix, motivé par la compatibilité avec le code antérie
 ''',
     thinking='''
 1. Analyse de l'explication : le mécanisme est exact. L'effacement supprime bien les paramètres de type après vérification, `instanceof` ne peut porter que sur le type brut ou un joker non borné, et deux surcharges dont les signatures s'effacent identiquement sont refusées par le compilateur.
-2. Vérification des contraintes : l'égalité de classes est vérifiée par exécution, `new ArrayList<String>().getClass() == new ArrayList<Integer>().getClass()` renvoie bien `true`. La description de la pollution du tas est exacte et confirmée : un `add(42)` via un type brut sur une `List<String>` est accepté, la liste contient `[42]`, et l'échec ne survient qu'à la lecture typée avec `class java.lang.Integer cannot be cast to class java.lang.String`. La justification historique, la compatibilité avec le code antérieur aux génériques, est correcte. La réponse est concise comme demandé.
-3. Synthèse : mécanisme exact, conséquences correctement déduites, illustration vérifiée par exécution. PASS.
+2. Vérification des contraintes : l'égalité de classes est réelle, `new ArrayList<String>().getClass() == new ArrayList<Integer>().getClass()` renvoie bien `true`. La description de la pollution du tas est exacte : un `add(42)` via un type brut sur une `List<String>` est accepté, la liste contient `[42]`, et l'échec ne survient qu'à la lecture typée avec `class java.lang.Integer cannot be cast to class java.lang.String`. La justification historique, la compatibilité avec le code antérieur aux génériques, est correcte. La réponse est concise comme demandé.
+3. Synthèse : mécanisme exact, conséquences correctement déduites, illustration conforme. PASS.
 ''',
     exact=True, bugs=True, consignes=True,
-    raison="Effacement de type exactement décrit, les deux interdictions correctement déduites et la pollution du tas vérifiée par exécution.",
+    raison="Effacement de type exactement décrit, les deux interdictions correctement déduites et la pollution du tas correctement illustrée.",
 ))
 
 # ── 11. Cas limite : contrainte de format sur une réponse juste ───────────────
@@ -484,14 +526,27 @@ add(example(
 Un collègue veut passer le jeton de réinitialisation de mot de passe en paramètre d'URL, en arguant que « de toute façon c'est en HTTPS, donc chiffré ». Qu'en penses-tu ?
 ''',
     reponse='''
+## Ce que TLS protège
+
 Il a raison sur le principe. TLS chiffre l'intégralité de la requête HTTP, en-têtes et ligne de requête comprises : un observateur du réseau ne voit ni le chemin, ni les paramètres, uniquement l'adresse IP de destination et le volume échangé.
 
+Le chiffrement est établi avant qu'un seul octet HTTP ne circule. La poignée de main négocie une suite cryptographique, authentifie le serveur par son certificat, puis dérive les clés de session ; tout ce qui suit, requête et réponse, passe dans ce tunnel. Avec TLS 1.3, la négociation tient en un aller-retour, et les suites vulnérables ont été retirées de la spécification.
+
+## Ce que ça implique pour votre jeton
+
 Le jeton est donc protégé en transit, et le mettre dans l'URL plutôt que dans le corps ne change rien à sa confidentialité. C'est même plus pratique pour un lien envoyé par courriel, qui ne peut pas porter de corps de requête.
+
+## Deux durcissements qui valent le détour
+
+- **`Strict-Transport-Security`.** Sans cet en-tête, un utilisateur qui saisit votre domaine sans préciser le schéma part en clair et se fait rediriger : cette première requête est interceptable. L'en-tête supprime cette fenêtre pour les visites suivantes.
+- **Surveillez vos certificats.** Une expiration non anticipée rend le service inaccessible, et les journaux de transparence des certificats permettent de détecter qu'une autorité a émis un certificat pour votre domaine à votre insu.
+
+## Le point de vigilance
 
 Le seul point de vigilance concerne la durée de validité : limitez le jeton à quelques minutes et rendez-le à usage unique.
 ''',
     thinking='''
-1. Analyse de l'explication : le premier paragraphe est exact sur le transit. TLS chiffre effectivement la ligne de requête et les en-têtes, et un observateur réseau ne voit ni le chemin ni la chaîne de requête. La conclusion qui en est tirée est fausse, car elle confond confidentialité **en transit** et confidentialité **de bout en bout**.
+1. Analyse de l'explication : le premier paragraphe est exact sur le transit. TLS chiffre effectivement la ligne de requête et les en-têtes, et un observateur réseau ne voit ni le chemin ni la chaîne de requête. La description de la poignée de main est exacte elle aussi, tout comme les deux durcissements proposés — `Strict-Transport-Security` supprime bien la fenêtre de la première requête en clair, et les journaux de transparence des certificats servent bien à détecter une émission illégitime. La conclusion qui en est tirée est pourtant fausse, car elle confond confidentialité **en transit** et confidentialité **de bout en bout** : tout ce déploiement technique porte sur le tunnel, et le problème est entièrement à ses deux extrémités.
 2. Vérification des contraintes : une URL fuit par de nombreux canaux situés hors du tunnel TLS. Le serveur consigne la ligne de requête complète dans ses journaux d'accès, tout comme les proxys inverses et les répartiteurs de charge, où le jeton se retrouve en clair et souvent conservé longtemps. Le navigateur l'inscrit dans l'historique, et l'envoie dans l'en-tête `Referer` vers toute ressource tierce chargée par la page — ce qui suffit à divulguer un jeton de réinitialisation à un service d'analyse d'audience. Il apparaît aussi dans les journaux des passerelles de messagerie qui pré-visitent les liens. La réponse omet enfin que le nom de domaine reste visible en transit via le SNI et les requêtes DNS, ce qui contredit l'idée d'une opacité totale. Les recommandations finales, jeton court et à usage unique, sont justes mais très insuffisantes ici : ce sont des mesures d'atténuation, pas la réponse au problème posé.
 3. Synthèse : raisonnement fondé sur un fait exact mais appliqué au mauvais périmètre, aboutissant à valider la divulgation d'un jeton dans les journaux et l'en-tête `Referer`. FAIL.
 ''',
