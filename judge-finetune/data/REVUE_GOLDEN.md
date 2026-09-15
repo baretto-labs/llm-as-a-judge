@@ -75,3 +75,50 @@ disparaîtrait si les deux contrôles basculaient toujours ensemble.
 
 Mis en œuvre dans `generators/gen_batch_01.py` (`RESPECT_CONSIGNES_PERIMETRE_REDUIT`), appliqué aux 28
 exemples portant un contrôle dédié. Aucun `verdict` ni `cas` modifié, donc le tirage est inchangé.
+
+## Séance du 2026-09-15 — reprise après le retirage
+
+### 3. `b09-009` — accord sur le verdict, désaccord croisé sur deux contrôles
+
+| | 1 `exactitude` | 2 `absence_de_bugs` | 3 `respect_consignes` | 4 `signature_publique_inchangee` |
+|---|---|---|---|---|
+| annotateur | **F** | V | V | **V** |
+| étiquette | **V** | V | V | **F** |
+
+Verdict **FAIL des deux côtés**. Les deux écarts vont en sens opposés, chacun voyant un défaut là où
+l'autre n'en voit pas.
+
+**Contrôle 4 — tranché, l'étiquette est maintenue.** L'annotateur a confirmé une inversion de frappe. La
+signature passe bien de `total(List<Integer>)` à `total(Optional<List<Integer>>)`, ce qui rompt la
+compatibilité **source** — tout appel existant cesse de compiler — et la compatibilité **binaire**, le
+descripteur inscrit dans le bytecode des appelants changeant, d'où un `NoSuchMethodError` pour les jars
+tiers déjà compilés. La requête posait la contrainte en toutes lettres.
+
+**Contrôle 1 — correction proposée, EN ATTENTE DE CONFIRMATION.**
+
+La réponse affirme : « l'appelant voit immédiatement que la valeur peut manquer, et le compilateur
+l'oblige à en tenir compte ». C'est faux. Un `Optional` en **paramètre** ne contraint l'appelant à rien :
+`total(null)` compile sans avertissement et lève une `NullPointerException` dans `orElseGet`. Sous le
+critère « chaque affirmation technique de la sortie est vraie », `exactitude_technique` doit donc valoir
+**faux**.
+
+Le `<thinking>` actuel relève bien qu'`Optional` en paramètre contrevient à l'usage recommandé, mais le
+traite comme une question de style rattachée au contrôle 4, sans jamais peser cette phrase comme une
+**affirmation factuelle**. C'est un défaut d'étiquetage réel, repéré par la relecture.
+
+Correction envisagée : `[F, V, V, F]`. Verdict inchangé (FAIL), `cas` inchangé (`limite` — le code devient
+effectivement tolérant au nul, c'est l'explication qui ment), donc strate du tirage inchangée et golden set
+intact. Coût nul.
+
+**Pourquoi elle n'est pas appliquée :** l'accord a été donné en clôture de séance, l'annotateur signalant
+lui-même sa fatigue. Modifier une étiquette du golden sur cette base reproduirait le raccourci — agir sur
+une lecture plausible plutôt que sur une vérification — que l'audit du jour a précisément fait corriger.
+À confirmer à tête reposée.
+
+### État de la relecture
+
+- **Accord sur le verdict : 3 / 3** (`b03-007`, `b04-015`, `b09-009`), dont 2 encore dans le golden set.
+- **En attente :** `b07-011` et `b10-015`, présentés avant la pause, non réécrits depuis, toujours dans le
+  golden — les réponses restent valables.
+- **Reprise :** confirmer le contrôle 1 de `b09-009`, puis les deux exemples en attente, puis la session 2
+  (`b03-012`, `b05-008`, `b06-013`, `b07-015`, `b12-008`, `b13-013`).
