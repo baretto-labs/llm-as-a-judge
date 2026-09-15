@@ -122,7 +122,7 @@ Décision du 2026-09-15 : **reprise ciblée avant tout fine-tuning**.
 | 2 | Étiquettes `verbeux` fausses | `b13-007`, `b14-008` | ✅ fait |
 | 3 | Revendications d'exécution | 104 occurrences, 61 tournures — reformulation cas par cas | à faire |
 | 4 | Longueur, `CODE_ANALYSIS` | 38 FAIL sous 666 car., surtout `generation` / `refactoring` / `question_reponse` | ✅ **clos** — 26 réécrits, voir ci-dessous |
-| 5 | Longueur, `RAG_FAITHFULNESS` | 8 FAIL sous 410 car., face à 14 PASS de 666 à 1087 | à faire — **seul chantier de longueur encore justifié** |
+| 5 | Longueur, `RAG_FAITHFULNESS` | 8 FAIL sous 410 car., face à 14 PASS de 666 à 1087 | ✅ clos — 84,0 % → 76,0 % (p 0,006 → 0,076), voir ci-dessous |
 | 6 | Polarité `citations_exactes` | produire la famille « citation déformée », absente du corpus | à faire |
 | 7 | Contextes RAG du golden | contextes inédits pour les items de test ; regrouper par contexte les familles qui le partagent | à faire |
 | 8 | Verbeux corrects | 13 au lieu des 15 exigés, conséquence de la correction n°2 | à faire |
@@ -193,3 +193,38 @@ après sa fin utile.
 `b13-012` 292, `b12-009` 324, `b13-014` 342, `b14-014` 357, `b14-017` 404) doivent rejoindre la plage des
 PASS, **666 à 1087 caractères**, sans la dépasser. Viser « long » plutôt que la distribution des PASS est
 précisément ce qui a retourné le biais côté code ; l'erreur ne doit pas être refaite ici.
+
+## Clôture du chantier 5 — l'erreur a pourtant été refaite
+
+Le paragraphe ci-dessus a été écrit, puis ignoré au tour suivant. Sur les 8 réécritures, **7 sont sorties
+de la plage**, entre 1144 et 1470 caractères, et la statistique est passée de 84,0 % à **88,0 %**
+(p 0,001) : le corpus était devenu **pire qu'avant le chantier**. La médiane FAIL grimpait à 1196 pour une
+médiane PASS de 734, les deux distributions étant à nouveau presque disjointes, simplement dans l'autre
+sens.
+
+La cause n'est pas l'ignorance de la règle, elle était écrite. C'est d'avoir rédigé au jugé — « ajouter
+quelques sections » — sans mesurer la longueur obtenue avant de régénérer. **Une consigne écrite ne
+remplace pas une mesure ; il faut vérifier la sortie, pas l'intention.**
+
+Correction par raccourcissement des 7 exemples, avec des cibles étalées sur 690-1080 pour entrelacer les
+deux distributions plutôt que de les séparer :
+
+| Étape | Observé | z | p |
+|---|---|---|---|
+| Avant chantier 5 | 84,0 % | +3,5 | 0,006 |
+| Après surcorrection | 88,0 % | +4,3 | 0,001 |
+| Après raccourcissement | **76,0 %** | **+2,0** | **0,076** |
+
+État final : 9 des 11 FAIL dans la plage des PASS, deux la dépassant de 43 et 84 caractères, étiquettes
+toutes intactes.
+
+**Deux réserves à ne pas masquer.** D'abord, p = 0,076 est **marginal** : la valeur observée tombe
+exactement sur le p95 de la distribution nulle. Ce n'est pas un résultat net, c'est le franchissement
+d'un seuil conventionnel. Ensuite, les longueurs cibles ont été **choisies** parmi plusieurs scénarios
+simulés ; optimiser des données contre la statistique qui les mesure, puis présenter cette statistique
+comme preuve, serait circulaire. Le scénario le plus « favorable » testé donnait d'ailleurs 56 %, soit
+z = −1,8, c'est-à-dire des longueurs anormalement bien appariées — il a été écarté pour cette raison.
+Le critère retenu est le recouvrement des distributions, pas la maximisation de p.
+
+À n = 25, avec un plancher de bruit à 66 % et un p95 à 76 %, il faut de toute façon considérer que cette
+tâche ne permet aucune conclusion fine sur la longueur.

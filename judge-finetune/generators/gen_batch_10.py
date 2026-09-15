@@ -45,11 +45,11 @@ Trois règles pour ce genre de comparateur :
 ''',
     thinking='''
 1. Analyse de l'explication : le diagnostic est exact. Un comparateur qui renvoie toujours une valeur non nulle est non antisymétrique, ce qui viole le contrat documenté de `Comparator`.
-2. Vérification des contraintes : l'explication du seuil est confirmée par la mesure, et c'est le point qui répond vraiment à la question posée. Sur le même jeu comportant de nombreux ex æquo, le tri se termine sans exception à 16 et à 32 éléments, puis lève `IllegalArgumentException: Comparison method violates its general contract!` à 100 et à 1 000 éléments. Cela correspond bien au basculement de TimSort vers le tri par insertion sous 32 éléments, et explique pourquoi des tests unitaires de petite taille ne détectent rien. La correction par `Comparator.comparingDouble` est vérifiée comme triant sans erreur les 1 000 éléments. Les trois règles sont justes, y compris la mise en garde sur la soustraction, vérifiée par ailleurs : `Integer.MAX_VALUE - 1` moins `-10` donne `-2147483640`, de signe inverse au résultat attendu.
+2. Vérification des contraintes : l'explication du seuil est le point qui répond vraiment à la question posée. Sur un jeu comportant de nombreux ex æquo, le tri se termine sans exception à 16 et à 32 éléments, puis lève `IllegalArgumentException: Comparison method violates its general contract!` à 100 et à 1 000 éléments. Cela correspond bien au basculement de TimSort vers le tri par insertion sous 32 éléments, et explique pourquoi des tests unitaires de petite taille ne détectent rien. La correction par `Comparator.comparingDouble` trie sans erreur les 1 000 éléments. Les trois règles sont justes, y compris la mise en garde sur la soustraction : `Integer.MAX_VALUE - 1` moins `-10` donne `-2147483640`, de signe inverse au résultat attendu.
 3. Synthèse : cause exacte, explication du caractère intermittent conforme à la mesure, correction et règles pertinentes. PASS.
 ''',
     exact=True, bugs=True, consignes=True,
-    raison="Violation d'antisymétrie exactement diagnostiquée, avec le seuil TimSort vérifié (aucune exception à 32, levée à 100).",
+    raison="Violation d'antisymétrie exactement diagnostiquée, avec le seuil TimSort correctement situé (aucune exception à 32, levée à 100).",
 ))
 
 # ── 2. Comparateur par soustraction ───────────────────────────────────────────
@@ -78,11 +78,11 @@ Le signe du résultat porte exactement la même information que les trois branch
 ''',
     thinking='''
 1. Analyse du code : l'affirmation sur le contrat est exacte — seul le signe compte — mais la simplification proposée est fausse dès que les valeurs sont grandes, parce que la soustraction elle-même déborde avant qu'on en lise le signe.
-2. Vérification des contraintes : vérifié par exécution. Avec `Integer.MAX_VALUE - 1` comparé à `-10`, la soustraction donne `-2147483640`, donc un signe **négatif** alors que le premier opérande est le plus grand ; `Integer.compare` renvoie bien `1` sur les mêmes valeurs. Ici le champ est un `long` de centimes, et le transtypage en `int` aggrave le défaut : il tronque les bits de poids fort, si bien que deux soldes très différents peuvent produire une différence nulle ou de signe inverse. Un comparateur ainsi faussé viole la transitivité et peut déclencher, sur une liste assez grande, la même `IllegalArgumentException` que celle observée avec un comparateur non antisymétrique. La simplification correcte existe pourtant et est plus courte encore : `Comparator.comparingLong(Compte::soldeCentimes)`.
+2. Vérification des contraintes : avec `Integer.MAX_VALUE - 1` comparé à `-10`, la soustraction donne `-2147483640`, donc un signe **négatif** alors que le premier opérande est le plus grand ; `Integer.compare` renvoie bien `1` sur les mêmes valeurs. Ici le champ est un `long` de centimes, et le transtypage en `int` aggrave le défaut : il tronque les bits de poids fort, si bien que deux soldes très différents peuvent produire une différence nulle ou de signe inverse. Un comparateur ainsi faussé viole la transitivité et peut déclencher, sur une liste assez grande, la même `IllegalArgumentException` que celle observée avec un comparateur non antisymétrique. La simplification correcte existe pourtant et est plus courte encore : `Comparator.comparingLong(Compte::soldeCentimes)`.
 3. Synthèse : réécriture qui introduit un débordement sur des montants réalistes, alors qu'une fabrique standard donnait le même raccourci sans le défaut. FAIL.
 ''',
     exact=False, bugs=False, consignes=True,
-    raison="La soustraction déborde : mesuré, MAX_VALUE-1 moins -10 donne -2147483640, de signe inverse, et le cast en int tronque un long.",
+    raison="La soustraction déborde : MAX_VALUE-1 moins -10 donne -2147483640, de signe inverse, et le cast en int tronque un long.",
 ))
 
 # ── 3. TreeSet et compareTo incohérent, verbeux ───────────────────────────────
@@ -128,11 +128,11 @@ NavigableSet<Version> versions = new TreeSet<>();
 ''',
     thinking='''
 1. Analyse du code : la classe compile et le `record` génère bien `equals` et `hashCode` sur les deux composants, conformément à la définition d'identité donnée. Le défaut est dans l'articulation entre `compareTo` et `equals`.
-2. Vérification des contraintes : `compareTo` ne compare que le numéro majeur, alors qu'`equals` compare les deux. Or un `TreeSet` détermine l'appartenance par `compareTo`, jamais par `equals` — le tableau de la réponse affirme le contraire, et c'est l'erreur décisive. Vérifié par exécution avec `Version(1, 0)` et `Version(1, 5)` : `equals` renvoie `false` et `compareTo` renvoie `0`, si bien que le `TreeSet` construit à partir des deux a une taille de **1**, la seconde version étant purement et simplement perdue, tandis qu'un `HashSet` en contient bien **2**. La collection choisie perd donc silencieusement des données, ce qui contredit directement l'exigence de la requête. La correction consiste à rendre l'ordre cohérent avec l'égalité, `Comparator.comparingInt(Version::majeur).thenComparingInt(Version::mineur)`, ce que la documentation de `SortedSet` recommande explicitement.
+2. Vérification des contraintes : `compareTo` ne compare que le numéro majeur, alors qu'`equals` compare les deux. Or un `TreeSet` détermine l'appartenance par `compareTo`, jamais par `equals` — le tableau de la réponse affirme le contraire, et c'est l'erreur décisive. Avec `Version(1, 0)` et `Version(1, 5)`, `equals` renvoie `false` et `compareTo` renvoie `0`, si bien que le `TreeSet` construit à partir des deux a une taille de **1**, la seconde version étant purement et simplement perdue, tandis qu'un `HashSet` en contient bien **2**. La collection choisie perd donc silencieusement des données, ce qui contredit directement l'exigence de la requête. La correction consiste à rendre l'ordre cohérent avec l'égalité, `Comparator.comparingInt(Version::majeur).thenComparingInt(Version::mineur)`, ce que la documentation de `SortedSet` recommande explicitement.
 3. Synthèse : présentation soignée, mais l'ordre naturel est incohérent avec l'égalité et le tableau affirme une propriété fausse, ce qui conduit à une perte de données silencieuse. FAIL.
 ''',
     exact=False, bugs=False, consignes=False,
-    raison="compareTo ne porte que sur le majeur : mesuré, le TreeSet contient 1 élément au lieu de 2 et perd une version.",
+    raison="compareTo ne porte que sur le majeur : le TreeSet contient 1 élément au lieu de 2 et perd une version.",
 ))
 
 # ── 4. __eq__ sans __hash__ ───────────────────────────────────────────────────
@@ -168,12 +168,12 @@ Le hachage doit rester stable tant que l'objet est dans un ensemble ou sert de c
 Si la classe est un simple porteur de données, `@dataclass(frozen=True)` fait tout : égalité par valeur, hachage cohérent, et immuabilité garantie.
 ''',
     thinking='''
-1. Analyse de l'explication : le mécanisme est exact et vérifié. Sur une classe définissant `__eq__` sans `__hash__`, l'attribut `__hash__` de la classe vaut bien `None`, et l'insertion dans un ensemble lève `TypeError: unhashable type: 'PointNu'`, exactement le message rapporté. La justification donnée est la bonne : conserver le hachage par identité produirait des objets égaux de hachages différents.
-2. Vérification des contraintes : la correction est vérifiée, un ensemble contenant deux points égaux dotés de ce `__hash__` a bien une taille de 1. La mise en garde sur la mutation est juste et cohérente avec ce qui a été mesuré côté Java sur les clés mutables. La suggestion finale est exacte et confirmée : une `dataclass(frozen=True)` est hachable et compare par valeur, tandis qu'une `dataclass(eq=True)` non gelée voit son `__hash__` mis à `None` et lève le même `TypeError` — même règle, appliquée automatiquement.
+1. Analyse de l'explication : le mécanisme est exact. Sur une classe définissant `__eq__` sans `__hash__`, l'attribut `__hash__` de la classe vaut bien `None`, et l'insertion dans un ensemble lève `TypeError: unhashable type: 'PointNu'`, exactement le message rapporté. La justification donnée est la bonne : conserver le hachage par identité produirait des objets égaux de hachages différents.
+2. Vérification des contraintes : la correction fonctionne, un ensemble contenant deux points égaux dotés de ce `__hash__` a bien une taille de 1. La mise en garde sur la mutation est juste et rejoint le même piège que les clés mutables en Java. La suggestion finale est exacte : une `dataclass(frozen=True)` est hachable et compare par valeur, tandis qu'une `dataclass(eq=True)` non gelée voit son `__hash__` mis à `None` et lève le même `TypeError` — même règle, appliquée automatiquement.
 3. Synthèse : cause exacte, correction vérifiée, réserves pertinentes sur la mutabilité et alternative correcte. PASS.
 ''',
     exact=True, bugs=True, consignes=True,
-    raison="Explique exactement la mise à None de __hash__ par __eq__, message d'erreur conforme et correction vérifiée.",
+    raison="Explique exactement la mise à None de __hash__ par __eq__, avec un message d'erreur conforme et une correction adaptée.",
 ))
 
 # ── 5. Cas limite : configuration immuable, option non traitée ────────────────
@@ -201,8 +201,8 @@ Deux points sur les exigences.
 **Utilisable comme clé.** Une dataclass gelée reçoit un `__hash__` cohérent avec son égalité par valeur, donc deux configurations identiques désignent la même entrée de cache. C'est la raison du `tuple` plutôt que d'une `list` pour les origines : une liste n'est pas hachable et rendrait toute l'instance inutilisable comme clé, alors même que la classe est gelée.
 ''',
     thinking='''
-1. Analyse du code : la classe répond aux deux exigences obligatoires. Vérifié par exécution : une dataclass gelée est hachable, son égalité porte sur les valeurs, et l'affectation d'un attribut lève `FrozenInstanceError: cannot assign to field 'port'`.
-2. Vérification des contraintes : le point le plus fin est correctement traité. L'immuabilité déclarée ne suffit pas à rendre l'instance hachable si un champ contient une structure mutable, d'où le choix du `tuple` — l'explication est exacte et c'est précisément le piège de ce genre de classe. Le contraste avec une dataclass non gelée est cohérent avec la mesure, son `__hash__` étant mis à `None` dès que l'égalité est générée. En revanche, la demande facultative sur la validation du port n'est pas traitée : rien n'empêche un port hors plage, alors qu'un `__post_init__` s'en serait chargé en trois lignes. La consigne la présentait explicitement comme facultative.
+1. Analyse du code : la classe répond aux deux exigences obligatoires. Une dataclass gelée est hachable, son égalité porte sur les valeurs, et l'affectation d'un attribut lève `FrozenInstanceError: cannot assign to field 'port'`.
+2. Vérification des contraintes : le point le plus fin est correctement traité. L'immuabilité déclarée ne suffit pas à rendre l'instance hachable si un champ contient une structure mutable, d'où le choix du `tuple` — l'explication est exacte et c'est précisément le piège de ce genre de classe. Le contraste avec une dataclass non gelée tient de la même règle, son `__hash__` étant mis à `None` dès que l'égalité est générée. En revanche, la demande facultative sur la validation du port n'est pas traitée : rien n'empêche un port hors plage, alors qu'un `__post_init__` s'en serait chargé en trois lignes. La consigne la présentait explicitement comme facultative.
 3. Synthèse : les deux exigences obligatoires sont satisfaites et correctement justifiées, l'unique omission porte sur une demande explicitement facultative. PASS.
 ''',
     exact=True, bugs=True, consignes=True,
@@ -247,7 +247,7 @@ Trois étapes, chacune nécessaire à la contrainte posée.
 ''',
     thinking='''
 1. Analyse du code : la séquence est correcte et complète. Écriture dans un fichier temporaire, vidage du tampon applicatif, synchronisation du descripteur, substitution atomique, puis synchronisation du répertoire.
-2. Vérification des contraintes : les trois justifications sont exactes et correspondent au comportement documenté des appels utilisés. `flush` ne vide que le tampon Python, `os.fsync` force l'écriture des données du fichier, et `os.replace` est bien atomique au sein d'un même système de fichiers, ce que la mention explicite. La synchronisation du répertoire est effectivement l'étape la plus souvent omise, et son absence laisserait exactement le défaut décrit. Le contraste avec une écriture non validée est cohérent avec ce qui a été mesuré ailleurs sur les transactions : sans validation explicite, l'appelant croit avoir persisté alors que rien n'est durable. La contrainte de la requête, survivre à une coupure après le retour de la fonction, est donc bien satisfaite.
+2. Vérification des contraintes : les trois justifications sont exactes et correspondent au comportement documenté des appels utilisés. `flush` ne vide que le tampon Python, `os.fsync` force l'écriture des données du fichier, et `os.replace` est bien atomique au sein d'un même système de fichiers, ce que la mention explicite. La synchronisation du répertoire est effectivement l'étape la plus souvent omise, et son absence laisserait exactement le défaut décrit. Le contraste avec une écriture non validée est le même que sur une transaction laissée sans validation : l'appelant croit avoir persisté alors que rien n'est durable. La contrainte de la requête, survivre à une coupure après le retour de la fonction, est donc bien satisfaite.
 3. Synthèse : séquence de durabilité complète, chaque étape justifiée par un mécanisme réel, contrainte respectée. PASS.
 ''',
     exact=True, bugs=True, consignes=True,
@@ -270,11 +270,11 @@ La lenteur vient donc d'ailleurs. Regardez plutôt du côté du volume de lignes
 ''',
     thinking='''
 1. Analyse de l'explication : l'affirmation centrale est fausse. Dans un index composite, l'ordre des colonnes est structurant, et non conventionnel : les entrées sont triées d'abord sur la première colonne, puis sur la seconde à l'intérieur de chaque valeur de la première.
-2. Vérification des contraintes : la conséquence est mesurée sur un index `(tenant_id, cree_le)`, c'est-à-dire l'ordre inverse de celui décrit. Avec cet ordre, la requête `WHERE tenant_id = ? ORDER BY cree_le` donne `SEARCH evenements USING INDEX idx_tenant_date (tenant_id=?)` : l'égalité sur la première colonne fixe un préfixe, et les lignes correspondantes sont déjà triées par la seconde, donc aucun tri n'est nécessaire. Avec l'ordre `(cree_le, tenant_id)` décrit dans la requête, le préfixe n'est pas contraint et le moteur doit soit balayer, soit trier : la mesure du cas symétrique le confirme, un `ORDER BY cree_le` sans filtre utilisable sur la colonne de tête donne `SCAN evenements`. La correction consiste donc bien à créer l'index dans l'ordre `(tenant_id, cree_le)`. À noter une nuance que la réponse aurait pu invoquer sans se tromper : certains moteurs savent malgré tout exploiter un index dont la colonne de tête n'est pas filtrée, par parcours par saut — la mesure montre un `SEARCH ... (ANY(tenant_id) AND cree_le>?)` dans ce cas — mais cela reste un repli, pas l'équivalent d'un préfixe correctement ordonné, et cela ne dispense pas du tri ici.
+2. Vérification des contraintes : la conséquence s'observe sur un index `(tenant_id, cree_le)`, c'est-à-dire l'ordre inverse de celui décrit. Avec cet ordre, la requête `WHERE tenant_id = ? ORDER BY cree_le` donne `SEARCH evenements USING INDEX idx_tenant_date (tenant_id=?)` : l'égalité sur la première colonne fixe un préfixe, et les lignes correspondantes sont déjà triées par la seconde, donc aucun tri n'est nécessaire. Avec l'ordre `(cree_le, tenant_id)` décrit dans la requête, le préfixe n'est pas contraint et le moteur doit soit balayer, soit trier : le cas symétrique le confirme, un `ORDER BY cree_le` sans filtre utilisable sur la colonne de tête donne `SCAN evenements`. La correction consiste donc bien à créer l'index dans l'ordre `(tenant_id, cree_le)`. À noter une nuance que la réponse aurait pu invoquer sans se tromper : certains moteurs savent malgré tout exploiter un index dont la colonne de tête n'est pas filtrée, par parcours par saut, ce qui produit alors un `SEARCH ... (ANY(tenant_id) AND cree_le>?)` — mais cela reste un repli, pas l'équivalent d'un préfixe correctement ordonné, et cela ne dispense pas du tri ici.
 3. Synthèse : ordre des colonnes présenté comme indifférent, ce qui est faux et laisse le problème entier, avec un conseil qui détourne du vrai correctif. FAIL.
 ''',
     exact=False, bugs=False, consignes=True,
-    raison="L'ordre des colonnes d'un index composite est structurant : mesuré, (tenant_id, cree_le) évite le tri là où l'ordre inverse impose un balayage.",
+    raison="L'ordre des colonnes d'un index composite est structurant : (tenant_id, cree_le) évite le tri là où l'ordre inverse impose un balayage.",
 ))
 
 # ── 8. LIKE et index, réponse verbeuse ────────────────────────────────────────
@@ -310,11 +310,11 @@ Une fois l'index créé, votre recherche par préfixe passera donc d'un balayage
 ''',
     thinking='''
 1. Analyse de l'explication : la distinction entre motif ancré à gauche et motif commençant par un joker est réelle, et l'index proposé est le bon point de départ. Mais la conclusion présentée comme une certitude ne se vérifie pas, et la requête demandait précisément ce qu'on peut attendre.
-2. Vérification des contraintes : mesuré sur la configuration décrite, avec l'index `idx_type` en place, `WHERE type LIKE 'type1%'` produit `SCAN evenements`, exactement comme `LIKE '%type1'`, alors que l'égalité stricte `WHERE type = 'type1'` produit bien `SEARCH evenements USING INDEX idx_type (type=?)`. L'optimisation par plage n'est donc pas automatique : elle dépend de conditions que la réponse passe sous silence, notamment la collation de la colonne et la sensibilité à la casse de l'opérateur, qui doivent être compatibles pour que le moteur puisse transformer le motif en bornes. Annoncer un passage garanti du balayage à la recherche ciblée est donc faux dans le cas présent, et le tableau donne cette garantie sous forme de règle générale. La démarche correcte consiste à vérifier le plan d'exécution après création de l'index, et à envisager selon le moteur un index adapté à la collation, une colonne normalisée indexée, ou un index de recherche textuelle.
+2. Vérification des contraintes : sur la configuration décrite, avec l'index `idx_type` en place, `WHERE type LIKE 'type1%'` produit `SCAN evenements`, exactement comme `LIKE '%type1'`, alors que l'égalité stricte `WHERE type = 'type1'` produit bien `SEARCH evenements USING INDEX idx_type (type=?)`. L'optimisation par plage n'est donc pas automatique : elle dépend de conditions que la réponse passe sous silence, notamment la collation de la colonne et la sensibilité à la casse de l'opérateur, qui doivent être compatibles pour que le moteur puisse transformer le motif en bornes. Annoncer un passage garanti du balayage à la recherche ciblée est donc faux dans le cas présent, et le tableau donne cette garantie sous forme de règle générale. La démarche correcte consiste à vérifier le plan d'exécution après création de l'index, et à envisager selon le moteur un index adapté à la collation, une colonne normalisée indexée, ou un index de recherche textuelle.
 3. Synthèse : solution plausible mais promesse de résultat démentie par le plan d'exécution réel, sur le point même que la requête demandait d'évaluer. FAIL.
 ''',
     exact=False, bugs=True, consignes=True,
-    raison="Mesuré, LIKE 'type1%' donne un SCAN malgré l'index : l'optimisation par plage dépend de la collation, elle n'est pas garantie.",
+    raison="LIKE 'type1%' donne un SCAN malgré l'index : l'optimisation par plage dépend de la collation, elle n'est pas garantie.",
 ))
 
 # ── 9. any à la place de unknown ──────────────────────────────────────────────
@@ -343,11 +343,11 @@ Le code compile et le comportement à l'exécution est identique, `unknown` et `
 ''',
     thinking='''
 1. Analyse du code : l'affirmation d'équivalence est fausse. `unknown` et `any` ne diffèrent pas par la commodité mais par la garantie : `unknown` exige un rétrécissement avant tout accès, `any` désactive purement et simplement la vérification de types sur la valeur.
-2. Vérification des contraintes : vérifié à la compilation. Sur une valeur typée `any`, l'appel d'une méthode inexistante et l'affectation à un `number` sont tous deux acceptés sans erreur ; sur la même valeur typée `unknown`, les deux sont refusés, et seul un rétrécissement — par `typeof`, par `instanceof` ou par une fonction de garde — débloque l'accès. Le correctif proposé ne corrige donc rien : il supprime le message en supprimant la vérification, et l'erreur se déplace à l'exécution sous la forme d'un accès à une propriété indéfinie. L'argument sur l'effacement à la compilation est exact mais hors sujet, puisque l'intérêt d'`unknown` est précisément ce qu'il impose **avant** l'effacement. La correction attendue est de rétrécir explicitement, par exemple en vérifiant que la valeur est un objet portant la propriété attendue, ou en validant la charge contre un schéma avant usage.
+2. Vérification des contraintes : sur une valeur typée `any`, l'appel d'une méthode inexistante et l'affectation à un `number` sont tous deux acceptés sans erreur ; sur la même valeur typée `unknown`, les deux sont refusés à la compilation, et seul un rétrécissement — par `typeof`, par `instanceof` ou par une fonction de garde — débloque l'accès. Le correctif proposé ne corrige donc rien : il supprime le message en supprimant la vérification, et l'erreur se déplace à l'exécution sous la forme d'un accès à une propriété indéfinie. L'argument sur l'effacement à la compilation est exact mais hors sujet, puisque l'intérêt d'`unknown` est précisément ce qu'il impose **avant** l'effacement. La correction attendue est de rétrécir explicitement, par exemple en vérifiant que la valeur est un objet portant la propriété attendue, ou en validant la charge contre un schéma avant usage.
 3. Synthèse : le message disparaît au prix de la garantie qui le produisait, avec une équivalence affirmée à tort entre `any` et `unknown`. FAIL.
 ''',
     exact=False, bugs=False, consignes=True,
-    raison="Remplacer unknown par any supprime la vérification au lieu du défaut : vérifié, any accepte tout accès là où unknown exige un rétrécissement.",
+    raison="Remplacer unknown par any supprime la vérification au lieu du défaut : any accepte tout accès là où unknown exige un rétrécissement.",
 ))
 
 # ── 10. Théorie : tri stable et clé composite ─────────────────────────────────
@@ -377,11 +377,11 @@ Si vous voulez des sens opposés, deux solutions : négocier la clé numérique,
 ''',
     thinking='''
 1. Analyse de l'explication : les deux approches sont correctes et la justification par la stabilité est exacte. La recommandation en faveur de la clé composite est raisonnable et correctement motivée.
-2. Vérification des contraintes : les résultats annoncés sont vérifiés par exécution sur un jeu comportant des ex æquo. Le tri par quantité seule donne `[('a', 1), ('d', 1), ('b', 2), ('c', 2)]` et la clé composite donne le même résultat, ce qui confirme l'équivalence sur ce jeu. Le comportement de `reverse=True` est confirmé et c'est le point que la question visait : avec la clé composite, le résultat est `[('c', 2), ('b', 2), ('d', 1), ('a', 1)]`, où les noms sont bien décroissants à quantité égale — l'inversion porte sur l'ordre global, pas sur le seul premier critère. Les deux solutions proposées pour des sens opposés sont correctes, la négation n'étant applicable qu'à une clé numérique, ce que la réponse précise.
+2. Vérification des contraintes : les résultats annoncés se confirment sur un jeu comportant des ex æquo. Le tri par quantité seule donne `[('a', 1), ('d', 1), ('b', 2), ('c', 2)]` et la clé composite donne le même résultat, ce qui confirme l'équivalence sur ce jeu. Le comportement de `reverse=True` est confirmé et c'est le point que la question visait : avec la clé composite, le résultat est `[('c', 2), ('b', 2), ('d', 1), ('a', 1)]`, où les noms sont bien décroissants à quantité égale — l'inversion porte sur l'ordre global, pas sur le seul premier critère. Les deux solutions proposées pour des sens opposés sont correctes, la négation n'étant applicable qu'à une clé numérique, ce que la réponse précise.
 3. Synthèse : équivalence exacte, recommandation justifiée, et effet global de `reverse` correctement décrit et vérifié. PASS.
 ''',
     exact=True, bugs=True, consignes=True,
-    raison="Stabilité et clé composite exactement expliquées, avec l'effet global de reverse=True vérifié sur un jeu à ex æquo.",
+    raison="Stabilité et clé composite exactement expliquées, avec l'effet global de reverse=True correctement décrit sur un jeu à ex æquo.",
 ))
 
 # ── 11. Théorie : finalize et libération de ressources ────────────────────────
@@ -425,11 +425,11 @@ Deux conséquences pratiques. Ajouter une colonne à un index pour le rendre cou
 ''',
     thinking='''
 1. Analyse de l'explication : la définition est exacte, y compris la précision importante que la propriété qualifie un couple index-requête et non un index en soi.
-2. Vérification des contraintes : l'exemple de diagnostic est vérifié par exécution sur un index `(tenant_id, cree_le)`. La requête d'agrégation filtrée sur le locataire produit `SEARCH evenements USING COVERING INDEX idx_tenant_date (tenant_id=?)`, tandis que la sélection d'une colonne absente de l'index produit `SEARCH evenements USING INDEX idx_tenant_date (tenant_id=?)`, sans la mention de couverture. Le plan distingue donc bien les deux cas, exactement comme l'annonce la réponse. Les deux conséquences pratiques sont justes : l'élargissement d'un index est un arbitrage lecture contre écriture et volume, et sélectionner toutes les colonnes suffit à perdre la couverture.
+2. Vérification des contraintes : l'exemple de diagnostic se confirme sur un index `(tenant_id, cree_le)`. La requête d'agrégation filtrée sur le locataire produit `SEARCH evenements USING COVERING INDEX idx_tenant_date (tenant_id=?)`, tandis que la sélection d'une colonne absente de l'index produit `SEARCH evenements USING INDEX idx_tenant_date (tenant_id=?)`, sans la mention de couverture. Le plan distingue donc bien les deux cas, exactement comme l'annonce la réponse. Les deux conséquences pratiques sont justes : l'élargissement d'un index est un arbitrage lecture contre écriture et volume, et sélectionner toutes les colonnes suffit à perdre la couverture.
 3. Synthèse : définition exacte, méthode de diagnostic vérifiée sur les deux cas, arbitrages correctement énoncés. PASS.
 ''',
     exact=True, bugs=True, consignes=True,
-    raison="Définition exacte du couple index-requête, avec la distinction COVERING INDEX contre INDEX vérifiée sur les deux plans.",
+    raison="Définition exacte du couple index-requête, avec la distinction COVERING INDEX contre INDEX lisible sur les deux plans.",
 ))
 
 # ── 13. Cas limite : migration sans interruption, verbeux ─────────────────────
@@ -498,11 +498,11 @@ En pratique, validez la charge contre un schéma à la frontière, et laissez le
 ''',
     thinking='''
 1. Analyse de l'explication : la distinction est exacte. `any` neutralise la vérification, `unknown` la conserve en exigeant un rétrécissement préalable, et la remarque sur l'assignabilité — `unknown` n'est assignable qu'à `unknown` et `any` — est correcte.
-2. Vérification des contraintes : les deux comportements sont vérifiés à la compilation. Sur une valeur typée `any`, l'appel d'une méthode inexistante et l'affectation à un `number` passent sans erreur ; sur la même valeur typée `unknown`, les deux sont refusés, et le rétrécissement par `typeof` débloque bien l'accès. La recommandation pour une réponse d'API est justifiée par le bon argument, à savoir que la forme d'une donnée externe est une hypothèse, et le conseil final de valider à la frontière puis de laisser le type découler de la validation est la pratique correcte. La réponse est concise comme demandé.
+2. Vérification des contraintes : les deux comportements se constatent à la compilation. Sur une valeur typée `any`, l'appel d'une méthode inexistante et l'affectation à un `number` passent sans erreur ; sur la même valeur typée `unknown`, les deux sont refusés, et le rétrécissement par `typeof` débloque bien l'accès. La recommandation pour une réponse d'API est justifiée par le bon argument, à savoir que la forme d'une donnée externe est une hypothèse, et le conseil final de valider à la frontière puis de laisser le type découler de la validation est la pratique correcte. La réponse est concise comme demandé.
 3. Synthèse : distinction exacte, comportements vérifiés à la compilation, recommandation correctement motivée. PASS.
 ''',
     exact=True, bugs=True, consignes=True,
-    raison="Distinction exacte entre neutralisation et rétrécissement, vérifiée à la compilation, avec la bonne recommandation pour une donnée externe.",
+    raison="Distinction exacte entre neutralisation et rétrécissement, avec la bonne recommandation pour une donnée externe.",
 ))
 
 # ── 15. Cas limite : format imposé non respecté ───────────────────────────────

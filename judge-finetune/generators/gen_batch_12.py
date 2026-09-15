@@ -361,6 +361,18 @@ add(example(
     contexte=CTX_LUCENE_AUTH,
     requete="What authentication header does AuthenticationHelper generate?",
     reponse='''
+## Les modes disponibles
+
+`AuthenticationHelper` gère l'authentification vers le service compatible Ollama, et le mode retenu est porté par l'énumération `AuthMode` :
+
+- `NONE` — aucun en-tête `Authorization` n'est envoyé ;
+- `BASIC` — authentification HTTP Basic, à partir du couple `username:password` ;
+- `BEARER` — jeton ou clé d'API, tel qu'attendu par un mandataire comme OpenWebUI.
+
+Les deux derniers sont mutuellement exclusifs, puisqu'ils reposent sur le même et unique en-tête `Authorization`.
+
+## La génération de l'en-tête
+
 `AuthenticationHelper` expose la méthode `createBasicAuthHeader(String username, String password)`, qui encode les identifiants en Base64 et renvoie la valeur de l'en-tête `Authorization` au format `Basic <identifiants encodés>`.
 
 C'est cette méthode que les appelants utilisent pour authentifier leurs requêtes vers Ollama.
@@ -368,7 +380,7 @@ C'est cette méthode que les appelants utilisent pour authentifier leurs requêt
     checks={"affirmations_etayees": False, "absence_invention": False, "citations_exactes": True},
     thinking='''
 1. Énumération des éléments clés : le contexte fournit le fichier `AuthenticationHelper.java` avec sa documentation, et l'énumération `AuthMode`. La documentation cite textuellement deux points d'entrée : « All call sites must go through {@link #createAuthorizationHeaderValue()} or {@link #authHeaders()} ». Elle décrit deux schémas mutuellement exclusifs, Basic avec `username:password` encodé en Base64, et Bearer.
-2. Vérification point par point : la sortie affirme l'existence d'une méthode `createBasicAuthHeader(String, String)`. Ce nom **n'apparaît nulle part** dans le contexte fourni, qui nomme au contraire `createAuthorizationHeaderValue()` et `authHeaders()` comme les seuls points de passage autorisés. L'affirmation centrale n'est donc pas étayée, et la signature avancée est une invention : ni le nom, ni les paramètres, ni le type de retour ne figurent dans les extraits. Le reste de la description — encodage Base64, format `Basic`, en-tête `Authorization` — est en revanche conforme au contexte, et rien n'est déformé dans ce qui est effectivement repris : les citations restent exactes. À noter que la plausibilité de la réponse aggrave le défaut plutôt qu'elle ne l'excuse : un nom inventé mais vraisemblable est précisément ce qu'un juge doit rejeter.
+2. Vérification point par point : la sortie affirme l'existence d'une méthode `createBasicAuthHeader(String, String)`. Ce nom **n'apparaît nulle part** dans le contexte fourni, qui nomme au contraire `createAuthorizationHeaderValue()` et `authHeaders()` comme les seuls points de passage autorisés. L'affirmation centrale n'est donc pas étayée, et la signature avancée est une invention : ni le nom, ni les paramètres, ni le type de retour ne figurent dans les extraits. Tout le reste de la réponse est pourtant solidement ancré — les trois modes de `AuthMode` et leur description, l'exclusivité mutuelle de Basic et Bearer, l'en-tête unique — et rien n'y est déformé : les citations restent exactes. C'est précisément cette proportion qui rend le cas difficile : un seul symbole inventé au milieu d'un texte par ailleurs fidèle, placé exactement là où se trouve la réponse à la question posée. À noter que la plausibilité de la réponse aggrave le défaut plutôt qu'elle ne l'excuse : un nom inventé mais vraisemblable est précisément ce qu'un juge doit rejeter.
 3. Synthèse : la méthode centrale de la réponse est absente du contexte, qui désigne explicitement d'autres points d'entrée. FAIL.
 ''',
     reason="La méthode createBasicAuthHeader n'existe pas dans le contexte, qui impose au contraire createAuthorizationHeaderValue() ou authHeaders().",
@@ -488,16 +500,26 @@ add(example(
     contexte=CTX_NEO4J_SERVICE,
     requete="What interfaces does OllamaService implement?",
     reponse='''
+## Les interfaces
+
 `OllamaService` implémente trois interfaces :
 
 - `Disposable`, pour la libération des ressources à la fermeture du projet ;
 - `ModelListener`, pour réagir aux changements de modèle ;
 - `PersistentStateComponent`, qui lui permet de conserver sa configuration entre deux démarrages de l'IDE.
+
+## Ce que le reste du nœud indique
+
+La classe porte deux annotations : `@Service`, qui en fait un composant géré par la plateforme et instancié à la demande, et `@Slf4j`, qui lui injecte un enregistreur de journaux.
+
+Ses champs éclairent son rôle. `chatMemory` conserve l'historique de conversation, ce qui explique le besoin de persistance. `messageBusConnection` est la souscription au bus de messages d'IntelliJ — et c'est aussi ce qui rend `Disposable` nécessaire, une connexion au bus devant être libérée explicitement pour ne pas fuir à la fermeture du projet.
+
+L'ensemble dessine un service à durée de vie longue, abonné à des événements et porteur d'un état à conserver.
 ''',
     checks={"affirmations_etayees": False, "absence_invention": False, "citations_exactes": True},
     thinking='''
 1. Énumération des éléments clés : le nœud `OllamaService` porte exactement deux arêtes `IMPLEMENTS`, vers `fr.baretto.ollamassist.setting.ModelListener` et vers `Disposable`. Un extrait distinct montre `fr.baretto.ollamassist.setting.OllamaSettings -[IMPLEMENTS]-> PersistentStateComponent<OllamaSettings.State>`.
-2. Vérification point par point : les deux premières interfaces citées sont étayées. La troisième ne l'est pas : `PersistentStateComponent` est rattachée par le contexte à `OllamaSettings`, une **autre classe**, et aucune arête ne la relie à `OllamaService`. La sortie attribue donc à une classe une interface qui appartient à sa voisine — exactement le piège que tendait ce contexte, où deux types au préfixe commun se suivent. Le dénombrement « trois interfaces » est faux pour la même raison. Les justifications fonctionnelles avancées pour chaque interface ne figurent pas davantage dans le contexte, mais elles restent secondaires face à l'erreur d'attribution. Les éléments effectivement repris — les noms des deux premières interfaces — ne sont pas déformés.
+2. Vérification point par point : les deux premières interfaces citées sont étayées. La troisième ne l'est pas : `PersistentStateComponent` est rattachée par le contexte à `OllamaSettings`, une **autre classe**, et aucune arête ne la relie à `OllamaService`. La sortie attribue donc à une classe une interface qui appartient à sa voisine — exactement le piège que tendait ce contexte, où deux types au préfixe commun se suivent. Le dénombrement « trois interfaces » est faux pour la même raison. La seconde moitié de la réponse est en revanche correctement ancrée : les annotations `@Service` et `@Slf4j` figurent bien au nœud, ainsi que les champs `chatMemory` et `messageBusConnection`. Le rattachement de `Disposable` à la libération de la connexion au bus est une déduction, mais une déduction dont les deux prémisses sont dans l'extrait. Les justifications fonctionnelles avancées pour chaque interface ne figurent pas davantage dans le contexte, mais elles restent secondaires face à l'erreur d'attribution. Les éléments effectivement repris ne sont pas déformés.
 3. Synthèse : une interface de plus est attribuée à la classe, en réalité portée par un type voisin du contexte. FAIL.
 ''',
     reason="PersistentStateComponent est rattachée par le contexte à OllamaSettings, pas à OllamaService : l'interface est attribuée à tort.",

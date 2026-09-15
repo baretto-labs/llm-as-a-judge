@@ -466,12 +466,18 @@ add(example(
     task="RAG_FAITHFULNESS", contexte=CTX_NEO4J_REFACTOR,
     requete="What does the dismiss method do in RefactorAction?",
     reponse='''
+## Ce que fait la méthode
+
 `dismiss(Editor)` démonte l'ensemble du dispositif de prévisualisation d'un refactoring : elle retire l'écouteur de souris et l'écouteur de mouvement enregistrés sous `MOUSE_LISTENER_KEY` et `MOUSE_MOTION_LISTENER_KEY`, supprime le surligneur de différences stocké sous `HIGHLIGHTER_KEY`, puis dispose l'inlay `RefactoringInlayRenderer` attaché à l'éditeur.
+
+## Sa place dans la classe
+
+La méthode est privée et ne renvoie rien : c'est un utilitaire interne, pas un point d'entrée de l'action. Elle est appelée depuis `createMouseAdapter(Project, Editor, String, TextRange, RefactoringInlayRenderer)`, c'est-à-dire depuis le code qui installe l'interaction — la même unité monte le dispositif et fournit le moyen de le retirer.
 ''',
     checks={"affirmations_etayees": False, "absence_invention": False, "citations_exactes": True},
     thinking='''
 1. Énumération des éléments clés : le contexte fournit le nœud `dismiss(Editor)` — visibilité, type de retour, paramètre, appelant — et le nœud de classe listant `MOUSE_LISTENER_KEY`, `MOUSE_MOTION_LISTENER_KEY` et `HIGHLIGHTER_KEY`, ainsi que le nœud `RefactoringInlayRenderer`. Aucun corps de méthode n'est fourni.
-2. Vérification point par point : les noms cités existent bien dans le contexte, et les citations ne sont pas déformées — c'est le seul contrôle que la sortie satisfait. En revanche, l'**action** attribuée à la méthode n'est nulle part étayée : rien ne dit qu'elle retire ces écouteurs, supprime ce surligneur ou dispose cet inlay. La sortie construit un comportement plausible à partir d'une liste de noms de clés, ce qui est une inférence et non une lecture. La différence avec une formulation acceptable est mince mais décisive : dire que la méthode intervient dans un dispositif comportant ces éléments est étayé, affirmer qu'elle les retire dans cet ordre ne l'est pas. La description se trouve être exacte dans la codebase, ce qui ne la rend pas étayée pour autant. Le qualificatif « surligneur de différences » ajoute même une précision que le seul nom de clé ne porte pas.
+2. Vérification point par point : les noms cités existent bien dans le contexte, et les citations ne sont pas déformées — c'est le seul contrôle que la sortie satisfait. La deuxième section est d'ailleurs entièrement étayée : la visibilité privée, le type de retour et la signature complète de l'appelant figurent tels quels dans les extraits. En revanche, l'**action** attribuée à la méthode n'est nulle part étayée : rien ne dit qu'elle retire ces écouteurs, supprime ce surligneur ou dispose cet inlay. La sortie construit un comportement plausible à partir d'une liste de noms de clés, ce qui est une inférence et non une lecture. La différence avec une formulation acceptable est mince mais décisive : dire que la méthode intervient dans un dispositif comportant ces éléments est étayé, affirmer qu'elle les retire dans cet ordre ne l'est pas. La description se trouve être exacte dans la codebase, ce qui ne la rend pas étayée pour autant. Le qualificatif « surligneur de différences » ajoute même une précision que le seul nom de clé ne porte pas.
 3. Synthèse : les noms viennent du contexte, mais le comportement décrit est déduit de noms de clés, sans aucun corps de méthode pour l'établir. FAIL.
 ''',
     reason="Le comportement attribué à dismiss est déduit de noms de clés : aucun corps de méthode ne figure au contexte pour l'étayer.",
@@ -483,12 +489,26 @@ add(example(
     task="RAG_FAITHFULNESS", contexte=CTX_NEO4J_APPROVAL,
     requete="How does FileCreator request user approval via FileApprovalNotifier?",
     reponse='''
+## Le déroulé
+
 `FileCreator` appelle sa méthode `requestApproval(String filePath, String content, String title)`, qui publie une demande sur le sujet du bus de messages et attend une `ApprovalDecision`. Si l'utilisateur ne répond pas dans le délai imparti, une `ApprovalTimeoutException` est levée.
+
+## Les trois arguments
+
+Le chemin et le contenu permettent à l'interface d'afficher ce qui va être écrit avant que l'utilisateur ne tranche — c'est la condition d'une approbation éclairée, par opposition à une boîte de dialogue qui demanderait un accord à l'aveugle. Le titre sert d'intitulé à la demande.
+
+## La décision
+
+`ApprovalDecision` est le type de retour, et il est également manipulé sous la forme d'un `Consumer<FileApprovalNotifier.ApprovalDecision>`, ce qui indique une remise par rappel : l'appelant fournit quoi faire de la décision plutôt que de l'attendre sur place.
+
+## Sur le délai
+
+`ApprovalTimeoutException` étend `RuntimeException` : elle n'est donc pas vérifiée par le compilateur, et rien n'oblige un appelant à la traiter. Sur un chemin où l'attente peut réellement expirer, mieux vaut la capturer explicitement plutôt que de la laisser remonter.
 ''',
     checks={"affirmations_etayees": False, "absence_invention": False, "citations_exactes": True},
     thinking='''
 1. Énumération des éléments clés : le contexte fournit `ToolApprovalHelper.requestApproval(String, String, String)` renvoyant une `FileApprovalNotifier.ApprovalDecision`, le type `Consumer<ApprovalDecision>`, `ApprovalTimeoutException -[EXTENDS]-> RuntimeException`, et un réglage d'approbation automatique. `FileCreator` n'y figure pas.
-2. Vérification point par point : la signature citée est exacte, mais la classe à laquelle elle est attribuée ne l'est pas. Le contexte rattache sans ambiguïté `requestApproval` à `ToolApprovalHelper` ; écrire que `FileCreator` appelle **sa** méthode déplace la fonction d'une classe à une autre, et rien dans les extraits n'établit même que `FileCreator` participe à ce mécanisme. La mention du sujet de bus de messages n'est pas davantage étayée : le contexte montre un type de décision et un consommateur, jamais une publication sur un topic. Le lien entre l'exception de délai et cette méthode est également supposé — l'exception existe bien au contexte, son déclenchement par `requestApproval` n'y est pas montré. Les éléments repris ne sont pas déformés pris isolément, d'où le seul contrôle satisfait.
+2. Vérification point par point : la signature citée est exacte, mais la classe à laquelle elle est attribuée ne l'est pas. Le contexte rattache sans ambiguïté `requestApproval` à `ToolApprovalHelper` ; écrire que `FileCreator` appelle **sa** méthode déplace la fonction d'une classe à une autre, et rien dans les extraits n'établit même que `FileCreator` participe à ce mécanisme. La mention du sujet de bus de messages n'est pas davantage étayée : le contexte montre un type de décision et un consommateur, jamais une publication sur un topic. Le lien entre l'exception de délai et cette méthode est également supposé — l'exception existe bien au contexte, son déclenchement par `requestApproval` n'y est pas montré. Deux sections sont pourtant correctement ancrées : le `Consumer<ApprovalDecision>` et l'héritage de `RuntimeException` figurent tous deux au contexte, et la lecture qui en est faite est juste. Le défaut tient donc à l'attribution initiale, reconduite ensuite par le possessif tout au long du texte. Les éléments repris ne sont pas déformés pris isolément, d'où le seul contrôle satisfait.
 3. Synthèse : la méthode est attribuée à une classe absente du contexte, alors que les extraits la rattachent explicitement à une autre. FAIL.
 ''',
     reason="Le contexte rattache requestApproval à ToolApprovalHelper ; FileCreator n'y figure pas, et la publication sur un topic n'est pas montrée.",
@@ -526,14 +546,24 @@ add(example(
     task="RAG_FAITHFULNESS", contexte=CTX_LUCENE_BATCH,
     requete="How does DocumentIndexingPipeline process documents in batches?",
     reponse='''
+## Les valeurs
+
 `processBatch()` draine la file d'attente par paquets de **10 documents** — la constante `BATCH_SIZE` vaut 10 — après avoir vérifié que le pipeline tourne et que la file n'est pas vide. En traitement synchrone, la taille passe à 100 via `SYNCHRONOUS_BATCH_SIZE`.
 
+## La séquence
+
 La méthode prend le verrou `processingLock` et synchronise les producteurs avec `processingPhaser.arriveAndAwaitAdvance()` avant de drainer.
+
+L'ordre des opérations mérite attention. La garde d'entrée sort immédiatement si `isRunning` est faux ou si `processingQueue` est vide, ce qui évite de payer la synchronisation pour rien sur un pipeline au repos. La barrière du phaser vient ensuite, puis seulement le verrou : on attend que les producteurs soient au rendez-vous avant de prendre l'exclusivité, et non l'inverse.
+
+## Le drainage
+
+`processingQueue.drainTo(currentBatch, BATCH_SIZE)` transfère les éléments de la file vers la liste en une opération, plutôt que par une boucle de retraits successifs. La liste est d'ailleurs pré-dimensionnée par `new ArrayList<>(BATCH_SIZE)`, ce qui évite les réallocations pendant le transfert.
 ''',
     checks={"affirmations_etayees": False, "absence_invention": False, "citations_exactes": True},
     thinking='''
 1. Énumération des éléments clés : le contexte fournit le corps de `processBatch`, qui montre la garde `if (!isRunning || processingQueue.isEmpty()) return;`, l'appel `processingPhaser.arriveAndAwaitAdvance()`, la prise de `processingLock`, puis `new ArrayList<>(BATCH_SIZE)` et `processingQueue.drainTo(currentBatch, BATCH_SIZE)`.
-2. Vérification point par point : le second paragraphe est entièrement étayé — verrou, phaser et garde figurent littéralement dans le corps fourni, et les citations sont exactes. Le premier ne l'est pas. La valeur 10 attribuée à `BATCH_SIZE` n'apparaît nulle part : la constante est utilisée deux fois dans le corps, jamais déclarée. `SYNCHRONOUS_BATCH_SIZE` et sa valeur de 100 sont absentes du contexte dans son intégralité. Les deux chiffres correspondent au code réel, et c'est le piège : ils donnent à la réponse une précision qui semble venir d'une lecture attentive, alors qu'ils viennent d'ailleurs. Le contexte permettait pourtant une formulation juste — drainer au plus `BATCH_SIZE` éléments, valeur non visible.
+2. Vérification point par point : tout ce qui décrit la mécanique est étayé — verrou, phaser, garde d'entrée, `drainTo` et pré-dimensionnement de la liste figurent littéralement dans le corps fourni, et les citations sont exactes. La lecture de l'ordre des opérations est juste elle aussi, elle se lit directement dans le corps fourni. La première section, elle, ne l'est pas. La valeur 10 attribuée à `BATCH_SIZE` n'apparaît nulle part : la constante est utilisée deux fois dans le corps, jamais déclarée. `SYNCHRONOUS_BATCH_SIZE` et sa valeur de 100 sont absentes du contexte dans son intégralité. Les deux chiffres correspondent au code réel, et c'est le piège : ils donnent à la réponse une précision qui semble venir d'une lecture attentive, alors qu'ils viennent d'ailleurs. Le contexte permettait pourtant une formulation juste — drainer au plus `BATCH_SIZE` éléments, valeur non visible.
 3. Synthèse : le mécanisme décrit est correct et étayé, mais les deux valeurs chiffrées avancées sont absentes du contexte. FAIL.
 ''',
     reason="Les valeurs 10 et 100 n'apparaissent pas : BATCH_SIZE n'est qu'utilisée dans le corps fourni, et SYNCHRONOUS_BATCH_SIZE en est absente.",

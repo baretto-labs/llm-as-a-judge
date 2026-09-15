@@ -406,12 +406,18 @@ add(example(
     contexte=CTX_NEO4J_PARSER,
     requete="What does BracketCallParser parse from LLM output?",
     reponse='''
+## Le format reconnu
+
 `BracketCallParser` reconnaît le format `[CALL CreateFile('chemin', 'contenu')]` dans la sortie du modèle. Il s'agit de la seule commande prise en charge : le parseur ne gère que `CreateFile`, et renvoie un `Optional` vide pour toute autre forme.
+
+## Sa place dans le dispositif
+
+La classe implémente `ToolCallParser` et redéfinit `parse(String)`, comme l'indique l'annotation `@Override`. Le type de retour, `Optional<DetectedToolCall>`, encode directement le fait qu'une analyse puisse ne rien trouver : pas de valeur sentinelle, pas de `null` à tester chez l'appelant. L'appelant en question est `ToolCallDetector.detect(String)`, qui interroge les parseurs dont il dispose.
 ''',
     checks={"affirmations_etayees": False, "absence_invention": False, "citations_exactes": True},
     thinking='''
 1. Énumération des éléments clés : le contexte fournit le nœud de classe `BracketCallParser`, implémentant `ToolCallParser`, avec les champs `BRACKET_PATTERN` et `MAX_ARGUMENTS`, ainsi que les deux nœuds `parse(String)` renvoyant `Optional<DetectedToolCall>`.
-2. Vérification point par point : le type de retour `Optional` est bien étayé, et le nom `BRACKET_PATTERN` soutient l'idée d'une reconnaissance par motif entre crochets. Le reste ne l'est pas. La syntaxe exacte `[CALL CreateFile('chemin', 'contenu')]` n'apparaît nulle part : le contexte nomme un champ de motif sans en donner la valeur. Surtout, l'affirmation selon laquelle `CreateFile` serait la **seule** commande prise en charge est une restriction que rien ne soutient — le contexte ne mentionne jamais `CreateFile`, et le champ `MAX_ARGUMENTS` suggère au contraire un format paramétrable. Cette affirmation se trouve être exacte dans la codebase, mais elle ne peut pas être lue dans les extraits fournis : sous cette tâche, elle doit être rejetée. Une portée annoncée à tort comme exhaustive est d'ailleurs le type d'erreur le plus coûteux, puisqu'elle ferme la question.
+2. Vérification point par point : la seconde section est solidement ancrée — l'arête `IMPLEMENTS` vers `ToolCallParser`, l'annotation `@Override`, le type de retour `Optional<DetectedToolCall>` et l'appelant `ToolCallDetector.detect(String)` figurent tels quels dans les extraits, et la lecture qui en est faite est juste. La première ne l'est pas. La syntaxe exacte `[CALL CreateFile('chemin', 'contenu')]` n'apparaît nulle part : le contexte nomme un champ de motif sans en donner la valeur. Surtout, l'affirmation selon laquelle `CreateFile` serait la **seule** commande prise en charge est une restriction que rien ne soutient — le contexte ne mentionne jamais `CreateFile`, et le champ `MAX_ARGUMENTS` suggère au contraire un format paramétrable. Cette affirmation se trouve être exacte dans la codebase, mais elle ne peut pas être lue dans les extraits fournis : sous cette tâche, elle doit être rejetée. Une portée annoncée à tort comme exhaustive est d'ailleurs le type d'erreur le plus coûteux, puisqu'elle ferme la question.
 3. Synthèse : la syntaxe citée et la restriction à une commande unique sont absentes du contexte, qui ne donne ni la valeur du motif ni aucun nom de commande. FAIL.
 ''',
     reason="Ni la syntaxe [CALL CreateFile(...)] ni la restriction à cette seule commande ne figurent au contexte, qui ne donne pas la valeur de BRACKET_PATTERN.",
@@ -449,17 +455,25 @@ add(example(
     contexte=CTX_NEO4J_ASSISTANT,
     requete="What methods does the Assistant interface define?",
     reponse='''
+## Les méthodes
+
 L'interface `Assistant` définit deux méthodes, toutes deux renvoyant un `TokenStream` :
 
 - `chat(String systemPrompt, String message)` ;
 - `refactor(String refactorPrompt, String code, String language)`.
 
-Le type `TokenStream` permet de consommer la réponse du modèle au fil de sa génération.
+## Le type de retour
+
+Le type `TokenStream` permet de consommer la réponse du modèle au fil de sa génération. C'est ce qui rend possible l'affichage progressif dans la fenêtre de discussion : l'interface reçoit les jetons à mesure qu'ils arrivent, au lieu d'attendre la fin de la génération pour afficher un bloc complet.
+
+## Le découpage des paramètres
+
+Séparer l'invite système du message utilisateur, plutôt que de les concaténer, laisse la couche d'infrastructure décider du gabarit exact attendu par le modèle.
 ''',
     checks={"affirmations_etayees": False, "absence_invention": False, "citations_exactes": True},
     thinking='''
 1. Énumération des éléments clés : le contexte fournit `ConversationMessage.assistant(String)`, `LightModelService.handleSuggestion(Editor)`, le nœud `AnAction` et deux fonctions `getAuthMode()`. L'interface `Assistant` n'y figure pas.
-2. Vérification point par point : aucune des deux méthodes citées n'apparaît dans les extraits, pas plus que le type `TokenStream`. La réponse décrit donc intégralement une interface absente du contexte fourni. Ces signatures sont exactes dans la codebase réelle, et c'est précisément ce qui rend le cas instructif : la sortie est juste, et doit malgré tout être rejetée, puisque rien dans le contexte ne la soutient. Accepter une réponse parce qu'elle sonne vrai revient à évaluer sa propre connaissance du sujet, pas l'ancrage de la réponse — et sur un contexte où la vérité diffère, le même jugement laisserait passer une invention. Le seul élément du contexte phonétiquement proche, `ConversationMessage.assistant(String)`, est une méthode de fabrique sans rapport, que la sortie ne mentionne d'ailleurs pas. Aucune citation n'est déformée, la sortie n'en fait aucune.
+2. Vérification point par point : aucune des deux méthodes citées n'apparaît dans les extraits, pas plus que le type `TokenStream`. La réponse décrit donc intégralement une interface absente du contexte fourni — et elle ne s'arrête pas aux signatures : l'affichage progressif et la séparation de l'invite système sont deux développements dont pas un mot ne figure au contexte. Le détail ajouté est ici l'inverse d'une garantie : plus la description s'étoffe, plus elle s'éloigne de ce que les extraits permettent d'affirmer. Ces signatures sont exactes dans la codebase réelle, et c'est précisément ce qui rend le cas instructif : la sortie est juste, et doit malgré tout être rejetée, puisque rien dans le contexte ne la soutient. Accepter une réponse parce qu'elle sonne vrai revient à évaluer sa propre connaissance du sujet, pas l'ancrage de la réponse — et sur un contexte où la vérité diffère, le même jugement laisserait passer une invention. Le seul élément du contexte phonétiquement proche, `ConversationMessage.assistant(String)`, est une méthode de fabrique sans rapport, que la sortie ne mentionne d'ailleurs pas. Aucune citation n'est déformée, la sortie n'en fait aucune.
 3. Synthèse : la réponse décrit une interface qui ne figure nulle part dans le contexte, ses deux signatures étant introuvables dans les extraits. FAIL.
 ''',
     reason="Les signatures chat et refactor, et le type TokenStream, sont absents du contexte : l'interface Assistant n'y figure pas du tout.",
@@ -507,12 +521,22 @@ add(example(
     contexte=CTX_NEO4J_INGEST,
     requete="How does DocumentIngestFactory create the embedding model with DJL fallback to Ollama?",
     reponse='''
+## Le mécanisme de repli
+
 `DocumentIngestFactory.createEmbeddingModel()` tente d'abord d'instancier le modèle local `BgeSmallEnV15QuantizedEmbeddingModel`, fourni par DJL. Si le chargement des bibliothèques natives échoue — `UnsatisfiedLinkError` ou `ExceptionInInitializerError` — la fabrique se replie sur un `OllamaEmbeddingModel` configuré avec `nomic-embed-text`.
+
+## Pourquoi ce repli existe
+
+DJL embarque des bibliothèques natives dont la disponibilité dépend de la plateforme et de l'architecture. Sur un poste où elles ne se chargent pas, un modèle d'embarquement purement local devient inutilisable, et l'indexation échouerait entièrement. Le repli vers Ollama déporte le calcul vers un service externe, au prix d'un appel réseau par lot.
+
+## Ce que la classe expose par ailleurs
+
+`DocumentIngestFactory` déclare un champ `FALLBACK_EMBEDDING_MODEL`, et sa fonction publique est `create(EmbeddingStore<TextSegment>, Project)`, qui renvoie un `EmbeddingStoreIngestor` — l'objet chargé de découper, vectoriser et stocker les documents.
 ''',
     checks={"affirmations_etayees": False, "absence_invention": False, "citations_exactes": True},
     thinking='''
 1. Énumération des éléments clés : le contexte fournit le nœud de classe `DocumentIngestFactory`, ses annotations et son unique champ listé `FALLBACK_EMBEDDING_MODEL`, la fonction `create(EmbeddingStore<TextSegment>, Project)` renvoyant un `EmbeddingStoreIngestor`, puis trois extraits sans rapport direct.
-2. Vérification point par point : la méthode `createEmbeddingModel()` dont parle la sortie **n'est pas dans le contexte** — seule `create(...)` y figure, avec une autre signature et un autre type de retour. Les deux classes de modèles citées, `BgeSmallEnV15QuantizedEmbeddingModel` et `OllamaEmbeddingModel`, sont absentes, de même que les deux types d'erreurs déclenchant le repli et le nom de modèle `nomic-embed-text`. Le seul appui réel est le champ `FALLBACK_EMBEDDING_MODEL`, dont le nom atteste qu'un repli existe — mais un nom de champ ne dit ni vers quoi l'on se replie, ni à quelle condition. La description est exacte au regard de la codebase, et c'est une circonstance aggravante ici : elle donne à un contenu non ancré toutes les apparences d'une lecture attentive du contexte.
+2. Vérification point par point : la méthode `createEmbeddingModel()` dont parle la sortie **n'est pas dans le contexte** — seule `create(...)` y figure, avec une autre signature et un autre type de retour. Les deux classes de modèles citées, `BgeSmallEnV15QuantizedEmbeddingModel` et `OllamaEmbeddingModel`, sont absentes, de même que les deux types d'erreurs déclenchant le repli et le nom de modèle `nomic-embed-text`. Le seul appui réel est le champ `FALLBACK_EMBEDDING_MODEL`, dont le nom atteste qu'un repli existe — mais un nom de champ ne dit ni vers quoi l'on se replie, ni à quelle condition. La dernière section est en revanche exacte : la signature de `create(...)` et son type de retour figurent bien au contexte. Le texte mêle donc un ancrage réel à une invention, et l'ancrage se trouve précisément dans la partie que la question ne posait pas. La description est exacte au regard de la codebase, et c'est une circonstance aggravante ici : elle donne à un contenu non ancré toutes les apparences d'une lecture attentive du contexte.
 3. Synthèse : méthode, classes de modèles et conditions de repli sont toutes absentes du contexte, qui n'en porte qu'un indice par le nom d'un champ. FAIL.
 ''',
     reason="createEmbeddingModel, les deux classes de modèles et les erreurs déclenchant le repli sont absentes ; seul le nom d'un champ évoque un repli.",
