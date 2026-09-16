@@ -312,3 +312,39 @@ question que le protocole doit trancher. À traiter avant le fine-tuning, propos
 
 - **Accord sur le verdict, premier passage : 7 / 8** — seul `b07-011` reste en désaccord.
 - **Désaccord au niveau contrôle : 1**, sur `b09-009`, tranché en faveur de l'annotateur et corrigé.
+
+### 9. `b05-008` — accord complet sur un item difficile, motif plus juste que l'étiquette
+
+| | 1 `exactitude_technique` | 2 `absence_de_bugs` | 3 `respect_consignes` | verdict |
+|---|---|---|---|---|
+| annotateur, premier passage | V | V | V | **PASS** |
+| étiquette | V | V | V | **PASS** |
+
+Cinquième accord consécutif, et le premier obtenu sur un des quatre items à difficulté réelle : `limite`,
+**verbeux**, cinq sections dont une rubrique « alternatives » non demandée — exactement le profil qui
+déclenche un rejet réflexe pour cause de longueur. L'annotateur ne l'a pas suivi. Aucune correction du corpus.
+
+**Point où le motif de l'annotateur dépasse l'étiquette.** L'étiquette qualifie les chiffres de « du bon
+ordre » ; l'annotateur écrit « exacts pour CPython ». Mesure faite sur CPython 3.12.0 :
+
+```
+avec __dict__  : objet 48 + dict 296 = 344 octets
+avec __slots__ : objet 48 octets            facteur 7,2
+sur 5 M d'instances : 1,48 Go          réponse : ~1,5 Go
+```
+
+Les 344 et 48 octets annoncés tombent à l'octet près, et l'extrapolation aussi. L'auteur de l'étiquette
+soupçonnait de surcroît, avant de mesurer, que 344 était un chiffre hérité de billets anciens et trop élevé
+pour un CPython récent : la mesure a corrigé l'auteur, pas l'annotateur. **Leçon : la couverture prudente
+(« du bon ordre ») n'est pas gratuite — elle masque une vérification qui était à portée de trois lignes.**
+
+**Nuance mesurée.** `getsizeof(obj.__dict__)` matérialise le dictionnaire, alors que depuis CPython 3.11 les
+attributs résident d'abord dans un tableau géré converti en `dict` seulement à l'accès. Une instance qui ne
+touche jamais `__dict__` coûte donc moins que 344 octets — mais les 48 octets de l'objet ne comptent pas non
+plus ce tableau. Les deux écarts se compensent grossièrement et le facteur annoncé tient. Sans effet sur l'étiquette.
+
+### État de la relecture
+
+- **Accord sur le verdict, premier passage : 8 / 9** — seul `b07-011` reste en désaccord.
+- **Désaccord au niveau contrôle : 1**, sur `b09-009`, tranché en faveur de l'annotateur et corrigé.
+- Items à difficulté réelle traités : 1 sur 4 (`b05-008`). Restent `b03-012`, `b07-015`, `b13-013`.
