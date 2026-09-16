@@ -369,14 +369,14 @@ public static int total(Optional<List<Integer>> valeurs) {
 Envelopper le paramètre dans un `Optional` rend l'absence explicite dans la signature, ce qui est plus propre qu'un test de nullité : l'appelant voit immédiatement que la valeur peut manquer, et le compilateur l'oblige à en tenir compte.
 ''',
     thinking='''
-1. Analyse du code : la logique de repli est correcte, `orElseGet(List::of)` fournissant bien une liste vide dont la somme vaut zéro, et le style est défendable dans l'absolu.
+1. Analyse du code : la logique de repli est correcte, `orElseGet(List::of)` fournissant bien une liste vide dont la somme vaut zéro. La justification avancée est en revanche fausse sur un point vérifiable : le compilateur n'oblige nullement l'appelant à tenir compte de l'absence. `total(null)` compile sans avertissement et lève un `NullPointerException` sur `orElseGet` — le type `Optional` contraint à emballer une valeur, non à traiter le cas vide, et ne protège donc même pas du `null` que la requête demandait précisément d'absorber.
 2. Vérification des contraintes : la requête pose une contrainte explicite et motivée — signature publique figée, applications tierces déjà compilées. Or changer le type du paramètre de `List<Integer>` à `Optional<List<Integer>>` casse à la fois la compatibilité **source**, tout appel existant cessant de compiler, et la compatibilité **binaire**, la signature de la méthode faisant partie de sa référence dans le bytecode appelant : les applications tierces échoueraient à l'exécution sur un `NoSuchMethodError`. Le conseil de rendre l'absence explicite est par ailleurs contraire à l'usage recommandé d'`Optional`, prévu pour les valeurs de retour plutôt que pour les paramètres. La correction attendue tient dans le corps de la méthode, sans toucher à la signature : `if (valeurs == null) return 0;`, ou `Objects.requireNonNullElse(valeurs, List.of())`.
 3. Synthèse : le comportement demandé est bien obtenu, mais au prix d'une rupture de compatibilité que la requête interdisait explicitement, alors qu'une correction interne suffisait. FAIL.
 ''',
-    exact=True, bugs=True, consignes=True,
+    exact=False, bugs=True, consignes=True,
     extra_criteres={"signature_publique_inchangee": "La signature publique de la méthode est inchangée, comme l'exige la requête."},
     extra_checks={"signature_publique_inchangee": False},
-    raison="Change le type du paramètre alors que la signature publique était figée : rupture de compatibilité source et binaire.",
+    raison="Change le type du paramètre alors que la signature publique était figée : rupture de compatibilité source et binaire ; affirme de surcroît à tort que le compilateur oblige l'appelant à traiter l'absence.",
 ))
 
 # ── 10. Théorie : SameSite et CSRF ────────────────────────────────────────────
