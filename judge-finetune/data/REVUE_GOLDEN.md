@@ -180,3 +180,36 @@ Réserve consignée, mais non retenue comme motif d'exclusion : ce point de mesu
 le correctif de protocole, quand un verdict global était demandé plutôt que quatre contrôles. Ce format a
 pu favoriser une lecture d'ensemble. Il n'a en revanche caché aucune information — la contrainte « trois
 points maximum » figurait en toutes lettres dans la requête présentée.
+
+### 5. `b10-015` — premier accord complet, avec une réserve d'amorçage
+
+| | 1 `exactitude` | 2 `absence_de_bugs` | 3 `respect_consignes` | 4 `format_impose` | verdict |
+|---|---|---|---|---|---|
+| annotateur, premier passage | V | V | V | **F** | **FAIL** |
+| étiquette | V | V | V | **F** | **FAIL** |
+
+Accord sur **les quatre contrôles**, pas seulement sur le verdict — le premier du journal. Les motifs
+coïncident également : l'annotateur relève « on demande explicitement aucun exemple et il y en a un dans
+la réponse », l'étiquette dit « insère un bloc de code avec l'exemple d'en-tête, alors que la requête
+imposait de la prose uniquement ». Aucune correction du corpus.
+
+**Réserve sur ce point de mesure : amorçage.** `b10-015` a été présenté immédiatement après `b07-011`,
+dont toute la leçon était de vérifier la contrainte de forme. La vigilance de l'annotateur ici n'est donc
+pas une lecture pleinement indépendante. Le point compte, mais il vaut moins qu'un accord obtenu à froid.
+
+**Défaut de séquencement, imputable au protocole et non à l'annotateur.** Trois des quatre exemples de la
+session 1 — `b04-015`, `b07-011`, `b10-015` — échouent sur un contrôle dédié de format ou de consigne. La
+session avait été composée sur le critère « un seul contrôle sépare PASS de FAIL », sans voir que cela
+produisait une série homogène, qui apprend au relecteur à chercher toujours le même type de défaut.
+
+**Correctif : entrelacer les types de contrôle fautif** dans les sessions suivantes, de sorte que deux
+exemples consécutifs ne partagent pas le même mode d'échec.
+
+### État de la relecture — session 1 close
+
+- **Accord sur le verdict, premier passage : 4 / 5** — `b03-007` ✅, `b04-015` ✅, `b09-009` ✅,
+  `b07-011` ❌, `b10-015` ✅.
+- Dont **4 dans le golden set actuel** (`b03-007` en est sorti au retirage) : 3 accords sur 4.
+- **Aucune correction du corpus n'a été rendue nécessaire par la session 1**, hors la correction de
+  périmètre de `respect_consignes` issue des exemples 1 et 2.
+- **En attente :** confirmation du contrôle 1 de `b09-009`, seul point resté ouvert.
