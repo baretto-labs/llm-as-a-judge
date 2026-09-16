@@ -348,3 +348,38 @@ plus ce tableau. Les deux écarts se compensent grossièrement et le facteur ann
 - **Accord sur le verdict, premier passage : 8 / 9** — seul `b07-011` reste en désaccord.
 - **Désaccord au niveau contrôle : 1**, sur `b09-009`, tranché en faveur de l'annotateur et corrigé.
 - Items à difficulté réelle traités : 1 sur 4 (`b05-008`). Restent `b03-012`, `b07-015`, `b13-013`.
+
+### 10. `b13-012` — accord sur le verdict, désaccord sur `citations_exactes`
+
+| | 1 `affirmations_etayees` | 2 `absence_invention` | 3 `citations_exactes` | verdict |
+|---|---|---|---|---|
+| annotateur, premier passage | F | F | **F** | **FAIL** |
+| étiquette | F | F | **V** | **FAIL** |
+
+Premier item `RAG_FAITHFULNESS` de la relecture. Accord entier sur le fond — l'interface `Assistant`, ses
+deux signatures et le type `TokenStream` sont intégralement absents du contexte — et motif identique.
+Le désaccord porte sur le seul contrôle 3. Aucune correction du corpus.
+
+**Convention vérifiée sur l'ensemble du corpus, non inventée pour l'occasion.** Sur les onze items
+`RAG_FAITHFULNESS` où `affirmations_etayees` et `absence_invention` sont tous deux faux,
+`citations_exactes` vaut **V dix fois et F une seule**. L'unique F, `b12-014`, est le cas qui justifie la
+règle : cette sortie ne se contente pas d'inventer, elle **fabrique une citation** —
+`OllamaService -[IMPLEMENTS]-> PersistentStateComponent<OllamaService.State>` — alors que l'arête réelle
+porte `OllamaSettings` des deux côtés, y compris dans le paramètre de type. Elle présente donc un extrait
+réécrit comme preuve vérifiable.
+
+**Règle retenue :** `citations_exactes` ne sanctionne que la déformation de matériau réellement puisé dans
+le contexte. Quand la sortie ne cite ni ne paraphrase rien du contexte, le contrôle est vrai par vacuité.
+
+**Justification de conception.** Si l'invention faisait également tomber le contrôle 3, celui-ci serait
+strictement impliqué par le contrôle 2 et n'apporterait jamais d'information. Le corpus perdrait la
+distinction entre « invente » et « invente et maquille une preuve », qui est le degré au-dessus : le lecteur
+y est invité à vérifier et croit trouver confirmation. La convention inverse reste tenable, au prix de la
+réécriture de dix items et de la fusion de fait des contrôles 2 et 3. Position de l'annotateur consignée.
+
+### État de la relecture
+
+- **Accord sur le verdict, premier passage : 9 / 10** — seul `b07-011` reste en désaccord.
+- **Désaccords au niveau contrôle : 2** — `b09-009`, tranché en faveur de l'annotateur et corrigé dans le
+  corpus, et `b13-012`, où l'étiquette est maintenue, convention documentée à l'appui.
+- Items à difficulté réelle traités : 1 sur 4. Restent `b03-012`, `b07-015`, `b13-013`.

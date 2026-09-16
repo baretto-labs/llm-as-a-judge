@@ -322,3 +322,19 @@ chacune pour les passes RAG, est un signal qualitatif, pas une mesure.
 - Vérifier après fine-tuning que le juge bascule bien de posture selon le marqueur de tâche : le test
   décisif est une sortie RAG contenant une affirmation **vraie mais absente du contexte**, qui doit être
   rejetée sous `RAG_FAITHFULNESS` et acceptée sous `CODE_ANALYSIS`.
+
+## Convention : portée de `citations_exactes` (RAG_FAITHFULNESS)
+
+`citations_exactes` ne sanctionne que la **déformation de matériau réellement puisé dans le contexte**.
+Lorsqu'une sortie invente de bout en bout sans rien citer ni paraphraser du contexte, il n'existe aucune
+citation à déformer et le contrôle vaut **vrai par vacuité** — le rejet est alors porté par
+`affirmations_etayees` et `absence_invention`, et le verdict reste FAIL puisque PASS exige tous les contrôles.
+
+Sans cette délimitation, le contrôle 3 serait strictement impliqué par le contrôle 2 et n'apporterait jamais
+d'information. La distinction qu'il préserve est celle entre une sortie qui **invente** et une sortie qui
+**invente et fabrique une citation à l'appui**, présentée comme preuve vérifiable : le lecteur est invité à
+contrôler et croit trouver confirmation. C'est le degré au-dessus de l'invention simple.
+
+État du corpus : sur les 11 items `RAG_FAITHFULNESS` dont les contrôles 1 et 2 sont faux, `citations_exactes`
+vaut V dix fois ; l'unique F est `b12-014`, où l'arête citée à l'appui réécrit `OllamaSettings` en
+`OllamaService`, paramètre de type compris.
