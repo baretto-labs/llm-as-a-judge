@@ -214,6 +214,8 @@ if latest_version > current_version:
 ```
 
 Les versions sont des chaînes du type `"1.9.0"`. Explique et corrige.
+
+Si tu veux compléter, dis un mot des versions préliminaires.
 ''',
     reponse='''
 ## Le diagnostic
@@ -246,7 +248,7 @@ Pensez à journaliser les deux versions comparées lorsque la notification se d�
 ''',
     thinking='''
 1. Analyse du code : le diagnostic est exact. La comparaison lexicographique compare `"1"` puis `"."` puis `"1"` contre `"9"`, si bien que `"1.10.0"` est jugé inférieur à `"1.9.0"`. Trier `["1.9.0", "1.10.0", "1.2.0"]` comme des chaînes donne `['1.10.0', '1.2.0', '1.9.0']`, et `"1.10" > "1.9"` renvoie `False`. La digression sur `float()` est également exacte, y compris l'inversion de `1.10` et `1.9` en arithmétique flottante.
-2. Vérification des contraintes : le correctif proposé fonctionne sur les exemples donnés, mais il est fragile sur trois points que la réponse passe sous silence, tout en développant longuement des considérations annexes. Il suppose que chaque composant tient sur trois chiffres, et casse dès qu'une version atteint 1000. Il suppose que les deux versions ont le même nombre de composants, sinon `"1.9"` et `"1.9.1"` restent mal ordonnés. Et il échoue sur tout suffixe non numérique, `zfill` laissant `"1.0.0-rc1"` intact. La justification du choix de `zfill` contre un formatage est d'ailleurs correcte dans son détail, mais elle vante une robustesse aux entrées non numériques qui est précisément ce qui produit le troisième défaut. La solution robuste est de comparer des tuples d'entiers, qui donne `['1.2.0', '1.9.0', '1.10.0']`, ou d'utiliser `packaging.version.Version`, qui gère aussi les pré-versions.
+2. Vérification des contraintes : le correctif proposé fonctionne sur les exemples donnés, mais il est fragile sur trois points que la réponse passe sous silence, tout en développant longuement des considérations annexes. Il suppose que chaque composant tient sur trois chiffres, et casse dès qu'une version atteint 1000. Il suppose que les deux versions ont le même nombre de composants, sinon `"1.9"` et `"1.9.1"` restent mal ordonnés. Et il échoue sur tout suffixe non numérique, `zfill` laissant `"1.0.0-rc1"` intact. La justification du choix de `zfill` contre un formatage est d'ailleurs correcte dans son détail, mais elle vante une robustesse aux entrées non numériques qui est précisément ce qui produit le troisième défaut. La solution robuste est de comparer des tuples d'entiers, qui donne `['1.2.0', '1.9.0', '1.10.0']`, ou d'utiliser `packaging.version.Version`, qui gère aussi les pré-versions. La demande facultative sur les versions préliminaires n'est pas traitée, mais la consigne la présentait explicitement comme telle : l'omission n'entre donc pas dans l'évaluation de `respect_consignes`.
 3. Synthèse : cause correctement identifiée, mais la correction reste une comparaison de chaînes déguisée, avec des limites non signalées qui reproduiront le même symptôme. FAIL.
 ''',
     exact=True, bugs=False, consignes=True,

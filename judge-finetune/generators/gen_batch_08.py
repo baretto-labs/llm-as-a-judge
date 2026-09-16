@@ -386,6 +386,8 @@ Simplifie ce tri, qui me paraît verbeux.
 ```ts
 const tries = [...articles].sort((a, b) => a.quantite - b.quantite);
 ```
+
+Accessoirement, dis un mot du tri stable.
 ''',
     reponse='''
 Le comparateur est superflu ici : `sort` sait ordonner les objets d'une même forme en s'appuyant sur leur représentation naturelle.
@@ -398,7 +400,7 @@ Le résultat est identique et l'intention plus lisible. Le comparateur explicite
 ''',
     thinking='''
 1. Analyse du code : l'affirmation est fausse. Sans comparateur, `Array.prototype.sort` convertit chaque élément en chaîne, et tous les objets ordinaires donnent `"[object Object]"`. Toutes les clés de tri sont donc égales entre elles.
-2. Vérification des contraintes : la conséquence est immédiate. `[{n:10},{n:9},{n:1}].sort()` renvoie `[{"n":10},{"n":9},{"n":1}]`, c'est-à-dire l'ordre d'origine inchangé, le tri étant stable depuis ES2019. Le résultat n'est donc pas « identique », il est simplement non trié, et le défaut est particulièrement pernicieux : sur un jeu de données déjà à peu près ordonné, la sortie paraît plausible et le bug passe la revue. La requête demandait une simplification à comportement constant ; le comparateur `(a, b) => a.quantite - b.quantite` est déjà la forme idiomatique et n'a rien de verbeux. La seule remarque défendable aurait été de signaler que `[...articles]` protège bien l'appelant, `sort` triant en place.
+2. Vérification des contraintes : la conséquence est immédiate. `[{n:10},{n:9},{n:1}].sort()` renvoie `[{"n":10},{"n":9},{"n":1}]`, c'est-à-dire l'ordre d'origine inchangé, le tri étant stable depuis ES2019. Le résultat n'est donc pas « identique », il est simplement non trié, et le défaut est particulièrement pernicieux : sur un jeu de données déjà à peu près ordonné, la sortie paraît plausible et le bug passe la revue. La requête demandait une simplification à comportement constant ; le comparateur `(a, b) => a.quantite - b.quantite` est déjà la forme idiomatique et n'a rien de verbeux. La seule remarque défendable aurait été de signaler que `[...articles]` protège bien l'appelant, `sort` triant en place. La demande facultative sur le tri stable n'est pas traitée, mais la consigne la présentait explicitement comme telle : l'omission n'entre donc pas dans l'évaluation de `respect_consignes`.
 3. Synthèse : la simplification proposée supprime purement et simplement le tri, tout en affirmant l'équivalence. FAIL.
 ''',
     exact=False, bugs=False, consignes=False,
@@ -440,6 +442,8 @@ add(example(
           "cas": "defaillant", "verbeux": False, "langage": "java"},
     consigne='''
 Quelle est la différence entre `ClassNotFoundException` et `NoClassDefFoundError` ? Notre application lève la seconde au démarrage.
+
+Accessoirement, dis un mot des dépendances optionnelles absentes à l'exécution.
 ''',
     reponse='''
 Ce sont deux noms pour la même situation, hérités de l'histoire de la plateforme : une classe est absente du chemin de classes.
@@ -450,7 +454,7 @@ Pour votre démarrage, vérifiez donc que toutes les dépendances sont bien pré
 ''',
     thinking='''
 1. Analyse de l'explication : l'assimilation des deux types est fausse, et la distinction annoncée entre « anciens chargeurs » et « mécanisme moderne » est inventée. Ce ne sont ni deux époques, ni deux implémentations : ce sont deux situations différentes, ce que reflète déjà leur hiérarchie — l'une est une exception vérifiée, l'autre une erreur.
-2. Vérification des contraintes : `ClassNotFoundException` est levée lors d'un chargement **explicite**, typiquement `Class.forName` ou `loadClass`, quand le nom demandé est introuvable. `NoClassDefFoundError` signifie que la classe était présente à la compilation mais que la JVM ne parvient pas à en produire la définition à l'exécution. Le cas décisif, absent de la réponse, est celui où la classe est bien présente : si son initialisation statique échoue, la première tentative lève `ExceptionInInitializerError`, et **toute tentative ultérieure lève `NoClassDefFoundError`** sur une classe pourtant bien empaquetée. Or la requête précise que l'erreur survient au démarrage, moment où les initialisations statiques s'exécutent : le conseil donné, vérifier la présence des bibliothèques, envoie chercher au mauvais endroit. La démarche correcte est de remonter aux premières lignes du journal pour trouver l'`ExceptionInInitializerError` d'origine et sa cause.
+2. Vérification des contraintes : `ClassNotFoundException` est levée lors d'un chargement **explicite**, typiquement `Class.forName` ou `loadClass`, quand le nom demandé est introuvable. `NoClassDefFoundError` signifie que la classe était présente à la compilation mais que la JVM ne parvient pas à en produire la définition à l'exécution. Le cas décisif, absent de la réponse, est celui où la classe est bien présente : si son initialisation statique échoue, la première tentative lève `ExceptionInInitializerError`, et **toute tentative ultérieure lève `NoClassDefFoundError`** sur une classe pourtant bien empaquetée. Or la requête précise que l'erreur survient au démarrage, moment où les initialisations statiques s'exécutent : le conseil donné, vérifier la présence des bibliothèques, envoie chercher au mauvais endroit. La démarche correcte est de remonter aux premières lignes du journal pour trouver l'`ExceptionInInitializerError` d'origine et sa cause. La demande facultative sur les dépendances optionnelles absentes à l'exécution n'est pas traitée, mais la consigne la présentait explicitement comme telle : l'omission n'entre donc pas dans l'évaluation de `respect_consignes`.
 3. Synthèse : les deux types sont confondus sur la base d'une explication historique inventée, et le conseil détourne du diagnostic réel dans le contexte donné. FAIL.
 ''',
     exact=False, bugs=False, consignes=True,

@@ -224,6 +224,8 @@ add(example(
           "cas": "defaillant", "verbeux": False, "langage": "java"},
     consigne='''
 Crée une annotation `@Audite` que notre intercepteur détectera **à l'exécution** par réflexion, pour journaliser les appels aux méthodes annotées.
+
+Accessoirement, dis un mot de `@Inherited`.
 ''',
     reponse='''
 ```java
@@ -244,7 +246,7 @@ if (methode.isAnnotationPresent(Audite.class)) {
 ''',
     thinking='''
 1. Analyse du code : l'annotation est syntaxiquement correcte et `RetentionPolicy.CLASS` est bien la valeur par défaut, comme l'affirme la réponse. Mais l'inférence tirée de cette conservation est fausse.
-2. Vérification des contraintes : `CLASS` signifie que l'annotation figure dans le fichier `.class` mais **n'est pas chargée** en mémoire par la machine virtuelle, donc elle est invisible par réflexion. Sur deux méthodes annotées, l'une en rétention `RUNTIME` et l'autre en `CLASS`, la réflexion voit **1** annotation pour la première et **0** pour la seconde. L'intercepteur proposé ne journaliserait donc jamais rien, en silence, ce qui contredit frontalement l'exigence de la requête, à savoir une détection à l'exécution. La correction tient en un mot : `@Retention(RetentionPolicy.RUNTIME)`. L'argument sur la valeur par défaut est exact mais hors sujet, la valeur par défaut étant justement inadaptée à cet usage.
+2. Vérification des contraintes : `CLASS` signifie que l'annotation figure dans le fichier `.class` mais **n'est pas chargée** en mémoire par la machine virtuelle, donc elle est invisible par réflexion. Sur deux méthodes annotées, l'une en rétention `RUNTIME` et l'autre en `CLASS`, la réflexion voit **1** annotation pour la première et **0** pour la seconde. L'intercepteur proposé ne journaliserait donc jamais rien, en silence, ce qui contredit frontalement l'exigence de la requête, à savoir une détection à l'exécution. La correction tient en un mot : `@Retention(RetentionPolicy.RUNTIME)`. L'argument sur la valeur par défaut est exact mais hors sujet, la valeur par défaut étant justement inadaptée à cet usage. La demande facultative sur `@Inherited` n'est pas traitée, mais la consigne la présentait explicitement comme telle : l'omission n'entre donc pas dans l'évaluation de `respect_consignes`.
 3. Synthèse : un fait exact sur la rétention par défaut sert à justifier un choix qui rend le dispositif inopérant, alors que la requête exigeait explicitement une détection à l'exécution. FAIL.
 ''',
     exact=False, bugs=False, consignes=False,
@@ -302,6 +304,8 @@ const uniques = [...new Set(creneaux.map((c) => c.debut))];   // c.debut est un 
 ```
 
 Explique et corrige.
+
+En bonus, dis un mot du coût mémoire de la déduplication.
 ''',
     reponse='''
 ## Le mécanisme
@@ -339,7 +343,7 @@ On lit souvent qu'il faudrait passer par `getTime()`. C'est possible, mais cela 
 ''',
     thinking='''
 1. Analyse de l'explication : le diagnostic est exact. `Set` s'appuie sur SameValueZero, donc sur l'identité pour les objets, et deux `Date` distinctes représentant le même instant ne sont pas égales. `a === b` vaut `false`, `a == b` également, et `new Set([a, b]).size` vaut **2**. La correction par `JSON.stringify` fonctionne, les deux dates produisant la même chaîne.
-2. Vérification des contraintes : le raisonnement écartant `getTime()` est faux, et c'est la seule partie qui compte pour le choix final. Un objet `Date` ne porte **aucun fuseau** : il encapsule un instant, un nombre de millisecondes depuis l'époque, et le fuseau n'intervient qu'à l'affichage, via les méthodes locales ou l'option passée au formateur. Passer par `getTime()` ne perd donc strictement rien, ce que la mesure confirme — `a.getTime() === b.getTime()` et `+a === +b` valent tous deux `true`, exactement comme l'égalité des chaînes JSON. La recommandation retenue est donc justifiée par une propriété inexistante, et elle est de surcroît plus coûteuse et plus fragile qu'un `getTime()`, la sérialisation dépendant du format ISO. Le tableau final inscrit cette contre-vérité.
+2. Vérification des contraintes : le raisonnement écartant `getTime()` est faux, et c'est la seule partie qui compte pour le choix final. Un objet `Date` ne porte **aucun fuseau** : il encapsule un instant, un nombre de millisecondes depuis l'époque, et le fuseau n'intervient qu'à l'affichage, via les méthodes locales ou l'option passée au formateur. Passer par `getTime()` ne perd donc strictement rien, ce que la mesure confirme — `a.getTime() === b.getTime()` et `+a === +b` valent tous deux `true`, exactement comme l'égalité des chaînes JSON. La recommandation retenue est donc justifiée par une propriété inexistante, et elle est de surcroît plus coûteuse et plus fragile qu'un `getTime()`, la sérialisation dépendant du format ISO. Le tableau final inscrit cette contre-vérité. La demande facultative sur le coût mémoire de la déduplication n'est pas traitée, mais la consigne la présentait explicitement comme telle : l'omission n'entre donc pas dans l'évaluation de `respect_consignes`.
 3. Synthèse : cause correctement identifiée et correction fonctionnelle, mais le choix est motivé par une affirmation fausse sur le fuseau, qui écarte la solution idiomatique. FAIL.
 ''',
     exact=False, bugs=True, consignes=True,
@@ -385,6 +389,8 @@ add(example(
           "cas": "defaillant", "verbeux": False, "langage": "web"},
     consigne='''
 Peut-on retirer nos jetons anti-CSRF maintenant que nos cookies de session sont en `SameSite=Lax` ?
+
+Sans obligation, dis un mot de `SameSite=Strict`.
 ''',
     reponse='''
 Oui. `SameSite=Lax` empêche le navigateur d'envoyer le cookie de session lors d'une requête initiée par un autre site, ce qui supprime la condition même de l'attaque CSRF : sans cookie, la requête forgée arrive non authentifiée et échoue.
@@ -395,7 +401,7 @@ Vous pouvez donc les retirer, en vous assurant simplement que tous vos cookies d
 ''',
     thinking='''
 1. Analyse de l'explication : la description de `SameSite=Lax` est incomplète sur le point décisif. En mode `Lax`, le cookie **est** envoyé lors d'une navigation de premier niveau en méthode sûre, typiquement un clic de lien conduisant à une requête `GET`. Il n'est écarté que pour les requêtes intersites non sûres ou en sous-ressource.
-2. Vérification des contraintes : la conclusion est donc fausse pour toute application exposant une action à effet de bord accessible en `GET`, cas encore fréquent sur des liens de désinscription, de suppression ou de changement d'état — un lien forgé suffit alors, cookie inclus. Trois limites supplémentaires sont passées sous silence. L'attribut est appliqué par le **navigateur** : un client ancien ou non conforme ne l'implémente pas, et la protection disparaît avec lui. Il raisonne par site enregistrable, donc un sous-domaine compromis reste considéré comme le même site. Et il ne protège pas des requêtes émises depuis une page du site elle-même, par exemple via une injection de contenu. `SameSite=Lax` est une défense en profondeur utile et à conserver, mais la protection primaire reste le jeton anti-CSRF ou le motif de double soumission, complétés par la vérification de l'origine.
+2. Vérification des contraintes : la conclusion est donc fausse pour toute application exposant une action à effet de bord accessible en `GET`, cas encore fréquent sur des liens de désinscription, de suppression ou de changement d'état — un lien forgé suffit alors, cookie inclus. Trois limites supplémentaires sont passées sous silence. L'attribut est appliqué par le **navigateur** : un client ancien ou non conforme ne l'implémente pas, et la protection disparaît avec lui. Il raisonne par site enregistrable, donc un sous-domaine compromis reste considéré comme le même site. Et il ne protège pas des requêtes émises depuis une page du site elle-même, par exemple via une injection de contenu. `SameSite=Lax` est une défense en profondeur utile et à conserver, mais la protection primaire reste le jeton anti-CSRF ou le motif de double soumission, complétés par la vérification de l'origine. La demande facultative sur `SameSite=Strict` n'est pas traitée, mais la consigne la présentait explicitement comme telle : l'omission n'entre donc pas dans l'évaluation de `respect_consignes`.
 3. Synthèse : mécanisme incomplet sur le cas des navigations `GET`, aboutissant à recommander le retrait de la protection primaire. FAIL.
 ''',
     exact=False, bugs=False, consignes=True,
@@ -435,6 +441,8 @@ add(example(
           "cas": "defaillant", "verbeux": False, "langage": "sql"},
     consigne='''
 Sous charge, nos requêtes attendent longtemps l'obtention d'une connexion. Un collègue propose de porter le pool de 20 à 200 connexions. Qu'en penses-tu ?
+
+Sans obligation, dis un mot du nombre de cœurs de la base.
 ''',
     reponse='''
 C'est la bonne réaction. L'attente que vous observez est directement causée par l'épuisement du pool : les threads applicatifs se mettent en file dès que les 20 connexions sont prises.
@@ -445,7 +453,7 @@ Réglez simplement le délai d'obtention à une valeur généreuse pour couvrir 
 ''',
     thinking='''
 1. Analyse de l'explication : le constat de départ est correct — l'attente vient bien de l'épuisement du pool — mais la conclusion inverse le raisonnement. Un pool ne crée pas de capacité, il en **plafonne** la consommation.
-2. Vérification des contraintes : l'affirmation selon laquelle la base traiterait dix fois plus de requêtes en parallèle est fausse. Le parallélisme réel d'un serveur de bases de données est borné par ses cœurs et ses disques ; au-delà, les connexions supplémentaires ne s'exécutent pas de front, elles se disputent les mêmes ressources. Chacune consomme en outre de la mémoire de travail côté serveur et un processus ou un fil d'exécution selon le moteur, si bien qu'au-delà d'un seuil le débit **diminue** au lieu d'augmenter, tout en allongeant les temps de réponse. Déplacer la file d'attente du pool vers le moteur ne la supprime pas, elle devient seulement invisible et plus coûteuse. Le conseil d'allonger le délai d'obtention aggrave le défaut : il transforme un échec rapide et diagnosticable en une latence longue subie par l'utilisateur. La démarche correcte consiste à chercher pourquoi les connexions sont retenues si longtemps — requêtes lentes faute d'index, transactions ouvertes pendant un appel réseau, absence de pagination — puis à dimensionner le pool à partir de la capacité réelle du serveur, généralement quelques dizaines de connexions, pas des centaines.
+2. Vérification des contraintes : l'affirmation selon laquelle la base traiterait dix fois plus de requêtes en parallèle est fausse. Le parallélisme réel d'un serveur de bases de données est borné par ses cœurs et ses disques ; au-delà, les connexions supplémentaires ne s'exécutent pas de front, elles se disputent les mêmes ressources. Chacune consomme en outre de la mémoire de travail côté serveur et un processus ou un fil d'exécution selon le moteur, si bien qu'au-delà d'un seuil le débit **diminue** au lieu d'augmenter, tout en allongeant les temps de réponse. Déplacer la file d'attente du pool vers le moteur ne la supprime pas, elle devient seulement invisible et plus coûteuse. Le conseil d'allonger le délai d'obtention aggrave le défaut : il transforme un échec rapide et diagnosticable en une latence longue subie par l'utilisateur. La démarche correcte consiste à chercher pourquoi les connexions sont retenues si longtemps — requêtes lentes faute d'index, transactions ouvertes pendant un appel réseau, absence de pagination — puis à dimensionner le pool à partir de la capacité réelle du serveur, généralement quelques dizaines de connexions, pas des centaines. La demande facultative sur le nombre de cœurs de la base n'est pas traitée, mais la consigne la présentait explicitement comme telle : l'omission n'entre donc pas dans l'évaluation de `respect_consignes`.
 3. Synthèse : constat juste mais conclusion inversée, avec un remède qui déplace la file d'attente et peut dégrader le débit. FAIL.
 ''',
     exact=False, bugs=False, consignes=True,

@@ -262,6 +262,8 @@ add(example(
           "cas": "defaillant", "verbeux": False, "langage": "sql"},
     consigne='''
 Notre requête `WHERE tenant_id = ? ORDER BY cree_le` reste lente malgré l'index `(cree_le, tenant_id)`. Faut-il changer quelque chose ?
+
+Si tu veux compléter, dis un mot des index partiels.
 ''',
     reponse='''
 Non, l'index couvre déjà les deux colonnes utilisées par la requête. Un index composite indexe l'ensemble des colonnes qu'il déclare, et le planificateur sait s'en servir quel que soit l'ordre dans lequel la requête les mentionne — cet ordre n'est qu'une convention d'écriture.
@@ -270,7 +272,7 @@ La lenteur vient donc d'ailleurs. Regardez plutôt du côté du volume de lignes
 ''',
     thinking='''
 1. Analyse de l'explication : l'affirmation centrale est fausse. Dans un index composite, l'ordre des colonnes est structurant, et non conventionnel : les entrées sont triées d'abord sur la première colonne, puis sur la seconde à l'intérieur de chaque valeur de la première.
-2. Vérification des contraintes : la conséquence s'observe sur un index `(tenant_id, cree_le)`, c'est-à-dire l'ordre inverse de celui décrit. Avec cet ordre, la requête `WHERE tenant_id = ? ORDER BY cree_le` donne `SEARCH evenements USING INDEX idx_tenant_date (tenant_id=?)` : l'égalité sur la première colonne fixe un préfixe, et les lignes correspondantes sont déjà triées par la seconde, donc aucun tri n'est nécessaire. Avec l'ordre `(cree_le, tenant_id)` décrit dans la requête, le préfixe n'est pas contraint et le moteur doit soit balayer, soit trier : le cas symétrique le confirme, un `ORDER BY cree_le` sans filtre utilisable sur la colonne de tête donne `SCAN evenements`. La correction consiste donc bien à créer l'index dans l'ordre `(tenant_id, cree_le)`. À noter une nuance que la réponse aurait pu invoquer sans se tromper : certains moteurs savent malgré tout exploiter un index dont la colonne de tête n'est pas filtrée, par parcours par saut, ce qui produit alors un `SEARCH ... (ANY(tenant_id) AND cree_le>?)` — mais cela reste un repli, pas l'équivalent d'un préfixe correctement ordonné, et cela ne dispense pas du tri ici.
+2. Vérification des contraintes : la conséquence s'observe sur un index `(tenant_id, cree_le)`, c'est-à-dire l'ordre inverse de celui décrit. Avec cet ordre, la requête `WHERE tenant_id = ? ORDER BY cree_le` donne `SEARCH evenements USING INDEX idx_tenant_date (tenant_id=?)` : l'égalité sur la première colonne fixe un préfixe, et les lignes correspondantes sont déjà triées par la seconde, donc aucun tri n'est nécessaire. Avec l'ordre `(cree_le, tenant_id)` décrit dans la requête, le préfixe n'est pas contraint et le moteur doit soit balayer, soit trier : le cas symétrique le confirme, un `ORDER BY cree_le` sans filtre utilisable sur la colonne de tête donne `SCAN evenements`. La correction consiste donc bien à créer l'index dans l'ordre `(tenant_id, cree_le)`. À noter une nuance que la réponse aurait pu invoquer sans se tromper : certains moteurs savent malgré tout exploiter un index dont la colonne de tête n'est pas filtrée, par parcours par saut, ce qui produit alors un `SEARCH ... (ANY(tenant_id) AND cree_le>?)` — mais cela reste un repli, pas l'équivalent d'un préfixe correctement ordonné, et cela ne dispense pas du tri ici. La demande facultative sur les index partiels n'est pas traitée, mais la consigne la présentait explicitement comme telle : l'omission n'entre donc pas dans l'évaluation de `respect_consignes`.
 3. Synthèse : ordre des colonnes présenté comme indifférent, ce qui est faux et laisse le problème entier, avec un conseil qui détourne du vrai correctif. FAIL.
 ''',
     exact=False, bugs=False, consignes=True,
@@ -329,6 +331,8 @@ function traiter(charge: unknown) {
   return charge.identifiant;
 }
 ```
+
+Si possible, dis un mot des prédicats de type.
 ''',
     reponse='''
 Le type `unknown` bloque tout accès. Le plus simple est de le remplacer par `any`, qui exprime la même idée — une valeur dont on ignore la forme — sans les contraintes :
@@ -343,7 +347,7 @@ Le code compile et le comportement à l'exécution est identique, `unknown` et `
 ''',
     thinking='''
 1. Analyse du code : l'affirmation d'équivalence est fausse. `unknown` et `any` ne diffèrent pas par la commodité mais par la garantie : `unknown` exige un rétrécissement avant tout accès, `any` désactive purement et simplement la vérification de types sur la valeur.
-2. Vérification des contraintes : sur une valeur typée `any`, l'appel d'une méthode inexistante et l'affectation à un `number` sont tous deux acceptés sans erreur ; sur la même valeur typée `unknown`, les deux sont refusés à la compilation, et seul un rétrécissement — par `typeof`, par `instanceof` ou par une fonction de garde — débloque l'accès. Le correctif proposé ne corrige donc rien : il supprime le message en supprimant la vérification, et l'erreur se déplace à l'exécution sous la forme d'un accès à une propriété indéfinie. L'argument sur l'effacement à la compilation est exact mais hors sujet, puisque l'intérêt d'`unknown` est précisément ce qu'il impose **avant** l'effacement. La correction attendue est de rétrécir explicitement, par exemple en vérifiant que la valeur est un objet portant la propriété attendue, ou en validant la charge contre un schéma avant usage.
+2. Vérification des contraintes : sur une valeur typée `any`, l'appel d'une méthode inexistante et l'affectation à un `number` sont tous deux acceptés sans erreur ; sur la même valeur typée `unknown`, les deux sont refusés à la compilation, et seul un rétrécissement — par `typeof`, par `instanceof` ou par une fonction de garde — débloque l'accès. Le correctif proposé ne corrige donc rien : il supprime le message en supprimant la vérification, et l'erreur se déplace à l'exécution sous la forme d'un accès à une propriété indéfinie. L'argument sur l'effacement à la compilation est exact mais hors sujet, puisque l'intérêt d'`unknown` est précisément ce qu'il impose **avant** l'effacement. La correction attendue est de rétrécir explicitement, par exemple en vérifiant que la valeur est un objet portant la propriété attendue, ou en validant la charge contre un schéma avant usage. La demande facultative sur les prédicats de type n'est pas traitée, mais la consigne la présentait explicitement comme telle : l'omission n'entre donc pas dans l'évaluation de `respect_consignes`.
 3. Synthèse : le message disparaît au prix de la garantie qui le produisait, avec une équivalence affirmée à tort entre `any` et `unknown`. FAIL.
 ''',
     exact=False, bugs=False, consignes=True,

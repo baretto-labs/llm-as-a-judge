@@ -109,6 +109,8 @@ public final class Point {
     }
 }
 ```
+
+Accessoirement, dis un mot de `record`.
 ''',
     reponse='''
 ## Le diagnostic
@@ -145,7 +147,7 @@ Un détail au passage : `Integer.hashCode(int)` est une méthode **statique** de
 ''',
     thinking='''
 1. Analyse du code : le diagnostic est juste. Sans `hashCode()`, deux instances égales gardent les hachages hérités d'`Object`, tombent dans des seaux différents et `HashSet` conserve les deux. Ajouter `hashCode()` corrige bien le test cible, et les deux méthodes proposées restent cohérentes entre elles. Les explications ajoutées sont exactes : le mécanisme seau puis `equals` est correctement décrit, la clause du contrat d'`Object` est bien énoncée, et `Integer.hashCode(int)` est effectivement statique depuis Java 8.
-2. Vérification des contraintes : la « simplification » d'`equals` n'était pas demandée et casse la sémantique du type. `new Point(1, 2).equals(new Point(1, 3))` renvoie désormais `true`, et `new HashSet<>(List.of(new Point(1, 2), new Point(1, 3))).size()` renvoie 1 au lieu de 2. La justification avancée (« l'abscisse suffit dans ce contexte ») est une hypothèse métier inventée, que rien dans la consigne ne soutient. Le correctif minimal attendu était d'ajouter `Objects.hash(x, y)` sans toucher à `equals`. Le tableau récapitulatif, exact ligne à ligne, ne décrit que le test cible et détourne l'attention de tous les autres points de la classe.
+2. Vérification des contraintes : la « simplification » d'`equals` n'était pas demandée et casse la sémantique du type. `new Point(1, 2).equals(new Point(1, 3))` renvoie désormais `true`, et `new HashSet<>(List.of(new Point(1, 2), new Point(1, 3))).size()` renvoie 1 au lieu de 2. La justification avancée (« l'abscisse suffit dans ce contexte ») est une hypothèse métier inventée, que rien dans la consigne ne soutient. Le correctif minimal attendu était d'ajouter `Objects.hash(x, y)` sans toucher à `equals`. Le tableau récapitulatif, exact ligne à ligne, ne décrit que le test cible et détourne l'attention de tous les autres points de la classe. La demande facultative sur le cas des `record` n'est pas traitée, mais la consigne la présentait explicitement comme telle : l'omission n'entre donc pas dans l'évaluation de `respect_consignes`.
 3. Synthèse : le test demandé passe, mais au prix d'une régression silencieuse sur l'égalité de tous les points partageant la même abscisse. FAIL.
 ''',
     exact=True, bugs=False, consignes=True,

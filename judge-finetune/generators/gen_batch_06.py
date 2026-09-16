@@ -571,6 +571,8 @@ add(example(
           "cas": "limite", "verbeux": False, "langage": "sql"},
     consigne='''
 Comment renommer une colonne très sollicitée sur une table de 50 millions de lignes en PostgreSQL, **sans aucune fenêtre de maintenance ni interruption de service** ? C'est la contrainte principale, l'application est déployée en continu.
+
+Sans obligation, dis un mot de la vue de compatibilité.
 ''',
     reponse='''
 Le renommage direct est en réalité peu coûteux en PostgreSQL : `ALTER TABLE ... RENAME COLUMN` ne réécrit pas les données, il modifie le catalogue. L'opération est quasi instantanée, même sur 50 millions de lignes.
@@ -588,7 +590,7 @@ La coupure se limite à quelques secondes, ce qui reste acceptable pour une opé
 ''',
     thinking='''
 1. Analyse de l'explication : la partie technique initiale est exacte. `ALTER TABLE ... RENAME COLUMN` modifie effectivement le catalogue sans réécrire les lignes, l'opération est quasi instantanée, et l'analyse du problème réel, l'absence de coexistence des deux noms pendant un déploiement continu, est correcte et bien vue.
-2. Vérification des contraintes : la marche à suivre viole frontalement la contrainte posée. La consigne exclut explicitement toute fenêtre de maintenance et toute interruption, en précisant que c'est la contrainte principale et que l'application est déployée en continu. La réponse propose une fenêtre nocturne, l'arrêt des instances, puis une remise en trafic, et conclut en qualifiant la coupure d'acceptable. Ce n'est pas un écart de forme : c'est la question posée qui reste sans réponse. La solution attendue est la migration par expansion et contraction, à savoir ajouter la nouvelle colonne, la synchroniser par déclencheur ou double écriture applicative, remplir l'historique par lots, basculer les lectures une fois les deux colonnes cohérentes, puis supprimer l'ancienne colonne une fois toutes les instances migrées.
+2. Vérification des contraintes : la marche à suivre viole frontalement la contrainte posée. La consigne exclut explicitement toute fenêtre de maintenance et toute interruption, en précisant que c'est la contrainte principale et que l'application est déployée en continu. La réponse propose une fenêtre nocturne, l'arrêt des instances, puis une remise en trafic, et conclut en qualifiant la coupure d'acceptable. Ce n'est pas un écart de forme : c'est la question posée qui reste sans réponse. La solution attendue est la migration par expansion et contraction, à savoir ajouter la nouvelle colonne, la synchroniser par déclencheur ou double écriture applicative, remplir l'historique par lots, basculer les lectures une fois les deux colonnes cohérentes, puis supprimer l'ancienne colonne une fois toutes les instances migrées. La demande facultative sur la vue de compatibilité n'est pas traitée, mais la consigne la présentait explicitement comme telle : l'omission n'entre donc pas dans l'évaluation de `respect_consignes`.
 3. Synthèse : le contenu technique est exact et l'analyse du problème pertinente, mais la procédure proposée contredit la seule contrainte imposée, ce qui rend la réponse inutilisable. FAIL.
 ''',
     exact=True, bugs=True, consignes=True,

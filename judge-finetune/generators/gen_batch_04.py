@@ -583,6 +583,8 @@ add(example(
           "cas": "defaillant", "verbeux": False, "langage": "web"},
     consigne='''
 Notre client mobile rejoue automatiquement les requêtes en cas de coupure réseau. Quelles méthodes HTTP peut-on rejouer sans risque, et que faire pour les autres ?
+
+En bonus, dis un mot de la clé d'idempotence.
 ''',
     reponse='''
 La règle est simple : une méthode est rejouable si elle est idempotente, c'est-à-dire si l'exécuter plusieurs fois donne le même résultat que l'exécuter une fois.
@@ -595,7 +597,7 @@ En pratique, autorisez donc le rejeu sur `GET`, `DELETE` et `POST`, et bloquez-l
 ''',
     thinking='''
 1. Analyse de l'explication : la définition initiale de l'idempotence est correcte, ainsi que le classement de `GET` et `DELETE`. Tout le reste est faux, et de manière symétrique.
-2. Vérification des contraintes : selon la RFC 9110, `PUT` **est** idempotent : il remplace intégralement l'état de la ressource par la représentation fournie, donc rejouer la même requête aboutit au même état final. Le contre-exemple invoqué, une écriture concurrente intercalée, ne relève pas de l'idempotence mais de la concurrence, qui se traite par requête conditionnelle avec `If-Match`. À l'inverse, `POST` n'est **pas** idempotent, et le code de statut renvoyé n'y change rien : un code de statut décrit un résultat, il ne modifie pas la sémantique de la méthode. Prétendre que renvoyer `200` rend un `POST` rejouable est faux, et la recommandation finale est exactement inversée : rejouer les `POST` de création produira des doublons en cas de coupure réseau, ce qui est précisément le scénario décrit par la consigne. La bonne réponse consiste à rejouer `GET`, `PUT` et `DELETE`, et à protéger les `POST` par une clé d'idempotence fournie par le client et mémorisée par le serveur.
+2. Vérification des contraintes : selon la RFC 9110, `PUT` **est** idempotent : il remplace intégralement l'état de la ressource par la représentation fournie, donc rejouer la même requête aboutit au même état final. Le contre-exemple invoqué, une écriture concurrente intercalée, ne relève pas de l'idempotence mais de la concurrence, qui se traite par requête conditionnelle avec `If-Match`. À l'inverse, `POST` n'est **pas** idempotent, et le code de statut renvoyé n'y change rien : un code de statut décrit un résultat, il ne modifie pas la sémantique de la méthode. Prétendre que renvoyer `200` rend un `POST` rejouable est faux, et la recommandation finale est exactement inversée : rejouer les `POST` de création produira des doublons en cas de coupure réseau, ce qui est précisément le scénario décrit par la consigne. La bonne réponse consiste à rejouer `GET`, `PUT` et `DELETE`, et à protéger les `POST` par une clé d'idempotence fournie par le client et mémorisée par le serveur. La demande facultative sur la clé d'idempotence n'est pas traitée, mais la consigne la présentait explicitement comme telle : l'omission n'entre donc pas dans l'évaluation de `respect_consignes`.
 3. Synthèse : les deux classements qui comptent sont inversés, et le conseil produirait des créations en double sur le cas d'usage décrit. FAIL.
 ''',
     exact=False, bugs=False, consignes=True,
