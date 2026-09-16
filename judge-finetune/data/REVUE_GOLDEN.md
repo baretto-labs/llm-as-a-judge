@@ -159,3 +159,24 @@ mesuré. Les deux colonnes restent séparées dans ce journal, et le κ se calcu
   `b07-011` ❌ (PASS contre FAIL, révisé après révélation).
 - Dont **3 encore dans le golden set** : `b04-015`, `b09-009`, `b07-011`.
 - **En attente :** confirmation du contrôle 1 de `b09-009` ; évaluation de `b10-015`.
+
+### Arbitrage du 2026-09-16 — le premier passage de `b07-011` compte dans le κ
+
+L'annotateur a proposé de corriger son premier passage de PASS en FAIL, par crainte « d'introduire une
+erreur humaine ». Trois options ont été posées : compter la donnée, l'exclure du κ en documentant
+pourquoi, ou la re-mesurer. **Option retenue : la compter.**
+
+Le malentendu à écarter d'abord : l'erreur n'est jamais entrée dans le corpus. `b07-011` est étiqueté FAIL
+et l'a toujours été ; le PASS n'existe que dans ce journal, comme **mesure**, jamais comme étiquette.
+
+La raison de fond : le κ inter-annotateurs ne note pas le relecteur, il fixe le **plafond du benchmark**.
+Effacer un désaccord dès que l'un des deux se ravise après avoir vu la réponse de l'autre ferait monter ce
+κ à 1,0 par construction, et conduirait à conclure que les étiquettes sont parfaitement reproductibles.
+Elles ne le sont pas : un relecteur compétent et attentif a lu cet exemple et conclu PASS. C'est un fait
+sur la difficulté réelle de la tâche, et il servira à interpréter les sorties du juge fine-tuné — si
+celui-ci rend PASS sur un cas analogue, on saura qu'un humain a fait la même lecture.
+
+Réserve consignée, mais non retenue comme motif d'exclusion : ce point de mesure a été recueilli **avant**
+le correctif de protocole, quand un verdict global était demandé plutôt que quatre contrôles. Ce format a
+pu favoriser une lecture d'ensemble. Il n'a en revanche caché aucune information — la contrainte « trois
+points maximum » figurait en toutes lettres dans la requête présentée.
