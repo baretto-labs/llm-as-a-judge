@@ -394,6 +394,8 @@ add(example(
           "cas": "defaillant", "verbeux": False, "langage": "java"},
     consigne='''
 Peut-on s'appuyer sur `finalize()` pour fermer un descripteur de fichier détenu par un objet ?
+
+Accessoirement, dis un mot de `Cleaner`.
 ''',
     reponse='''
 Oui, c'est même l'usage pour lequel la méthode a été prévue. Le ramasse-miettes appelle `finalize()` avant de récupérer l'objet, ce qui donne l'occasion de libérer les ressources natives qu'il détient.
@@ -401,14 +403,16 @@ Oui, c'est même l'usage pour lequel la méthode a été prévue. Le ramasse-mie
 En pratique, redéfinissez la méthode et fermez-y le descripteur. La libération sera peut-être différée de quelques cycles de collecte, mais elle est garantie : aucun objet n'est récupéré sans que sa finalisation ait été exécutée.
 
 Pour les cas où la fermeture doit être immédiate, `try-with-resources` reste évidemment préférable.
+
+Quant à `Cleaner`, introduit en Java 9, il apporte précisément la garantie qui manquait : les actions enregistrées sont exécutées à l'arrêt de la machine virtuelle, y compris pour les objets que le ramasse-miettes n'a jamais collectés. C'est ce qui en fait un filet de sécurité fiable pour les descripteurs restés ouverts.
 ''',
     thinking='''
 1. Analyse de l'explication : l'affirmation de garantie est fausse. La spécification ne promet **pas** que la finalisation d'un objet soit exécutée : elle ne l'est pas si le programme se termine avant la collecte, et la machine virtuelle n'est pas tenue de récupérer un objet donné. Un descripteur peut donc n'être jamais fermé.
-2. Vérification des contraintes : plusieurs défauts s'ajoutent à cette garantie inexistante. La finalisation s'exécute sur un fil dédié, sans ordre garanti et sans délai borné, si bien qu'un programme ouvrant des fichiers plus vite que le ramasse-miettes ne collecte épuise ses descripteurs, ce qui est précisément le scénario de la question. Une exception levée dans la finalisation est ignorée en silence, masquant les échecs de fermeture. Le mécanisme retarde en outre la récupération de l'objet d'au moins un cycle. Enfin, la réponse ignore l'état de la plateforme : `finalize` est déprécié pour suppression depuis Java 9, et la finalisation est désactivée par défaut depuis Java 18, de sorte que le code proposé ne s'exécuterait tout simplement pas sur une machine virtuelle récente. La réponse correcte est d'implémenter `AutoCloseable` et de laisser l'appelant utiliser `try-with-resources`, en ajoutant au besoin un `Cleaner` comme filet de sécurité — un filet, non un mécanisme principal.
+2. Vérification des contraintes : plusieurs défauts s'ajoutent à cette garantie inexistante. La finalisation s'exécute sur un fil dédié, sans ordre garanti et sans délai borné, si bien qu'un programme ouvrant des fichiers plus vite que le ramasse-miettes ne collecte épuise ses descripteurs, ce qui est précisément le scénario de la question. Une exception levée dans la finalisation est ignorée en silence, masquant les échecs de fermeture. Le mécanisme retarde en outre la récupération de l'objet d'au moins un cycle. Enfin, la réponse ignore l'état de la plateforme : `finalize` est déprécié pour suppression depuis Java 9, et la finalisation est désactivée par défaut depuis Java 18, de sorte que le code proposé ne s'exécuterait tout simplement pas sur une machine virtuelle récente. La réponse correcte est d'implémenter `AutoCloseable` et de laisser l'appelant utiliser `try-with-resources`, en ajoutant au besoin un `Cleaner` comme filet de sécurité — un filet, non un mécanisme principal. La demande facultative sur `Cleaner` est par ailleurs traitée, mais elle l'est faussement : la documentation ne garantit nullement l'exécution des actions de nettoyage, et surtout pas à l'arrêt de la machine virtuelle, où rien n'oblige un nettoyeur en attente à s'exécuter. La réponse prête donc à `Cleaner` la garantie même qu'elle vient d'attribuer à tort à la finalisation. Ce défaut relève de `exactitude_technique` et non de `respect_consignes` : la demande était facultative, c'est son contenu qui est faux, non son omission.
 3. Synthèse : garantie d'exécution affirmée à tort, défauts opérationnels passés sous silence, et recommandation d'un mécanisme désactivé par défaut sur les versions actuelles. FAIL.
 ''',
     exact=False, bugs=False, consignes=True,
-    raison="La finalisation n'est pas garantie, elle est dépréciée depuis Java 9 et désactivée par défaut depuis Java 18 : le descripteur peut ne jamais être fermé.",
+    raison="La finalisation n'est pas garantie, elle est dépréciée depuis Java 9 et désactivée par défaut depuis Java 18 : le descripteur peut ne jamais être fermé ; la garantie prêtée en outre à Cleaner à l'arrêt de la machine virtuelle n'existe pas.",
 ))
 
 # ── 12. Théorie : index couvrant ──────────────────────────────────────────────

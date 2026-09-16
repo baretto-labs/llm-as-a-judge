@@ -398,6 +398,8 @@ Les deux premiers cas sont les plus dangereux : rien ne signale la perte, et le 
 
 C'est l'algorithme de clonage structuré de la plateforme, disponible nativement depuis Node 17. Il préserve les `Date`, gère les références circulaires, et effectue une copie réellement profonde : muter un tableau imbriqué du clone ne touche pas la source.
 
+Pour répondre au point sur les `Map` : elles sont prises en charge, et les `Set` aussi. Le clone est une véritable `Map`, dont les clés et les valeurs sont elles-mêmes clonées en profondeur. C'est d'ailleurs l'un des écarts les plus brutaux avec l'aller-retour JSON, qui réduit une `Map` à `{}` sans rien signaler.
+
 ## Ses limites
 
 Il ne clone pas les fonctions, ni les symboles, ni la chaîne de prototypes : un objet de classe revient en objet simple, et une méthode fait lever une `DataCloneError`. Pour de la configuration composée de données, ce n'est pas un problème.
@@ -408,13 +410,13 @@ Sans `structuredClone`, il reste `lodash.cloneDeep` ou une fonction récursive m
 ''',
     thinking='''
 1. Analyse du code : la solution proposée est la bonne et tient en une ligne. Sous Node 22, `structuredClone` préserve bien l'instance `Date` avec sa valeur `2026-03-01T12:00:00.000Z`, et la copie est réellement profonde, une mutation du tableau imbriqué du clone laissant la source inchangée.
-2. Vérification des contraintes : les cinq pertes attribuées à l'aller-retour JSON sont toutes réelles : la `Date` revient en chaîne, `NaN` devient `null`, la clé de valeur `undefined` disparaît, un `BigInt` lève une `TypeError` avec le message « Do not know how to serialize a BigInt », et une référence circulaire lève également une `TypeError`. Les limites énoncées sur `structuredClone` sont exactes, notamment la perte de la chaîne de prototypes et l'échec sur les fonctions. La demande facultative sur les `Map` n'est en revanche pas traitée, alors qu'elle aurait été favorable à la réponse, l'algorithme les prenant en charge. Écart secondaire : la réponse est longue pour une question dont la solution tient en une ligne.
-3. Synthèse : la réponse obligatoire est exacte et bien argumentée ; l'omission porte sur une demande explicitement facultative, et la verbosité seule ne justifie pas un échec. PASS.
+2. Vérification des contraintes : les cinq pertes attribuées à l'aller-retour JSON sont toutes réelles : la `Date` revient en chaîne, `NaN` devient `null`, la clé de valeur `undefined` disparaît, un `BigInt` lève une `TypeError` avec le message « Do not know how to serialize a BigInt », et une référence circulaire lève également une `TypeError`. Les limites énoncées sur `structuredClone` sont exactes, notamment la perte de la chaîne de prototypes et l'échec sur les fonctions. La demande facultative sur les `Map` est traitée, et l'affirmation est exacte : le clonage structuré restitue une véritable `Map`, clés et valeurs clonées en profondeur, ainsi que les `Set`, là où `JSON.stringify` réduit silencieusement une `Map` à `{}`. Écart secondaire : la réponse est longue pour une question dont la solution tient en une ligne.
+3. Synthèse : la réponse obligatoire est exacte et bien argumentée, la demande facultative est traitée sans erreur, et la verbosité seule ne justifie pas un échec. PASS.
 ''',
     exact=True, bugs=True, consignes=True,
     extra_criteres={"aucune_dependance_externe": "La solution n'utilise que les API de la plateforme, comme l'exige la requête."},
     extra_checks={"aucune_dependance_externe": True},
-    raison="structuredClone est la bonne réponse, et les cinq pertes du clonage JSON sont réelles ; seul le point facultatif sur les Map manque.",
+    raison="structuredClone est la bonne réponse, les cinq pertes du clonage JSON sont réelles, et le point facultatif sur les Map est traité exactement.",
 ))
 
 # ── 10. Théorie : ramasse-miettes de la JVM ───────────────────────────────────

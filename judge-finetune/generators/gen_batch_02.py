@@ -340,8 +340,8 @@ Une expression régulière repère les paires nombre/unité, puis on additionne.
 ```python
 import re
 
-_PATTERN = re.compile(r"(\\d+)([hms])")
-_FACTORS = {"h": 3600, "m": 60, "s": 1}
+_PATTERN = re.compile(r"(\\d+)([dhms])")
+_FACTORS = {"d": 86400, "h": 3600, "m": 60, "s": 1}
 
 
 def parse_duration(s):
@@ -365,6 +365,10 @@ def parse_duration(s):
 45
 >>> parse_duration("2h")
 7200
+>>> parse_duration("2d")
+172800
+>>> parse_duration("1d12h")
+129600
 >>> parse_duration("1h 30m")
 Traceback (most recent call last):
 ValueError: Durée invalide : '1h 30m'
@@ -376,13 +380,13 @@ On pourrait accepter les décimales, tolérer les espaces, ou valider que les un
 ''',
     thinking='''
 1. Analyse du code : l'expression régulière capture les paires nombre/unité et la somme pondérée est juste. `'1h30m'` donne 5400, `'45s'` donne 45, `'2h'` donne 7200. La vérification par reconstruction fait son travail : `'1h 30m'`, `'1h!!'`, `'abc'`, `''` et une entrée non textuelle lèvent bien `ValueError`, alors qu'un simple `findall` aurait accepté les trois premiers en silence. L'explication de ce mécanisme est exacte.
-2. Vérification des contraintes : les exigences obligatoires sont satisfaites, à savoir la conversion, la levée de `ValueError` sur entrée invalide et l'absence de dépendance externe. Deux écarts mineurs : les jours ne sont pas gérés, mais la consigne les présentait comme facultatifs (« si tu as le temps »), et `'2d'` lève proprement `ValueError` plutôt que de produire un résultat faux ; par ailleurs la réponse est verbeuse, avec une section « pour aller plus loin » non demandée.
-3. Synthèse : tout l'obligatoire est correct, les écarts portent sur une consigne facultative et sur le style. La verbosité ne doit pas faire échouer une réponse juste. PASS.
+2. Vérification des contraintes : les exigences obligatoires sont satisfaites, à savoir la conversion, la levée de `ValueError` sur entrée invalide et l'absence de dépendance externe. La demande facultative sur les jours est en outre traitée, et elle l'est correctement : l'unité `d` figure au motif comme à la table des facteurs, `'2d'` donne 172800 et `'1d12h'` donne 129600, et la vérification par reconstruction continue de rejeter `'2x'`. Un seul écart subsiste, la verbosité, avec une section « pour aller plus loin » non demandée.
+3. Synthèse : tout l'obligatoire est correct, la demande facultative est traitée sans erreur, et le seul écart restant est stylistique. La verbosité ne doit pas faire échouer une réponse juste. PASS.
 ''',
     exact=True, bugs=True, consignes=True,
     extra_criteres={"aucune_dependance_externe": "La solution n'utilise que la bibliothèque standard, comme l'exige la requête."},
     extra_checks={"aucune_dependance_externe": True},
-    raison="Toutes les exigences obligatoires sont satisfaites ; les jours relevaient d'une consigne facultative.",
+    raison="Toutes les exigences obligatoires sont satisfaites, et la demande facultative sur les jours est traitée sans erreur.",
 ))
 
 # ── 9. Cas limite : signature imposée non respectée ───────────────────────────
