@@ -510,7 +510,7 @@ add(example(
     meta={"id": "b05-012", "famille": "outillage-semver", "domaine": "theorie", "tache": "question_reponse",
           "cas": "limite", "verbeux": False, "langage": "outillage"},
     consigne='''
-On sort une version de notre bibliothèque qui corrige un bug, mais dont la correction change le comportement observable d'une méthode publique. Majeure, mineure ou correctif ? Si tu as le temps, dis un mot des versions `0.x`.
+On sort une version de notre bibliothèque qui corrige un bug, mais dont la correction change le comportement observable d'une méthode publique. Majeure, mineure ou correctif ? Si possible, dis un mot des versions `0.x`.
 ''',
     reponse='''
 Version **majeure**.

@@ -181,7 +181,7 @@ add(example(
     meta={"id": "b10-005", "famille": "python-config-immuable-frozen", "domaine": "code", "tache": "generation",
           "cas": "limite", "verbeux": False, "langage": "python"},
     consigne='''
-Écris la configuration de notre service : hôte, port, et liste d'origines autorisées. Elle doit être **immuable après construction** et utilisable comme clé de cache. Si tu as le temps, dis un mot de la validation du port.
+Écris la configuration de notre service : hôte, port, et liste d'origines autorisées. Elle doit être **immuable après construction** et utilisable comme clé de cache. Accessoirement, dis un mot de la validation du port.
 ''',
     reponse='''
 ```python
@@ -437,7 +437,7 @@ add(example(
     meta={"id": "b10-013", "famille": "db-migration-expansion-contraction", "domaine": "theorie",
           "tache": "explication", "cas": "limite", "verbeux": True, "langage": "web"},
     consigne='''
-Comment scinder notre colonne `nom_complet` en `prenom` et `nom` sur une table très sollicitée, **sans aucune interruption de service** ? Si tu as le temps, dis un mot du retour arrière.
+Comment scinder notre colonne `nom_complet` en `prenom` et `nom` sur une table très sollicitée, **sans aucune interruption de service** ? Si tu veux compléter, dis un mot du retour arrière.
 ''',
     reponse='''
 ## Le principe

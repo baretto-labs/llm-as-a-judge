@@ -519,7 +519,7 @@ add(example(
     meta={"id": "b04-012", "famille": "js-egalite-lache", "domaine": "theorie", "tache": "explication",
           "cas": "limite", "verbeux": False, "langage": "typescript"},
     consigne='''
-Explique la différence entre `==` et `===` en JavaScript, et donne la règle à suivre en pratique. Si tu as le temps, dis aussi un mot d'`Object.is`.
+Explique la différence entre `==` et `===` en JavaScript, et donne la règle à suivre en pratique. En bonus, dis aussi un mot d'`Object.is`.
 ''',
     reponse='''
 `===` compare type et valeur, sans conversion. `==` applique d'abord un ensemble de règles de conversion, puis compare.

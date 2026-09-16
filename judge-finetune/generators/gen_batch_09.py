@@ -457,7 +457,7 @@ add(example(
     meta={"id": "b09-013", "famille": "obs-journalisation-donnees", "domaine": "theorie", "tache": "explication",
           "cas": "limite", "verbeux": True, "langage": "web"},
     consigne='''
-Que faut-il éviter de journaliser dans une application qui manipule des données clients, et comment s'en assurer ? **Reste sur la journalisation applicative, ne parle pas du chiffrement de la base ni des sauvegardes.** Si tu as le temps, dis un mot de la durée de rétention.
+Que faut-il éviter de journaliser dans une application qui manipule des données clients, et comment s'en assurer ? **Reste sur la journalisation applicative, ne parle pas du chiffrement de la base ni des sauvegardes.** Si possible, dis un mot de la durée de rétention.
 ''',
     reponse='''
 ## Ce qui n'a rien à faire dans un journal

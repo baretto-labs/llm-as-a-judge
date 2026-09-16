@@ -572,7 +572,7 @@ add(example(
     meta={"id": "b02-014", "famille": "db-index-btree-hash", "domaine": "theorie", "tache": "explication",
           "cas": "limite", "verbeux": False, "langage": "sql"},
     consigne='''
-Dans PostgreSQL, quelle est la différence entre un index B-tree et un index hash, et lequel choisir pour des recherches par plage de dates ? Si tu as le temps, dis aussi un mot des index partiels.
+Dans PostgreSQL, quelle est la différence entre un index B-tree et un index hash, et lequel choisir pour des recherches par plage de dates ? Accessoirement, dis aussi un mot des index partiels.
 ''',
     reponse='''
 **B-tree** : structure ordonnée. Elle sait répondre à l'égalité, aux comparaisons (`<`, `>`, `BETWEEN`), aux tris (`ORDER BY` sur la colonne indexée) et aux recherches par préfixe avec `LIKE 'abc%'`. C'est le type par défaut, et celui qui couvre l'immense majorité des besoins.

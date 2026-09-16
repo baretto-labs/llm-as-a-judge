@@ -496,7 +496,7 @@ add(example(
     meta={"id": "b03-012", "famille": "git-merge-rebase", "domaine": "theorie", "tache": "explication",
           "cas": "limite", "verbeux": True, "langage": "git"},
     consigne='''
-Explique la différence entre `merge` et `rebase`, et dis lequel utiliser dans notre workflow de pull requests. Si tu as le temps, dis aussi un mot de `git rebase --onto`.
+Explique la différence entre `merge` et `rebase`, et dis lequel utiliser dans notre workflow de pull requests. Sans obligation, dis aussi un mot de `git rebase --onto`.
 ''',
     reponse='''
 ## La différence de fond
@@ -609,7 +609,7 @@ add(example(
     meta={"id": "b03-015", "famille": "securite-hachage-mdp", "domaine": "theorie", "tache": "explication",
           "cas": "limite", "verbeux": False, "langage": "securite"},
     consigne='''
-Comment stocker les mots de passe de nos utilisateurs ? Nous utilisons actuellement SHA-256 avec un sel par utilisateur. Si possible, compare bcrypt et argon2.
+Comment stocker les mots de passe de nos utilisateurs ? Nous utilisons actuellement SHA-256 avec un sel par utilisateur. Si tu veux compléter, compare bcrypt et argon2.
 ''',
     reponse='''
 Le sel est une bonne chose, il vous protège des tables précalculées et des attaques mutualisées sur l'ensemble de la base. Mais SHA-256 reste le mauvais outil : c'est une fonction de hachage **rapide**, conçue pour l'intégrité. Sur du matériel dédié, un attaquant qui récupère votre base teste des milliards de candidats par seconde, sel ou pas sel, puisque le sel n'est secret que jusqu'à la fuite de la base, où il figure à côté du condensé.

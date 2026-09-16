@@ -462,7 +462,7 @@ add(example(
     meta={"id": "b08-012", "famille": "archi-saga", "domaine": "theorie", "tache": "explication",
           "cas": "limite", "verbeux": True, "langage": "sql"},
     consigne='''
-Nous découpons notre monolithe en deux services, commandes et paiements, chacun avec sa base. Comment garder la cohérence d'une opération qui touche les deux ? Si tu as le temps, dis un mot de la boîte d'envoi transactionnelle.
+Nous découpons notre monolithe en deux services, commandes et paiements, chacun avec sa base. Comment garder la cohérence d'une opération qui touche les deux ? En bonus, dis un mot de la boîte d'envoi transactionnelle.
 ''',
     reponse='''
 ## Ce qui n'est plus disponible
@@ -504,7 +504,7 @@ add(example(
     meta={"id": "b08-013", "famille": "web-http2-http3", "domaine": "theorie", "tache": "question_reponse",
           "cas": "limite", "verbeux": False, "langage": "web"},
     consigne='''
-Faut-il activer HTTP/3 sur notre passerelle, déjà en HTTP/2 ? **Réponds en quatre puces maximum.** Si tu as le temps, dis un mot de la découverte de service via `Alt-Svc`.
+Faut-il activer HTTP/3 sur notre passerelle, déjà en HTTP/2 ? **Réponds en quatre puces maximum.** Sans obligation, dis un mot de la découverte de service via `Alt-Svc`.
 ''',
     reponse='''
 - **Le gain réel porte sur les réseaux instables.** HTTP/2 multiplexe plusieurs flux sur une connexion TCP unique : une perte de paquet bloque tous les flux le temps de la retransmission. HTTP/3, au-dessus de QUIC, isole les flux, donc une perte n'affecte que le flux concerné.

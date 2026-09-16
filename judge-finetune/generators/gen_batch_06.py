@@ -373,7 +373,7 @@ add(example(
     meta={"id": "b06-009", "famille": "js-clonage-profond", "domaine": "code", "tache": "generation",
           "cas": "limite", "verbeux": True, "langage": "typescript"},
     consigne='''
-Nous devons cloner en profondeur un objet de configuration contenant des dates et des tableaux imbriqués, sans dépendance externe (Node 22). Si tu as le temps, dis un mot du cas des `Map`.
+Nous devons cloner en profondeur un objet de configuration contenant des dates et des tableaux imbriqués, sans dépendance externe (Node 22). Si tu veux compléter, dis un mot du cas des `Map`.
 ''',
     reponse='''
 ## La réponse courte

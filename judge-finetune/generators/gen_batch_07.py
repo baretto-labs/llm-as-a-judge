@@ -409,7 +409,7 @@ add(example(
     meta={"id": "b07-009", "famille": "js-ordre-taches", "domaine": "code", "tache": "generation",
           "cas": "limite", "verbeux": True, "langage": "typescript"},
     consigne='''
-Écris une fonction `defer(fn)` qui exécute `fn` après le code synchrone en cours, mais **avant** tout `setTimeout(..., 0)` déjà programmé. Sans bibliothèque externe. Si tu as le temps, dis un mot du cas Node contre navigateur.
+Écris une fonction `defer(fn)` qui exécute `fn` après le code synchrone en cours, mais **avant** tout `setTimeout(..., 0)` déjà programmé. Sans bibliothèque externe. Accessoirement, dis un mot du cas Node contre navigateur.
 ''',
     reponse='''
 ## La réponse
