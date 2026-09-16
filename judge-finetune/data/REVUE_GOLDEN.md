@@ -431,3 +431,33 @@ autant que l'entraînement.
 - **Accord sur le verdict, premier passage : 10 / 11** — seul `b07-011` reste en désaccord.
 - **Désaccords au niveau contrôle : 2** — `b09-009` (corrigé en faveur de l'annotateur), `b13-012` (étiquette maintenue).
 - Items à difficulté réelle traités : 2 sur 4. Restent `b03-012`, `b13-013`.
+
+### Correctif de la fuite « consigne facultative » — exécuté
+
+Le correctif esquissé à la fiche `b07-015` a été mené en trois lots, sans créer ni supprimer aucun exemple
+et sans déplacer un seul verdict.
+
+| lot | contenu | items |
+|---|---|---|
+| 1 | diversification des formulations : les 15 « Si tu as le temps » deviennent six tournures | 12 réécritures |
+| 2 | clause facultative ajoutée à des FAIL existants, `<thinking>` repris à chaque fois | 12 (3 golden, 2 valid, 7 train) |
+| 3 | items où le volet facultatif est réellement **traité** | 3 |
+
+**Résultat mesuré.** La règle de surface « requête à clause facultative ⇒ PASS » passe de **17/17 (100 %)** à
+**17/30 (57 %)** sur le corpus et **3/6 (50 %)** sur le golden set, où elle ne vaut donc plus mieux qu'une
+pièce lancée.
+
+**Le lot 3 répond à un second raccourci**, distinct de la corrélation et plus insidieux : dans les 17 items
+d'origine, la clause facultative était *toujours ignorée* par la réponse. Un juge pouvait donc apprendre
+« une clause facultative est là pour être sautée » sans acquérir la notion. Les trois formes manquantes :
+`b02-008` traite les jours correctement et reste PASS ; `b06-009` traite les `Map` correctement et reste
+PASS ; `b10-011` traite `Cleaner` **faussement** — il lui prête l'exécution des actions à l'arrêt de la
+machine virtuelle, garantie inexistante — et le défaut tombe sur `exactitude_technique`, non sur
+`respect_consignes`, puisque la demande était facultative : c'est son contenu qui est faux, pas son omission.
+
+**Cinq candidats ont été refusés par le script plutôt que corrompus** : `b03-001` partage sa `consigne` avec
+une paire contrastive, et `b05-014`, `b06-005`, `b06-011`, `b07-012` traitaient déjà le sujet de la clause
+dans leur réponse, où la phrase « non traitée » aurait été fausse.
+
+**Invariants après correctif :** 200 exemples, 0 erreur de validation, 104 PASS / 96 FAIL, golden 24/26,
+tirage inchangé. Les onze relectures déjà faites restent valides.
