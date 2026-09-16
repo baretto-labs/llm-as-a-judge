@@ -245,3 +245,32 @@ le contexte est manifestement pertinent, ce qui invite à le valider en bloc. Au
 - **Désaccord au niveau contrôle : 1**, sur `b09-009`, tranché en faveur de l'annotateur et corrigé
   dans le corpus.
 - Aucune correction du corpus rendue nécessaire par la session 2 à ce stade.
+
+### 7. `b06-013` — accord complet sur une consigne facultative
+
+| | 1 `exactitude_technique` | 2 `absence_de_bugs` | 3 `respect_consignes` | verdict |
+|---|---|---|---|---|
+| annotateur, premier passage | V | V | V | **PASS** |
+| étiquette | V | V | V | **PASS** |
+
+Troisième accord consécutif sur tous les contrôles. L'item se joue sur une omission réelle — la réponse
+ne dit rien du passage à l'échelle derrière un répartiteur de charge, ni affinité de session, ni diffusion
+multi-instances, ni bus de messages — mais la requête introduisait cette demande par « si tu as le temps ».
+`respect_consignes` ne portant que sur les consignes obligatoires, l'omission ne fait pas échouer l'item.
+Les sept affirmations techniques vérifiables sont exactes. Aucune correction du corpus.
+
+**Réserve méthodologique sur ce point de mesure : chemin non observé.** L'annotateur a répondu « VVV, Pass »
+sans motif. Un PASS obtenu en voyant la demande facultative et en jugeant correctement qu'elle n'engage pas,
+et un PASS obtenu en ne remarquant pas qu'il y avait une seconde partie, produisent la même case. L'accord
+est réel, mais il ne démontre pas la maîtrise de la notion de consigne facultative.
+
+**Correctif de protocole : demander une ligne de motif sur les items jugés PASS.** Sur les FAIL, la
+formulation spontanée de l'annotateur (« ça Fail car… ») lève déjà l'ambiguïté ; c'est sur les PASS que le
+raisonnement reste invisible, et ce sont précisément les items où une inattention se confond avec un accord.
+
+### État de la relecture
+
+- **Accord sur le verdict, premier passage : 6 / 7** — seul `b07-011` reste en désaccord.
+- **Désaccord au niveau contrôle : 1**, sur `b09-009`, tranché en faveur de l'annotateur et corrigé.
+- Trois accords complets consécutifs : `b10-015` (amorcé), `b12-008` (non confondu), `b06-013`
+  (chemin non observé).
