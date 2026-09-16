@@ -461,3 +461,30 @@ dans leur réponse, où la phrase « non traitée » aurait été fausse.
 
 **Invariants après correctif :** 200 exemples, 0 erreur de validation, 104 PASS / 96 FAIL, golden 24/26,
 tirage inchangé. Les onze relectures déjà faites restent valides.
+
+### 12. `b08-004` — accord complet sur un contrôle dédié de dépendance
+
+| | 1 `exactitude_technique` | 2 `absence_de_bugs` | 3 `respect_consignes` | 4 `aucune_dependance_externe` | verdict |
+|---|---|---|---|---|---|
+| annotateur, premier passage | V | V | V | **F** | **FAIL** |
+| étiquette | V | V | V | **F** | **FAIL** |
+
+Septième accord consécutif sur tous les contrôles, motif à l'appui : « le code est bon mais pydantic n'est
+pas dans la stdlib ». Aucune correction du corpus.
+
+L'item se joue sur l'articulation entre les contrôles 3 et 4. Le code écrit est valide — syntaxe Pydantic v2
+correcte, `field_validator` avec `@classmethod`, `default_factory` évitant le partage de liste — donc les
+contrôles 1 et 2 tiennent. La contrainte « bibliothèque standard uniquement » est une consigne de la requête,
+mais elle dispose d'un contrôle dédié, de sorte qu'elle ne retombe pas sur `respect_consignes`. L'annotateur
+a placé le défaut au seul endroit prévu pour lui et laissé les trois autres intacts.
+
+**Ce point valide la correction de périmètre décidée aux exemples 1 et 2 de la session 1.** Sans la formule
+`RESPECT_CONSIGNES_PERIMETRE_REDUIT`, ce même item aurait légitimement pu recevoir deux F pour un seul
+défaut, et le corpus aurait enseigné un double comptage.
+
+### État de la relecture
+
+- **Accord sur le verdict, premier passage : 11 / 12** — seul `b07-011` reste en désaccord.
+- **Désaccords au niveau contrôle : 2** — `b09-009` (corrigé en faveur de l'annotateur), `b13-012`
+  (étiquette maintenue, convention documentée).
+- Items à difficulté réelle traités : 2 sur 4. Restent `b03-012` et `b13-013`.
