@@ -213,3 +213,35 @@ exemples consécutifs ne partagent pas le même mode d'échec.
 - **Aucune correction du corpus n'a été rendue nécessaire par la session 1**, hors la correction de
   périmètre de `respect_consignes` issue des exemples 1 et 2.
 - **En attente :** confirmation du contrôle 1 de `b09-009`, seul point resté ouvert.
+
+## Session 2
+
+**Composition revue avant de commencer.** Les six `limite` restants se répartissaient en cinq PASS sans
+aucun contrôle fautif et un seul FAIL. Les présenter dans l'ordre du bucket aurait reproduit en pire le
+défaut relevé en session 1 : après trois PASS consécutifs, le verdict devient prévisible par la position
+et les items suivants ne mesurent plus rien. La session 2 est donc tirée sur **l'ensemble du golden set**,
+en alternant les verdicts et les contrôles fautifs, au lieu de vider le bucket `limite`.
+
+### 6. `b12-008` — accord complet, non confondu
+
+| | 1 `contexte_pertinent` | 2 `contexte_suffisant` | 3 `bruit_maitrise` | verdict |
+|---|---|---|---|---|
+| annotateur, premier passage | V | **F** | V | **FAIL** |
+| étiquette | V | **F** | V | **FAIL** |
+
+Second accord consécutif sur tous les contrôles, et le premier qui ne souffre d'aucune réserve
+d'amorçage : tâche `RAG_CONTEXT_RELEVANCE` jamais rencontrée dans la relecture, mode d'échec inédit,
+aucun exemple antérieur n'orientait vers la suffisance. Les motifs coïncident — l'annotateur relève qu'il
+« manque encore quelques infos pour répondre de façon pertinente », l'étiquette que l'ordre de fusion
+demandé reste absent faute de corps de méthode.
+
+Le point remarquable est le **placement** du défaut : sur la suffisance et non sur la pertinence. C'est
+la distinction que ces trois critères servent précisément à séparer, et la partie difficile de l'item —
+le contexte est manifestement pertinent, ce qui invite à le valider en bloc. Aucune correction du corpus.
+
+### État de la relecture
+
+- **Accord sur le verdict, premier passage : 5 / 6** — seul `b07-011` reste en désaccord.
+- **Désaccord au niveau contrôle : 1**, sur `b09-009`, tranché en faveur de l'annotateur et corrigé
+  dans le corpus.
+- Aucune correction du corpus rendue nécessaire par la session 2 à ce stade.
