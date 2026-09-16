@@ -122,3 +122,40 @@ une lecture plausible plutôt que sur une vérification — que l'audit du jour 
   golden — les réponses restent valables.
 - **Reprise :** confirmer le contrôle 1 de `b09-009`, puis les deux exemples en attente, puis la session 2
   (`b03-012`, `b05-008`, `b06-013`, `b07-015`, `b12-008`, `b13-013`).
+
+### 4. `b07-011` — premier désaccord sur un verdict, et ce qu'il révèle
+
+| | 1 `exactitude` | 2 `absence_de_bugs` | 3 `respect_consignes` | 4 `format_impose` | verdict |
+|---|---|---|---|---|---|
+| annotateur, **premier passage** | — | — | — | — | **PASS** |
+| étiquette | V | V | V | **F** | **FAIL** |
+| annotateur, après révélation | V | V | V | F | FAIL |
+
+**Étiquette maintenue, aucune correction du corpus.** Le contenu technique est exact de bout en bout —
+condition `volatile`, décomposition de `new Holder()`, publication d'une référence partiellement
+construite, JSR-133 depuis Java 5, idiome de la classe interne. Le seul contrôle fautif est le 4 : la
+requête impose « trois points maximum », la réponse en aligne cinq.
+
+**Ce que le cas révèle.** L'annotateur a évalué le fond, jugé — à raison — que tout y était exact, et
+conclu PASS sans peser la contrainte de forme. Il l'a reconnu de lui-même : « je me suis concentré sur le
+fond et je n'ai pas vu les 3 points ». Or le contrôle décisif ne demandait **aucune connaissance du
+double-checked locking**, seulement de compter.
+
+C'est précisément le piège que `format_impose` existe pour attraper, et le fait qu'un relecteur technique
+attentif y tombe est un indice que l'exemple est bien construit. Un indice, sur un cas.
+
+**Correctif de protocole adopté.** L'annotateur répond désormais **contrôle par contrôle**, quatre valeurs
+dans l'ordre, et non par un verdict global. Le verdict en découle mécaniquement, et un contrôle omis
+devient visible au lieu d'être absorbé par une impression d'ensemble. Le format d'appel des exemples est
+inchangé ; seule la forme de la réponse attendue se resserre.
+
+**Règle de comptage du κ.** Le jugement de **premier passage** est celui qui compte pour l'accord
+inter-annotateurs. Une révision faite après avoir vu l'étiquette gonflerait artificiellement le plafond
+mesuré. Les deux colonnes restent séparées dans ce journal, et le κ se calculera sur la première.
+
+### État de la relecture au 2026-09-16
+
+- **Accord sur le verdict, premier passage : 3 / 4** — `b03-007` ✅, `b04-015` ✅, `b09-009` ✅,
+  `b07-011` ❌ (PASS contre FAIL, révisé après révélation).
+- Dont **3 encore dans le golden set** : `b04-015`, `b09-009`, `b07-011`.
+- **En attente :** confirmation du contrôle 1 de `b09-009` ; évaluation de `b10-015`.
