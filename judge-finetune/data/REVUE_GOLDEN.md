@@ -383,3 +383,51 @@ réécriture de dix items et de la fusion de fait des contrôles 2 et 3. Positio
 - **Désaccords au niveau contrôle : 2** — `b09-009`, tranché en faveur de l'annotateur et corrigé dans le
   corpus, et `b13-012`, où l'étiquette est maintenue, convention documentée à l'appui.
 - Items à difficulté réelle traités : 1 sur 4. Restent `b03-012`, `b07-015`, `b13-013`.
+
+### 11. `b07-015` — accord complet, et découverte d'une fuite déterministe
+
+| | 1 `exactitude_technique` | 2 `absence_de_bugs` | 3 `respect_consignes` | verdict |
+|---|---|---|---|---|
+| annotateur, premier passage | V | V | V | **PASS** |
+| étiquette | V | V | V | **PASS** |
+
+Sixième accord consécutif sur tous les contrôles. L'item se joue sur l'articulation exacte entre attente
+exponentielle et gigue — l'exponentielle seule espace les vagues sans les désynchroniser — et sur une demande
+non traitée, le disjoncteur, introduite par « si tu as le temps ». Aucune correction du corpus.
+
+**Réserve d'amorçage.** C'est le deuxième item de la relecture dont le point de bascule est une consigne
+facultative, après `b06-013`, et le motif de l'annotateur porte sur ce seul aspect. La règle appliquée est la
+bonne, mais un annotateur ayant retenu le raccourci de surface produirait la même réponse.
+
+### Fuite mesurée : la consigne facultative prédit parfaitement le verdict
+
+Balayage des 200 requêtes du corpus sur les tournures facultatives (« si tu as le temps », « si possible »,
+« éventuellement », « facultat… ») :
+
+```
+17 items portent une consigne facultative
+  cas      : limite  17 / 17
+  verdicts : PASS    17 / 17
+  formule  : « Si tu as le temps » dans 15 des 17
+```
+
+**Zéro contre-exemple.** Contrairement au biais de verbosité, corrélation statistique qu'il fallait éprouver
+par test de permutation, celle-ci est **déterministe** : aucun test n'est nécessaire, la règle de surface
+classe les 17 items sans erreur. Un juge n'a donc jamais besoin d'acquérir la notion de consigne facultative —
+détecter la chaîne suffit, et c'est le raccourci qu'un modèle apprend en premier, étant plus simple que la
+règle visée.
+
+Ces 17 items représentent par ailleurs 17 des 40 `limite` du corpus, soit la catégorie censée porter la
+difficulté.
+
+**Correctif pressenti, à chiffrer avant d'être proposé :** introduire des items portant une consigne
+facultative mais dont le verdict est FAIL pour une raison sans rapport — affirmation fausse, bug — de façon à
+briser la corrélation sans toucher aux 17 existants, et diversifier les formulations. Reste à établir leur
+répartition entre `train` et le golden set : si le golden en contient plusieurs, le benchmark est touché
+autant que l'entraînement.
+
+### État de la relecture
+
+- **Accord sur le verdict, premier passage : 10 / 11** — seul `b07-011` reste en désaccord.
+- **Désaccords au niveau contrôle : 2** — `b09-009` (corrigé en faveur de l'annotateur), `b13-012` (étiquette maintenue).
+- Items à difficulté réelle traités : 2 sur 4. Restent `b03-012`, `b13-013`.
