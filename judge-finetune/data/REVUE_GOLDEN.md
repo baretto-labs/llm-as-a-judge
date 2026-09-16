@@ -274,3 +274,41 @@ raisonnement reste invisible, et ce sont précisément les items où une inatten
 - **Désaccord au niveau contrôle : 1**, sur `b09-009`, tranché en faveur de l'annotateur et corrigé.
 - Trois accords complets consécutifs : `b10-015` (amorcé), `b12-008` (non confondu), `b06-013`
   (chemin non observé).
+
+### 8. `b02-001` — accord complet sur une injection SQL
+
+| | 1 `exactitude_technique` | 2 `absence_de_bugs` | 3 `respect_consignes` | verdict |
+|---|---|---|---|---|
+| annotateur, premier passage | V | **F** | V | **FAIL** |
+| étiquette | V | **F** | V | **FAIL** |
+
+Quatrième accord consécutif sur tous les contrôles, motif à l'appui : « il y a un risque d'injection SQL ».
+L'étiquette dit la même chose — requête construite par interpolation de chaîne, CWE-89. `exactitude_technique`
+est correctement laissé à V : les six affirmations annexes de la réponse sont vraies, `rowcount` à `-1` sur un
+`SELECT` sqlite3 compris. Sur un item de ce genre, la tentation est de tout noircir une fois la faille repérée.
+Aucune correction du corpus.
+
+**Nuance sans effet sur l'étiquette.** Le raisonnement de référence relève une seconde conséquence non
+mentionnée par l'annotateur : le même code lève `sqlite3.OperationalError` sur une donnée légitime contenant
+une apostrophe (`o'brien@example.com`). Faille de sécurité et bug de correction tombent tous deux dans
+`absence_de_bugs`, la case est donc identique et l'accord entier.
+
+**Mise en garde sur la lecture de la série.** `b02-001` est un cas `defaillant`, classé trivialement séparable
+par le relevé ci-dessous. Ce point confirme la calibration de l'annotateur, il ne la met pas à l'épreuve.
+
+### Relevé : la difficulté restante est concentrée sur quatre items
+
+Sur les 44 items du golden set non encore relus, `cas` prédit le verdict presque parfaitement — les 21 FAIL
+sont tous `defaillant`, et 19 des 23 PASS sont `parfait`. Les seuls items conservant une difficulté réelle
+sont les quatre `limite` encore PASS : `b03-012`, `b05-008`, `b07-015`, `b13-013`.
+
+**Conséquence pour la relecture :** le κ inter-annotateur finira près de 1 sans que ce soit informatif.
+
+**Conséquence pour le benchmark, plus sérieuse :** si 44 items sur 50 sont trivialement séparables, le 14B
+et le 32B y marqueront tous deux très haut et la comparaison manquera de résolution — c'est précisément la
+question que le protocole doit trancher. À traiter avant le fine-tuning, proposition chiffrée à établir.
+
+### État de la relecture
+
+- **Accord sur le verdict, premier passage : 7 / 8** — seul `b07-011` reste en désaccord.
+- **Désaccord au niveau contrôle : 1**, sur `b09-009`, tranché en faveur de l'annotateur et corrigé.
