@@ -637,3 +637,52 @@ nu les intercepte. La réponse la rend exactement, et l'annotateur l'a relevée 
 - Items à difficulté réelle traités : 3 sur 4. Reste `b13-013`.
 - **Échantillon aléatoire : 3 sur 8 relus, 3 accords.** L'hypothèse « le reste du golden set est
   trivialement séparable » n'est pas contredite à ce stade.
+
+### 18. `b07-008` — accord complet sur un fait exact au service d'une conclusion fausse
+
+| | 1 `exactitude_technique` | 2 `absence_de_bugs` | 3 `respect_consignes` | verdict |
+|---|---|---|---|---|
+| annotateur, premier passage | F | F | V | **FAIL** |
+| étiquette | F | F | V | **FAIL** |
+
+Treizième accord consécutif, et l'annotateur nomme le bon vecteur : `<img src=x onerror=alert(1)>` traverse
+le filtre par expression régulière sans rencontrer un seul `<script>`. Aucune correction du corpus.
+
+**Structure de l'item, identique à `b09-006`.** L'affirmation 3 est **vraie** — une balise `<script>`
+insérée via `innerHTML` n'est pas exécutée, la spécification le prévoit. Ce qui est faux, c'est l'inférence
+4 qu'on en tire (« le vecteur est donc largement neutralisé ») et la correction 5 qui en découle. Deux items
+du golden set partagent donc cette forme : un fait exact mis au service d'une conclusion dangereuse.
+`respect_consignes` reste à V, la requête demandant d'expliquer et de corriger — les deux ont été tentés.
+
+### Décision de méthode : l'annotateur peut et doit vérifier
+
+Question posée par l'annotateur à cet item : est-il légitime de faire des recherches pour répondre ?
+
+**Oui, et c'est requis**, depuis que le golden set a changé de rôle. Tant que la relecture était un sondage
+de contrôle des étiquettes, la recherche aurait biaisé la mesure. Mais le golden set sert désormais
+d'**étalon de référence** à toutes les variantes, y compris à un juge extérieur au corpus : un étalon doit
+être juste, pas rapide, et une étiquette de référence devinée ne vaut rien.
+
+**Seule interdiction : consulter l'étiquette ou le `<thinking>` de référence avant d'avoir répondu.**
+Vérifier un fait technique est légitime ; lire le raisonnement de référence détruirait l'indépendance.
+
+**À déclarer dans le REX :** le κ mesure alors l'accord entre une étiquette rédigée par un LLM et un expert
+humain disposant de temps et d'un moteur de recherche. C'est la comparaison pertinente pour un étalon, et
+elle doit être écrite explicitement plutôt que sous-entendue.
+
+### Nouvelle donnée collectée : « vérifié » contre « de tête »
+
+Le champ `cas` (`parfait` / `limite` / `defaillant`) a été attribué a priori par l'auteur des étiquettes, et
+le relevé a montré qu'il prédit le verdict presque parfaitement — il mesure donc mal la difficulté réelle.
+Le signalement par l'annotateur d'avoir dû vérifier un point constitue une **mesure de difficulté
+indépendante et humaine**, à collecter sur les items restants d'un mot (« vérifié » / « de tête »).
+
+Elle alimentera la métrique secondaire n°4 du pré-enregistrement — justesse sur la strate difficile —
+aujourd'hui adossée à un `cas` peu fiable.
+
+### État de la relecture
+
+- **Accord sur le verdict, premier passage : 17 / 18** — seul `b07-011` reste en désaccord.
+- **Désaccords au niveau contrôle : 2** — `b09-009` (corrigé), `b13-012` (étiquette maintenue).
+- Items à difficulté réelle traités : 3 sur 4. Reste `b13-013`.
+- Échantillon aléatoire : 4 sur 8 relus, 4 accords.
