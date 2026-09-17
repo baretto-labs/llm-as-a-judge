@@ -784,3 +784,66 @@ compromis, signalé à l'annotateur avant sa réponse.
   `b08-011` (étiquettes maintenues).
 - **Items à difficulté réelle : 4 sur 4, terminés.**
 - Échantillon aléatoire : 7 sur 8. Reste `b04-014`, dernier item avant le calcul du κ.
+
+### 22. `b04-014` — accord sur le verdict, désaccord de contrôle identique à `b08-011`
+
+| | 1 `exactitude_technique` | 2 `absence_de_bugs` | 3 `respect_consignes` | verdict |
+|---|---|---|---|---|
+| annotateur, premier passage | F | F | **F** | **FAIL** |
+| étiquette | F | F | **V** | **FAIL** |
+
+Sur le fond, accord entier : la réponse inverse la règle d'idempotence de la RFC 9110 — `PUT` **est**
+idempotent, `POST` ne l'est pas — et le conseil final, rejouer les `POST` et bloquer les `PUT`, est dangereux
+à l'envers. Aucune correction du corpus.
+
+**Le troisième F invoque à nouveau l'omission d'une demande facultative**, comme à `b08-011`. Mais
+l'explication retenue là-bas ne s'applique plus : `b04-014` est un item rétrofité **dont la clause a été
+remise en incise** au correctif du chantier 9. Elle se lit désormais comme celles des items d'origine, donc
+le placement n'est plus en cause.
+
+Deux lectures soumises à l'annotateur, aux conséquences opposées : soit il **énumère** les griefs sur un item
+déjà FAIL sans les attribuer à un contrôle précis — cohérent avec ses six items PASS, où aucune omission
+facultative n'a jamais fait basculer un verdict, et sans conséquence sur le corpus ; soit il **récuse la
+convention**, et il faut alors réécrire une dizaine d'items et la règle de `PROTOCOLE.md`. **Réponse en
+attente ; l'étiquette n'est pas modifiée entre-temps.**
+
+---
+
+## κ inter-annotateur — calculé le 2026-09-17 sur 21 items
+
+```
+items relus du golden set : 21 / 50  (42 %)
+accord observé sur le verdict : 20/21 = 95,2 %
+κ de Cohen : 0,901        IC 95 % bootstrap [0,674 — 1,000]
+
+matrice de confusion (verdict)
+  annotateur PASS / étiquette PASS : 8
+  annotateur PASS / étiquette FAIL : 1     (b07-011)
+  annotateur FAIL / étiquette PASS : 0
+  annotateur FAIL / étiquette FAIL : 12
+```
+
+`b03-007` est exclu du calcul : relu avant le retirage, il ne fait plus partie du golden set.
+
+**Lecture honnête de ces chiffres.**
+
+1. **L'intervalle est large.** La borne basse à 0,674 interdit d'affirmer un accord « quasi parfait » plutôt
+   que « substantiel ». C'est la limite de puissance prévue au pré-enregistrement ; porter la relecture à 50
+   items resserrerait l'intervalle d'environ moitié.
+2. **Le κ sur le verdict flatte.** L'accord **complet, contrôle par contrôle**, vaut **16/21 = 76 %** :
+   4 items portent au moins un désaccord de contrôle (`b09-009`, `b13-012`, `b08-011`, `b04-014`). Le verdict
+   est robuste, l'attribution du défaut au bon contrôle l'est nettement moins. C'est ce second chiffre qui
+   doit figurer en premier dans le REX.
+3. **Trois des quatre écarts portent sur le même point** — l'imputation d'une omission facultative à
+   `respect_consignes` — donc il s'agit d'un désaccord unique répété, non de quatre erreurs indépendantes.
+4. **Ce κ est un majorant.** Les items sont présentés à l'annotateur avec les affirmations déjà isolées dans
+   un tableau, ce qui constitue une aide réelle. Un annotateur lisant la sortie brute ferait vraisemblablement
+   moins bien. À déclarer dans le REX.
+
+### État de la relecture
+
+- **21 items relus sur 50**, accord verdict 20/21, accord complet 16/21.
+- **Items à difficulté réelle : 4 sur 4, terminés.**
+- **Échantillon aléatoire : 8 sur 8, terminé** — aucun désaccord de verdict. L'hypothèse « le reste du golden
+  set est trivialement séparable » n'est pas contredite.
+- En attente : arbitrage de l'annotateur sur la convention de `respect_consignes`.
