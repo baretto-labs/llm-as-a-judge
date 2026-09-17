@@ -582,3 +582,34 @@ par leur accumulation, pas individuellement : c'est un désaccord qui serait inf
   (étiquette maintenue).
 - Items à difficulté réelle traités : 3 sur 4. Reste `b13-013`.
 - Échantillon aléatoire : 1 sur 8 relu.
+
+### 16. `b09-006` — accord complet, et première validation indépendante d'un rétrofit
+
+| | 1 `exactitude_technique` | 2 `absence_de_bugs` | 3 `respect_consignes` | verdict |
+|---|---|---|---|---|
+| annotateur, premier passage | F | F | F | **FAIL** |
+| étiquette | F | F | F | **FAIL** |
+
+Onzième accord consécutif, motif identique jusqu'au mécanisme : `RetentionPolicy.CLASS` conserve
+l'annotation dans le `.class` mais la machine virtuelle ne la charge pas, `isAnnotationPresent` renvoie
+`false`, et l'intercepteur ne journalise jamais rien, en silence. Aucune correction du corpus.
+
+Deux finesses tranchées correctement sans commentaire. **L'affirmation 3 de la réponse est vraie** — `CLASS`
+est bien la rétention par défaut : la réponse énonce un fait exact et s'en sert pour justifier un choix qui
+rend le dispositif inopérant, et l'annotateur n'a pas laissé le fait juste sauver le raisonnement faux.
+**`respect_consignes` tombe** parce que la requête exigeait explicitement une détection « à l'exécution »,
+consigne obligatoire violée, distincte du défaut technique.
+
+**Validation indépendante du lot 2.** `b09-006` est l'un des douze items rétrofités quelques heures plus
+tôt : sa clause « Accessoirement, dis un mot de `@Inherited` » a été ajoutée par le correctif de fuite, et
+la réponse ne la traite pas. L'annotateur, qui ignorait que cet item avait été modifié, n'en a pas fait
+état — correctement, la clause étant facultative. C'est la première vérification par un tiers non informé
+que la clause ajoutée ne dérègle pas le jugement et ne détourne pas l'attention du défaut réel.
+
+### État de la relecture
+
+- **Accord sur le verdict, premier passage : 15 / 16** — seul `b07-011` reste en désaccord.
+- **Désaccords au niveau contrôle : 2** — `b09-009` (corrigé en faveur de l'annotateur), `b13-012`
+  (étiquette maintenue).
+- Items à difficulté réelle traités : 3 sur 4. Reste `b13-013`.
+- Échantillon aléatoire : 2 sur 8 relus, 2 accords.
