@@ -698,3 +698,27 @@ que dernier item difficile, avec la réserve consignée.
 Le golden set contient donc **trois items adossés à un unique contexte RAG**. C'est l'effet voulu du
 regroupement par famille, qui supprime la fuite de contexte entre entraînement et test ; le prix en est une
 corrélation entre items de test, consignée en addendum daté du pré-enregistrement.
+
+### 19. `b08-007` — accord complet sur la pollution de prototype
+
+| | 1 `exactitude_technique` | 2 `absence_de_bugs` | 3 `respect_consignes` | verdict |
+|---|---|---|---|---|
+| annotateur, premier passage | V | V | V | **PASS** |
+| étiquette | V | V | V | **PASS** |
+
+Quatorzième accord consécutif. Aucune correction du corpus.
+
+Le motif de l'annotateur touche le point subtil de l'item sans avoir eu à le chercher : « issue de
+`JSON.parse` ». C'est exactement ce qui rend l'affirmation 2 vraie — `JSON.parse` crée `__proto__` comme
+propriété **propre et énumérable**, donc visible par `Object.keys`, là où un littéral d'objet passerait par
+l'accesseur et ne produirait aucune clé. Sans cette particularité, l'attaque décrite ne fonctionnerait pas,
+et la correction proposée n'aurait pas d'objet.
+
+Signal de difficulté (« vérifié » / « de tête ») : **non renseigné** pour cet item.
+
+### État de la relecture
+
+- **Accord sur le verdict, premier passage : 18 / 19** — seul `b07-011` reste en désaccord.
+- **Désaccords au niveau contrôle : 2** — `b09-009` (corrigé), `b13-012` (étiquette maintenue).
+- Items à difficulté réelle traités : 3 sur 4. Reste `b13-013`, reporté et compromis.
+- **Échantillon aléatoire : 5 sur 8 relus, 5 accords.**
