@@ -264,3 +264,69 @@ Le critère retenu est le recouvrement des distributions, pas la maximisation de
 
 À n = 25, avec un plancher de bruit à 66 % et un p95 à 76 %, il faut de toute façon considérer que cette
 tâche ne permet aucune conclusion fine sur la longueur.
+
+---
+
+## Chantier 9 — La fuite déplacée : corriger un biais en en créant un pire
+
+**2026-09-17.** Consigné en détail parce que c'est l'erreur la plus instructive du projet.
+
+### Ce qui s'est passé
+
+Le correctif de la fuite « consigne facultative ⇒ PASS » (17/17) a consisté à ajouter une clause facultative
+à 13 items FAIL existants. Le script l'ajoutait **en paragraphe séparé**, à la fin de la consigne. Or les 17
+items d'origine la portaient **en incise**, à la fin de la phrase d'instruction.
+
+Résultat mesuré après coup :
+
+```
+origine  : 17 incises,  0 paragraphes isolés   — tous PASS
+rétrofit :  0 incises, 13 paragraphes isolés   — tous FAIL
+```
+
+**La règle « clause en paragraphe isolé ⇒ FAIL » classait 30 items sur 30.** La fuite de départ valait
+17/17 ; en la corrigeant, elle a été portée à 30/30. Le correctif a aggravé exactement ce qu'il réparait.
+
+### Comment elle est restée invisible
+
+L'anomalie a traversé une régénération, une validation à 0 erreur, trois mesures de corrélation et un
+commit. Toutes les mesures portaient sur le **contenu** de la clause — sa présence, sa formulation, le
+verdict associé — aucune sur sa **mise en forme**. Un script ne trouve que les corrélations qu'on pense à
+lui demander, et personne ne pense à mesurer ce qu'on vient soi-même d'introduire.
+
+### Ce qui l'a révélée
+
+Un humain. À `b08-011`, l'annotateur a marqué `respect_consignes` faux en invoquant l'omission de la clause
+facultative — alors qu'il avait appliqué correctement la règle inverse quatre fois auparavant
+(`b06-013`, `b07-015`, `b03-012`, `b09-006`). Ce n'était pas un relâchement : le stimulus était réellement
+différent, un paragraphe isolé se lisant comme une seconde exigence là où une incise se lit comme un aparté.
+
+**Le désaccord d'un relecteur humain a fonctionné comme un détecteur de biais que douze mesures automatiques
+avaient manqué.**
+
+### La réparation, et la seconde bévue
+
+Remettre les 13 clauses en incise par heuristique — « coller en fin de première ligne non vide » — a cassé
+deux énoncés, `b02-003` et `b05-005`, dont la première ligne se terminait par un deux-points introduisant un
+bloc de code. La clause s'intercalait entre l'annonce et le code annoncé. Seule la lecture intégrale des 13
+consignes a permis de le voir ; les métriques, elles, étaient revenues au vert.
+
+Correction faite à la main sur ces deux items, en rattachant la clause à une phrase de prose autonome.
+
+### État final
+
+```
+30 clauses, toutes en incise
+règle de surface « incise ⇒ PASS » : 17/30 = 57%
+corpus 200, 0 erreur, PASS 104 / FAIL 96, golden 24/26
+```
+
+### Leçons
+
+1. **Toute correction de biais introduit un stimulus nouveau, qui doit être mesuré comme le biais d'origine.**
+   Corriger sans re-mesurer la forme de sa propre correction revient à déplacer le problème.
+2. **Mesurer la forme, pas seulement le fond.** Placement, longueur, ponctuation, position dans l'énoncé :
+   tout ce qui sépare deux populations d'items est une fuite potentielle.
+3. **La relecture humaine n'est pas une formalité de validation.** Elle a trouvé ici ce qu'aucun script
+   n'avait cherché. Un désaccord d'annotateur, sur un corpus où il avait été constant, doit être traité
+   comme un signal sur le corpus avant d'être traité comme une erreur de l'annotateur.

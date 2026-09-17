@@ -722,3 +722,35 @@ Signal de difficulté (« vérifié » / « de tête ») : **non renseigné** po
 - **Désaccords au niveau contrôle : 2** — `b09-009` (corrigé), `b13-012` (étiquette maintenue).
 - Items à difficulté réelle traités : 3 sur 4. Reste `b13-013`, reporté et compromis.
 - **Échantillon aléatoire : 5 sur 8 relus, 5 accords.**
+
+### 20. `b08-011` — le désaccord qui a révélé une fuite de mon fait
+
+| | 1 `exactitude_technique` | 2 `absence_de_bugs` | 3 `respect_consignes` | verdict |
+|---|---|---|---|---|
+| annotateur, premier passage | F | F | **F** | **FAIL** |
+| étiquette | F | F | **V** | **FAIL** |
+
+Accord sur le verdict, et l'analyse de fond de l'annotateur dépasse l'étiquette : `NoClassDefFoundError`
+dérive de `LinkageError` et signale un échec de résolution lors de la liaison sur une classe présente à la
+compilation, tandis que `ClassNotFoundException` provient d'un chargement dynamique explicite
+(`Class.forName`, `loadClass`). Le « distinguo historique » de la réponse est une invention.
+
+**Le désaccord sur le contrôle 3 n'est pas un écart de l'annotateur : il a révélé un défaut du corpus.**
+Le motif invoquait l'omission de la clause facultative, alors que la convention veut qu'une omission
+facultative n'entre pas dans `respect_consignes` — règle que l'annotateur avait appliquée correctement
+quatre fois. La cause était que `b08-011` est un item rétrofité, dont la clause avait été placée **en
+paragraphe séparé** au lieu d'une incise, ce qui la fait lire comme une seconde exigence.
+
+Mesure consécutive : les 17 items d'origine portaient tous la clause en incise et étaient tous PASS, les 13
+rétrofits la portaient tous en paragraphe isolé et étaient tous FAIL — une fuite déterministe à **30/30**,
+créée en corrigeant celle à 17/17. Détail complet au chantier 9 de `AUDIT.md`.
+
+**Étiquette maintenue à V sur le contrôle 3**, la convention étant inchangée. Le premier passage de
+l'annotateur est consigné tel quel, et la cause du désaccord est portée au débit du corpus, non au sien.
+
+### État de la relecture
+
+- **Accord sur le verdict, premier passage : 19 / 20.**
+- **Désaccords au niveau contrôle : 3** — `b09-009` (corrigé en faveur de l'annotateur), `b13-012`
+  (étiquette maintenue, convention documentée), `b08-011` (étiquette maintenue, corpus corrigé).
+- Échantillon aléatoire : 6 sur 8 relus. Reste `b04-014`, puis `b13-013` reporté.

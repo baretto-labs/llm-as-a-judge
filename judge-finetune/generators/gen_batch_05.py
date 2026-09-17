@@ -213,9 +213,7 @@ if latest_version > current_version:
     notify_update(latest_version)
 ```
 
-Les versions sont des chaînes du type `"1.9.0"`. Explique et corrige.
-
-Si tu veux compléter, dis un mot des versions préliminaires.
+Les versions sont des chaînes du type `"1.9.0"`. Explique et corrige. Si tu veux compléter, dis un mot des versions préliminaires.
 ''',
     reponse='''
 ## Le diagnostic

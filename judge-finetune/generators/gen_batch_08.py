@@ -381,13 +381,11 @@ add(example(
     meta={"id": "b08-009", "famille": "js-tri-objets", "domaine": "code", "tache": "refactoring",
           "cas": "defaillant", "verbeux": False, "langage": "typescript"},
     consigne='''
-Simplifie ce tri, qui me paraît verbeux.
+Simplifie ce tri, qui me paraît verbeux. Accessoirement, dis un mot du tri stable.
 
 ```ts
 const tries = [...articles].sort((a, b) => a.quantite - b.quantite);
 ```
-
-Accessoirement, dis un mot du tri stable.
 ''',
     reponse='''
 Le comparateur est superflu ici : `sort` sait ordonner les objets d'une même forme en s'appuyant sur leur représentation naturelle.
@@ -441,9 +439,7 @@ add(example(
     meta={"id": "b08-011", "famille": "java-chargement-classes", "domaine": "theorie", "tache": "question_reponse",
           "cas": "defaillant", "verbeux": False, "langage": "java"},
     consigne='''
-Quelle est la différence entre `ClassNotFoundException` et `NoClassDefFoundError` ? Notre application lève la seconde au démarrage.
-
-Accessoirement, dis un mot des dépendances optionnelles absentes à l'exécution.
+Quelle est la différence entre `ClassNotFoundException` et `NoClassDefFoundError` ? Notre application lève la seconde au démarrage. Accessoirement, dis un mot des dépendances optionnelles absentes à l'exécution.
 ''',
     reponse='''
 Ce sont deux noms pour la même situation, hérités de l'histoire de la plateforme : une classe est absente du chemin de classes.

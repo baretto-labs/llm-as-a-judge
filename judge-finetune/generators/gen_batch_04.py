@@ -582,9 +582,7 @@ add(example(
     meta={"id": "b04-014", "famille": "rest-idempotence", "domaine": "theorie", "tache": "explication",
           "cas": "defaillant", "verbeux": False, "langage": "web"},
     consigne='''
-Notre client mobile rejoue automatiquement les requêtes en cas de coupure réseau. Quelles méthodes HTTP peut-on rejouer sans risque, et que faire pour les autres ?
-
-En bonus, dis un mot de la clé d'idempotence.
+Notre client mobile rejoue automatiquement les requêtes en cas de coupure réseau. Quelles méthodes HTTP peut-on rejouer sans risque, et que faire pour les autres ? En bonus, dis un mot de la clé d'idempotence.
 ''',
     reponse='''
 La règle est simple : une méthode est rejouable si elle est idempotente, c'est-à-dire si l'exécuter plusieurs fois donne le même résultat que l'exécuter une fois.

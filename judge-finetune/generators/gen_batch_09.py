@@ -223,9 +223,7 @@ add(example(
     meta={"id": "b09-006", "famille": "java-retention-annotation", "domaine": "code", "tache": "generation",
           "cas": "defaillant", "verbeux": False, "langage": "java"},
     consigne='''
-Crée une annotation `@Audite` que notre intercepteur détectera **à l'exécution** par réflexion, pour journaliser les appels aux méthodes annotées.
-
-Accessoirement, dis un mot de `@Inherited`.
+Crée une annotation `@Audite` que notre intercepteur détectera **à l'exécution** par réflexion, pour journaliser les appels aux méthodes annotées. Accessoirement, dis un mot de `@Inherited`.
 ''',
     reponse='''
 ```java
@@ -297,15 +295,13 @@ add(example(
     meta={"id": "b09-008", "famille": "js-egalite-dates", "domaine": "code", "tache": "debogage",
           "cas": "defaillant", "verbeux": True, "langage": "typescript"},
     consigne='''
-Notre déduplication de créneaux laisse passer des doublons : deux créneaux à la même date sont comptés deux fois.
+Notre déduplication de créneaux laisse passer des doublons : deux créneaux à la même date sont comptés deux fois. En bonus, dis un mot du coût mémoire de la déduplication.
 
 ```ts
 const uniques = [...new Set(creneaux.map((c) => c.debut))];   // c.debut est un Date
 ```
 
 Explique et corrige.
-
-En bonus, dis un mot du coût mémoire de la déduplication.
 ''',
     reponse='''
 ## Le mécanisme
@@ -388,9 +384,7 @@ add(example(
     meta={"id": "b09-010", "famille": "web-samesite-csrf", "domaine": "theorie", "tache": "question_reponse",
           "cas": "defaillant", "verbeux": False, "langage": "web"},
     consigne='''
-Peut-on retirer nos jetons anti-CSRF maintenant que nos cookies de session sont en `SameSite=Lax` ?
-
-Sans obligation, dis un mot de `SameSite=Strict`.
+Peut-on retirer nos jetons anti-CSRF maintenant que nos cookies de session sont en `SameSite=Lax` ? Sans obligation, dis un mot de `SameSite=Strict`.
 ''',
     reponse='''
 Oui. `SameSite=Lax` empêche le navigateur d'envoyer le cookie de session lors d'une requête initiée par un autre site, ce qui supprime la condition même de l'attaque CSRF : sans cookie, la requête forgée arrive non authentifiée et échoue.
@@ -440,9 +434,7 @@ add(example(
     meta={"id": "b09-012", "famille": "db-pool-connexions", "domaine": "theorie", "tache": "explication",
           "cas": "defaillant", "verbeux": False, "langage": "sql"},
     consigne='''
-Sous charge, nos requêtes attendent longtemps l'obtention d'une connexion. Un collègue propose de porter le pool de 20 à 200 connexions. Qu'en penses-tu ?
-
-Sans obligation, dis un mot du nombre de cœurs de la base.
+Sous charge, nos requêtes attendent longtemps l'obtention d'une connexion. Un collègue propose de porter le pool de 20 à 200 connexions. Qu'en penses-tu ? Sans obligation, dis un mot du nombre de cœurs de la base.
 ''',
     reponse='''
 C'est la bonne réaction. L'attente que vous observez est directement causée par l'épuisement du pool : les threads applicatifs se mettent en file dès que les 20 connexions sont prises.

@@ -572,9 +572,7 @@ add(example(
     meta={"id": "b06-015", "famille": "db-migration-sans-interruption", "domaine": "theorie", "tache": "explication",
           "cas": "limite", "verbeux": False, "langage": "sql"},
     consigne='''
-Comment renommer une colonne très sollicitée sur une table de 50 millions de lignes en PostgreSQL, **sans aucune fenêtre de maintenance ni interruption de service** ? C'est la contrainte principale, l'application est déployée en continu.
-
-Sans obligation, dis un mot de la vue de compatibilité.
+Comment renommer une colonne très sollicitée sur une table de 50 millions de lignes en PostgreSQL, **sans aucune fenêtre de maintenance ni interruption de service** ? C'est la contrainte principale, l'application est déployée en continu. Sans obligation, dis un mot de la vue de compatibilité.
 ''',
     reponse='''
 Le renommage direct est en réalité peu coûteux en PostgreSQL : `ALTER TABLE ... RENAME COLUMN` ne réécrit pas les données, il modifie le catalogue. L'opération est quasi instantanée, même sur 50 millions de lignes.

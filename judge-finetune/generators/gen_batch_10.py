@@ -261,9 +261,7 @@ add(example(
     meta={"id": "b10-007", "famille": "sql-index-composite", "domaine": "code", "tache": "debogage",
           "cas": "defaillant", "verbeux": False, "langage": "sql"},
     consigne='''
-Notre requête `WHERE tenant_id = ? ORDER BY cree_le` reste lente malgré l'index `(cree_le, tenant_id)`. Faut-il changer quelque chose ?
-
-Si tu veux compléter, dis un mot des index partiels.
+Notre requête `WHERE tenant_id = ? ORDER BY cree_le` reste lente malgré l'index `(cree_le, tenant_id)`. Faut-il changer quelque chose ? Si tu veux compléter, dis un mot des index partiels.
 ''',
     reponse='''
 Non, l'index couvre déjà les deux colonnes utilisées par la requête. Un index composite indexe l'ensemble des colonnes qu'il déclare, et le planificateur sait s'en servir quel que soit l'ordre dans lequel la requête les mentionne — cet ordre n'est qu'une convention d'écriture.
@@ -324,15 +322,13 @@ add(example(
     meta={"id": "b10-009", "famille": "ts-any-unknown", "domaine": "code", "tache": "refactoring",
           "cas": "defaillant", "verbeux": False, "langage": "typescript"},
     consigne='''
-Ce code ne compile pas : « Object is of type 'unknown' ». Corrige-le.
+Ce code ne compile pas : « Object is of type 'unknown' ». Corrige-le. Si possible, dis un mot des prédicats de type.
 
 ```ts
 function traiter(charge: unknown) {
   return charge.identifiant;
 }
 ```
-
-Si possible, dis un mot des prédicats de type.
 ''',
     reponse='''
 Le type `unknown` bloque tout accès. Le plus simple est de le remplacer par `any`, qui exprime la même idée — une valeur dont on ignore la forme — sans les contraintes :
@@ -393,9 +389,7 @@ add(example(
     meta={"id": "b10-011", "famille": "java-finalize-cleaner", "domaine": "theorie", "tache": "question_reponse",
           "cas": "defaillant", "verbeux": False, "langage": "java"},
     consigne='''
-Peut-on s'appuyer sur `finalize()` pour fermer un descripteur de fichier détenu par un objet ?
-
-Accessoirement, dis un mot de `Cleaner`.
+Peut-on s'appuyer sur `finalize()` pour fermer un descripteur de fichier détenu par un objet ? Accessoirement, dis un mot de `Cleaner`.
 ''',
     reponse='''
 Oui, c'est même l'usage pour lequel la méthode a été prévue. Le ramasse-miettes appelle `finalize()` avant de récupérer l'objet, ce qui donne l'occasion de libérer les ressources natives qu'il détient.

@@ -93,7 +93,7 @@ Set<Point> set = new HashSet<>(List.of(new Point(1, 2), new Point(1, 2)));
 assertEquals(1, set.size());
 ```
 
-Voici la classe, corrige-la (Java 17).
+Voici la classe, corrige-la (Java 17). Accessoirement, dis un mot de `record`.
 
 ```java
 public final class Point {
@@ -109,8 +109,6 @@ public final class Point {
     }
 }
 ```
-
-Accessoirement, dis un mot de `record`.
 ''',
     reponse='''
 ## Le diagnostic
