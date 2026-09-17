@@ -686,3 +686,15 @@ aujourd'hui adossée à un `cas` peu fiable.
 - **Désaccords au niveau contrôle : 2** — `b09-009` (corrigé), `b13-012` (étiquette maintenue).
 - Items à difficulté réelle traités : 3 sur 4. Reste `b13-013`.
 - Échantillon aléatoire : 4 sur 8 relus, 4 accords.
+
+### Report de `b13-013`, et limite de famille dans le golden set
+
+`b13-013`, dernier item classé difficile, partage sa famille `rag-ctx-assistant-neo4j` et son contexte
+(empreinte `8559f10c33bf`) avec `b13-012` et `b13-003`, tous deux déjà relus. La règle inscrite à la fiche
+`b13-003` interdit de l'enchaîner : il est reporté, et **restera compromis quel que soit le moment où il
+sera présenté**, l'annotateur ayant déjà analysé ce contexte deux fois. Il sera relu malgré tout, en tant
+que dernier item difficile, avec la réserve consignée.
+
+Le golden set contient donc **trois items adossés à un unique contexte RAG**. C'est l'effet voulu du
+regroupement par famille, qui supprime la fuite de contexte entre entraînement et test ; le prix en est une
+corrélation entre items de test, consignée en addendum daté du pré-enregistrement.

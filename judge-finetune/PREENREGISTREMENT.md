@@ -141,3 +141,30 @@ Toute analyse non listée ici est **exploratoire** et sera signalée comme telle
 signification présenté comme confirmatoire. Cela vaut notamment pour la comparaison entre tailles
 (14B contre 32B), dont il est établi d'avance qu'elle manque de puissance : elle sera rapportée en section
 secondaire, et « indistinguables » y est un résultat acceptable et attendu.
+
+---
+
+## Addendum daté — 2026-09-17, après signature
+
+Ajout **additif** à la section §9 « Limites connues ». Aucune métrique, aucun test et aucune règle de
+conclusion n'est modifié : seule une limite découverte après signature est consignée.
+
+### 6. Items RAG corrélés par contexte partagé
+
+Le golden set compte **12 items RAG reposant sur seulement 5 contextes d'extraction distincts**.
+Un même contexte y sert jusqu'à trois items, sous des marqueurs de tâche différents
+(`RAG_CONTEXT_RELEVANCE` et `RAG_FAITHFULNESS`).
+
+C'est la conséquence directe et voulue du regroupement par famille, qui fait voyager les familles en bloc
+dans le tirage et rend structurellement impossible la fuite de contexte entre entraînement et test. Le
+prix en est une **corrélation entre items de test** : un juge qui comprend un contexte marque sur tous les
+items qui en dépendent, et un juge qui s'y trompe les perd tous ensemble.
+
+**Conséquence sur la puissance :** la taille d'échantillon effective des items RAG est inférieure à leur
+nombre. Les intervalles calculés sur la sous-population RAG seront donc **optimistes**, et seront présentés
+comme tels. La métrique principale portant sur les 50 items, majoritairement `CODE_ANALYSIS`, l'effet sur
+elle reste limité — mais il n'est pas nul et ne sera pas passé sous silence.
+
+**Conséquence sur la relecture par paire :** deux items d'une même famille ne peuvent pas constituer deux
+points de mesure indépendants. L'analyse du premier règle le second. Les items concernés sont signalés
+comme compromis dans `data/REVUE_GOLDEN.md`.
