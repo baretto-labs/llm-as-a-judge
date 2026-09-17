@@ -535,3 +535,25 @@ aussi séparables que leur `cas` le prétend. Un désaccord sur deux d'entre eux
 - **Désaccords au niveau contrôle : 2** — `b09-009` (corrigé en faveur de l'annotateur), `b13-012`
   (étiquette maintenue).
 - Items à difficulté réelle traités : **3 sur 4**. Reste `b13-013`.
+
+### 14. `b13-003` — accord complet, sur un point de mesure compromis
+
+| | 1 `contexte_pertinent` | 2 `contexte_suffisant` | 3 `bruit_maitrise` | verdict |
+|---|---|---|---|---|
+| annotateur, premier passage | F | F | F | **FAIL** |
+| étiquette | F | F | F | **FAIL** |
+
+Neuvième accord consécutif. Contraste net avec `b12-008`, où seule la suffisance tombait : ici les trois
+contrôles échouent, aucun extrait ne portant sur l'interface visée. Aucune correction du corpus.
+
+**Point de mesure compromis, signalé à l'annotateur avant sa réponse.** `b13-003` partage son contexte et sa
+requête avec `b13-012`, déjà relu : mêmes cinq extraits, même question. L'annotateur avait donc déjà établi
+que rien n'y concerne l'interface `Assistant`. Les deux items appartiennent à la même famille — le
+regroupement par contexte d'extraction les fait voyager ensemble dans le tirage, ce qui explique leur
+présence commune dans le golden set.
+
+L'item **n'a pas été échangé** contre un autre : le tirage avait été figé et commité précisément pour
+interdire de remplacer un item devenu gênant.
+
+**Conséquence à retenir pour la composition des sessions :** deux items d'une même famille RAG ne doivent
+pas être présentés à la suite, l'analyse du premier réglant le second.
