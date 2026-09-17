@@ -613,3 +613,27 @@ que la clause ajoutée ne dérègle pas le jugement et ne détourne pas l'attent
   (étiquette maintenue).
 - Items à difficulté réelle traités : 3 sur 4. Reste `b13-013`.
 - Échantillon aléatoire : 2 sur 8 relus, 2 accords.
+
+### 17. `b09-014` — accord complet sur la hiérarchie des exceptions
+
+| | 1 `exactitude_technique` | 2 `absence_de_bugs` | 3 `respect_consignes` | verdict |
+|---|---|---|---|---|
+| annotateur, premier passage | V | V | V | **PASS** |
+| étiquette | V | V | V | **PASS** |
+
+Douzième accord consécutif. Aucune correction du corpus.
+
+Le point piégeux de l'item est l'affirmation 7 : `KeyboardInterrupt` et `SystemExit` dérivent de
+`BaseException` et non d'`Exception`, de sorte qu'`except Exception` les laisse passer là où un `except:`
+nu les intercepte. La réponse la rend exactement, et l'annotateur l'a relevée explicitement dans son motif
+— c'est la vérification qui distingue une lecture attentive d'un accord de principe sur une réponse bien
+écrite et bien structurée.
+
+### État de la relecture
+
+- **Accord sur le verdict, premier passage : 16 / 17** — seul `b07-011` reste en désaccord.
+- **Désaccords au niveau contrôle : 2** — `b09-009` (corrigé en faveur de l'annotateur), `b13-012`
+  (étiquette maintenue).
+- Items à difficulté réelle traités : 3 sur 4. Reste `b13-013`.
+- **Échantillon aléatoire : 3 sur 8 relus, 3 accords.** L'hypothèse « le reste du golden set est
+  trivialement séparable » n'est pas contredite à ce stade.
