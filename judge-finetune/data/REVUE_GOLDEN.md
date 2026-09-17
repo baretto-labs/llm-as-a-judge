@@ -754,3 +754,33 @@ l'annotateur est consigné tel quel, et la cause du désaccord est portée au d�
 - **Désaccords au niveau contrôle : 3** — `b09-009` (corrigé en faveur de l'annotateur), `b13-012`
   (étiquette maintenue, convention documentée), `b08-011` (étiquette maintenue, corpus corrigé).
 - Échantillon aléatoire : 6 sur 8 relus. Reste `b04-014`, puis `b13-013` reporté.
+
+### 21. `b13-013` — accord complet sur une abstention, dernier item difficile
+
+| | 1 `affirmations_etayees` | 2 `absence_invention` | 3 `citations_exactes` | verdict |
+|---|---|---|---|---|
+| annotateur, premier passage | V | V | V | **PASS** |
+| étiquette | V | V | V | **PASS** |
+
+Quinzième accord consécutif, et **les quatre items à difficulté réelle sont désormais couverts**
+(`b05-008`, `b07-015`, `b03-012`, `b13-013`). Aucune correction du corpus.
+
+Le motif de l'annotateur nomme le pivot de l'item : l'abstention est « justifiée à partir des extraits
+disponibles ». C'est ce qui sauve `affirmations_etayees` — une abstention n'est pas étayée d'office, elle
+l'est ici parce que l'inventaire des cinq extraits est exact et vérifiable point par point.
+
+**Paire pédagogique avec `b13-012`, sur un contexte identique.** Là, la sortie fabriquait l'interface
+entière et échouait ; ici, elle écarte explicitement `ConversationMessage.assistant(String)` comme homonyme
+trompeur au lieu de l'exploiter. Le corpus enseigne donc les deux faces de la même situation : ce que la
+corrélation de familles coûte en indépendance statistique, elle le rapporte en valeur d'apprentissage.
+
+**Réserve maintenue :** troisième item bâti sur ce contexte, après `b13-012` et `b13-003`. Point de mesure
+compromis, signalé à l'annotateur avant sa réponse.
+
+### État de la relecture
+
+- **Accord sur le verdict, premier passage : 20 / 21.**
+- **Désaccords au niveau contrôle : 3** — `b09-009` (corrigé en faveur de l'annotateur), `b13-012` et
+  `b08-011` (étiquettes maintenues).
+- **Items à difficulté réelle : 4 sur 4, terminés.**
+- Échantillon aléatoire : 7 sur 8. Reste `b04-014`, dernier item avant le calcul du κ.
