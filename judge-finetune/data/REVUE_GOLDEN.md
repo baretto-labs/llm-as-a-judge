@@ -488,3 +488,50 @@ défaut, et le corpus aurait enseigné un double comptage.
 - **Désaccords au niveau contrôle : 2** — `b09-009` (corrigé en faveur de l'annotateur), `b13-012`
   (étiquette maintenue, convention documentée).
 - Items à difficulté réelle traités : 2 sur 4. Restent `b03-012` et `b13-013`.
+
+### 13. `b03-012` — accord complet, et une erreur de présentation qui en réduit la portée
+
+| | 1 `exactitude_technique` | 2 `absence_de_bugs` | 3 `respect_consignes` | verdict |
+|---|---|---|---|---|
+| annotateur, premier passage | V | V | V | **PASS** |
+| étiquette | V | V | V | **PASS** |
+
+Huitième accord consécutif. Les sept affirmations vérifiables sont exactes, `--force-with-lease` compris,
+et le motif coïncide : « le `--onto` est sans obligation donc pas bloquant ». Aucune correction du corpus.
+
+**Réserve, imputable au présentateur.** Cet item devait établir que l'annotateur applique la *notion* de
+consigne facultative et non la chaîne « si tu as le temps », puisque sa formulation avait été réécrite en
+« sans obligation » au lot 1. Mais la présentation annonçait explicitement cette réécriture et précisait que
+« l'item teste donc la notion ». L'annotateur a donc été informé de ce qu'il fallait chercher. Le point
+demeure un accord ; il ne démontre plus la généralisation visée.
+
+C'est la troisième réserve de cette nature, après `b10-015` et `b07-015`. **Correctif : ne plus indiquer, en
+présentant un item, ce qu'il est censé tester.** La difficulté doit rester à découvrir.
+
+### Échantillon aléatoire des items faciles — tiré le 2026-09-17, graine 17
+
+Tiré parmi les 37 items du golden set ni relus ni classés difficiles, et **commité avant relecture du
+premier d'entre eux**, pour la même raison que le pré-enregistrement : sans tirage figé d'avance, rien
+n'empêche de choisir au fil de l'eau les items faciles qui arrangent.
+
+| item | verdict | cas | tâche |
+|---|---|---|---|
+| `b04-014` | FAIL | defaillant | explication |
+| `b07-005` | PASS | parfait | debogage |
+| `b07-008` | FAIL | defaillant | debogage, verbeux |
+| `b08-007` | PASS | parfait | debogage |
+| `b08-011` | FAIL | defaillant | question_reponse |
+| `b09-006` | FAIL | defaillant | generation |
+| `b09-014` | PASS | parfait | explication |
+| `b13-003` | FAIL | defaillant | retrieval (RAG_CONTEXT_RELEVANCE) |
+
+5 FAIL / 3 PASS, proche de la proportion du golden set. **Objet du sondage :** vérifier que ces items sont
+aussi séparables que leur `cas` le prétend. Un désaccord sur deux d'entre eux invaliderait l'affirmation
+« le reste du golden set est trivial » et imposerait d'élargir la relecture.
+
+### État de la relecture
+
+- **Accord sur le verdict, premier passage : 12 / 13** — seul `b07-011` reste en désaccord.
+- **Désaccords au niveau contrôle : 2** — `b09-009` (corrigé en faveur de l'annotateur), `b13-012`
+  (étiquette maintenue).
+- Items à difficulté réelle traités : **3 sur 4**. Reste `b13-013`.
