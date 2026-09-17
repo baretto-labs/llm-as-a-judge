@@ -557,3 +557,28 @@ interdire de remplacer un item devenu gênant.
 
 **Conséquence à retenir pour la composition des sessions :** deux items d'une même famille RAG ne doivent
 pas être présentés à la suite, l'analyse du premier réglant le second.
+
+### 15. `b07-005` — accord complet, premier item de l'échantillon aléatoire
+
+| | 1 `exactitude_technique` | 2 `absence_de_bugs` | 3 `respect_consignes` | verdict |
+|---|---|---|---|---|
+| annotateur, premier passage | V | V | V | **PASS** |
+| étiquette | V | V | V | **PASS** |
+
+Dixième accord consécutif. Le motif de l'annotateur couvre les deux moitiés de l'item : le diagnostic
+d'épuisement du générateur, et la vérification que les deux corrections proposées sont elles-mêmes sans bug.
+C'est le piège propre à ce type d'exemple — valider l'explication et omettre de relire le code correctif.
+Aucune correction du corpus.
+
+**Premier point de l'échantillon aléatoire, et il se comporte comme prévu :** accord immédiat sur un item
+`parfait`, sans information sur la calibration de l'annotateur. C'est précisément ce qu'un sondage doit
+produire si l'hypothèse « le reste du golden set est trivialement séparable » est vraie. Ces points valent
+par leur accumulation, pas individuellement : c'est un désaccord qui serait informatif ici, pas un accord.
+
+### État de la relecture
+
+- **Accord sur le verdict, premier passage : 14 / 15** — seul `b07-011` reste en désaccord.
+- **Désaccords au niveau contrôle : 2** — `b09-009` (corrigé en faveur de l'annotateur), `b13-012`
+  (étiquette maintenue).
+- Items à difficulté réelle traités : 3 sur 4. Reste `b13-013`.
+- Échantillon aléatoire : 1 sur 8 relu.
