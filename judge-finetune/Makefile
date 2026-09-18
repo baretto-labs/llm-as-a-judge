@@ -91,11 +91,14 @@ data/mlx/train.jsonl:
 	@echo "ERREUR : data/mlx/train.jsonl absent. Lance d'abord 'make split' (ou 'make split-poc')." >&2
 	@exit 1
 
+# Passe par train_variant.sh, qui mesure durée, mémoire de pointe et jetons vus : ces
+# chiffres sont une affirmation publiée de l'étude et sont irrécupérables après coup.
+# Les poids sont récupérés hors chronomètre (le 32B pèse ~18 Go non encore en cache).
 train-14b: data/mlx/train.jsonl
-	$(LORA) --model $(MODEL_14B) --data data/mlx --adapter-path adapters/14b-judge $(LORA_ARGS)
+	MODEL=$(MODEL_14B) ADAPTER=adapters/14b-judge ./scripts/train_variant.sh 14b $(LORA_ARGS)
 
 train-32b: data/mlx/train.jsonl
-	$(LORA) --model $(MODEL_32B) --data data/mlx --adapter-path adapters/32b-judge $(LORA_ARGS)
+	MODEL=$(MODEL_32B) ADAPTER=adapters/32b-judge ./scripts/train_variant.sh 32b $(LORA_ARGS)
 
 # Une variante à la fois : le serveur est démarré puis arrêté par le script.
 bench-14b:

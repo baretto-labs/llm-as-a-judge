@@ -847,3 +847,30 @@ matrice de confusion (verdict)
 - **Échantillon aléatoire : 8 sur 8, terminé** — aucun désaccord de verdict. L'hypothèse « le reste du golden
   set est trivialement séparable » n'est pas contredite.
 - En attente : arbitrage de l'annotateur sur la convention de `respect_consignes`.
+
+---
+
+## Arbitrage à froid — 2026-09-18
+
+**Question posée** (reportée de la veille, à dessein) : sur `b08-011` et `b04-014`, l'annotateur avait marqué
+`respect_consignes` faux en invoquant l'omission d'une demande introduite par « Accessoirement » / « En
+bonus ». Énumération de griefs sur un item déjà FAIL, ou récusation de la convention ?
+
+**Réponse, rendue en début de séance et non en fin :** erreur d'inattention. La convention est confirmée —
+une demande facultative ignorée n'entre pas dans `respect_consignes`.
+
+**Conséquences.**
+
+- **Aucune modification du corpus.** Les deux étiquettes sont maintenues, la convention de `PROTOCOLE.md`
+  est inchangée, et la dizaine d'items qu'une récusation aurait imposé de réécrire est épargnée.
+- **Les premiers passages restent consignés tels quels.** Ils comptent pour le κ, fatigue comprise :
+  l'accord complet contrôle par contrôle demeure **16/21 = 76 %**, et l'accord verdict **20/21**. Corriger
+  rétroactivement le premier passage donnerait un chiffre flatteur et faux.
+- **Les trois désaccords de contrôle sur `respect_consignes` sont donc un désaccord unique répété**, dû à
+  l'inattention et non à une divergence de fond. À dire tel quel dans le REX.
+
+**Ce que cet arbitrage valide, au-delà de son contenu.** Le protocole à deux colonnes — premier passage pour
+le κ, arbitrage à froid pour l'étiquette — a été adopté la veille en réponse à la question « la fatigue de
+l'annotateur est-elle un aléa acceptable ? ». C'est sa première mise à l'épreuve, et elle confirme la
+distinction : le même relecteur, sur le même item, a jugé différemment selon son état, et c'est le passage à
+froid qui fixe l'étalon tandis que le passage fatigué reste dans la mesure de reproductibilité.
