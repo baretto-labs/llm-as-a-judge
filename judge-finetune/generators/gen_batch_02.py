@@ -340,6 +340,13 @@ def parse_duration(s):
     return sum(int(n) * _FACTORS[u] for n, u in matches)
 ```
 
+| unité | facteur |
+|---|---|
+| `d` | 86 400 |
+| `h` | 3 600 |
+| `m` | 60 |
+| `s` | 1 |
+
 ## Exemples
 
 ```python

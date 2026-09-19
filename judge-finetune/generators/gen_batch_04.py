@@ -240,6 +240,12 @@ return String.join(";", values);
 
 Attention, ce n'est pas strictement équivalent : `String.join` ne met pas de séparateur final, alors que votre version en ajoute un après la dernière valeur.
 
+| | coût | séparateur final |
+|---|---|---|
+| `+=` en boucle | quadratique | présent |
+| `StringBuilder` | amorti linéaire | présent |
+| `String.join` | amorti linéaire | **absent** |
+
 ## Mesure
 
 Sur 20 000 concaténations, l'écart est déjà d'un ordre de grandeur en faveur de `StringBuilder`. Sur 100 000, la version d'origine devient inutilisable.

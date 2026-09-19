@@ -168,3 +168,46 @@ elle reste limité — mais il n'est pas nul et ne sera pas passé sous silence.
 **Conséquence sur la relecture par paire :** deux items d'une même famille ne peuvent pas constituer deux
 points de mesure indépendants. L'analyse du premier règle le second. Les items concernés sont signalés
 comme compromis dans `data/REVUE_GOLDEN.md`.
+
+---
+
+## Addendum daté — 2026-09-19, révision du critère de fuite de surface
+
+Ajout **additif**. La métrique principale, la comparaison principale, le test et la règle de conclusion
+sont inchangés. Seul le critère interne d'acceptation du corpus est révisé, et le motif est consigné.
+
+### Le critère initial était mal posé
+
+Il avait été fixé à « balayage global p ≥ 0,05 et aucune strate déterministe ». Trois tours de correction
+ont montré que la première moitié est une cible sans fin : sur un corpus écrit par un seul auteur, il
+subsiste toujours un corrélat de forme, et neutraliser un trait fait remonter le suivant de la même
+famille — sections, titres, tableaux, gras sont quatre mesures d'une seule habitude de rédaction.
+
+### Critère retenu à la place
+
+**Aucune cellule déterministe**, c'est-à-dire aucune règle de surface à zéro contre-exemple. La
+distinction est de nature, non de degré : une corrélation laisse au modèle une raison d'apprendre autre
+chose, une règle sans exception ne lui en laisse aucune.
+
+**État atteint :** plus aucune cellule déterministe sur les traits balayés. `reponse_tableau` passe de
+0 PASS / 18 FAIL à 5P/2F en non verbeux et 4P/16F en verbeux ; `reponse_sections` de 0P/24F à une
+répartition mêlée. `reponse_gras` mène désormais `CODE_ANALYSIS` à 64,7 % (p = 0,0225) mais n'est **pas**
+déterministe — 48P/17F contre 21P/31F — et n'est donc pas traité.
+
+### Ce qui remplace la poursuite du nettoyage
+
+Conformément à la pratique documentée en 2026 sur le biais de format des juges, la fuite résiduelle est
+**mesurée et publiée** plutôt que poursuivie :
+
+1. **Passe « format normalisé »** ajoutée aux métriques secondaires : le benchmark est rejoué sur des
+   réponses dépouillées de leur Markdown — titres, puces, gras, tableaux — et **l'écart entre les deux
+   passes mesure la part de forme dans le score du juge**.
+2. **Exclusion obligatoire** de cette passe : les 5 items dont la requête impose un format, où la forme
+   *est* le critère évalué et dont le dépouillement les rendrait injugeables.
+3. Le chiffre de fuite résiduelle du corpus est publié tel quel dans le REX.
+
+### Pourquoi ce renversement
+
+Le nettoyage est non borné, il dégrade la représentativité du corpus, et un corpus déclaré « propre » ne
+prouve rien. Un écart mesuré entre passe formatée et passe dépouillée est vérifiable, reproductible, et
+constitue une **preuve positive** que le juge a appris autre chose que la forme.

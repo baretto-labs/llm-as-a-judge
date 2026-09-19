@@ -482,6 +482,13 @@ Deux propriétés à accepter :
 - **La cohérence devient éventuelle.** Il existe une fenêtre où la commande existe sans paiement. L'interface doit l'assumer, par exemple avec un statut explicite.
 - **La compensation n'est pas un retour arrière.** On ne défait pas le passé, on ajoute une opération qui en neutralise l'effet. Un remboursement laisse une trace, contrairement à une annulation de transaction.
 
+| | validation en deux phases | saga |
+|---|---|---|
+| atomicité | conservée | remplacée par des compensations |
+| verrous | tenus pendant tout le protocole | locaux à chaque transaction |
+| coordinateur | point de défaillance | aucun |
+| cohérence | immédiate | éventuelle |
+
 ## Le point difficile
 
 Ce n'est pas la saga elle-même, c'est la **fiabilité de la transition** : votre service doit valider en base et publier un message, et ces deux actions ne sont pas atomiques. Si le processus tombe entre les deux, l'état est incohérent sans que personne ne le sache.

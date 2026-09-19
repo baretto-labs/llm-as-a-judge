@@ -382,6 +382,15 @@ C'est l'algorithme de clonage structuré de la plateforme, disponible nativement
 
 Pour répondre au point sur les `Map` : elles sont prises en charge, et les `Set` aussi. Le clone est une véritable `Map`, dont les clés et les valeurs sont elles-mêmes clonées en profondeur. C'est d'ailleurs l'un des écarts les plus brutaux avec l'aller-retour JSON, qui réduit une `Map` à `{}` sans rien signaler.
 
+| | aller-retour JSON | `structuredClone` |
+|---|---|---|
+| `Date` | devient une chaîne | préservée |
+| `NaN` | devient `null` | préservé |
+| clé à `undefined` | disparaît | préservée |
+| `BigInt` | lève une `TypeError` | préservé |
+| référence circulaire | lève une `TypeError` | gérée |
+| `Map` et `Set` | réduits à `{}` | préservés, clonés en profondeur |
+
 ## Ses limites
 
 Il ne clone pas les fonctions, ni les symboles, ni la chaîne de prototypes : un objet de classe revient en objet simple, et une méthode fait lever une `DataCloneError`. Pour de la configuration composée de données, ce n'est pas un problème.
