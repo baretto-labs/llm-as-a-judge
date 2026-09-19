@@ -561,6 +561,12 @@ Deux approches corrigent cela :
 - **Fenêtre glissante.** On compte les requêtes des soixante dernières secondes, pas de la minute en cours. Exact, mais il faut conserver les horodatages, ou approximer en pondérant le compteur de la fenêtre précédente.
 - **Seau à jetons.** Le client dispose d'un seau réalimenté à débit constant, ici environ 1,67 jeton par seconde, et chaque requête en consomme un. La capacité du seau fixe la rafale tolérée, indépendamment du débit moyen. C'est le mécanisme le plus courant, parce qu'il exprime séparément les deux propriétés qui vous intéressent.
 
+| | ce qu'on stocke | rafale tolérée |
+|---|---|---|
+| fenêtre fixe | un compteur par minute civile | jusqu'au double de la limite, à cheval sur la frontière |
+| fenêtre glissante | les horodatages, ou un compteur pondéré | conforme à la limite |
+| seau à jetons | un niveau et une date de dernier remplissage | fixée par la capacité du seau |
+
 Trois points de mise en œuvre : le compteur doit être partagé entre instances, donc dans un stockage commun avec des opérations atomiques ; renvoyez `429` avec un en-tête `Retry-After` pour que les clients bien élevés sachent attendre ; et décidez explicitement du comportement si le stockage partagé tombe, laisser passer ou refuser, car ce choix est un arbitrage entre disponibilité et protection.
 ''',
     thinking='''

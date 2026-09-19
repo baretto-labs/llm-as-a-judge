@@ -415,6 +415,12 @@ Non, et pour deux raisons distinctes.
 
 **C'est contre-productif quand elle est honorée.** L'appel déclenche typiquement une collecte complète, qui parcourt l'ensemble du tas, alors que les collecteurs modernes sont conçus pour éviter cela. Leur hypothèse générationnelle est que la plupart des objets meurent jeunes : les collectes mineures ne parcourent que la jeune génération, sont fréquentes et brèves. Forcer une collecte complète juste avant une section critique, c'est s'offrir la pause la plus longue possible au pire moment, et détruire au passage les statistiques d'adaptation du collecteur.
 
+| | collecte mineure | collecte complète, déclenchée par `System.gc()` |
+|---|---|---|
+| parcourt | la jeune génération | l'ensemble du tas |
+| fréquence | élevée | forcée, hors du rythme du collecteur |
+| pause | brève | la plus longue possible |
+
 Ce qu'il faut faire à la place : dimensionner le tas, choisir un collecteur adapté à l'objectif de latence, et surtout mesurer avec les journaux de collecte plutôt que raisonner par intuition. Si des pauses gênent réellement une section critique, le levier est le choix et le réglage du collecteur, pas un appel dans le code applicatif.
 ''',
     thinking='''

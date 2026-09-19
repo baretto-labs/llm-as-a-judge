@@ -427,6 +427,11 @@ const opts = { retries: 3, verbose: true };
 run(opts);                             // accepté : opts n'est plus un littéral frais
 ```
 
+| | s'applique à | effet sur une propriété en trop |
+|---|---|---|
+| typage structurel | toute affectation | acceptée, la forme suffit |
+| contrôle des excédents | littéraux « frais » uniquement | rejetée |
+
 Ce n'est pas une incohérence : le contrôle vise les fautes de frappe et les options inventées, là où elles sont détectables sans risque. Passer par une variable est d'ailleurs le contournement admis quand on veut délibérément transporter des propriétés en plus.
 ''',
     thinking='''
@@ -597,7 +602,14 @@ Comment stocker les mots de passe de nos utilisateurs ? Nous utilisons actuellem
     reponse='''
 Le sel est une bonne chose, il vous protège des tables précalculées et des attaques mutualisées sur l'ensemble de la base. Mais SHA-256 reste le mauvais outil : c'est une fonction de hachage **rapide**, conçue pour l'intégrité. Sur du matériel dédié, un attaquant qui récupère votre base teste des milliards de candidats par seconde, sel ou pas sel, puisque le sel n'est secret que jusqu'à la fuite de la base, où il figure à côté du condensé.
 
-Il vous faut une fonction **lente et à coût paramétrable**, conçue pour le stockage de mots de passe : argon2id, scrypt ou bcrypt. Trois points de mise en œuvre :
+Il vous faut une fonction **lente et à coût paramétrable**, conçue pour le stockage de mots de passe : argon2id, scrypt ou bcrypt.
+
+| | conçue pour | coût réglable | sel |
+|---|---|---|---|
+| SHA-256 + sel maison | l'intégrité, donc rapide | non | géré par vous |
+| argon2id, scrypt, bcrypt | le stockage de mots de passe | oui | intégré à la chaîne stockée |
+
+Trois points de mise en œuvre :
 
 1. Calibrez le facteur de coût sur votre matériel de production, en visant de l'ordre de 100 à 250 ms par vérification. C'est imperceptible à la connexion et cela renchérit massivement une attaque hors ligne.
 2. Ces algorithmes génèrent et intègrent le sel dans la chaîne stockée : ne gérez pas le vôtre séparément.

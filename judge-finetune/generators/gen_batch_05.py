@@ -521,6 +521,14 @@ TCP établit une connexion, numérote les segments, retransmet ce qui manque, r�
 
 UDP se contente d'envoyer des datagrammes indépendants. Pas de connexion, pas de retransmission, pas d'ordre garanti, pas de contrôle de congestion. Un datagramme arrive entier ou pas du tout.
 
+| | TCP | UDP |
+|---|---|---|
+| connexion | poignée de main initiale | aucune |
+| pertes | retransmises | non retransmises |
+| ordre | garanti | non garanti |
+| congestion | débit adapté | à votre charge |
+| revers | blocage en tête de file | datagramme entier ou rien |
+
 Pour de la télémétrie temps réel, c'est effectivement souvent le bon choix, mais pour la bonne raison : une mesure perdue est sans intérêt une fois périmée, et vous préférez la suivante à une retransmission tardive. Trois réserves toutefois :
 
 - L'absence de contrôle de congestion est un problème de voisinage : sous charge, votre flux peut noyer le reste du trafic. Prévoyez une limitation de débit côté émetteur.
