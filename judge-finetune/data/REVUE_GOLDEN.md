@@ -874,3 +874,26 @@ le κ, arbitrage à froid pour l'étiquette — a été adopté la veille en ré
 l'annotateur est-elle un aléa acceptable ? ». C'est sa première mise à l'épreuve, et elle confirme la
 distinction : le même relecteur, sur le même item, a jugé différemment selon son état, et c'est le passage à
 froid qui fixe l'étalon tandis que le passage fatigué reste dans la mesure de reproductibilité.
+
+## Session 3 — reprise pendant l'entraînement du 14B
+
+### 23. `b02-002` — accord complet, point non indépendant
+
+| | 1 `exactitude_technique` | 2 `absence_de_bugs` | 3 `respect_consignes` | verdict |
+|---|---|---|---|---|
+| annotateur, premier passage | V | V | V | **PASS** |
+| étiquette | V | V | V | **PASS** |
+
+Accord sur les trois contrôles et le verdict. Motif concordant : requête paramétrée, API `sqlite3`
+standard, ni bug ni injection. Aucune correction du corpus.
+
+**Réserve : point non indépendant.** `b02-002` forme une paire contrastive avec `b02-001`, déjà relu,
+dont il partage l'énoncé mot pour mot — l'annotateur y avait jugé la version vulnérable à l'injection.
+Divulgué avant sa réponse. Même traitement que `b13-003` et `b13-013`.
+
+### État de la relecture
+
+- **Accord sur le verdict, premier passage : 21 / 22.**
+- **Désaccords au niveau contrôle : 3** — `b09-009` (corrigé en faveur de l'annotateur), `b13-012` et
+  `b08-011` (étiquettes maintenues ; l'arbitrage à froid du 2026-09-18 a confirmé la convention).
+- **22 items relus sur 50**, 28 restants.
