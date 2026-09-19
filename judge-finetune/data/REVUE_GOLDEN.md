@@ -1010,3 +1010,45 @@ invalidée, et la modification est purement typographique — aucun mot du conte
 - **Accord sur le verdict, premier passage : 25 / 26.**
 - **Désaccords au niveau contrôle : 4**, inchangé.
 - **26 items relus sur 50**, 24 restants.
+
+### 28. `b10-003` — accord verdict, désaccord sur les contrôles 1 et 2
+
+| | 1 `exactitude_technique` | 2 `absence_de_bugs` | 3 `respect_consignes` | verdict |
+|---|---|---|---|---|
+| annotateur, premier passage | V | V | **F** | **FAIL** |
+| étiquette | **F** | **F** | **F** | **FAIL** |
+
+**Diagnostic de l'annotateur exact et complet** : `compareTo` ignore le mineur, `TreeSet` détermine
+l'appartenance par `compareTo` et non par `equals`, donc `Version(1,0)` et `Version(1,5)` produisent un
+ensemble de taille 1 et une version est perdue silencieusement. Aucune correction du corpus.
+
+**Mais un bug décrit en prose, avec `absence_de_bugs` laissé à V.** « Supprimer à tort les versions
+suivantes » est un bug logique, définition même du contrôle 2. Et le tableau de la réponse affirme que
+`TreeSet` élimine les doublons « via `equals` », ce qui est faux : affirmation technique inexacte,
+donc contrôle 1 également.
+
+**Cinquième désaccord d'attribution, quatrième de cette forme, deuxième consécutif après `b03-014`.**
+La récurrence a conduit à **suspendre la présentation d'items** plutôt qu'à accumuler des points de mesure
+ininterprétables : une clarification immédiate protège les 24 items restants, là où un arbitrage à froid
+différé porterait sur vingt-quatre points ambigus.
+
+Deux lectures soumises à l'annotateur :
+
+- **A** — `respect_consignes` est employé comme contrôle-chapeau, « la réponse ne fait pas ce qu'on attend
+  d'elle », les contrôles 1 et 2 étant réservés à ce qui se vérifie sans référence à la requête. Divergence
+  réelle sur la rubrique : impose de réécrire la définition des contrôles dans `PROTOCOLE.md` ou de
+  reprendre les items concernés.
+- **B** — glissement d'attribution sur des items déjà FAIL, où le verdict ne change pas et où l'énumération
+  prend le pas sur le classement. Sans conséquence sur le corpus.
+
+**Convention en vigueur, rappelée à l'annotateur :** les trois contrôles sont **indépendants et
+cumulatifs**, un même défaut pouvant en faire tomber plusieurs. Affirmation fausse → contrôle 1 ;
+comportement fautif observable → contrôle 2 ; consigne explicite non honorée → contrôle 3.
+
+Premier passage consigné tel quel dans les deux cas — il compte pour le κ.
+
+### État de la relecture
+
+- **Accord sur le verdict, premier passage : 26 / 27.**
+- **Désaccords au niveau contrôle : 5** — `b09-009` (corrigé), `b13-012`, `b08-011`, `b03-014`, `b10-003`.
+- **27 items relus sur 50**, 23 restants. **Présentation suspendue** dans l'attente de la clarification.
