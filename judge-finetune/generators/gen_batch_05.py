@@ -513,9 +513,13 @@ add(example(
 On sort une version de notre bibliothèque qui corrige un bug, mais dont la correction change le comportement observable d'une méthode publique. Majeure, mineure ou correctif ? Si possible, dis un mot des versions `0.x`.
 ''',
     reponse='''
+## La réponse
+
 Version **majeure**.
 
 Le critère du versionnage sémantique n'est pas l'intention, c'est la compatibilité. Un correctif de bug reste un `PATCH` tant que le contrat public est préservé. Dès lors que le comportement observable d'une API publique change, du code qui fonctionnait peut cesser de fonctionner : c'est une rupture, donc `MAJOR`, même si le changement est une correction et même s'il est souhaitable.
+
+## Deux atténuations
 
 En pratique, deux atténuations valent mieux qu'un débat sur le numéro :
 

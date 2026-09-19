@@ -535,7 +535,11 @@ add(example(
 Quand utiliser un `record` plutôt qu'une classe immuable classique en Java 17 ? Réponse concise, avec un exemple de validation.
 ''',
     reponse='''
+## Quand un record convient
+
 Un `record` convient quand le type est un **porteur de données transparent** : son état est exactement ses composants, et vous acceptez de les exposer. Le compilateur génère alors le constructeur canonique, les accesseurs, `equals`, `hashCode` et `toString`.
+
+## La validation
 
 La validation se place dans le constructeur compact, qui peut aussi normaliser les valeurs avant affectation :
 
@@ -551,6 +555,8 @@ public record Money(BigDecimal amount, Currency currency) {
     }
 }
 ```
+
+## Quand préférer une classe classique
 
 Préférez une classe classique quand vous avez besoin d'un état mutable, d'une encapsulation forte (un record publie ses composants par construction), ou d'hériter d'une autre classe : un record est implicitement `final` et ne peut pas étendre de classe, même s'il peut implémenter des interfaces.
 ''',

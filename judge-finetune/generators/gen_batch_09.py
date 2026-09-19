@@ -267,7 +267,11 @@ for (var i = 0; i < onglets.length; i++) {
 Explique et corrige.
 ''',
     reponse='''
+## La cause
+
 `var` a une portée de **fonction**, pas de bloc : la boucle ne crée qu'une seule variable `i`, partagée par toutes les fermetures. Au moment du clic, la boucle est terminée depuis longtemps et `i` vaut `onglets.length` — d'où le comportement identique de tous les boutons, et même un `onglets[i]` indéfini.
+
+## La correction
 
 La correction tient en un mot-clé :
 
@@ -278,6 +282,8 @@ for (let i = 0; i < onglets.length; i++) {
 ```
 
 `let` a une portée de bloc, et la spécification prévoit une **liaison par itération** pour les boucles `for` : chaque tour capture sa propre copie de `i`.
+
+## Deux variantes
 
 Deux variantes équivalentes : itérer sur les valeurs plutôt que sur les indices, avec `onglets.forEach((onglet, index) => ...)`, ce qui supprime la question ; ou, en code ancien contraint à `var`, envelopper dans une fonction immédiatement invoquée pour créer une portée par tour.
 ''',
@@ -412,11 +418,19 @@ Notre validation d'entrées rejette une liste de caractères et de motifs danger
     reponse='''
 La différence tient à ce qui se passe quand vous n'avez pas pensé à un cas.
 
+## Liste noire
+
 Une **liste noire** énumère ce qui est interdit : tout ce qui n'y figure pas passe. Elle est donc toujours en retard d'un contournement — un encodage alternatif, une variante Unicode, une casse inattendue, un caractère nouvellement significatif dans une couche que vous ne contrôlez pas. Chaque incident ajoute une ligne à la liste, sans jamais garantir qu'elle est complète.
+
+## Liste blanche
 
 Une **liste blanche** énumère ce qui est permis : tout le reste est refusé. L'inconnu est rejeté par défaut, ce qui inverse la charge — vous n'avez plus à prévoir les attaques, seulement à décrire vos données légitimes.
 
+## En pratique
+
 En pratique, une liste blanche se décrit par la forme attendue : un jeu de caractères, une longueur, un format, une plage de valeurs, une énumération de valeurs admises. Pour un identifiant, `\\A[a-z0-9_-]{1,64}\\Z` dit tout ce qu'il y a à dire.
+
+## Deux précisions
 
 Deux précisions utiles. La validation ne remplace pas l'échappement au point d'usage : requête paramétrée pour le SQL, liste d'arguments pour un appel de commande, encodage contextuel pour le HTML. Une entrée peut être parfaitement légitime et rester dangereuse si elle est concaténée. Et la validation doit s'exécuter côté serveur : un contrôle côté client est une aide à la saisie, pas une protection.
 ''',

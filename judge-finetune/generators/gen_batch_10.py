@@ -358,6 +358,8 @@ add(example(
 Pour trier par quantité croissante puis par nom, faut-il deux `sorted` successifs ou une clé composite ? Et que se passe-t-il avec `reverse=True` ?
 ''',
     reponse='''
+## Deux passes ou clé composite
+
 Les deux fonctionnent, et pour la même raison : `sorted` est **stable**, donc un second tri préserve l'ordre relatif établi par le premier.
 
 ```python
@@ -370,6 +372,8 @@ articles = sorted(articles, key=lambda a: (a.quantite, a.nom))
 ```
 
 Préférez la clé composite : une seule passe, et l'intention est lisible sans avoir à connaître la stabilité du tri ni à se souvenir que les passes s'écrivent dans l'ordre inverse des priorités.
+
+## Le piège de reverse=True
 
 Pour `reverse=True`, attention : il inverse l'ordre **global**, donc tous les critères à la fois. `sorted(key=lambda a: (a.quantite, a.nom), reverse=True)` donne des quantités décroissantes **et** des noms décroissants au sein de chaque quantité.
 

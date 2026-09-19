@@ -284,9 +284,11 @@ add(example(
 Explique la logique à trois valeurs de SQL et ses conséquences les plus fréquentes en pratique.
 ''',
     reponse='''
+## Le principe
+
 Une comparaison SQL ne renvoie pas un booléen mais l'une de trois valeurs : vrai, faux, ou **inconnu**. `NULL` ne représente pas une valeur particulière mais l'absence d'information, si bien que toute comparaison qui l'implique renvoie inconnu — y compris `NULL = NULL`.
 
-Quatre conséquences pratiques.
+## Quatre conséquences pratiques
 
 **Les filtres ne gardent que le vrai.** Une clause `WHERE` évaluée à inconnu écarte la ligne, exactement comme si elle valait faux. D'où le piège de `NOT IN` sur un ensemble contenant un `NULL` : l'expression ne peut jamais valoir vrai, et la requête ne renvoie rien.
 
@@ -295,6 +297,8 @@ Quatre conséquences pratiques.
 **Les agrégats ignorent les nuls, sauf `COUNT(*)`.** `AVG` divise par le nombre de valeurs présentes, pas par le nombre de lignes : recalculer une moyenne avec `SUM / COUNT(*)` donne un autre résultat. Sur un ensemble vide, `SUM` renvoie `NULL` alors que `COUNT` renvoie zéro.
 
 **L'unicité tolère plusieurs nuls.** Deux `NULL` n'étant pas égaux, une contrainte d'unicité les accepte en nombre quelconque — surprenant quand on comptait sur elle pour garantir l'absence de doublon.
+
+## La parade
 
 La parade générale est de décider à la conception si une colonne peut être inconnue, et d'expliciter le traitement avec `COALESCE` partout où la réponse est non.
 ''',

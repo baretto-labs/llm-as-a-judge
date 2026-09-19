@@ -430,12 +430,16 @@ add(example(
     contexte=CTX_NEO4J_PARSER,
     requete="What does BracketCallParser parse from LLM output?",
     reponse='''
+## Ce que le contexte établit
+
 D'après le contexte :
 
 - `BracketCallParser` implémente l'interface `ToolCallParser` et redéfinit sa méthode `parse(String text)`, comme l'indique l'annotation `@Override`.
 - Cette méthode renvoie un `Optional<DetectedToolCall>` : l'analyse peut donc ne rien détecter, auquel cas l'`Optional` est vide.
 - La classe déclare deux champs, `BRACKET_PATTERN` et `MAX_ARGUMENTS`, dont les noms suggèrent une reconnaissance par expression régulière entre crochets et une limite sur le nombre d'arguments acceptés.
 - L'appelant visible est `ToolCallDetector.detect(String)`.
+
+## Ce qu'il ne permet pas de dire
 
 La valeur du motif n'est pas fournie, donc la syntaxe exacte reconnue et les commandes acceptées ne sont pas déterminables à partir de ce contexte.
 ''',

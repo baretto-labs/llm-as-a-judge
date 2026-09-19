@@ -520,7 +520,11 @@ add(example(
     task="RAG_FAITHFULNESS", contexte=CTX_NEO4J_APPROVAL,
     requete="How does FileCreator request user approval via FileApprovalNotifier?",
     reponse='''
+## Pourquoi je ne peux pas répondre
+
 `FileCreator` n'apparaît pas dans le contexte fourni : je ne peux donc pas décrire comment cette classe demande l'approbation.
+
+## Le mécanisme d'approbation
 
 Ce que le contexte établit sur le mécanisme d'approbation lui-même :
 
@@ -528,6 +532,8 @@ Ce que le contexte établit sur le mécanisme d'approbation lui-même :
 - Le type `Consumer<FileApprovalNotifier.ApprovalDecision>` apparaît, ce qui indique une remise de décision par rappel.
 - `ApprovalTimeoutException` existe et étend `RuntimeException`.
 - Un réglage d'interface expose une case `getAutoApproveFileCreationCheckbox()`, donc l'approbation peut être court-circuitée par configuration.
+
+## Ce que le contexte n'établit pas
 
 Rien n'établit en revanche que `FileCreator` passe par ce chemin, ni comment la demande est publiée ou attendue.
 ''',
