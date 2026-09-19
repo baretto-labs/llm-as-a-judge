@@ -7,3 +7,4 @@ Iter 1: Val loss 1.816, Val took 93.476s
 Iter 10: Train loss 1.646, Learning Rate 1.000e-05, It/sec 0.095, Tokens/sec 39.185, Trained Tokens 4127, Peak mem 10.912 GB
 Iter 20: Train loss 1.453, Learning Rate 1.000e-05, It/sec 0.084, Tokens/sec 36.599, Trained Tokens 8506, Peak mem 11.009 GB
 Iter 30: Train loss 1.289, Learning Rate 1.000e-05, It/sec 0.093, Tokens/sec 37.729, Trained Tokens 12543, Peak mem 11.009 GB
+Iter 40: Train loss 1.273, Learning Rate 1.000e-05, It/sec 0.092, Tokens/sec 39.688, Trained Tokens 16869, Peak mem 11.009 GB

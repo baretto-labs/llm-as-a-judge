@@ -897,3 +897,30 @@ Divulgué avant sa réponse. Même traitement que `b13-003` et `b13-013`.
 - **Désaccords au niveau contrôle : 3** — `b09-009` (corrigé en faveur de l'annotateur), `b13-012` et
   `b08-011` (étiquettes maintenues ; l'arbitrage à froid du 2026-09-18 a confirmé la convention).
 - **22 items relus sur 50**, 28 restants.
+
+### 24. `b07-002` — accord complet sur un interblocage par verrous croisés
+
+| | 1 `exactitude_technique` | 2 `absence_de_bugs` | 3 `respect_consignes` | verdict |
+|---|---|---|---|---|
+| annotateur, premier passage | F | F | V | **FAIL** |
+| étiquette | F | F | V | **FAIL** |
+
+Seizième accord consécutif sur tous les contrôles. Le motif de l'annotateur — « le vrai problème est un
+interblocage par verrous croisés » — nomme exactement ce que l'étiquette développe : un verrou équitable
+ordonne les prétendants à un même verrou, il ne supprime pas la dépendance circulaire entre deux verrous
+distincts. Aucune correction du corpus.
+
+`respect_consignes` correctement laissé à V : la requête demandait d'expliquer et de corriger, les deux
+ont été tentés.
+
+**Nuance sans effet sur les cases.** L'étiquette relève un second défaut que le motif de l'annotateur ne
+mentionne pas : le code proposé supprime bien l'interblocage, mais en remplaçant les verrous par instance
+par un verrou unique global, ce qui sérialise tous les virements du service et échange le gel contre un
+goulot d'étranglement — précisément sous la charge qui motivait la question. Les deux défauts relèvent de
+`absence_de_bugs`, la case est donc identique.
+
+### État de la relecture
+
+- **Accord sur le verdict, premier passage : 22 / 23.**
+- **Désaccords au niveau contrôle : 3**, inchangé.
+- **23 items relus sur 50**, 27 restants.
