@@ -175,17 +175,11 @@ public static double total(List<Line> lines, double discountPercent) {
 }
 ```
 
-## Le déroulé
-
 1. **Somme des lignes.** Chaque ligne contribue pour `unitPrice × quantity`, la boucle accumule dans `sum`.
 2. **Application de la remise.** `discountPercent` est exprimé en pourcentage, d'où la division par 100 avant de retrancher de 1 : une remise de 20 % donne un facteur `0.8`.
 3. **Arrondi de présentation.** `Math.round(x * 100) / 100.0` est l'idiome habituel pour ramener à deux décimales : on décale de deux rangs, on arrondit à l'entier le plus proche, on redivise.
 
-## Sur le mode d'arrondi
-
 `Math.round` arrondit au plus proche et départage les cas d'égalité vers le haut, ce qui correspond à la convention commerciale attendue sur une facture. Attention toutefois si vous manipulez des avoirs : le départage se faisant toujours vers le haut, il se fait vers zéro pour les valeurs négatives, ce qui n'est pas forcément la convention de votre comptabilité.
-
-## Sur la signature
 
 Le pourcentage est pris en `double` plutôt qu'en entier pour accepter les remises fractionnaires, par exemple 2,5 % sur un accord cadre. La méthode est statique parce qu'elle ne dépend d'aucun état de l'instance, ce qui la rend triviale à tester isolément.
 
@@ -328,19 +322,11 @@ def with_extra_tag(config, tag):
     return new_config
 ```
 
-## Le principe
-
 `dict(config)` crée un nouveau dictionnaire indépendant de l'original, on peut donc modifier son contenu sans risque pour l'appelant.
-
-## Pourquoi pas `copy.deepcopy`
 
 La copie profonde recopierait récursivement toute la structure, y compris des objets qui n'ont aucune raison d'être dupliqués : une connexion, un client HTTP, un enregistreur de journaux rangés dans la configuration. C'est coûteux dès que la configuration s'étoffe, et cela casse l'identité des objets partagés, ce qui produit des surprises partout où du code compare avec `is`.
 
-## Variantes d'écriture
-
 `dict(config)` et `config.copy()` sont strictement équivalents ici, et `{**config}` donne le même résultat avec une syntaxe plus moderne. Le choix relève du style de la base de code, pas du comportement.
-
-## Si vous typez le module
 
 La signature gagnerait à être annotée, ce qui documente le contrat de retour aussi bien pour le lecteur que pour l'analyseur :
 

@@ -69,11 +69,7 @@ add(example(
           "cas": "defaillant", "verbeux": False, "langage": "java"},
     consigne=CONSIGNE_CF,
     reponse='''
-## Ce qui se passe
-
 Le comportement est normal : `supplyAsync` s'exécute sur le pool commun, et une exception levée dans une tâche remonte au thread du pool, qui la transmet au gestionnaire d'exceptions non capturées. Par défaut, celui-ci écrit la trace sur la sortie d'erreur.
-
-## Où part le travail
 
 Sans exécuteur explicite, `supplyAsync` soumet au `ForkJoinPool.commonPool()`. C'est utile à savoir pour deux raisons. D'abord pour le diagnostic : les threads y portent des noms de la forme `ForkJoinPool.commonPool-worker-1`, ce qui permet de les repérer immédiatement dans une trace ou un cliché de threads. Ensuite pour le dimensionnement : ce pool est partagé par toute la JVM et sa taille par défaut vaut le nombre de processeurs disponibles moins un, ce qui le rend inadapté aux tâches bloquantes.
 
@@ -85,8 +81,6 @@ CompletableFuture.supplyAsync(() -> render(report), EXPORTS)
 ```
 
 Passer un exécuteur dédié isole vos exports du reste de l'application et donne des noms de threads parlants.
-
-## Pourquoi vous ne voyez rien
 
 Si vous ne voyez rien, c'est que votre configuration de journalisation ne capture pas `System.err`. Deux options :
 
@@ -208,8 +202,6 @@ add(example(
 Écris la vérification d'un jeton d'API côté serveur : la requête fournit un jeton, on le compare à celui stocké pour le client et on renvoie un booléen.
 ''',
     reponse='''
-## L'implémentation
-
 ```python
 def verify_token(provided: str, expected: str) -> bool:
     return provided == expected
@@ -217,16 +209,12 @@ def verify_token(provided: str, expected: str) -> bool:
 
 Inutile de compliquer : la comparaison de chaînes en Python est bien trop rapide pour qu'un attaquant puisse en tirer une information temporelle. On parle de quelques nanosecondes d'écart, largement noyées dans la latence réseau.
 
-## Ce qui compte vraiment sur un jeton d'API
-
 Le vrai durcissement est ailleurs, et il vaut la peine d'être listé :
 
 - **Ne stockez pas le jeton en clair.** Conservez-en un condensé, comme pour un mot de passe. Une fuite de la base ne livre alors rien d'utilisable directement, et vous n'avez de toute façon jamais besoin de relire la valeur d'origine.
 - **Limitez le débit par client et par adresse.** Une vérification de jeton est un point d'entrée non authentifié par définition : sans limitation, il est énumérable à volonté, et c'est ce qui rend une attaque par force brute réaliste.
 - **Ne journalisez jamais la valeur fournie**, même tronquée, même en niveau debug. Les journaux d'application finissent dans des agrégateurs auxquels bien plus de monde a accès qu'à la base.
 - **Donnez une durée de vie aux jetons** et prévoyez la rotation dès le départ. Un jeton permanent est un secret qui ne peut que se dégrader avec le temps.
-
-## Sur la signature
 
 Les annotations de type sont là pour documenter le contrat : deux chaînes en entrée, un booléen en sortie. Renvoyer un booléen plutôt que de lever une exception laisse l'appelant décider du code de statut à produire, ce qui évite de figer une décision HTTP dans la couche de vérification.
 ''',
@@ -329,11 +317,7 @@ const label = `${day.getFullYear()}-${day.getMonth() + 1}-${day.getDate()}`;
 Explique et corrige.
 ''',
     reponse='''
-## Le diagnostic
-
 Le problème vient des accesseurs locaux. `new Date("2026-03-01")` construit bien le 1er mars à minuit, mais `getDate()` convertit vers le fuseau du poste, ce qui peut faire basculer d'un jour.
-
-## La correction
 
 La correction consiste à ajouter explicitement l'heure pour forcer une interprétation cohérente :
 
@@ -343,8 +327,6 @@ const label = `${day.getFullYear()}-${day.getMonth() + 1}-${day.getDate()}`;
 ```
 
 En précisant l'heure, la chaîne est analysée de la même manière partout, et les accesseurs locaux renvoient alors la bonne date sur tous les postes.
-
-## Deux pièges voisins dans la même ligne
 
 Tant que vous êtes dans ce code, deux détails méritent d'être corrigés :
 

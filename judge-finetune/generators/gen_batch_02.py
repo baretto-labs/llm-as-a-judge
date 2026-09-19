@@ -111,13 +111,9 @@ public final class Point {
 ```
 ''',
     reponse='''
-## Le diagnostic
-
 `Point` redéfinit `equals` mais laisse `hashCode()` hérité d'`Object`. Or `HashSet` procède en deux temps : il calcule d'abord `hashCode()` pour choisir un seau, puis ne compare avec `equals` que les éléments déjà présents **dans ce seau**. Deux points égaux mais de hachages différents atterrissent dans des seaux distincts et ne se rencontrent jamais — d'où la taille 2 au lieu de 1.
 
 Le contrat d'`Object` est explicite sur ce point : si `a.equals(b)` est vrai, alors `a.hashCode() == b.hashCode()` doit l'être aussi.
-
-## La correction
 
 J'ajoute `hashCode()`, et j'en profite pour simplifier `equals` : l'abscisse suffit à identifier un point dans ce contexte, ce qui rend la comparaison plus rapide et le hachage moins coûteux à calculer.
 
@@ -133,8 +129,6 @@ public int hashCode() {
     return Integer.hashCode(x);
 }
 ```
-
-## Pourquoi le test passe maintenant
 
 | Avant | Après |
 |---|---|
@@ -264,8 +258,6 @@ add(example(
           "cas": "defaillant", "verbeux": False, "langage": "sql"},
     consigne=CONSIGNE_AUTEURS,
     reponse='''
-## La requête
-
 ```sql
 SELECT a.id, a.name, COUNT(*) AS book_count
 FROM authors a
@@ -274,15 +266,9 @@ GROUP BY a.id, a.name
 ORDER BY book_count DESC;
 ```
 
-## Le raisonnement
-
 Le point décisif est le `LEFT JOIN` plutôt qu'un `INNER JOIN`. Un `INNER JOIN` ne conserve que les lignes ayant une correspondance des deux côtés : les auteurs sans livre disparaîtraient purement et simplement du résultat, ce qui est exactement ce que la consigne interdit. Le `LEFT JOIN`, lui, conserve toutes les lignes de `authors` et complète avec des `NULL` quand aucun livre ne correspond. Le `LEFT JOIN` conserve les auteurs sans livre, qui obtiennent donc 0.
 
-## Sur le regroupement
-
 Le `GROUP BY` porte sur `a.id` et `a.name`. Grouper sur `a.id` seul suffirait en SQLite, qui tolère les colonnes non agrégées dans la liste de sélection, mais énumérer les deux garde la requête portable vers PostgreSQL, nettement plus strict sur ce point : il exige que toute colonne projetée soit agrégée ou présente dans le `GROUP BY`.
-
-## Sur le tri
 
 Le tri décroissant met les auteurs les plus prolifiques en tête, ce qui est en général ce qu'on veut afficher. Ajoutez `, a.name` comme second critère si vous souhaitez un ordre déterministe en cas d'égalité : sans lui, deux auteurs à égalité peuvent s'intervertir d'une exécution à l'autre.
 ''',
@@ -545,17 +531,11 @@ add(example(
 On stocke déjà l'identifiant et le rôle de l'utilisateur dans un JWT. Un collègue propose d'y ajouter l'email et le numéro de téléphone du client, « puisque c'est chiffré ». Qu'en penses-tu ?
 ''',
     reponse='''
-## Ce que contient un JWT
-
 Un JWT se compose de trois segments séparés par des points : l'en-tête, qui déclare l'algorithme employé, le payload, qui porte les *claims* — chez vous l'identifiant et le rôle —, et la signature, qui scelle l'ensemble.
-
-## Pourquoi l'ajout ne pose pas de difficulté
 
 C'est tout à fait faisable. Le JWT est chiffré par la signature HMAC-SHA256 : le contenu du token n'est pas lisible côté client, seul le serveur possède la clé secrète permettant de le déchiffrer et d'en vérifier l'intégrité. Tant que cette clé ne fuite pas, le payload reste opaque pour qui intercepte le token.
 
 Vous pouvez donc y placer l'email et le numéro de téléphone sans risque particulier.
-
-## Les vrais points de vigilance
 
 - Évitez d'y mettre le mot de passe, même haché, par principe de moindre privilège.
 - Attention à la taille du token : au-delà de quelques kilooctets, vous pénalisez chaque requête HTTP puisque le token voyage dans l'en-tête `Authorization`.

@@ -77,23 +77,13 @@ public static int firstTrue(int lo, int hi, IntPredicate predicate) {
 }
 ```
 
-## L'invariant
-
 L'invariant est classique : `hi` reste toujours une borne pour laquelle le prédicat est vrai, `lo` progresse tant qu'il est faux. La boucle se termine quand les deux se rejoignent.
 
-## Pourquoi `lo < hi` et non `lo <= hi`
-
-C'est le point qui fait le plus souvent boucler ces implémentations à l'infini. Avec `<`, l'intervalle de recherche est semi-ouvert et la condition d'arrêt est atteinte exactement quand une seule valeur candidate subsiste, celle qu'on renvoie. Avec `<=`, il faut un traitement séparé du cas où les deux bornes coïncident, faute de quoi `hi = mid` laisse l'intervalle inchangé et la boucle ne progresse plus.
-
-## Pourquoi la boucle termine
+Le choix de `lo < hi` plutôt que `lo <= hi` est le point qui fait le plus souvent boucler ces implémentations à l'infini. Avec `<`, l'intervalle de recherche est semi-ouvert et la condition d'arrêt est atteinte exactement quand une seule valeur candidate subsiste, celle qu'on renvoie. Avec `<=`, il faut un traitement séparé du cas où les deux bornes coïncident, faute de quoi `hi = mid` laisse l'intervalle inchangé et la boucle ne progresse plus.
 
 À chaque tour, l'intervalle se réduit strictement : la branche vraie ramène `hi` à `mid`, qui est strictement inférieur à `hi` puisque la division tronque vers le bas, et la branche fausse porte `lo` à `mid + 1`, strictement supérieur à `lo`. La largeur décroît donc à chaque itération, et le nombre de tours est logarithmique en la largeur initiale.
 
-## La condition d'application
-
 Le prédicat doit être **monotone** sur la plage : faux puis vrai, sans alternance. C'est l'hypothèse implicite de toute recherche binaire sur les valeurs, et elle mérite d'être écrite dans la Javadoc, parce qu'un appelant qui la viole n'obtient pas d'erreur, seulement un résultat arbitraire.
-
-## Sur la signature
 
 `IntPredicate` plutôt que `Predicate<Integer>` évite l'autoboxing à chaque test, ce qui compte quand le prédicat est évalué une trentaine de fois par appel et que l'appel lui-même est fréquent.
 ''',
@@ -216,13 +206,9 @@ if latest_version > current_version:
 Les versions sont des chaînes du type `"1.9.0"`. Explique et corrige. Si tu veux compléter, dis un mot des versions préliminaires.
 ''',
     reponse='''
-## Le diagnostic
-
 Le problème vient de la comparaison lexicographique des chaînes, qui compare caractère par caractère. Python n'a aucune raison de deviner que vos chaînes représentent des versions : il applique l'ordre des points de code, exactement comme il le ferait sur des mots. Le premier caractère qui diffère décide, et la longueur des composants n'entre jamais en ligne de compte.
 
 C'est pour la même raison qu'on ne peut pas s'en tirer avec un `float(version)` : `"1.9.0"` n'est pas un nombre décimal valide, et même sur deux composants, `1.10` serait strictement inférieur à `1.9` en arithmétique flottante, ce qui est l'inverse de la convention des versions.
-
-## La correction
 
 La correction consiste à normaliser la longueur des composants avec un remplissage de zéros :
 
@@ -236,11 +222,7 @@ if normalize(latest_version) > normalize(current_version):
 
 Avec ce remplissage, `"1.9.0"` devient `"001.009.000"` et `"1.10.0"` devient `"001.010.000"` : la comparaison de chaînes redonne alors le bon ordre.
 
-## Pourquoi `zfill` et non un formatage
-
 `zfill` est une méthode de `str`, elle ne suppose rien du contenu et ne lève pas d'exception sur un composant vide. Un `f"{int(part):03d}"` ferait le même travail sur des composants numériques, mais planterait sur toute entrée qui n'est pas un entier, ce qui rendrait le vérificateur de mise à jour plus fragile qu'il n'a besoin de l'être.
-
-## Une remarque d'exploitation
 
 Pensez à journaliser les deux versions comparées lorsque la notification se déclenche. Le jour où un utilisateur signale une proposition de mise à jour surprenante, c'est la seule trace qui permette de reconstituer la comparaison exacte qui a été faite.
 ''',
@@ -311,8 +293,6 @@ add(example(
 Conçois la pagination de notre flux d'activité, qui reçoit des insertions en continu. L'utilisateur fait défiler page après page. Explique la garantie que ton approche offre sur les éléments vus.
 ''',
     reponse='''
-## La requête
-
 La pagination par décalage est la plus simple et convient parfaitement ici :
 
 ```sql
@@ -322,19 +302,11 @@ ORDER BY id
 LIMIT 20 OFFSET :page * 20;
 ```
 
-## La garantie offerte
-
 La garantie est solide : comme le tri porte sur un identifiant croissant et stable, chaque élément occupe une position déterminée dans l'ordre global. L'utilisateur qui fait défiler verra donc chaque élément exactement une fois, sans doublon ni oubli, même si des insertions ont lieu pendant sa navigation.
-
-## Sur l'ordre de tri
 
 Un mot sur le choix de la colonne de tri : `ORDER BY id` plutôt que `ORDER BY created_at`. Deux événements enregistrés dans la même milliseconde partageraient le même horodatage, et l'ordre entre eux ne serait alors pas déterministe d'une requête à l'autre. L'identifiant, lui, est unique par construction, ce qui rend l'ordre total et reproductible. Si vous tenez à trier par date pour l'affichage, faites-le sur le couple `(created_at, id)`, où l'identifiant sert de départage.
 
-## Sur la taille de page
-
 Vingt lignes est un bon compromis pour un flux d'activité : assez pour remplir un écran sans défilement immédiat, assez peu pour que la réponse reste légère sur mobile. Évitez les pages configurables sans borne supérieure, sinon un client peut demander `LIMIT 100000` et faire le travail d'un export sur votre chemin de lecture.
-
-## Côté performance
 
 Pensez simplement à indexer la colonne de tri. Sans index sur `id` — il existe déjà si c'est votre clé primaire — le moteur devrait trier l'intégralité de la table à chaque page.
 ''',
@@ -574,26 +546,16 @@ add(example(
 Quand renvoyer 401 et quand renvoyer 403 dans notre API ? Et quel code pour une ressource qu'un utilisateur authentifié n'a pas le droit de voir, sans lui révéler qu'elle existe ?
 ''',
     reponse='''
-## La règle
-
 La règle est la suivante :
 
 - **401 Forbidden** : l'utilisateur est authentifié, mais ses droits ne suffisent pas pour l'opération demandée.
 - **403 Unauthorized** : l'utilisateur n'est pas authentifié, ou son jeton est expiré. Le client doit alors se reconnecter.
 
-## Ce que le client doit en faire
-
 La distinction est surtout utile côté client, et c'est là qu'elle se paie si on l'ignore. Sur le premier cas, rien ne sert de réessayer : les droits ne changeront pas d'eux-mêmes, et l'interface doit afficher un message explicite plutôt qu'une invite de connexion. Sur le second, le client peut tenter un rafraîchissement de jeton puis rejouer la requête une fois, et n'inviter à se reconnecter qu'en cas de second échec. Accompagnez ce cas d'un en-tête `WWW-Authenticate` : c'est ce qui permet au client de savoir quel schéma d'authentification présenter.
-
-## Ne confondez pas avec 400
 
 Un point qui revient souvent en revue : si la requête est malformée — un champ manquant, un type incorrect —, c'est `400 Bad Request`, indépendamment de toute question d'identité ou de droits. Et si la requête est bien formée mais sémantiquement invalide, par exemple une date de fin antérieure à la date de début, `422 Unprocessable Content` est plus précis.
 
-## Journalisation
-
 Quel que soit le code retenu, journalisez l'identité, la ressource visée et la règle qui a refusé l'accès. Sans cette trace, les demandes de support du type « je devrais pouvoir voir cette page » sont impossibles à instruire.
-
-## Pour votre troisième cas
 
 Renvoyez **403** : puisque l'utilisateur n'a pas les droits, c'est bien un défaut d'authentification pour cette ressource précise, et le client saura qu'il doit renouveler son jeton.
 ''',

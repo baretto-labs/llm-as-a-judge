@@ -526,22 +526,14 @@ add(example(
 Un collègue veut passer le jeton de réinitialisation de mot de passe en paramètre d'URL, en arguant que « de toute façon c'est en HTTPS, donc chiffré ». Qu'en penses-tu ?
 ''',
     reponse='''
-## Ce que TLS protège
-
 Il a raison sur le principe. TLS chiffre l'intégralité de la requête HTTP, en-têtes et ligne de requête comprises : un observateur du réseau ne voit ni le chemin, ni les paramètres, uniquement l'adresse IP de destination et le volume échangé.
 
 Le chiffrement est établi avant qu'un seul octet HTTP ne circule. La poignée de main négocie une suite cryptographique, authentifie le serveur par son certificat, puis dérive les clés de session ; tout ce qui suit, requête et réponse, passe dans ce tunnel. Avec TLS 1.3, la négociation tient en un aller-retour, et les suites vulnérables ont été retirées de la spécification.
 
-## Ce que ça implique pour votre jeton
-
 Le jeton est donc protégé en transit, et le mettre dans l'URL plutôt que dans le corps ne change rien à sa confidentialité. C'est même plus pratique pour un lien envoyé par courriel, qui ne peut pas porter de corps de requête.
-
-## Deux durcissements qui valent le détour
 
 - **`Strict-Transport-Security`.** Sans cet en-tête, un utilisateur qui saisit votre domaine sans préciser le schéma part en clair et se fait rediriger : cette première requête est interceptable. L'en-tête supprime cette fenêtre pour les visites suivantes.
 - **Surveillez vos certificats.** Une expiration non anticipée rend le service inaccessible, et les journaux de transparence des certificats permettent de détecter qu'une autorité a émis un certificat pour votre domaine à votre insu.
-
-## Le point de vigilance
 
 Le seul point de vigilance concerne la durée de validité : limitez le jeton à quelques minutes et rendez-le à usage unique.
 ''',

@@ -24,8 +24,6 @@ add(example(
           "cas": "defaillant", "verbeux": False, "langage": "typescript"},
     consigne=CONSIGNE_CHUNK,
     reponse='''
-## Implémentation
-
 ```ts
 export function chunk<T>(items: T[], size: number): T[][] {
   if (size <= 0) {
@@ -39,8 +37,6 @@ export function chunk<T>(items: T[], size: number): T[][] {
   return out;
 }
 ```
-
-## Les choix de conception
 
 **Le paramètre de type.** `T` est déclaré sur la fonction et se propage jusqu'au type de retour `T[][]`. L'appelant conserve donc le type de ses éléments : `chunk(users, 10)` produit un `User[][]`, sans assertion ni `any` nulle part. C'est ce qui distingue cette signature d'un `chunk(items: unknown[], ...)`, qui obligerait à recaster à chaque usage.
 
@@ -229,19 +225,13 @@ func filterEven(nums []int) []int {
     reponse='''
 Votre fonction est correcte, il n'y a rien à corriger ici.
 
-## Pourquoi le slice d'origine ne peut pas être touché
-
 `nums[:0]` crée un nouveau slice de longueur zéro, distinct de `nums`, et `append` alloue un nouveau tableau sous-jacent dès le premier élément ajouté. Les écritures se font donc dans une zone mémoire indépendante, et le tableau d'origine ne peut pas être touché.
-
-## Où chercher, alors
 
 La modification que vous observez vient forcément d'ailleurs. Trois pistes, par ordre de probabilité :
 
 1. **Un autre appelant partage le slice.** En Go, passer un slice à une fonction copie l'en-tête, pas les données. Si une autre partie de votre code écrit dans ce même slice, la modification est visible partout, y compris depuis l'appelant qui n'a rien réassigné.
 2. **Une goroutine concurrente.** Lancez vos tests avec `go test -race` : le détecteur de courses instrumente les accès mémoire et signale l'endroit exact où deux goroutines touchent la même zone sans synchronisation. C'est de loin l'outil le plus rentable sur ce genre de symptôme, parce qu'il pointe la pile des deux accès fautifs.
 3. **Une réutilisation de tampon.** Si le slice provient d'un `sync.Pool` ou d'un tampon recyclé entre deux requêtes, son contenu peut changer sous vos pieds sans que personne n'écrive explicitement dedans.
-
-## Une précaution générale
 
 Si vous voulez garantir qu'un appelé ne puisse pas observer ni modifier vos données, copiez explicitement avant de passer le slice :
 
@@ -284,8 +274,6 @@ public String displayName(Optional<User> user) {
 }
 ```
 
-## Ce que le refactoring apporte
-
 **On supprime le couple `isPresent()` / `get()`.** C'est le principal reproche fait à la version d'origine : ce duo reproduit exactement la logique d'un test de nullité, alors qu'`Optional` a précisément été introduit pour l'éviter. Les revues de code le signalent systématiquement, et la plupart des analyseurs statiques le remontent comme un anti-motif.
 
 **`map` applique la transformation sans sortir du conteneur.** `user.map(User::name)` produit un `Optional<String>` : si l'`Optional` de départ est vide, la référence de méthode n'est jamais appelée et le résultat est vide à son tour. Aucun test intermédiaire à écrire, aucun risque d'oublier une branche.
@@ -318,7 +306,6 @@ import re
 
 _IBAN_FORMAT = re.compile(r"[A-Z]{2}[0-9]{2}[A-Z0-9]{11,30}")
 
-
 def is_valid_iban(s: str) -> bool:
     if not _IBAN_FORMAT.fullmatch(s):
         return False
@@ -327,15 +314,11 @@ def is_valid_iban(s: str) -> bool:
     return int(digits) % 97 == 1
 ```
 
-## L'algorithme
-
 La validation d'un IBAN suit la norme ISO 13616 et se déroule en trois temps.
 
 1. **Contrôle de forme.** Deux lettres de pays, deux chiffres de clé, puis 11 à 30 caractères alphanumériques majuscules. Le choix de `fullmatch` plutôt que `match` est important : `match` n'ancre qu'au début et accepterait une chaîne traînant des caractères parasites en fin.
 2. **Permutation.** Les quatre premiers caractères — code pays et clé de contrôle — sont déplacés en fin de chaîne. C'est ce que fait `s[4:] + s[:4]`.
 3. **Conversion et modulo.** Chaque lettre est remplacée par sa valeur numérique, `A` valant 10 jusqu'à `Z` valant 35. `int(c, 36)` fait exactement cela pour une lettre, et renvoie le chiffre lui-même pour un caractère numérique, ce qui permet de traiter les deux cas d'une seule expression. Le nombre obtenu est valide si et seulement si son reste modulo 97 vaut 1.
-
-## Un mot sur la taille des entiers
 
 Le calcul porte sur un entier Python, dont la taille n'est pas bornée : inutile de découper la chaîne en tranches et de propager un reste intermédiaire pour éviter un dépassement, contrairement à ce qu'imposent les implémentations en C ou en Java, où le nombre obtenu dépasse largement 64 bits.
 
@@ -465,18 +448,12 @@ On vient d'ajouter des `ETag` sur nos ressources statiques. Un collègue propose
     reponse='''
 Il a raison, l'`ETag` est le mécanisme le plus précis des deux et rend `Cache-Control` redondant.
 
-## Le principe
-
 Le navigateur conserve l'`ETag` reçu et, tant que celui-ci ne change pas côté serveur, il réutilise sa copie locale sans rien redemander. Une ressource inchangée n'est donc jamais retéléchargée, ce que `Cache-Control: max-age` faisait de manière plus grossière, avec le risque de servir une version périmée pendant toute la durée du `max-age`.
-
-## Bien générer vos ETag
 
 Deux points méritent attention dans votre mise en place :
 
 - **Fort ou faible.** Un `ETag` préfixé par `W/` est dit faible : il annonce une équivalence sémantique, et non une identité octet pour octet. Réservez-le aux ressources dont la représentation peut varier à la marge — compression, reformatage — sans que le contenu utile change.
 - **Sur quoi le calculer.** Un condensé du contenu est le choix le plus sûr. Dériver l'`ETag` de l'inode et de la date de modification, comme le font certains serveurs par défaut, produit des valeurs différentes d'une machine à l'autre : derrière un répartiteur de charge, le même fichier se voit attribuer plusieurs `ETag` selon le serveur qui répond, et le bénéfice disparaît.
-
-## N'oubliez pas `Vary`
 
 Si vous servez des représentations différentes selon les en-têtes de la requête — `Accept-Encoding` au premier chef —, déclarez-le avec `Vary`. Sans cela, un cache intermédiaire peut servir une version compressée à un client qui ne sait pas la décompresser.
 
