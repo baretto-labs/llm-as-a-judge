@@ -1077,3 +1077,26 @@ contrainte de dépendance, définition donnée dans l'énoncé.
 une question et deux minutes ; le même doute, découvert après vingt-quatre items supplémentaires, aurait
 rendu ces vingt-quatre points ininterprétables. C'est le pendant de la leçon du chantier 9 : on arrête dès
 que la mesure devient douteuse, on ne l'accumule pas en espérant trancher plus tard.
+
+### 29. `b03-004` — accord complet sur un pool de workers Go
+
+| | 1 `exactitude_technique` | 2 `absence_de_bugs` | 3 `respect_consignes` | verdict |
+|---|---|---|---|---|
+| annotateur, premier passage | V | V | V | **PASS** |
+| étiquette | V | V | V | **PASS** |
+
+Dix-neuvième accord consécutif, et premier item depuis la clarification de convention. Le motif de
+l'annotateur nomme le patron — producteur / workers / fan-in — et la **fermeture des canaux**, qui est
+le seul endroit où ce motif casse : `close(jobs)` par le producteur libère les `range` des workers, et
+`close(results)` après `wg.Wait()` évite à la fois l'envoi sur canal fermé et la boucle de lecture
+inatteignable. Les trois exigences de la requête sont couvertes, tri croissant compris, et `sync` comme
+`sort` relèvent de la bibliothèque standard. Aucune correction du corpus.
+
+Seul item en Go du golden set.
+
+### État de la relecture
+
+- **Accord sur le verdict, premier passage : 27 / 28.**
+- **Désaccords au niveau contrôle : 5**, inchangé.
+- **28 items relus sur 50**, 22 restants — dont les 8 items RAG, gardés pour un bloc final parce que
+  plusieurs partagent leur contexte d'extraction.

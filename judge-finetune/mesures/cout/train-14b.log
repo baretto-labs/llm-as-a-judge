@@ -19,3 +19,4 @@ Iter 100: Train loss 1.157, Learning Rate 1.000e-05, It/sec 0.091, Tokens/sec 39
 Iter 100: Saved adapter weights to adapters/14b-judge/adapters.safetensors and adapters/14b-judge/0000100_adapters.safetensors.
 Iter 110: Train loss 1.143, Learning Rate 1.000e-05, It/sec 0.098, Tokens/sec 39.373, Trained Tokens 46639, Peak mem 11.274 GB
 Iter 120: Train loss 1.080, Learning Rate 1.000e-05, It/sec 0.085, Tokens/sec 39.412, Trained Tokens 51295, Peak mem 11.274 GB
+Iter 130: Train loss 1.091, Learning Rate 1.000e-05, It/sec 0.098, Tokens/sec 38.969, Trained Tokens 55271, Peak mem 11.274 GB
