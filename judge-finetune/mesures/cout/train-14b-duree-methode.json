@@ -1,0 +1,22 @@
+{
+  "date": "2026-09-19T22:00:15+02:00",
+  "objet": "durée d'entraînement du 14B — méthode de reconstruction, DÉCLARÉE AVANT LA VEILLE",
+  "pourquoi": "la machine est mise en veille volontairement pendant l'entraînement. Le chronomètre de /usr/bin/time -l mesure du temps réel écoulé : il comptabilisera la veille et produira une durée sans rapport avec le coût d'entraînement",
+  "regle": {
+    "champ_invalide": "entrainement.duree_s du relevé train-14b.json — À NE PAS PUBLIER",
+    "substitut": "400 / moyenne(It/sec) sur les rapports d'itération du journal",
+    "exclusion_declaree_a_l_avance": "le premier rapport suivant le réveil mesure le temps écoulé À TRAVERS la veille et affichera une vitesse aberrante. Il est exclu du calcul. Cette exclusion est déclarée maintenant, avant d'avoir vu la valeur, pour qu'elle ne puisse pas être un arrangement commode",
+    "critere_d_exclusion": "tout rapport dont It/sec est inférieur au dixième de la médiane"
+  },
+  "etat_a_la_mise_en_veille": {
+    "iteration": 160,
+    "sur": 400,
+    "rapports_disponibles": 16,
+    "it_par_s_moyenne": 0.0914,
+    "it_par_s_mediane": 0.093,
+    "duree_estimee_totale_s": 4378,
+    "duree_estimee_totale_lisible": "73 min"
+  },
+  "a_publier": "la durée dérivée, accompagnée de la mention explicite que la machine a été mise en veille et que le temps réel n'est pas exploitable. La mémoire de pointe, les jetons vus, les versions et la machine restent valides, la veille ne les affectant pas",
+  "recoupement": "la mesure du 0.5B (12,7 s pour 20 itérations, 0,65 s/it) et celle à venir du 32B sont prises sans veille et servent de contrôle de vraisemblance"
+}
