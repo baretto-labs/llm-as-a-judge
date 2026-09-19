@@ -924,3 +924,30 @@ goulot d'étranglement — précisément sous la charge qui motivait la question
 - **Accord sur le verdict, premier passage : 22 / 23.**
 - **Désaccords au niveau contrôle : 3**, inchangé.
 - **23 items relus sur 50**, 27 restants.
+
+### 25. `b06-014` — accord complet, et une imprécision manquée des deux côtés
+
+| | 1 `exactitude_technique` | 2 `absence_de_bugs` | 3 `respect_consignes` | verdict |
+|---|---|---|---|---|
+| annotateur, premier passage | V | V | V | **PASS** |
+| étiquette | V | V | V | **PASS** |
+
+Dix-septième accord consécutif. Les deux réfutations demandées sont exactes — inférence à la compilation,
+bytecode identique — et le recentrage sur la lisibilité est pertinent. Aucune correction du corpus.
+
+**Réserve portée contre l'étiquette elle-même.** La réponse affirme que `var` ne s'applique « jamais aux
+champs ni aux paramètres ». C'est exact pour les paramètres de méthode, **inexact pour les paramètres de
+lambda**, autorisés depuis Java 11 sous la forme `(var x, var y) -> …`. Le `<thinking>` de référence ne
+mentionne pas les lambdas — vérifié, aucune occurrence — et l'annotateur ne l'a pas relevé davantage.
+
+L'imprécision est mineure et ne renverse pas le verdict : la question posée portait sur deux arguments
+précis, tous deux correctement réfutés. Mais elle est consignée, **parce qu'un accord peut être un accord
+sur une inattention commune** — et c'est précisément ce que le κ ne distingue pas d'un accord éclairé.
+À verser au REX comme limite de la mesure d'accord inter-annotateur.
+
+### État de la relecture
+
+- **Accord sur le verdict, premier passage : 23 / 24.**
+- **Désaccords au niveau contrôle : 3**, inchangé.
+- **24 items relus sur 50**, 26 restants.
+- **Inattentions communes repérées : 1** (`b06-014`).
