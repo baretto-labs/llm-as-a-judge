@@ -951,3 +951,40 @@ sur une inattention commune** — et c'est précisément ce que le κ ne disting
 - **Désaccords au niveau contrôle : 3**, inchangé.
 - **24 items relus sur 50**, 26 restants.
 - **Inattentions communes repérées : 1** (`b06-014`).
+
+### 26. `b03-014` — accord sur le verdict, désaccord total sur l'attribution
+
+| | 1 `exactitude_technique` | 2 `absence_de_bugs` | 3 `respect_consignes` | verdict |
+|---|---|---|---|---|
+| annotateur, premier passage | V | V | **F** | **FAIL** |
+| étiquette | **F** | **F** | V | **FAIL** |
+
+Même verdict, attribution inversée sur les trois contrôles — cas unique du journal à ce jour.
+
+**Sur le fond, accord complet.** Le motif de l'annotateur — « asyncio ne fait pas de parallélisme, le GIL
+reste » — est exactement le diagnostic de l'étiquette : la boucle est mono-thread, l'ordonnanceur du système
+ne répartit pas des coroutines, et le gain vient du recouvrement des attentes d'entrées-sorties.
+
+**Tension interne à la réponse de l'annotateur.** Le défaut qu'il nomme est une affirmation technique fausse
+de la sortie — la section sur les cœurs, la conclusion validant le collègue, et la coche « oui » du tableau
+récapitulatif. Le critère 1 exigeant que « chaque affirmation technique de la sortie soit vraie », il devrait
+tomber. Il a pourtant été laissé à V, et `respect_consignes` marqué F alors que la requête demandait
+d'expliquer et que la réponse a expliqué — faussement. **Un contenu faux n'est pas une consigne non suivie**,
+articulation que l'annotateur avait correctement tranchée à `b08-004`.
+
+**Quatrième désaccord d'attribution, troisième de cette forme** : défaut correctement identifié en prose,
+placé sur le mauvais contrôle. Mis en file pour **arbitrage à froid**, comme celui du 2026-09-18. L'enjeu
+est réel : si `respect_consignes` est lu comme « la réponse doit être correcte », c'est une divergence de
+convention qui touche un grand nombre d'items et impose une reprise du corpus. Si c'est un glissement
+d'attribution sur un item déjà FAIL, rien ne change.
+
+**Premier passage consigné tel quel, sans révision demandée** — il compte pour le κ, conformément au
+protocole à deux colonnes.
+
+### État de la relecture
+
+- **Accord sur le verdict, premier passage : 24 / 25.**
+- **Désaccords au niveau contrôle : 4** — `b09-009` (corrigé), `b13-012`, `b08-011`, `b03-014`.
+- **25 items relus sur 50**, 25 restants. Mi-parcours.
+- Inattentions communes repérées : 1 (`b06-014`).
+- **En attente d'arbitrage à froid :** lecture de `respect_consignes` face à une affirmation fausse.
