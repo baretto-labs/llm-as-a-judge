@@ -211,3 +211,23 @@ Conformément à la pratique documentée en 2026 sur le biais de format des juge
 Le nettoyage est non borné, il dégrade la représentativité du corpus, et un corpus déclaré « propre » ne
 prouve rien. Un écart mesuré entre passe formatée et passe dépouillée est vérifiable, reproductible, et
 constitue une **preuve positive** que le juge a appris autre chose que la forme.
+
+---
+
+## Gel du corpus — 2026-09-19
+
+Le corpus est **gelé** à cette date, conformément au §1. Dernier état :
+
+```
+200 exemples, 0 erreur de validation, 104 PASS / 96 FAIL
+golden 50 (24 PASS / 26 FAIL), SPLIT_SEED=11
+aucune cellule de surface déterministe
+```
+
+Les splits ont été régénérés après les dernières retouches de contenu : `train` 135, `valid` 15,
+`golden` 50, avec 27 exemples portant un tableau répartis sur les trois. Les verdicts et les `cas`
+n'ayant jamais bougé, la partition est restée identique d'un bout à l'autre des corrections — le tirage,
+le golden set et les 21 relectures déjà faites demeurent valides.
+
+**Premier entraînement lancé après ce gel.** Toute modification ultérieure du corpus invalide les
+résultats produits et impose un nouveau pré-enregistrement daté.
