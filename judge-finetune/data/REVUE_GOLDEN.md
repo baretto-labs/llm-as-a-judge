@@ -1052,3 +1052,28 @@ Premier passage consigné tel quel dans les deux cas — il compte pour le κ.
 - **Accord sur le verdict, premier passage : 26 / 27.**
 - **Désaccords au niveau contrôle : 5** — `b09-009` (corrigé), `b13-012`, `b08-011`, `b03-014`, `b10-003`.
 - **27 items relus sur 50**, 23 restants. **Présentation suspendue** dans l'attente de la clarification.
+
+### Clarification de convention — 2026-09-19, en séance
+
+**Question posée** après le cinquième désaccord d'attribution : une affirmation fausse ou un comportement
+fautif relèvent-ils de `respect_consignes` (lecture A, contrôle-chapeau), ou des contrôles 1 et 2, le
+contrôle 3 étant réservé aux consignes explicitement formulées dans la requête (lecture B) ?
+
+**Réponse de l'annotateur : B.** La convention du corpus est confirmée. Les trois contrôles sont
+indépendants et cumulatifs ; `respect_consignes` ne couvre que les consignes explicites — format imposé,
+contrainte de dépendance, définition donnée dans l'énoncé.
+
+**Conséquences.**
+
+- **Aucune modification du corpus.** `PROTOCOLE.md` est inchangé, aucun item n'est repris.
+- `b03-014` et `b10-003` sont donc des **glissements d'attribution** sur des items déjà FAIL, non une
+  divergence de fond. L'annotateur avait appliqué B correctement une dizaine de fois auparavant —
+  `b02-001`, `b07-002`, `b07-008`, `b09-006` — avant deux écarts consécutifs.
+- **Les premiers passages restent consignés tels quels** et comptent pour le κ, conformément au protocole
+  à deux colonnes. Corriger rétroactivement produirait un chiffre flatteur et faux.
+- **Présentation reprise** à l'item 7 de la session 3.
+
+**Ce que cet épisode vaut pour le REX.** Suspendre après deux désaccords consécutifs de même forme a coûté
+une question et deux minutes ; le même doute, découvert après vingt-quatre items supplémentaires, aurait
+rendu ces vingt-quatre points ininterprétables. C'est le pendant de la leçon du chantier 9 : on arrête dès
+que la mesure devient douteuse, on ne l'accumule pas en espérant trancher plus tard.
