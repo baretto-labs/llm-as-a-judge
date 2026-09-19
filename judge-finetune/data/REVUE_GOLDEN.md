@@ -988,3 +988,25 @@ protocole à deux colonnes.
 - **25 items relus sur 50**, 25 restants. Mi-parcours.
 - Inattentions communes repérées : 1 (`b06-014`).
 - **En attente d'arbitrage à froid :** lecture de `respect_consignes` face à une affirmation fausse.
+
+### 27. `b09-011` — accord complet sur la charge de la preuve
+
+| | 1 `exactitude_technique` | 2 `absence_de_bugs` | 3 `respect_consignes` | verdict |
+|---|---|---|---|---|
+| annotateur, premier passage | V | V | V | **PASS** |
+| étiquette | V | V | V | **PASS** |
+
+Dix-huitième accord consécutif. Le motif de l'annotateur nomme le pivot exact de l'item — le **refus par
+défaut** — qui est ce qui sépare réellement les deux approches, davantage que l'énumération des
+contournements. Les deux réserves finales de la réponse, sur l'échappement contextuel et sur l'inutilité
+d'un contrôle côté client, sont relevées. Aucune correction du corpus.
+
+Note de provenance : `b09-011` fait partie des huit réponses ayant reçu des titres `##` le 2026-09-19 lors
+du correctif de la fuite de mise en forme. L'item n'avait jamais été relu, donc aucune mesure n'est
+invalidée, et la modification est purement typographique — aucun mot du contenu n'a changé.
+
+### État de la relecture
+
+- **Accord sur le verdict, premier passage : 25 / 26.**
+- **Désaccords au niveau contrôle : 4**, inchangé.
+- **26 items relus sur 50**, 24 restants.
