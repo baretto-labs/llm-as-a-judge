@@ -1444,3 +1444,45 @@ en premier ; les six autres le seront avec leur réserve, et jamais deux d'un m�
 - **40 items relus sur 50**, 10 restants — 2 hors RAG, plus les 8 RAG du bloc final.
 - **Accord sur le verdict, premier passage : 39 / 40.**
 - **Désaccords au niveau contrôle : 10**, inchangé.
+
+### 42. `b13-004` — première erreur de verdict du golden set, trouvée par l'annotateur
+
+| | 1 `contexte_pertinent` | 2 `contexte_suffisant` | 3 `bruit_maitrise` | verdict |
+|---|---|---|---|---|
+| annotateur, premier passage | V | **F** | V | **FAIL** |
+| étiquette d'origine | V | **V** | V | **PASS** |
+| **étiquette corrigée** | V | **F** | V | **FAIL** |
+
+**Première erreur de verdict du corpus, et la quatrième étiquette corrigée à l'initiative de l'annotateur**
+après `b09-009`, `b06-008` et `b03-001`.
+
+Le contexte de `b13-004` ne contient **aucun corps de méthode** : dix extraits, tous tronqués, 769
+caractères. La requête demande *comment* les clés de cache sont construites. Le raisonnement de référence
+justifiait pourtant le PASS par une phrase **inventée** — « le corps de la méthode figure dans l'extrait,
+dont seul l'affichage est tronqué ici » — contredite par le JSONL comme par les extractions versionnées
+dans `verification/contexts/`.
+
+**La règle, dégagée en vérifiant les items de même forme.** Neuf items `RAG_CONTEXT_RELEVANCE` posent une
+question en « how » ou « in what order ». Six portent correctement `contexte_suffisant = faux`. `b14-005`
+est légitimement vrai, son contexte contenant réellement du corps. `b13-007` est légitimement vrai pour une
+autre raison : ses extraits portent `localAvailable`, `localFailedWithFallback` et `ollamaAvailable`, dont
+les **noms seuls décrivent la logique interrogée**. `b13-004` était la seule violation.
+
+> **La suffisance ne dépend pas de la présence d'un corps de méthode, mais de ce que les noms et signatures
+> suffisent ou non à répondre à la question posée.**
+
+**Effets mesurés avant d'agir, par simulation sur copie.** Le retirage fait sortir `b13-004` du golden et y
+fait entrer `b13-007` : **une seule relecture invalidée, celle de l'item erroné lui-même**, 40 des 41
+autres restent valides, et la composition reste 24 PASS / 26 FAIL. Invariants : 200 exemples, 0 erreur,
+103 PASS / 97 FAIL, `cas` 79/81/40.
+
+**Conséquence assumée :** `b13-007` quitte `train`, donc l'adaptateur entraîné ce jour est périmé.
+**Réentraînement reporté à la fin de la relecture**, sur décision de l'annotateur — deux relances ont déjà
+été provoquées par des découvertes, et il reste dix items susceptibles d'en produire d'autres.
+
+### État de la relecture
+
+- **40 items relus sur 50**, **10 restants** : `b03-002`, `b05-009`, `b12-005` (arbitrage en attente),
+  `b12-007`, `b12-011`, `b12-012`, `b13-001`, `b13-007`, `b13-008`, `b13-009`.
+- **Accord sur le verdict, premier passage : 39 / 40** — `b13-004` devient un accord après correction.
+- **Quatre étiquettes corrigées à l'initiative de l'annotateur**, dont une erreur de verdict.

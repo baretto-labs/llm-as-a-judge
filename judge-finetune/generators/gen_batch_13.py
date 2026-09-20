@@ -283,18 +283,18 @@ add(example(
 
 add(example(
     meta={"id": "b13-004", "famille": "rag-ctx-cache-cles-lucene", "task": "RAG_CONTEXT_RELEVANCE",
-          "domaine": "rag", "tache": "retrieval", "cas": "parfait", "verbeux": False, "langage": "java"},
+          "domaine": "rag", "tache": "retrieval", "cas": "defaillant", "verbeux": False, "langage": "java"},
     task="RAG_CONTEXT_RELEVANCE",
     contexte=CTX_LUCENE_CACHE,
     requete="How does SuggestionCache generate cache keys for completion requests?",
     reponse=SORTIE_RELEVANCE,
-    checks={"contexte_pertinent": True, "contexte_suffisant": True, "bruit_maitrise": True},
+    checks={"contexte_pertinent": True, "contexte_suffisant": False, "bruit_maitrise": True},
     thinking='''
 1. Énumération des éléments clés : la requête vise la construction des clés de cache par `SuggestionCache`. Le premier extrait est précisément `SuggestionCache#generateCacheKey`, suivi de la classe `SuggestionCache` elle-même et de ses autres méthodes `get`, `put` et `getStats`, puis de classes voisines du même paquet de complétion.
-2. Vérification point par point : la méthode exactement demandée occupe la première place du contexte, la pertinence est donc immédiate. Sur la suffisance, le contexte rassemble la méthode visée, sa classe et l'ensemble des opérations du cache, ainsi que l'appelant `EnhancedCompletionService#handleCompletionWithCache` : l'information nécessaire est là, et le corps de la méthode figure dans l'extrait, dont seul l'affichage est tronqué ici. Les trois derniers extraits — `CompletionDebouncer`, `CachedSuggestion` — relèvent du même domaine fonctionnel et n'égarent pas ; sur dix extraits, sept portent directement sur le cache.
-3. Synthèse : la méthode visée est en tête de contexte, entourée de sa classe et de son appelant. PASS.
+2. Vérification point par point : la méthode exactement demandée occupe la première place du contexte, la pertinence est donc immédiate. Sur la suffisance, en revanche, le contexte ne porte que des signatures : les dix extraits sont tronqués et **aucun corps de méthode n'y figure**. Or la requête demande *comment* la clé est construite, ce qu'un nom de méthode ne dit pas. `generateCacheKey` annonce l'intention sans livrer la composition — quels champs entrent dans la clé, dans quel ordre, avec quel séparateur ou quelle fonction de hachage. La différence avec un contexte suffisant se mesure sur `b13-007`, où les noms `localAvailable`, `localFailedWithFallback` et `ollamaAvailable` décrivent à eux seuls la logique interrogée ; ici, rien de tel. Le bruit reste maîtrisé, sept extraits sur dix portant sur le cache.
+3. Synthèse : la méthode visée est en tête de contexte, mais le contexte ne contient que des signatures et ne permet pas de dire comment la clé est construite. FAIL.
 ''',
-    reason="generateCacheKey arrive en premier extrait, avec sa classe, ses opérations voisines et son appelant.",
+    reason="generateCacheKey est en tête de contexte, mais aucun corps de méthode n'est fourni : la construction de la clé reste indéterminable.",
 ))
 
 add(example(

@@ -444,3 +444,24 @@ l'entraînement lancé ce jour n'est pas affecté et se poursuit.
 
 Troisième correction d'étiquette à l'initiative de l'annotateur, après `b09-009` et `b06-008` — fait à
 rapporter dans le REX comme mesure de ce que la relecture humaine apporte réellement au-delà du κ.
+
+---
+
+## Amendement daté — 2026-09-20, correction de verdict sur `b13-004`
+
+Dixième étiquette corrigée depuis le gel, **avant toute exécution du benchmark**, et **la première qui
+change un verdict**.
+
+`contexte_suffisant` passe de V à F, donc le verdict de PASS à FAIL et `cas` de `parfait` à `defaillant`.
+Motif : le contexte ne contient que des signatures tronquées, aucun corps de méthode, alors que la requête
+demande *comment* la clé de cache est construite. Le raisonnement de référence justifiait le PASS par une
+affirmation inventée sur le contenu du contexte.
+
+**Effets mesurés par simulation avant application :** le retirage échange `b13-004` contre `b13-007` dans
+le golden set ; une seule relecture est invalidée, celle de l'item erroné ; 40 des 41 autres restent
+valides ; la composition du golden reste 24 PASS / 26 FAIL. Corpus : 200 exemples, 0 erreur,
+103 PASS / 97 FAIL, `cas` 79/81/40.
+
+**`b13-007` quitte `train` : l'adaptateur du 2026-09-20 est périmé.** Le réentraînement est **reporté à la
+fin de la relecture**, dix items restant à relire et deux relances ayant déjà été provoquées par des
+découvertes. Les règles de sélection du point de contrôle restent celles de l'addendum du 2026-09-20.
