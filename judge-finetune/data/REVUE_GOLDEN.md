@@ -1310,3 +1310,43 @@ nommé l'interblocage par verrous croisés. Divulgué avant sa réponse. Même t
 - **Accord sur le verdict, premier passage : 35 / 36.**
 - **Désaccords au niveau contrôle : 8**, inchangé.
 - Points non indépendants (paires contrastives ou contexte partagé) : 4.
+
+### 38. `b03-005` — et la découverte que la rubrique, non l'annotateur, est en cause
+
+| | 1 `exactitude_technique` | 2 `absence_de_bugs` | 3 `respect_consignes` | verdict |
+|---|---|---|---|---|
+| annotateur, premier passage | F | F | **F** | **FAIL** |
+| étiquette (corrigée le matin même) | F | F | **V** | **FAIL** |
+
+Diagnostic de l'annotateur exact : `nums[:0]` partage le tableau sous-jacent et en conserve la capacité,
+`append` n'y réalloue jamais, et l'appelant se retrouve avec `[2 4 6 4 5 6]`. Aucune correction du corpus.
+
+Septième désaccord de la même forme, sur un item dont l'étiquette venait d'être corrigée le matin — et
+résistant au correctif de présentation par texte intégral des critères. La récurrence a conduit à croiser
+**tous** les jugements de l'annotateur sur `respect_consignes` avec la nature de l'exigence portée par la
+requête.
+
+#### Le croisement, sur 14 items relus
+
+| la requête porte… | accord annotateur / étiquette |
+|---|---|
+| une **exigence littérale** (format imposé, détection à l'exécution, définition donnée, interdiction de modifier…) | **7 / 7** |
+| **aucune** exigence littérale (« explique et corrige », « simplifie », « écris une fonction qui… ») | **1 / 7** |
+
+**L'annotateur n'est pas en cause.** Son comportement est parfaitement prédit par le **libellé** du
+contrôle — « Toutes les consignes obligatoires de la requête sont respectées » — dont la lecture ordinaire
+fait de « explique et corrige » une consigne obligatoire. La convention du corpus exige une lecture étroite,
+restreinte aux exigences explicites **au-delà de la tâche elle-même**, que le texte n'énonce nulle part.
+
+#### Conséquences, qui dépassent la relecture
+
+1. **Un modèle ne voyant que cette rubrique divergera de la même façon.** `14B-baseline-nu` sera pénalisé
+   sur le contrôle 3 pour une ambiguïté de rédaction, non pour une faiblesse de jugement.
+2. **Une part du gain du fine-tuning sera « avoir appris une convention que la rubrique n'énonce pas ».**
+   C'est un gain réel — acquérir les règles maison est la fonction même d'un fine-tuning — mais il doit
+   être nommé dans le REX plutôt que confondu avec une meilleure capacité de jugement.
+3. La variante `14B-baseline-conventions` reçoit les conventions de `PROTOCOLE.md` dans son invite : elle
+   est donc protégée de cet artefact, ce qui conforte le choix d'en faire le concurrent principal.
+
+**Décision en attente de l'annotateur :** réécrire le libellé du contrôle 3 et réentraîner, ou le conserver
+et publier l'ambiguïté avec cette table de contingence comme preuve.
