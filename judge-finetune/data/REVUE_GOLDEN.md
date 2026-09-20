@@ -1586,3 +1586,29 @@ est donc consignée sans effet sur les cases.
 - **`b13-001` est le dernier point de mesure sain du corpus** : premier de sa famille `9f177235`, dont
   `b13-008` et `b13-009` n'ont pas encore été présentés. Les cinq suivants seront tous compromis, soit par
   un contexte déjà analysé (`9fefd8a6`, vu à `b12-008`), soit par la famille ouverte par `b13-001`.
+
+### 46. `b13-001` — accord complet sur le dernier point de mesure sain
+
+| | 1 `contexte_pertinent` | 2 `contexte_suffisant` | 3 `bruit_maitrise` | verdict |
+|---|---|---|---|---|
+| annotateur, premier passage | V | **F** | V | **FAIL** |
+| étiquette | V | **F** | V | **FAIL** |
+
+Vingt-neuvième accord consécutif. Motif identique à l'étiquette : `fileRetries` établit qu'un compteur de
+réessais existe, **pas la politique** qui le régit. Aucune correction du corpus.
+
+**Ce point vaut plus que les autres, pour deux raisons.**
+
+1. **C'est le dernier point de mesure sain du corpus** — premier de sa famille `9f177235`, dont `b13-008`
+   et `b13-009` n'avaient pas encore été présentés. L'annotateur le découvrait réellement.
+2. **Il valide les deux règles de l'audit élargi sur un item neuf.** L'annotateur a jugé `pertinent` V
+   parce que la classe visée est présente, et `suffisant` F parce qu'une question en « comment » ne se
+   satisfait pas de champs et de signatures — sans avoir les règles sous les yeux, et sans savoir qu'elles
+   venaient d'être codifiées. **Elles n'ont donc pas été taillées après coup pour produire un accord :
+   elles prédisent son jugement.**
+
+### État de la relecture
+
+- **45 items relus sur 50**, **5 restants**, tous RAG et tous compromis :
+  `b12-007`, `b13-008`, `b12-011`, `b13-009`, `b12-012`.
+- **Accord sur le verdict : 44 / 45.**
