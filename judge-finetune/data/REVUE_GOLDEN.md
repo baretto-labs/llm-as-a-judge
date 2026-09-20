@@ -1688,3 +1688,33 @@ seul l'objet du jugement diffère — le contexte là, une réponse construite s
 
 - **47 items relus sur 50**, **3 restants** : `b12-011`, `b13-009`, `b12-012`.
 - **Accord sur le verdict : 45 / 47.**
+
+### 49. `b12-011` — troisième occurrence du désaccord sur `citations_exactes`
+
+| | 1 `affirmations_etayees` | 2 `absence_invention` | 3 `citations_exactes` | verdict |
+|---|---|---|---|---|
+| annotateur, premier passage | F | F | **F** | **FAIL** |
+| étiquette | F | F | **V** | **FAIL** |
+
+Accord sur le verdict et sur les deux premiers contrôles. Le motif de l'annotateur énumère exactement les
+quatre inventions relevées par l'étiquette — pool de trois threads, filtrage à 30 caractères,
+déduplication par texte, traitement des délais et exceptions — et identifie correctement le premier
+paragraphe comme seul passage étayé : signature, visibilité, `@Override`, type de retour. Aucune correction
+du corpus.
+
+Même enseignement qu'à `b13-008` : **ces affirmations sont vraies dans la codebase réelle**, et doivent
+néanmoins tomber. Les accepter au motif de leur exactitude reviendrait à valider, sur un autre dossier,
+une hallucination indiscernable.
+
+**Troisième occurrence du désaccord sur `citations_exactes`**, après `b13-012` (2026-09-17) et `b13-008`.
+Trois items, trois jours, une seule et même lecture. Le constat tient sans qu'il faille le chercher : le
+libellé n'exprime pas la convention de vacuité.
+
+**Réserve : point compromis.** Contexte `9fefd8a6` déjà vu à `b12-008` et `b12-007`, et requête identique
+à celle de `b12-007` — seul l'objet du jugement change.
+
+### État de la relecture
+
+- **48 items relus sur 50**, **2 restants** : `b13-009`, `b12-012`.
+- **Accord sur le verdict : 46 / 48.**
+- Désaccords sur `citations_exactes` : **3**, tous de même forme.
