@@ -3,85 +3,3 @@ Loading datasets
 Training
 Trainable parameters: 0.078% (11.469M/14770.034M)
 Starting training..., iters: 400
-Iter 1: Val loss 1.816, Val took 93.476s
-Iter 10: Train loss 1.646, Learning Rate 1.000e-05, It/sec 0.095, Tokens/sec 39.185, Trained Tokens 4127, Peak mem 10.912 GB
-Iter 20: Train loss 1.453, Learning Rate 1.000e-05, It/sec 0.084, Tokens/sec 36.599, Trained Tokens 8506, Peak mem 11.009 GB
-Iter 30: Train loss 1.289, Learning Rate 1.000e-05, It/sec 0.093, Tokens/sec 37.729, Trained Tokens 12543, Peak mem 11.009 GB
-Iter 40: Train loss 1.273, Learning Rate 1.000e-05, It/sec 0.092, Tokens/sec 39.688, Trained Tokens 16869, Peak mem 11.009 GB
-Iter 50: Val loss 1.261, Val took 92.791s
-Iter 50: Train loss 1.298, Learning Rate 1.000e-05, It/sec 0.091, Tokens/sec 39.659, Trained Tokens 21214, Peak mem 11.009 GB
-Iter 60: Train loss 1.216, Learning Rate 1.000e-05, It/sec 0.097, Tokens/sec 39.999, Trained Tokens 25347, Peak mem 11.009 GB
-Iter 70: Train loss 1.210, Learning Rate 1.000e-05, It/sec 0.085, Tokens/sec 37.508, Trained Tokens 29769, Peak mem 11.207 GB
-Iter 80: Train loss 1.235, Learning Rate 1.000e-05, It/sec 0.095, Tokens/sec 40.601, Trained Tokens 34024, Peak mem 11.207 GB
-Iter 90: Train loss 1.117, Learning Rate 1.000e-05, It/sec 0.086, Tokens/sec 36.455, Trained Tokens 38272, Peak mem 11.274 GB
-Iter 100: Val loss 1.165, Val took 92.917s
-Iter 100: Train loss 1.157, Learning Rate 1.000e-05, It/sec 0.091, Tokens/sec 39.603, Trained Tokens 42621, Peak mem 11.274 GB
-Iter 100: Saved adapter weights to adapters/14b-judge/adapters.safetensors and adapters/14b-judge/0000100_adapters.safetensors.
-Iter 110: Train loss 1.143, Learning Rate 1.000e-05, It/sec 0.098, Tokens/sec 39.373, Trained Tokens 46639, Peak mem 11.274 GB
-Iter 120: Train loss 1.080, Learning Rate 1.000e-05, It/sec 0.085, Tokens/sec 39.412, Trained Tokens 51295, Peak mem 11.274 GB
-Iter 130: Train loss 1.091, Learning Rate 1.000e-05, It/sec 0.098, Tokens/sec 38.969, Trained Tokens 55271, Peak mem 11.274 GB
-Iter 140: Train loss 1.012, Learning Rate 1.000e-05, It/sec 0.098, Tokens/sec 37.345, Trained Tokens 59100, Peak mem 11.274 GB
-Iter 150: Val loss 1.132, Val took 93.007s
-Iter 150: Train loss 0.999, Learning Rate 1.000e-05, It/sec 0.080, Tokens/sec 37.762, Trained Tokens 63806, Peak mem 11.274 GB
-Iter 160: Train loss 0.815, Learning Rate 1.000e-05, It/sec 0.094, Tokens/sec 36.994, Trained Tokens 67759, Peak mem 11.274 GB
-Iter 170: Train loss 0.910, Learning Rate 1.000e-05, It/sec 0.086, Tokens/sec 38.073, Trained Tokens 72169, Peak mem 11.274 GB
-Iter 180: Train loss 0.934, Learning Rate 1.000e-05, It/sec 0.079, Tokens/sec 36.549, Trained Tokens 76811, Peak mem 11.274 GB
-Iter 190: Train loss 0.887, Learning Rate 1.000e-05, It/sec 0.080, Tokens/sec 34.914, Trained Tokens 81162, Peak mem 11.274 GB
-Iter 200: Val loss 1.126, Val took 101.121s
-Iter 200: Train loss 0.894, Learning Rate 1.000e-05, It/sec 0.079, Tokens/sec 35.323, Trained Tokens 85657, Peak mem 11.274 GB
-Iter 200: Saved adapter weights to adapters/14b-judge/adapters.safetensors and adapters/14b-judge/0000200_adapters.safetensors.
-Iter 210: Train loss 0.884, Learning Rate 1.000e-05, It/sec 0.095, Tokens/sec 37.337, Trained Tokens 89568, Peak mem 11.274 GB
-Iter 220: Train loss 0.935, Learning Rate 1.000e-05, It/sec 0.093, Tokens/sec 41.858, Trained Tokens 94088, Peak mem 11.274 GB
-Iter 230: Train loss 0.773, Learning Rate 1.000e-05, It/sec 0.098, Tokens/sec 39.317, Trained Tokens 98116, Peak mem 11.274 GB
-Iter 240: Train loss 0.809, Learning Rate 1.000e-05, It/sec 0.090, Tokens/sec 36.281, Trained Tokens 102150, Peak mem 11.274 GB
-Iter 250: Val loss 1.104, Val took 98.261s
-Iter 250: Train loss 0.749, Learning Rate 1.000e-05, It/sec 0.098, Tokens/sec 37.050, Trained Tokens 105938, Peak mem 11.274 GB
-Iter 260: Train loss 0.924, Learning Rate 1.000e-05, It/sec 0.085, Tokens/sec 36.225, Trained Tokens 110189, Peak mem 11.320 GB
-Iter 270: Train loss 0.843, Learning Rate 1.000e-05, It/sec 0.082, Tokens/sec 34.881, Trained Tokens 114432, Peak mem 11.320 GB
-Iter 280: Train loss 0.559, Learning Rate 1.000e-05, It/sec 0.085, Tokens/sec 34.766, Trained Tokens 118499, Peak mem 11.320 GB
-Iter 290: Train loss 0.645, Learning Rate 1.000e-05, It/sec 0.076, Tokens/sec 35.208, Trained Tokens 123108, Peak mem 11.320 GB
-Iter 300: Val loss 1.207, Val took 102.587s
-Iter 300: Train loss 0.536, Learning Rate 1.000e-05, It/sec 0.092, Tokens/sec 36.739, Trained Tokens 127107, Peak mem 11.320 GB
-Iter 300: Saved adapter weights to adapters/14b-judge/adapters.safetensors and adapters/14b-judge/0000300_adapters.safetensors.
-Iter 310: Train loss 0.529, Learning Rate 1.000e-05, It/sec 0.080, Tokens/sec 34.100, Trained Tokens 131374, Peak mem 11.320 GB
-Iter 320: Train loss 0.515, Learning Rate 1.000e-05, It/sec 0.086, Tokens/sec 34.515, Trained Tokens 135410, Peak mem 11.320 GB
-Iter 330: Train loss 0.611, Learning Rate 1.000e-05, It/sec 0.085, Tokens/sec 34.371, Trained Tokens 139448, Peak mem 11.320 GB
-Iter 340: Train loss 0.615, Learning Rate 1.000e-05, It/sec 0.080, Tokens/sec 35.564, Trained Tokens 143916, Peak mem 11.320 GB
-Iter 350: Val loss 1.201, Val took 102.710s
-Iter 350: Train loss 0.573, Learning Rate 1.000e-05, It/sec 0.085, Tokens/sec 35.588, Trained Tokens 148098, Peak mem 11.320 GB
-Iter 360: Train loss 0.552, Learning Rate 1.000e-05, It/sec 0.090, Tokens/sec 35.557, Trained Tokens 152055, Peak mem 11.320 GB
-Iter 370: Train loss 0.571, Learning Rate 1.000e-05, It/sec 0.080, Tokens/sec 34.007, Trained Tokens 156304, Peak mem 11.320 GB
-Iter 380: Train loss 0.645, Learning Rate 1.000e-05, It/sec 0.076, Tokens/sec 32.821, Trained Tokens 160614, Peak mem 11.320 GB
-Iter 390: Train loss 0.674, Learning Rate 1.000e-05, It/sec 0.082, Tokens/sec 36.915, Trained Tokens 165108, Peak mem 11.320 GB
-Iter 400: Val loss 1.183, Val took 102.781s
-Iter 400: Train loss 0.587, Learning Rate 1.000e-05, It/sec 0.083, Tokens/sec 36.409, Trained Tokens 169501, Peak mem 11.320 GB
-Iter 400: Saved adapter weights to adapters/14b-judge/adapters.safetensors and adapters/14b-judge/0000400_adapters.safetensors.
-Saved final weights to adapters/14b-judge/adapters.safetensors.
-Fetching 10 files:   0%|          | 0/10 [00:00<?, ?it/s]Fetching 10 files: 100%|██████████| 10/10 [00:00<00:00, 3306.77it/s]
-Calculating loss...: 0it [00:00, ?it/s]Calculating loss...: 1it [00:04,  4.90s/it]Calculating loss...: 2it [00:12,  6.49s/it]Calculating loss...: 3it [00:19,  6.72s/it]Calculating loss...: 4it [00:25,  6.45s/it]Calculating loss...: 5it [00:31,  6.19s/it]Calculating loss...: 6it [00:38,  6.40s/it]Calculating loss...: 7it [00:43,  6.17s/it]Calculating loss...: 8it [00:52,  6.95s/it]Calculating loss...: 9it [00:57,  6.32s/it]Calculating loss...: 10it [01:02,  6.09s/it]Calculating loss...: 11it [01:08,  5.96s/it]Calculating loss...: 12it [01:14,  6.08s/it]Calculating loss...: 13it [01:20,  5.88s/it]Calculating loss...: 14it [01:26,  6.02s/it]Calculating loss...: 15it [01:33,  6.24s/it]Calculating loss...: 15it [01:33,  6.23s/it]
-Calculating loss...: 0it [00:00, ?it/s]Calculating loss...: 1it [00:08,  8.57s/it]Calculating loss...: 2it [00:14,  6.72s/it]Calculating loss...: 3it [00:19,  6.22s/it]Calculating loss...: 4it [00:25,  5.98s/it]Calculating loss...: 5it [00:29,  5.52s/it]Calculating loss...: 6it [00:36,  5.93s/it]Calculating loss...: 7it [00:43,  6.24s/it]Calculating loss...: 8it [00:49,  6.28s/it]Calculating loss...: 9it [00:57,  6.65s/it]Calculating loss...: 10it [01:03,  6.61s/it]Calculating loss...: 11it [01:09,  6.31s/it]Calculating loss...: 12it [01:16,  6.46s/it]Calculating loss...: 13it [01:21,  5.99s/it]Calculating loss...: 14it [01:26,  5.85s/it]Calculating loss...: 15it [01:32,  5.91s/it]Calculating loss...: 15it [01:32,  6.19s/it]
-Calculating loss...: 0it [00:00, ?it/s]Calculating loss...: 1it [00:04,  4.73s/it]Calculating loss...: 2it [00:10,  5.46s/it]Calculating loss...: 3it [00:17,  5.87s/it]Calculating loss...: 4it [00:23,  6.27s/it]Calculating loss...: 5it [00:30,  6.30s/it]Calculating loss...: 6it [00:35,  6.01s/it]Calculating loss...: 7it [00:44,  6.84s/it]Calculating loss...: 8it [00:49,  6.21s/it]Calculating loss...: 9it [00:55,  6.37s/it]Calculating loss...: 10it [01:02,  6.56s/it]Calculating loss...: 11it [01:08,  6.28s/it]Calculating loss...: 12it [01:16,  6.67s/it]Calculating loss...: 13it [01:21,  6.36s/it]Calculating loss...: 14it [01:27,  6.15s/it]Calculating loss...: 15it [01:32,  5.97s/it]Calculating loss...: 15it [01:32,  6.19s/it]
-Calculating loss...: 0it [00:00, ?it/s]Calculating loss...: 1it [00:06,  6.72s/it]Calculating loss...: 2it [00:15,  7.81s/it]Calculating loss...: 3it [00:20,  6.73s/it]Calculating loss...: 4it [00:26,  6.33s/it]Calculating loss...: 5it [00:32,  6.24s/it]Calculating loss...: 6it [00:39,  6.43s/it]Calculating loss...: 7it [00:45,  6.20s/it]Calculating loss...: 8it [00:49,  5.74s/it]Calculating loss...: 9it [00:56,  5.96s/it]Calculating loss...: 10it [01:01,  5.64s/it]Calculating loss...: 11it [01:06,  5.59s/it]Calculating loss...: 12it [01:13,  5.82s/it]Calculating loss...: 13it [01:20,  6.31s/it]Calculating loss...: 14it [01:27,  6.49s/it]Calculating loss...: 15it [01:33,  6.23s/it]Calculating loss...: 15it [01:33,  6.20s/it]
-Calculating loss...: 0it [00:00, ?it/s]Calculating loss...: 1it [04:17, 257.10s/it]Calculating loss...: 2it [04:24, 110.36s/it]Calculating loss...: 3it [04:34, 64.49s/it] Calculating loss...: 4it [04:41, 41.56s/it]Calculating loss...: 5it [04:46, 28.41s/it]Calculating loss...: 6it [04:51, 20.67s/it]Calculating loss...: 7it [04:58, 16.03s/it]Calculating loss...: 8it [05:05, 13.17s/it]Calculating loss...: 9it [05:11, 10.95s/it]Calculating loss...: 10it [05:16,  9.27s/it]Calculating loss...: 11it [05:22,  8.17s/it]Calculating loss...: 12it [05:29,  7.75s/it]Calculating loss...: 13it [05:36,  7.47s/it]Calculating loss...: 14it [05:41,  6.94s/it]Calculating loss...: 15it [05:46,  6.34s/it]Calculating loss...: 15it [05:46, 23.12s/it]
-Calculating loss...: 0it [00:00, ?it/s]Calculating loss...: 1it [00:04,  4.70s/it]Calculating loss...: 2it [00:11,  5.90s/it]Calculating loss...: 3it [00:20,  7.12s/it]Calculating loss...: 4it [00:25,  6.52s/it]Calculating loss...: 5it [00:32,  6.66s/it]Calculating loss...: 6it [00:38,  6.31s/it]Calculating loss...: 7it [00:43,  6.13s/it]Calculating loss...: 8it [00:50,  6.32s/it]Calculating loss...: 9it [00:58,  6.95s/it]Calculating loss...: 10it [01:06,  7.12s/it]Calculating loss...: 11it [01:13,  7.12s/it]Calculating loss...: 12it [01:19,  6.80s/it]Calculating loss...: 13it [01:25,  6.39s/it]Calculating loss...: 14it [01:32,  6.60s/it]Calculating loss...: 15it [01:38,  6.44s/it]Calculating loss...: 15it [01:38,  6.55s/it]
-Calculating loss...: 0it [00:00, ?it/s]Calculating loss...: 1it [00:05,  5.23s/it]Calculating loss...: 2it [00:12,  6.56s/it]Calculating loss...: 3it [00:18,  6.41s/it]Calculating loss...: 4it [00:26,  6.83s/it]Calculating loss...: 5it [00:34,  7.14s/it]Calculating loss...: 6it [00:40,  6.84s/it]Calculating loss...: 7it [00:49,  7.73s/it]Calculating loss...: 8it [00:56,  7.39s/it]Calculating loss...: 9it [01:02,  6.98s/it]Calculating loss...: 10it [01:10,  7.38s/it]Calculating loss...: 11it [01:17,  7.27s/it]Calculating loss...: 12it [01:24,  7.19s/it]Calculating loss...: 13it [01:30,  6.64s/it]Calculating loss...: 14it [01:36,  6.45s/it]Calculating loss...: 15it [01:42,  6.38s/it]Calculating loss...: 15it [01:42,  6.84s/it]
-Calculating loss...: 0it [00:00, ?it/s]Calculating loss...: 1it [00:07,  7.02s/it]Calculating loss...: 2it [00:13,  6.55s/it]Calculating loss...: 3it [00:20,  6.98s/it]Calculating loss...: 4it [00:28,  7.26s/it]Calculating loss...: 5it [00:34,  6.90s/it]Calculating loss...: 6it [00:39,  6.33s/it]Calculating loss...: 7it [00:49,  7.37s/it]Calculating loss...: 8it [00:57,  7.66s/it]Calculating loss...: 9it [01:03,  7.16s/it]Calculating loss...: 10it [01:11,  7.26s/it]Calculating loss...: 11it [01:16,  6.70s/it]Calculating loss...: 12it [01:23,  6.69s/it]Calculating loss...: 13it [01:29,  6.56s/it]Calculating loss...: 14it [01:36,  6.72s/it]Calculating loss...: 15it [01:42,  6.51s/it]Calculating loss...: 15it [01:42,  6.85s/it]
-Calculating loss...: 0it [00:00, ?it/s]Calculating loss...: 1it [00:07,  7.46s/it]Calculating loss...: 2it [00:13,  6.73s/it]Calculating loss...: 3it [00:21,  7.16s/it]Calculating loss...: 4it [00:27,  6.80s/it]Calculating loss...: 5it [00:34,  6.75s/it]Calculating loss...: 6it [00:41,  7.01s/it]Calculating loss...: 7it [00:47,  6.49s/it]Calculating loss...: 8it [00:53,  6.34s/it]Calculating loss...: 9it [01:02,  7.34s/it]Calculating loss...: 10it [01:08,  7.00s/it]Calculating loss...: 11it [01:15,  6.70s/it]Calculating loss...: 12it [01:23,  7.19s/it]Calculating loss...: 13it [01:30,  7.16s/it]Calculating loss...: 14it [01:35,  6.58s/it]Calculating loss...: 15it [01:42,  6.74s/it]Calculating loss...: 15it [01:42,  6.85s/it]
-    49368.35 real        32.99 user        66.42 sys
-          5879054336  maximum resident set size
-                   0  average shared memory size
-                   0  average unshared data size
-                   0  average unshared stack size
-              580543  page reclaims
-                 669  page faults
-                   0  swaps
-                   0  block input operations
-                   0  block output operations
-                  22  messages sent
-                  60  messages received
-                   0  signals received
-                1474  voluntary context switches
-             1165176  involuntary context switches
-        652132651903  instructions retired
-        292936197184  cycles elapsed
-         13702274632  peak memory footprint
