@@ -381,3 +381,48 @@ cause et seront régénérés.
 Les décisions de l'addendum du 2026-09-20 sur le choix du point de contrôle — variante principale
 sélectionnée sur la perte de validation, variante finale rapportée en secondaire — **restent en vigueur et
 s'appliqueront au nouvel entraînement**, avec les nouvelles valeurs de validation.
+
+---
+
+## Amendement daté — 2026-09-20, ambiguïté assumée du contrôle `respect_consignes`
+
+Déclaré **avant toute exécution du benchmark**. Ne modifie ni la métrique principale, ni la comparaison
+principale, ni le test, ni la règle de conclusion. Fixe la manière dont un artefact connu sera rapporté.
+
+### Le fait établi
+
+Le libellé du contrôle 3 est : « Toutes les consignes obligatoires de la requête sont respectées. » La
+convention du corpus lui donne un sens **étroit** — seules comptent les exigences explicitement formulées
+au-delà de la tâche elle-même : format imposé, contrainte de dépendance, signature figée, définition
+donnée. **Le texte ne l'énonce pas.**
+
+Mesuré sur les 14 items relus où ce contrôle était en jeu :
+
+| la requête porte… | accord annotateur humain / étiquette |
+|---|---|
+| une exigence littérale | **7 / 7** |
+| aucune exigence littérale | **1 / 7** |
+
+Un lecteur attentif, appliquant le sens ordinaire du français, juge donc `respect_consignes` faux dès que
+la réponse échoue à sa tâche. Ce n'est pas une erreur de l'annotateur : c'est la lecture du texte.
+
+### Décision : le libellé est conservé
+
+Réécrire la rubrique aurait imposé de régénérer les 200 exemples et de relancer l'entraînement. Surtout,
+cela aurait **retiré au fine-tuning une partie de ce qu'il apporte réellement** : l'acquisition d'une
+convention maison non écrite est précisément la fonction d'un fine-tuning, et c'est ce que les lecteurs du
+REX cherchent à savoir.
+
+### Engagements de rapport, pris d'avance
+
+1. **La table de contingence ci-dessus sera publiée**, comme mesure directe de l'ambiguïté.
+2. **La part du gain attribuable à l'apprentissage de la convention sera nommée explicitement**, et non
+   présentée comme une supériorité de jugement. Formulation interdite : laisser entendre que le fine-tune
+   « juge mieux » là où il applique seulement une règle que la rubrique n'énonce pas.
+3. **`14B-baseline-nu` sera rapporté avec la réserve correspondante** : ne recevant que la rubrique, il
+   subit l'ambiguïté et son score sur le contrôle 3 ne mesure pas sa qualité de jugement.
+4. **`14B-baseline-conventions` reste le concurrent de la comparaison principale**, précisément parce que
+   les conventions de `PROTOCOLE.md` figurent dans son invite : il est protégé de l'artefact, ce qui rend
+   la comparaison principale interprétable.
+5. L'accord par contrôle sera publié **avec et sans le contrôle 3**, afin que le lecteur puisse isoler
+   l'effet de l'ambiguïté sur les chiffres.
