@@ -278,3 +278,53 @@ L'écart de perplexité entre les deux vaut 7 %. Sur 50 items et une métrique d
 vraisemblablement **zéro à trois items**, soit largement à l'intérieur de l'intervalle de ±12 à 14 points
 annoncé au §5. Il est donc probable que les deux variantes soient **indistinguables**, et ce résultat-là
 sera rapporté comme tel.
+
+---
+
+## Amendement daté — 2026-09-20, liste des variantes et texte des conventions
+
+Le §3 interdit d'ajouter ou de retirer une variante après signature. Cet amendement l'exerce
+explicitement plutôt que de modifier la liste en silence.
+
+### Gemini est retiré de la liste, faute de clé d'API
+
+`gemini-flash` et `gemini-pro` **ne sont pas benchmarkés**. Motif : aucune clé d'API disponible à cette
+date. Ce n'est pas un retrait motivé par un résultat — aucune exécution n'a eu lieu.
+
+**Condition de réintégration :** leur ajout ultérieur exigera un **nouvel amendement daté, antérieur à
+toute exécution les concernant**, et ils seront alors rapportés comme variantes ajoutées après coup, avec
+leur date. Un juge extérieur introduit après avoir vu les résultats locaux n'aurait aucune valeur
+probante.
+
+**Conséquence sur la portée :** la limite §9.1 — provenance de la vérité de référence — perd de son
+acuité immédiate, puisqu'aucun juge extérieur au corpus n'est mesuré. Elle reste entière pour le REX, et
+redeviendra critique le jour où Gemini entrera.
+
+### Liste des variantes effectivement mesurées
+
+| variante | modèle servi | adaptateur | statut |
+|---|---|---|---|
+| `14B-baseline-nu` | 14B-4bit | aucun | secondaire — montre l'écart dû au seul prompt |
+| `14B-baseline-conventions` | 14B-4bit | aucun | **concurrent de la comparaison principale** |
+| `14B-finetuned` | 14B-4bit | `adapters/14b-judge-200` | **principale** (point 200, val 1,126) |
+| `14B-finetuned-final` | 14B-4bit | `adapters/14b-judge` | secondaire (point 400, val 1,183) |
+| `32B-baseline-conventions` | 32B-4bit | aucun | exploratoire |
+| `32B-finetuned` | 32B-4bit | `adapters/32b-judge` | exploratoire, sous réserve de faisabilité en 36 Go |
+
+### Texte des conventions injectées dans l'invite
+
+Les variantes `*-baseline-conventions` reçoivent les règles de `PROTOCOLE.md` **mot pour mot**, sans
+ajout, sans reformulation et sans exemple. Décision prise avant toute exécution : un texte enrichi ferait
+de la ligne de base un mode d'emploi que le fine-tune n'a jamais reçu, un texte appauvri en ferait un
+homme de paille. La copie littérale est le seul choix défendable, et elle est vérifiable.
+
+### Défaut d'appariement corrigé avant toute mesure
+
+`build_report` **devinait** les paires à comparer par `size` et `fine_tuned`, et prenait le premier
+élément trouvé dans l'ordre du fichier. Avec quatre variantes 14B — deux non fine-tunées, deux
+fine-tunées — la comparaison principale déclarée aurait pu être remplacée silencieusement par
+`14B-finetuned-final` contre `14B-baseline-nu`, soit le point surappris contre l'homme de paille, avec un
+intervalle de confiance d'apparence normale.
+
+**Les paires sont désormais déclarées explicitement dans `configs/variants.json`**, et le script doit
+échouer bruyamment si une variante nommée est absente. Aucune mesure ne sera produite avant ce correctif.
