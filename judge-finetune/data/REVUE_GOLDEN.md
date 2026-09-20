@@ -1650,3 +1650,41 @@ la distinction sans demander de correction.
 
 - **46 items relus sur 50**, **4 restants** : `b13-008`, `b12-011`, `b13-009`, `b12-012`.
 - **Accord sur le verdict : 44 / 46** — `b07-011` et `b12-007`.
+
+### 48. `b13-008` — et la seconde rubrique dont le libellé n'exprime pas sa convention
+
+| | 1 `affirmations_etayees` | 2 `absence_invention` | 3 `citations_exactes` | verdict |
+|---|---|---|---|---|
+| annotateur, premier passage | F | F | **F** | **FAIL** |
+| étiquette | F | F | **V** | **FAIL** |
+
+Accord sur le verdict et sur les deux premiers contrôles, motif identique : `handleDocumentError`,
+`MAX_RETRIES = 3`, `handleCorruption()` et les tailles de lot 10/100 sont **absents des cinq extraits**.
+Aucune correction du corpus.
+
+Le raisonnement de référence ajoute ce qui fait l'intérêt de l'item : **ces affirmations sont exactes pour
+la codebase réelle**. C'est le piège même de la tâche — sous `RAG_FAITHFULNESS`, une affirmation non
+étayée doit tomber quand bien même elle serait vraie, sinon le juge ne distingue plus une restitution
+d'une hallucination. La précision des chiffres aggrave le défaut au lieu de le crédibiliser.
+
+**Le désaccord sur le contrôle 3 reproduit exactement celui de `b13-012`, le 2026-09-17.** Deux
+occurrences, à trois jours d'intervalle, sur deux items différents, avec la même lecture : quand une sortie
+invente tout sans rien citer, l'annotateur juge `citations_exactes` faux. La convention du corpus veut
+qu'il soit vrai par vacuité — rien de cité, donc rien de déformé — et cette convention est documentée dans
+`PROTOCOLE.md` depuis le 17.
+
+> **C'est le second libellé de rubrique qui n'exprime pas sa convention, après `respect_consignes`.**
+> Même forme, même cause : la lecture ordinaire du texte donne le jugement de l'annotateur, et la
+> convention exige une lecture restrictive que le texte n'énonce pas.
+
+**Aucune correction n'est proposée** : la convention est documentée, dix items du corpus l'appliquent, et
+la changer imposerait une troisième réécriture du corpus. Elle rejoint `respect_consignes` dans les limites
+à publier, et pour la même raison — **un modèle ne lisant que la rubrique jugera comme l'annotateur**.
+
+**Réserve : point compromis.** Contexte `9f177235` et requête identiques à `b13-001`, relu juste avant ;
+seul l'objet du jugement diffère — le contexte là, une réponse construite sur lui ici.
+
+### État de la relecture
+
+- **47 items relus sur 50**, **3 restants** : `b12-011`, `b13-009`, `b12-012`.
+- **Accord sur le verdict : 45 / 47.**
