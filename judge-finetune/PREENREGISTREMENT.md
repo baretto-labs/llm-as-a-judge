@@ -465,3 +465,29 @@ valides ; la composition du golden reste 24 PASS / 26 FAIL. Corpus : 200 exemple
 **`b13-007` quitte `train` : l'adaptateur du 2026-09-20 est périmé.** Le réentraînement est **reporté à la
 fin de la relecture**, dix items restant à relire et deux relances ayant déjà été provoquées par des
 découvertes. Les règles de sélection du point de contrôle restent celles de l'addendum du 2026-09-20.
+
+---
+
+## Amendement daté — 2026-09-20, audit élargi des items RAG
+
+Onzième et douzième étiquettes corrigées depuis le gel, **avant toute exécution du benchmark**. Simulation
+d'impact réalisée sur copie avant application.
+
+Deux règles, dégagées d'un audit de l'ensemble des items `RAG_CONTEXT_RELEVANCE` et appliquées
+uniformément :
+
+1. **Aucun symbole visé présent au contexte ⇒ `contexte_pertinent` et `bruit_maitrise` faux.** Vérifiée
+   18/18 dans le sens positif. Une violation corrigée : `b12-005`, désormais F F F.
+2. **Question en « comment » et contexte réduit à des signatures ⇒ `contexte_suffisant` faux.** Une
+   violation corrigée : `b13-007`, désormais V F V / FAIL, `cas` `parfait` → `defaillant`.
+
+`b12-006` et `b14-004` ont été **retirés du périmètre après lecture de leur source** : leur requête nomme
+deux entités et la seconde figure bien au contexte. La détection automatique, limitée au premier
+identifiant de la requête, était en cause.
+
+**Effets :** le tirage échange `b13-007` contre `b13-004`, une relecture est perdue — celle de l'item
+corrigé —, aucune relecture supplémentaire n'est requise. Corpus : 200 exemples, 0 erreur,
+102 PASS / 98 FAIL, `cas` 78/82/40, golden 23 PASS / 27 FAIL.
+
+**L'adaptateur reste périmé** et le réentraînement demeure reporté à la fin de la relecture, huit items
+restant à présenter.

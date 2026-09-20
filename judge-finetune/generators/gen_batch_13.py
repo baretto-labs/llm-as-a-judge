@@ -331,18 +331,18 @@ add(example(
 
 add(example(
     meta={"id": "b13-007", "famille": "rag-ctx-prerequis-lucene", "task": "RAG_CONTEXT_RELEVANCE",
-          "domaine": "rag", "tache": "retrieval", "cas": "parfait", "verbeux": False, "langage": "java"},
+          "domaine": "rag", "tache": "retrieval", "cas": "defaillant", "verbeux": False, "langage": "java"},
     task="RAG_CONTEXT_RELEVANCE",
     contexte=CTX_LUCENE_PREREQ,
     requete="How does PrerequisiteService fall back from local DJL embedding to Ollama?",
     reponse=SORTIE_RELEVANCE,
-    checks={"contexte_pertinent": True, "contexte_suffisant": True, "bruit_maitrise": True},
+    checks={"contexte_pertinent": True, "contexte_suffisant": False, "bruit_maitrise": True},
     thinking='''
 1. Énumération des éléments clés : la requête porte sur le repli du modèle d'embedding local DJL vers Ollama dans `PrerequisiteService`. Les extraits fournissent `checkLocalEmbeddingModel`, `checkEmbeddingModelAsync`, `DocumentIngestFactory#createEmbeddingModel`, la classe `EmbeddingModelCheckResult` et ses trois méthodes `localAvailable`, `localFailedWithFallback` et `ollamaAvailable`, ainsi que `testDJLNativeLibraries`.
-2. Vérification point par point : les deux méthodes nommées dans la requête sont présentes, la pertinence est immédiate. Sur la suffisance, le contexte couvre la chaîne complète : le test des bibliothèques natives DJL, la vérification du modèle local, l'orchestration asynchrone, et surtout le type de résultat dont les trois cas — local disponible, échec local avec repli, Ollama disponible — décrivent exactement la logique demandée. Le nom `localFailedWithFallback` porte à lui seul la réponse. Le contexte est verbeux, dix extraits dont plusieurs accesseurs redondants et un `FontUtils#getIDECodeFont` sans aucun rapport, mais cette abondance ne noie pas l'information utile : les huit premiers extraits sont tous du domaine visé, et le seul extrait parasite arrive en neuvième position.
-3. Synthèse : contexte long mais dense, couvrant toute la chaîne de repli interrogée. PASS.
+2. Vérification point par point : `PrerequisiteService` est présent avec deux de ses méthodes, la pertinence est donc immédiate. Sur la suffisance, en revanche, les dix extraits sont **réduits à des signatures** : aucun corps de méthode ne figure au contexte. Or la requête demande *comment* le repli s'opère. Les noms `localAvailable`, `localFailedWithFallback` et `ollamaAvailable` établissent qu'un repli existe et nomment ses trois issues, mais ils ne disent ni ce qui le déclenche, ni quelle condition est testée, ni dans quel ordre — `testDJLNativeLibraries` suggère un test de bibliothèques natives, et le déduire serait une inférence, pas une lecture. Le bruit reste maîtrisé : les huit premiers extraits relèvent du domaine visé et le seul parasite, `FontUtils#getIDECodeFont`, arrive en neuvième position.
+3. Synthèse : contexte pertinent et thématiquement dense, mais réduit à des signatures : la mécanique du repli n'y figure pas. FAIL.
 ''',
-    reason="La chaîne complète est couverte, de testDJLNativeLibraries à localFailedWithFallback ; la verbosité ne noie pas l'information utile.",
+    reason="Les noms d'issues établissent qu'un repli existe, mais aucun corps de méthode n'est fourni : son déclenchement reste indéterminable.",
 ))
 
 # ══ RAG_FAITHFULNESS (8) ═════════════════════════════════════════════════════

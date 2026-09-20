@@ -295,10 +295,10 @@ add(example(
     contexte=CTX_LUCENE_SERVICE,
     requete="What interfaces does OllamaService implement?",
     reponse=SORTIE_RELEVANCE,
-    checks={"contexte_pertinent": True, "contexte_suffisant": False, "bruit_maitrise": True},
+    checks={"contexte_pertinent": False, "contexte_suffisant": False, "bruit_maitrise": False},
     thinking='''
 1. Énumération des éléments clés : la requête vise les interfaces de `OllamaService`. Les extraits portent sur `OllamaSettings#getInstance`, `OllamaContent#createConversationPanel`, `SuggestionActionHandler#isEnabledForCaret`, puis sur le type `OllamaSettings implements PersistentStateComponent`.
-2. Vérification point par point : le contexte n'est pas entièrement hors sujet — il reste dans le paquet `fr.baretto.ollamassist`, et le quatrième extrait est bien une déclaration d'implémentation d'interface, ce qui correspond à la forme de la question. La pertinence minimale est donc atteinte. Mais la classe déclarée y est `OllamaSettings`, pas `OllamaService` : un quasi-homonyme, dans un paquet voisin, avec une interface sans rapport, `PersistentStateComponent`. Aucun extrait ne montre `OllamaService` ni ses interfaces, le contexte est donc insuffisant pour répondre. Le bruit reste maîtrisé au sens où les extraits ne noient pas une information utile — il n'y en a simplement aucune. Le danger de ce contexte est précisément là : il invite à répondre `PersistentStateComponent`, ce qui serait faux.
+2. Vérification point par point : `OllamaService` est le seul symbole visé par la requête, et **il n'apparaît dans aucun extrait**. Le quatrième est bien une déclaration d'implémentation d'interface, ce qui donne au contexte la forme de la question, mais la classe déclarée y est `OllamaSettings` — un quasi-homonyme d'un paquet voisin, avec une interface sans rapport, `PersistentStateComponent`. Une ressemblance de forme sur la mauvaise classe n'est pas de la pertinence : aucun extrait ne porte sur le symbole interrogé. Le contexte est donc à la fois non pertinent et insuffisant, et le bruit est total puisque les quatre extraits sont hors sujet — il n'y a aucune information utile qu'ils pourraient noyer. Le danger est précisément là : ce contexte invite à répondre `PersistentStateComponent`, ce qui serait faux.
 3. Synthèse : contexte de forme adéquate mais portant sur la mauvaise classe, donc insuffisant pour répondre. FAIL.
 ''',
     reason="Le seul extrait déclarant une interface concerne OllamaSettings, quasi-homonyme : OllamaService n'apparaît nulle part.",

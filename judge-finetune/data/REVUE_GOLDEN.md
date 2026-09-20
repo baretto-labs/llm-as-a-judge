@@ -1486,3 +1486,55 @@ autres restent valides, et la composition reste 24 PASS / 26 FAIL. Invariants : 
   `b12-007`, `b12-011`, `b12-012`, `b13-001`, `b13-007`, `b13-008`, `b13-009`.
 - **Accord sur le verdict, premier passage : 39 / 40** — `b13-004` devient un accord après correction.
 - **Quatre étiquettes corrigées à l'initiative de l'annotateur**, dont une erreur de verdict.
+
+### 43. Audit élargi — deux règles appliquées uniformément aux items RAG
+
+Déclenché par le désaccord sur `b13-007`, lui-même issu de la correction de `b13-004`. **Simulé sur copie
+avant toute application**, conformément à la discipline adoptée à `b13-004`.
+
+#### Règle 1 — pertinence
+
+> **Si aucun symbole visé par la requête n'apparaît au contexte, `contexte_pertinent` et `bruit_maitrise`
+> valent faux.** Une ressemblance de forme sur une classe voisine n'est pas de la pertinence, et là où
+> aucune information utile n'existe, tous les extraits sont hors sujet.
+
+Vérifiée sur les 25 items `RAG_CONTEXT_RELEVANCE` : quand le symbole visé est présent, `pertinent` vaut V
+**18 fois sur 18**. Une seule violation, **`b12-005`** — `OllamaService` absent, seul un quasi-homonyme
+`OllamaSettings` porte une déclaration d'interface. Corrigé en **F F F**.
+
+**Deux items ont été écartés de la correction après lecture de leur source.** `b12-006` et `b14-004`
+paraissaient violer la règle, mais leur requête nomme **deux** entités et la seconde est bien présente au
+contexte — `NewUserMessageNotifier` et `FileApprovalNotifier`. C'est la détection automatique, qui ne
+relevait que le premier identifiant de la requête, qui était fausse. Troisième fois dans la journée qu'une
+lecture sur pièce contredit une règle tirée d'une mesure automatique.
+
+#### Règle 2 — suffisance
+
+> **Une question en « comment » ou « dans quel ordre » n'est pas satisfaite par un contexte réduit à des
+> signatures.** Un nom de méthode annonce une intention, il ne livre pas la mécanique.
+
+Vérifiée sur les 9 items concernés : 8 la respectaient déjà, `b14-005` étant légitimement suffisant
+puisque son contexte contient réellement du corps de méthode. Une violation, **`b13-007`**, corrigée en
+**V F V / FAIL**.
+
+**L'exception que l'auteur des étiquettes avait forgée pour `b13-007`** — « les noms `localAvailable`,
+`localFailedWithFallback`, `ollamaAvailable` décrivent à eux seuls la logique » — **a été reconnue comme
+un raisonnement motivé** : elle avait été écrite dans le mouvement même de la correction de `b13-004`, et
+protégeait une étiquette déjà posée. L'annotateur ne l'a pas suivie et avait raison : ces noms établissent
+qu'un repli existe, pas ce qui le déclenche.
+
+#### Effets mesurés
+
+```
+golden 50 -> 50    b13-007 sort, b13-004 revient (sa relecture reste valide)
+relectures perdues : 1 (b13-007)      items à présenter en plus : 0
+corpus 200, 0 erreur, PASS 102 / FAIL 98, cas 78/82/40, golden 23/27
+```
+
+### État de la relecture
+
+- **42 items relus sur 50**, **8 restants** : `b03-002`, `b05-009`, `b12-007`, `b12-011`, `b12-012`,
+  `b13-001`, `b13-008`, `b13-009`.
+- **Accord sur le verdict : 41 / 42** — seul `b07-011` reste en désaccord.
+- **Six étiquettes corrigées à l'initiative de l'annotateur** : `b09-009`, `b06-008`, `b03-001`,
+  `b13-004`, `b12-005`, `b13-007` — dont deux changements de verdict.
