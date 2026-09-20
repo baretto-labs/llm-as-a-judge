@@ -1538,3 +1538,25 @@ corpus 200, 0 erreur, PASS 102 / FAIL 98, cas 78/82/40, golden 23/27
 - **Accord sur le verdict : 41 / 42** — seul `b07-011` reste en désaccord.
 - **Six étiquettes corrigées à l'initiative de l'annotateur** : `b09-009`, `b06-008`, `b03-001`,
   `b13-004`, `b12-005`, `b13-007` — dont deux changements de verdict.
+
+### 44. `b03-002` — accord complet sur la jumelle corrigée de `b03-001`
+
+| | 1 `exactitude_technique` | 2 `absence_de_bugs` | 3 `respect_consignes` | 4 `validation_entree` | verdict |
+|---|---|---|---|---|---|
+| annotateur, premier passage | V | V | V | V | **PASS** |
+| étiquette | V | V | V | V | **PASS** |
+
+Vingt-septième accord consécutif. Le motif nomme les deux points qui séparent cette réponse de sa jumelle :
+`slice(i, i + size)` au lieu de `slice(i, size)`, et `Number.isInteger` complétant le test de signe — soit
+exactement les deux défauts que l'annotateur avait relevés sur `b03-001` une heure plus tôt. Aucune
+correction du corpus.
+
+**Réserve : point non indépendant.** Paire contrastive de `b03-001`, relu le même jour, dont il partage
+l'énoncé mot pour mot. Divulgué avant la réponse. Cinquième point de ce type après `b02-002`, `b07-001`,
+`b13-003` et `b13-013`.
+
+### État de la relecture
+
+- **43 items relus sur 50**, **7 restants** : `b05-009`, puis les 6 RAG à contexte partagé
+  (`b12-007`, `b12-011`, `b12-012`, `b13-001`, `b13-008`, `b13-009`).
+- **Accord sur le verdict : 42 / 43.**
