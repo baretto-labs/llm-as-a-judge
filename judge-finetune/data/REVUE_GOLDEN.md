@@ -1100,3 +1100,48 @@ Seul item en Go du golden set.
 - **Désaccords au niveau contrôle : 5**, inchangé.
 - **28 items relus sur 50**, 22 restants — dont les 8 items RAG, gardés pour un bloc final parce que
   plusieurs partagent leur contexte d'extraction.
+
+### 30. `b06-008` — l'annotateur corrige l'étiquette, et déclenche un audit du corpus
+
+| | 1 `exactitude_technique` | 2 `absence_de_bugs` | 3 `respect_consignes` | verdict |
+|---|---|---|---|---|
+| annotateur, premier passage | F | F | **V** | **FAIL** |
+| étiquette d'origine | F | F | **F** | **FAIL** |
+| **étiquette corrigée** | F | F | **V** | **FAIL** |
+
+Diagnostic de l'annotateur exact : ajouter `T00:00:00` fait passer l'analyse d'UTC à l'heure locale, si
+bien que `2026-03-01` devient `2026-02-28T23:00:00Z` sur un poste à UTC+1 — le correctif introduit le
+décalage qu'il prétend supprimer.
+
+**Sur le contrôle 3, l'annotateur avait raison et l'étiquette avait tort.** La requête disait « explique
+et corrige » : la réponse a fait les deux, mal. L'auteur des étiquettes avait lui-même soutenu la veille,
+à `b03-014`, qu'un contenu faux n'est pas une consigne non suivie — et son étiquette contredisait sa
+propre convention. **Étiquette corrigée.**
+
+Imprécision relevée dans le motif de l'annotateur, sans effet sur les cases : il écrit que la réponse
+« omet le remplissage par zéro », alors qu'elle le traite plus loin avec `padStart`. La lecture tient si
+l'on vise le premier correctif, qui conserve le gabarit non rempli.
+
+**Ce désaccord a déclenché un audit des 17 items portant `respect_consignes = faux`** : huit étaient
+incohérents avec la convention et ont été corrigés, neuf conservés. Détail et effets dans
+`PREENREGISTREMENT.md`, amendement du 2026-09-20. Six corrections touchant `train`, l'adaptateur du
+2026-09-19 est périmé et l'entraînement a été relancé.
+
+### 31. `b07-014` — accord complet sur le protocole `__exit__`
+
+| | 1 `exactitude_technique` | 2 `absence_de_bugs` | 3 `respect_consignes` | verdict |
+|---|---|---|---|---|
+| annotateur, premier passage | V | V | V | **PASS** |
+| étiquette | V | V | V | **PASS** |
+
+Vingtième accord consécutif sur tous les contrôles. Le motif relève les deux points qui font la valeur de
+la réponse — le triplet reçu par `__exit__` et l'absorption silencieuse sur retour vrai — c'est-à-dire la
+seconde question de la requête, celle qu'une réponse superficielle expédie. Aucune correction du corpus.
+
+### État de la relecture
+
+- **30 items relus sur 50**, 20 restants — dont les 8 RAG, gardés pour un bloc final.
+- **Accord sur le verdict, premier passage : 29 / 30.** Seul `b07-011` reste en désaccord.
+- **Désaccords au niveau contrôle : 6** — `b09-009` et `b06-008` **perdus par l'auteur des étiquettes et
+  corrigés dans le corpus** ; `b13-012`, `b08-011`, `b03-014`, `b10-003` où l'étiquette est maintenue.
+- Inattentions communes repérées : 1 (`b06-014`).
