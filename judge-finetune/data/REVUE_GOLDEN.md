@@ -1286,3 +1286,27 @@ le fait pas. Présenté avec le texte intégral des critères.
 - **35 items relus sur 50**, 15 restants — 7 hors RAG, plus les 8 RAG gardés pour un bloc final.
 - **Accord sur le verdict, premier passage : 34 / 35.**
 - **Désaccords au niveau contrôle : 8**, inchangé.
+
+### 37. `b07-001` — accord complet, point non indépendant
+
+| | 1 `exactitude_technique` | 2 `absence_de_bugs` | 3 `respect_consignes` | verdict |
+|---|---|---|---|---|
+| annotateur, premier passage | V | V | V | **PASS** |
+| étiquette | V | V | V | **PASS** |
+
+Vingt-quatrième accord consécutif. Le motif relève la **réentrance de `synchronized`** pour le cas
+`from == to` — détail que la plupart des lectures sautent, et qui rend juste, plutôt que décorative, la
+remarque de la réponse. L'ordre total fondé sur l'identifiant casse bien la condition d'attente
+circulaire. Aucune correction du corpus.
+
+**Réserve : point non indépendant.** `b07-001` forme une paire contrastive avec `b07-002`, relu deux
+heures plus tôt dans la même séance, dont il partage l'énoncé mot pour mot — l'annotateur y avait déjà
+nommé l'interblocage par verrous croisés. Divulgué avant sa réponse. Même traitement que `b02-002`,
+`b13-003` et `b13-013`.
+
+### État de la relecture
+
+- **36 items relus sur 50**, 14 restants — 6 hors RAG, plus les 8 RAG en bloc final.
+- **Accord sur le verdict, premier passage : 35 / 36.**
+- **Désaccords au niveau contrôle : 8**, inchangé.
+- Points non indépendants (paires contrastives ou contexte partagé) : 4.
