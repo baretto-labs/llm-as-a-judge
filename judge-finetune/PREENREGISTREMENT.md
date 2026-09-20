@@ -328,3 +328,56 @@ intervalle de confiance d'apparence normale.
 
 **Les paires sont désormais déclarées explicitement dans `configs/variants.json`**, et le script doit
 échouer bruyamment si une variante nommée est absente. Aucune mesure ne sera produite avant ce correctif.
+
+---
+
+## Amendement daté — 2026-09-20, correction de huit étiquettes `respect_consignes`
+
+Le §1 gèle le corpus et impose qu'une modification ultérieure soit datée et signalée. Cet amendement
+l'exerce. **Aucune exécution du benchmark n'a eu lieu** : la correction est antérieure à toute mesure.
+
+### Ce qui a été découvert, et comment
+
+Pendant la relecture, l'annotateur a marqué `respect_consignes` à V sur `b06-008` là où l'étiquette le
+mettait à F. En vérifiant, l'auteur des étiquettes a constaté que **sa propre étiquette contredisait la
+convention qu'il avait lui-même défendue la veille** — « un contenu faux n'est pas une consigne non
+suivie ». L'annotateur avait raison, l'étiquette avait tort.
+
+Un audit des 17 items portant `respect_consignes = faux` a suivi. **Huit étaient incohérents** avec la
+convention : `b03-005`, `b06-008`, `b04-006`, `b05-004`, `b05-007`, `b06-002`, `b06-004`, `b08-009`.
+Leur requête ne formule aucune exigence explicite — elle dit « explique et corrige », « simplifie »,
+« écris une fonction qui… ». La réponse a fait la chose, mal : cela relève des contrôles 1 et 2.
+
+**Neuf conservent `respect_consignes = faux`**, chacun violant une exigence littéralement écrite dans
+l'énoncé : détection « à l'exécution » (`b09-006`), définition de l'identité sur deux composants
+(`b10-003`), « y compris les auteurs qui n'en ont aucun » (`b02-006`), « sans changer le comportement »
+(`b03-006`), « une nouvelle configuration sans modifier celle reçue » (`b04-007`), bornes jusqu'à
+`Integer.MAX_VALUE` (`b05-002`), « sans lui révéler qu'elle existe » (`b05-014`), validation d'un entier
+strictement positif (`b03-001`), et « empêche l'appelant de modifier la liste » (`b04-002`).
+
+**Deux items ont été retirés de la liste des corrections après examen du code source.** `b03-001` et
+`b04-002` figuraient dans la classification initiale, que l'annotateur avait validée ; la lecture de leur
+`<thinking>` a montré qu'ils invoquaient une exigence réellement explicite. Le changement a été signalé à
+l'annotateur plutôt qu'appliqué en silence.
+
+### Effets vérifiés
+
+- **Aucun verdict ne change.** Sur les 17 items, aucun n'avait `respect_consignes` comme seul contrôle
+  faux : PASS ⟺ tous les contrôles vrais ne bascule nulle part.
+- **Aucun `cas` ne change** — 80 `parfait` / 80 `defaillant` / 40 `limite` — donc le tirage
+  `SPLIT_SEED=11` est identique, le golden set est identique, et **les 28 relectures déjà faites restent
+  valides**.
+- Deux `<thinking>` ont été réécrits, `b03-005` et `b05-007`, qui adossaient explicitement le défaut à la
+  consigne et auraient contredit un contrôle passé à V.
+- Corpus : 200 exemples, 0 erreur, PASS 104 / FAIL 96, golden 24/26.
+
+### Conséquence coûteuse, assumée
+
+**Six des huit corrections touchent le jeu `train`.** L'adaptateur `adapters/14b-judge`, entraîné le
+2026-09-19, l'a été sur des étiquettes désormais fausses : **il est périmé et l'entraînement est relancé**.
+Les points de contrôle antérieurs, y compris le `0000200` déclaré principal, sont invalidés par la même
+cause et seront régénérés.
+
+Les décisions de l'addendum du 2026-09-20 sur le choix du point de contrôle — variante principale
+sélectionnée sur la perte de validation, variante finale rapportée en secondaire — **restent en vigueur et
+s'appliqueront au nouvel entraînement**, avec les nouvelles valeurs de validation.

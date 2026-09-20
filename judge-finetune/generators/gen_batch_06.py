@@ -96,7 +96,7 @@ ou rediriger `System.err` vers votre journalisation au démarrage. Le code de `e
 2. Vérification des contraintes : après l'échec de la tâche, `isCompletedExceptionally()` vaut `true` sur le futur et sur la chaîne, et rien n'est écrit ni sur la sortie d'erreur ni ailleurs tant qu'aucun `join()`, `get()`, `whenComplete` ou `exceptionally` n'est appelé. Les deux remèdes proposés sont donc inopérants : capturer `System.err` ou installer un gestionnaire global ne fera rien apparaître, puisque rien n'est jamais émis. Le conseil final, affirmant que `exportAsync` n'a pas besoin d'être modifié, laisse le défaut entier alors que c'est exactement là qu'il faut agir, en terminant la chaîne par `whenComplete` ou `exceptionally`, et en renvoyant le futur à l'appelant.
 3. Synthèse : mécanisme inventé, correctifs sans effet, et le bug réel reste en place. FAIL.
 ''',
-    exact=False, bugs=False, consignes=False,
+    exact=False, bugs=False, consignes=True,
     raison="L'exception n'atteint jamais le gestionnaire non capturé : elle est stockée dans le futur, donc les deux correctifs proposés sont sans effet.",
 ))
 
@@ -190,7 +190,7 @@ private static final InheritableThreadLocal<String> TENANT = new InheritableThre
 2. Vérification des contraintes : aucun exécuteur ne réinitialise les `ThreadLocal` entre deux tâches. Sur un pool à un seul thread, une première tâche pose la valeur `client-A`, et la tâche suivante, qui ne pose rien, lit `client-A`. La fuite entre requêtes est donc bien réelle, et c'est exactement le symptôme décrit. Le correctif attendu produit l'effet inverse : après un `TENANT.remove()` placé dans un bloc `finally`, la tâche suivante lit `null`. La piste avancée par la réponse, les traitements asynchrones et `InheritableThreadLocal`, décrit un problème différent et réel, mais elle détourne du défaut principal, et le tableau final valide explicitement l'idée fausse d'un nettoyage automatique. À noter que `InheritableThreadLocal` est de surcroît inadapté à un pool, puisque l'héritage n'a lieu qu'à la création du thread, pas à la soumission d'une tâche.
 3. Synthèse : affirmation centrale fausse sur le nettoyage entre tâches, correctif nécessaire non fourni, et orientation vers une piste secondaire. FAIL.
 ''',
-    exact=False, bugs=False, consignes=False,
+    exact=False, bugs=False, consignes=True,
     raison="Aucun exécuteur ne nettoie les ThreadLocal entre tâches : la tâche suivante relit client-A ; il manque le remove() en finally.",
 ))
 
@@ -346,7 +346,7 @@ Si l'étiquette est destinée à un affichage plutôt qu'à un identifiant, `Int
 2. Vérification des contraintes : sur un poste à UTC+1, `new Date("2026-03-01")` donne l'instant `2026-03-01T00:00:00.000Z`, tandis que `new Date("2026-03-01T00:00:00")` donne `2026-02-28T23:00:00.000Z`, soit un jour d'écart en UTC. Ajouter `T00:00:00` ne stabilise donc rien, cela déplace simplement l'ambiguïté et casse la valeur sur les fuseaux à l'est de Greenwich. La cause réelle du décalage est de mélanger une chaîne interprétée en UTC avec des accesseurs locaux : sur un poste à UTC−5, `getDate()` sur `2026-03-01T00:00:00Z` renvoie 28 février. Les corrections valides sont d'utiliser les accesseurs UTC, `getUTCFullYear` et suivants, ou de ne jamais convertir en `Date` une donnée qui est une date civile et de la traiter comme une chaîne, éventuellement avec `Temporal.PlainDate`.
 3. Synthèse : symptôme correctement repéré, mais mécanisme inversé et correctif qui introduit précisément le décalage qu'il prétend supprimer. FAIL.
 ''',
-    exact=False, bugs=False, consignes=False,
+    exact=False, bugs=False, consignes=True,
     raison="Ajouter T00:00:00 fait passer l'analyse d'UTC à l'heure locale : 2026-03-01 devient 2026-02-28T23:00:00Z.",
 ))
 

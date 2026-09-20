@@ -309,7 +309,7 @@ reminder_at = scheduled_at + timedelta(hours=1)
 2. Vérification des contraintes : l'affirmation centrale, selon laquelle l'addition d'un `timedelta` sur un `datetime` conscient du fuseau recalculerait le décalage, est démentie par l'exécution. En partant de `2026-03-29 01:30:00+01:00` à Paris, l'ajout d'une heure donne `2026-03-29 02:30:00+01:00` : le décalage reste à +01:00 et le résultat désigne une heure locale qui n'existe pas cette nuit-là. L'arithmétique sur `datetime` est délibérément « naïve sur le mur d'horloge », elle ajoute au champ heure sans consulter la base de fuseaux. La correction proposée, un `replace(tzinfo=...)` sur les données d'entrée, ne change rien à ce comportement et le tableau final inscrit l'erreur. La méthode correcte est de calculer en UTC, `dt.astimezone(timezone.utc) + timedelta(hours=1)`, puis de reconvertir, ou d'appeler `normalize` selon la bibliothèque utilisée.
 3. Synthèse : contexte correctement posé, mais le diagnostic est inversé, le bug réel est attribué aux données d'entrée et la correction proposée laisse le défaut intact. FAIL.
 ''',
-    exact=False, bugs=False, consignes=False,
+    exact=False, bugs=False, consignes=True,
     raison="Affirme à tort que l'addition d'un timedelta recalcule le décalage : 01:30+01:00 + 1h donne 02:30+01:00, heure inexistante.",
 ))
 

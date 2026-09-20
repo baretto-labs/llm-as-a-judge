@@ -187,7 +187,7 @@ Les octets non décodables sont remplacés par le caractère de remplacement `\\
 2. Vérification des contraintes : le tableau final généralise l'erreur en affichant UTF-8 pour Windows. La correction proposée est pire que le mal : `errors="replace"` ne corrige pas l'encodage, il masque l'échec en remplaçant les octets non décodables, ce qui produit silencieusement des accents corrompus dans les données traitées. Relire un fichier UTF-8 en latin-1 donne `cafÃ© â\\x80\\x94 naÃ¯ve` sans lever la moindre exception, illustrant qu'une lecture qui « passe » n'est pas une lecture correcte. Le correctif attendu est de déclarer explicitement l'encodage du fichier reçu, `open(path, encoding="utf-8")` ou `encoding="cp1252"` selon la source, éventuellement avec détection préalable.
 3. Synthèse : la cause réelle est niée, remplacée par une affirmation fausse sur le comportement de `open()`, et la correction proposée masque l'erreur en corrompant les données. FAIL.
 ''',
-    exact=False, bugs=False, consignes=False,
+    exact=False, bugs=False, consignes=True,
     raison="Affirme à tort que open() lit toujours en UTF-8 : c'est l'encodage local, et errors=\"replace\" masque le défaut en corrompant les accents.",
 ))
 
@@ -312,10 +312,10 @@ Pensez simplement à indexer la colonne de tri. Sans index sur `id` — il exist
 ''',
     thinking='''
 1. Analyse de la proposition : la requête est syntaxiquement correcte et la pagination par décalage fonctionne sur un jeu figé. Les développements annexes sont exacts et pertinents : le départage par identifiant pour rendre l'ordre total est le bon conseil, le couple `(created_at, id)` est la forme correcte d'un tri par date, et la mise en garde sur une taille de page non bornée est fondée. La remarque sur l'index de tri est juste. Mais la garantie annoncée est fausse dans le cas d'usage décrit, un flux qui reçoit des insertions en continu.
-2. Vérification des contraintes : `OFFSET` compte des lignes dans le résultat au moment de la requête, il ne mémorise pas où l'utilisateur en était. Toute insertion qui s'intercale avant la position courante décale l'ensemble. Après lecture d'une première page `[1, 2, 3]`, l'insertion d'une ligne en tête fait renvoyer `[3, 4, 5]` à la page suivante : l'élément 3 est donc affiché deux fois. Symétriquement, une suppression fait sauter un élément. La consigne demandait explicitement d'expliquer la garantie offerte sur les éléments vus, et la réponse en affirme une qui n'existe pas — et l'affirme d'autant plus solidement qu'elle vient d'établir, correctement, que l'ordre est total et déterministe. C'est vrai de l'ordre, cela ne dit rien du décalage. L'approche adaptée est la pagination par curseur, `WHERE id > :dernier_id ORDER BY id LIMIT 20`, qui renvoie `[4, 5, 6]` dans la même situation, et qui présente en prime un coût constant là où `OFFSET` doit parcourir puis jeter les lignes ignorées.
-3. Synthèse : la requête fonctionne, mais la garantie centrale demandée par la consigne est fausse sur un flux en insertion continue, ce qui est exactement le contexte donné. FAIL.
+2. Vérification des contraintes : `OFFSET` compte des lignes dans le résultat au moment de la requête, il ne mémorise pas où l'utilisateur en était. Toute insertion qui s'intercale avant la position courante décale l'ensemble. Après lecture d'une première page `[1, 2, 3]`, l'insertion d'une ligne en tête fait renvoyer `[3, 4, 5]` à la page suivante : l'élément 3 est donc affiché deux fois. Symétriquement, une suppression fait sauter un élément. La garantie annoncée sur les éléments vus n'existe donc pas, et la réponse l'affirme d'autant plus solidement qu'elle vient d'établir, correctement, que l'ordre est total et déterministe. C'est vrai de l'ordre, cela ne dit rien du décalage. L'approche adaptée est la pagination par curseur, `WHERE id > :dernier_id ORDER BY id LIMIT 20`, qui renvoie `[4, 5, 6]` dans la même situation, et qui présente en prime un coût constant là où `OFFSET` doit parcourir puis jeter les lignes ignorées.
+3. Synthèse : la requête fonctionne, mais la garantie centrale annoncée est fausse sur un flux en insertion continue, ce qui est exactement le contexte donné. FAIL.
 ''',
-    exact=True, bugs=False, consignes=False,
+    exact=True, bugs=False, consignes=True,
     raison="La pagination par OFFSET n'est pas stable sous insertions : l'élément 3 est renvoyé sur deux pages consécutives.",
 ))
 

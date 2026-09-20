@@ -401,7 +401,7 @@ Le résultat est identique et l'intention plus lisible. Le comparateur explicite
 2. Vérification des contraintes : la conséquence est immédiate. `[{n:10},{n:9},{n:1}].sort()` renvoie `[{"n":10},{"n":9},{"n":1}]`, c'est-à-dire l'ordre d'origine inchangé, le tri étant stable depuis ES2019. Le résultat n'est donc pas « identique », il est simplement non trié, et le défaut est particulièrement pernicieux : sur un jeu de données déjà à peu près ordonné, la sortie paraît plausible et le bug passe la revue. La requête demandait une simplification à comportement constant ; le comparateur `(a, b) => a.quantite - b.quantite` est déjà la forme idiomatique et n'a rien de verbeux. La seule remarque défendable aurait été de signaler que `[...articles]` protège bien l'appelant, `sort` triant en place. La demande facultative sur le tri stable n'est pas traitée, mais la consigne la présentait explicitement comme telle : l'omission n'entre donc pas dans l'évaluation de `respect_consignes`.
 3. Synthèse : la simplification proposée supprime purement et simplement le tri, tout en affirmant l'équivalence. FAIL.
 ''',
-    exact=False, bugs=False, consignes=False,
+    exact=False, bugs=False, consignes=True,
     raison="Sans comparateur, sort() compare des chaînes « [object Object] » : l'ordre reste inchangé, le tri disparaît.",
 ))
 
