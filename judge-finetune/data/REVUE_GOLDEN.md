@@ -1179,3 +1179,25 @@ s'interdire de qualifier les éléments sur lesquels porte le jugement.
 - **Désaccords au niveau contrôle : 7** — dont `b09-009` et `b06-008` perdus par l'auteur des étiquettes
   et corrigés, et **`b01-005` provoqué par la présentation**, donc non imputable à l'annotateur.
 - Inattentions communes : 1 (`b06-014`). Désaccords induits par la présentation : 1 (`b01-005`).
+
+### 33. `b08-003` — accord complet sur les imports circulaires
+
+| | 1 `exactitude_technique` | 2 `absence_de_bugs` | 3 `respect_consignes` | verdict |
+|---|---|---|---|---|
+| annotateur, premier passage | V | V | V | **PASS** |
+| étiquette | V | V | V | **PASS** |
+
+Vingt-et-unième accord consécutif. Le motif nomme le point exact — les **modules partiellement
+initialisés dans `sys.modules`** — qui est le détail dont dépend tout l'item : l'inscription du module
+avant l'exécution de son corps évite la récursion infinie mais expose un objet incomplet, d'où
+l'`AttributeError`. Les trois corrections sont valides et correctement hiérarchisées, l'extraction d'un
+module tiers étant la seule qui supprime le cycle au lieu de l'accommoder. Aucune correction du corpus.
+
+Premier item présenté avec le correctif adopté à `b01-005` : le critère 3 est décrit sans qualifier les
+demandes de la requête d'explicites ou d'implicites.
+
+### État de la relecture
+
+- **32 items relus sur 50**, 18 restants — dont les 8 RAG, gardés pour un bloc final.
+- **Accord sur le verdict, premier passage : 31 / 32.**
+- **Désaccords au niveau contrôle : 7**, inchangé.
