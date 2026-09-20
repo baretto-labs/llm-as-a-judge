@@ -1350,3 +1350,27 @@ restreinte aux exigences explicites **au-delà de la tâche elle-même**, que le
 
 **Décision en attente de l'annotateur :** réécrire le libellé du contrôle 3 et réentraîner, ou le conserver
 et publier l'ambiguïté avec cette table de contingence comme preuve.
+
+### 39. `b06-006` — accord complet sur l'attribut de classe mutable
+
+| | 1 `exactitude_technique` | 2 `absence_de_bugs` | 3 `respect_consignes` | verdict |
+|---|---|---|---|---|
+| annotateur, premier passage | V | V | V | **PASS** |
+| étiquette | V | V | V | **PASS** |
+
+Vingt-cinquième accord consécutif. Le motif nomme le pivot — la mutation d'un attribut de classe partagé —
+qui repose sur la distinction que les explications superficielles omettent : `self.items.append(...)` est
+une **lecture** qui remonte à la classe, seule une **affectation** créerait un attribut d'instance
+masquant. La nuance finale sur les attributs de classe immuables est relevée comme juste. Aucune
+correction du corpus.
+
+Premier item relu après la décision A sur l'ambiguïté de `respect_consignes` : requête sans exigence
+littérale, contrôle 3 jugé V des deux côtés, conformément à ce que la table de contingence laissait
+attendre lorsque la réponse **réussit** sa tâche.
+
+### État de la relecture
+
+- **38 items relus sur 50**, 12 restants — 4 hors RAG, plus les 8 RAG en bloc final.
+- **Accord sur le verdict, premier passage : 37 / 38.**
+- **Désaccords au niveau contrôle : 9** — dont **7 relevant de l'ambiguïté du libellé** documentée à
+  `b03-005`, 2 perdus par l'auteur des étiquettes et corrigés.
