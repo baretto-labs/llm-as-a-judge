@@ -1560,3 +1560,29 @@ l'énoncé mot pour mot. Divulgué avant la réponse. Cinquième point de ce typ
 - **43 items relus sur 50**, **7 restants** : `b05-009`, puis les 6 RAG à contexte partagé
   (`b12-007`, `b12-011`, `b12-012`, `b13-001`, `b13-008`, `b13-009`).
 - **Accord sur le verdict : 42 / 43.**
+
+### 45. `b05-009` — accord complet, dernier item hors RAG
+
+| | 1 `exactitude_technique` | 2 `absence_de_bugs` | 3 `respect_consignes` | verdict |
+|---|---|---|---|---|
+| annotateur, premier passage | V | V | V | **PASS** |
+| étiquette | V | V | V | **PASS** |
+
+Vingt-huitième accord consécutif, et **dernier item `CODE_ANALYSIS` du golden set**. Les six affirmations
+vérifiables tiennent, y compris `-7 % 2 = -1` et `Math.floorMod(-7, 2) = 1`, et le choix de `floorMod`
+est bien la primitive correcte pour un index circulaire. Aucune correction du corpus.
+
+Le raisonnement de référence porte une réserve que le motif de l'annotateur ne mentionne pas :
+`current + offset` pourrait théoriquement déborder sur des valeurs extrêmes. Elle est explicitement jugée
+sans conséquence pour des index de carrousel, et ce silence n'est pas compté comme un défaut — la réserve
+est donc consignée sans effet sur les cases.
+
+### État de la relecture — bloc RAG final
+
+- **44 items relus sur 50**, **6 restants**, tous RAG.
+- **Accord sur le verdict : 43 / 44.**
+- Ordre retenu pour le bloc final, alternant les deux familles pour ne jamais enchaîner deux contextes
+  identiques : `b13-001`, `b12-007`, `b13-008`, `b12-011`, `b13-009`, `b12-012`.
+- **`b13-001` est le dernier point de mesure sain du corpus** : premier de sa famille `9f177235`, dont
+  `b13-008` et `b13-009` n'ont pas encore été présentés. Les cinq suivants seront tous compromis, soit par
+  un contexte déjà analysé (`9fefd8a6`, vu à `b12-008`), soit par la famille ouverte par `b13-001`.
