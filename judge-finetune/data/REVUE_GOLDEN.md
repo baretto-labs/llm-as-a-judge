@@ -1412,3 +1412,35 @@ n'est pas affecté**, aucun réentraînement.
 - **Accord sur le verdict, premier passage : 38 / 39.**
 - **Désaccords au niveau contrôle : 10** — dont 7 relevant de l'ambiguïté du libellé, et **3 perdus par
   l'auteur des étiquettes et corrigés dans le corpus** (`b09-009`, `b06-008`, `b03-001`).
+
+### 41. `b02-012` — accord complet sur le GIL
+
+| | 1 `exactitude_technique` | 2 `absence_de_bugs` | 3 `respect_consignes` | verdict |
+|---|---|---|---|---|
+| annotateur, premier passage | V | V | V | **PASS** |
+| étiquette | V | V | V | **PASS** |
+
+Vingt-sixième accord consécutif. La seule affirmation réellement datable — PEP 703, *builds* sans GIL
+optionnels depuis CPython 3.13 — tient, de même que les nuances sur le relâchement du GIL en entrées-sorties
+et par les extensions natives. Aucune correction du corpus.
+
+### Carte des familles RAG — ordre du bloc final
+
+Établie avant d'ouvrir le bloc, pour ne pas présenter deux items d'un même contexte à la suite :
+
+| contexte | items | état |
+|---|---|---|
+| `b1d8dc1d` | `b12-005` | **unique au corpus** |
+| `6bbce10c` | `b13-004` | **unique au corpus** |
+| `9fefd8a6` | `b12-007`, `b12-011`, `b12-012` | `b12-008` déjà relu → compromis |
+| `9f177235` | `b13-001`, `b13-008`, `b13-009` | trois entre eux → le premier est sain, les suivants compromis |
+| `8559f10c` | — | famille entièrement relue |
+
+**Seuls `b12-005` et `b13-004` sont des points de mesure RAG pleinement indépendants.** Ils sont présentés
+en premier ; les six autres le seront avec leur réserve, et jamais deux d'un même contexte consécutivement.
+
+### État de la relecture
+
+- **40 items relus sur 50**, 10 restants — 2 hors RAG, plus les 8 RAG du bloc final.
+- **Accord sur le verdict, premier passage : 39 / 40.**
+- **Désaccords au niveau contrôle : 10**, inchangé.
