@@ -1145,3 +1145,37 @@ seconde question de la requête, celle qu'une réponse superficielle expédie. A
 - **Désaccords au niveau contrôle : 6** — `b09-009` et `b06-008` **perdus par l'auteur des étiquettes et
   corrigés dans le corpus** ; `b13-012`, `b08-011`, `b03-014`, `b10-003` où l'étiquette est maintenue.
 - Inattentions communes repérées : 1 (`b06-014`).
+
+### 32. `b01-005` — désaccord de contrôle provoqué par la présentation
+
+| | 1 `exactitude_technique` | 2 `absence_de_bugs` | 3 `respect_consignes` | verdict |
+|---|---|---|---|---|
+| annotateur, premier passage | F | F | **F** | **FAIL** |
+| étiquette | F | F | **V** | **FAIL** |
+
+Accord entier sur le fond. Le motif de l'annotateur — « confond visibilité et atomicité » — est le
+diagnostic de l'étiquette en plus court : `count++` est une séquence `getfield` / `iadd` / `putfield`, et
+la « barrière mémoire commune » invoquée par la réponse n'existe pas dans la JVM. Aucune correction du
+corpus : le `<thinking>` de référence dit explicitement « sur la forme, toutes les parties de la consigne
+sont traitées », donc `respect_consignes` vaut bien V sous la convention confirmée le 2026-09-20.
+
+**Ce désaccord est imputable au présentateur, et n'est pas porté au débit de l'annotateur.** Le critère 3
+lui a été présenté ainsi : « la requête pose **trois demandes explicites** : expliquer, trancher, proposer
+une alternative ». Le mot *explicites* est exactement le déclencheur de `respect_consignes` dans la
+convention. La formulation désignait la réponse attendue.
+
+**Correctif de présentation, applicable immédiatement :** décrire ce que la requête demande, sans jamais
+qualifier ces demandes d'explicites ou d'implicites — c'est précisément le jugement que l'annotateur doit
+rendre, et le lui souffler vide l'item de sa valeur de mesure.
+
+Deuxième faute de ce type après `b03-012`, où la présentation avait annoncé ce que l'item était censé
+tester. Le correctif d'alors — ne pas dire ce qu'un item teste — était trop étroit : il faut aussi
+s'interdire de qualifier les éléments sur lesquels porte le jugement.
+
+### État de la relecture
+
+- **31 items relus sur 50**, 19 restants.
+- **Accord sur le verdict, premier passage : 30 / 31.**
+- **Désaccords au niveau contrôle : 7** — dont `b09-009` et `b06-008` perdus par l'auteur des étiquettes
+  et corrigés, et **`b01-005` provoqué par la présentation**, donc non imputable à l'annotateur.
+- Inattentions communes : 1 (`b06-014`). Désaccords induits par la présentation : 1 (`b01-005`).
