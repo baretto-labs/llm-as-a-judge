@@ -426,3 +426,21 @@ REX cherchent à savoir.
    la comparaison principale interprétable.
 5. L'accord par contrôle sera publié **avec et sans le contrôle 3**, afin que le lecteur puisse isoler
    l'effet de l'ambiguïté sur les chiffres.
+
+---
+
+## Amendement daté — 2026-09-20, correction de l'étiquette `b03-001`
+
+Neuvième étiquette corrigée depuis le gel, **avant toute exécution du benchmark**.
+
+`exactitude_technique` passe de V à F. Motif : la réponse conclut par « la fonction est générique et
+compile en mode strict », affirmation littéralement vraie mais servant de quitus à un code dont le
+découpage est faux dès la deuxième tranche. Relevé par l'annotateur humain ; le raisonnement de référence
+listait les affirmations explicites sans examiner la portée de cette conclusion.
+
+**Effets vérifiés :** verdict FAIL inchangé, `cas` inchangé, invariants intacts (200 exemples,
+104 PASS / 96 FAIL, 80/80/40, golden 24/26). **`b03-001` appartient au golden set et non à `train`** :
+l'entraînement lancé ce jour n'est pas affecté et se poursuit.
+
+Troisième correction d'étiquette à l'initiative de l'annotateur, après `b09-009` et `b06-008` — fait à
+rapporter dans le REX comme mesure de ce que la relecture humaine apporte réellement au-delà du κ.

@@ -49,12 +49,12 @@ export function chunk<T>(items: T[], size: number): T[][] {
 La fonction est générique et compile en mode strict.
 ''',
     thinking='''
-1. Analyse du code : la signature générique est correcte, le code compile en mode strict et l'erreur est bien levée pour `size = 0`. Les développements sur la conception sont exacts : le paramètre de type se propage bien jusqu'au retour, `RangeError` est bien le type prévu par la spécification pour une valeur hors domaine, et l'incrément par tranche est correctement décrit. Mais `slice(i, size)` est faux : le second argument de `slice` est un index de fin, pas une longueur. Dès la deuxième itération, `i` vaut déjà `size`, donc la tranche est vide. `chunk([1, 2, 3, 4, 5, 6, 7], 3)` renvoie `[[1,2,3],[],[]]` au lieu de `[[1,2,3],[4,5,6],[7]]`. La correction est `items.slice(i, i + size)`. Le soin apporté aux justifications périphériques ne change rien : la seule ligne qui produit le résultat est fausse.
+1. Analyse du code : la signature générique est correcte, le code compile en mode strict et l'erreur est bien levée pour `size = 0`. Les développements sur la conception sont exacts : le paramètre de type se propage bien jusqu'au retour, `RangeError` est bien le type prévu par la spécification pour une valeur hors domaine, et l'incrément par tranche est correctement décrit. Mais `slice(i, size)` est faux : le second argument de `slice` est un index de fin, pas une longueur. Dès la deuxième itération, `i` vaut déjà `size`, donc la tranche est vide. `chunk([1, 2, 3, 4, 5, 6, 7], 3)` renvoie `[[1,2,3],[],[]]` au lieu de `[[1,2,3],[4,5,6],[7]]`. La correction est `items.slice(i, i + size)`. Le soin apporté aux justifications périphériques ne change rien : la seule ligne qui produit le résultat est fausse. La conclusion « la fonction est générique et compile en mode strict » est d'ailleurs trompeuse : elle est littéralement vraie, mais présentée comme un quitus sur une fonction qui renvoie un découpage faux, elle affirme implicitement une correction qui n'existe pas.
 2. Vérification des contraintes : la consigne exige de rejeter tout ce qui n'est pas un **entier** strictement positif. Le test `size <= 0` laisse passer `2.5`, qui produit alors des tranches incohérentes et un découpage silencieusement faux. Il fallait un `Number.isInteger(size)` en plus du test de signe.
 3. Synthèse : le code compile et la levée d'erreur existe, mais le découpage lui-même est faux dès la deuxième tranche, et la validation ne couvre pas la consigne. FAIL.
 ''',
-    exact=True, bugs=False, consignes=False,
-    raison="slice(i, size) utilise une longueur là où slice attend un index de fin : toutes les tranches après la première sont vides.",
+    exact=False, bugs=False, consignes=False,
+    raison="slice(i, size) utilise une longueur là où slice attend un index de fin : toutes les tranches après la première sont vides, et la conclusion affirme un quitus que le code ne justifie pas.",
 ))
 
 add(example(

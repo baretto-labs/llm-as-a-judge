@@ -1374,3 +1374,41 @@ attendre lorsque la réponse **réussit** sa tâche.
 - **Accord sur le verdict, premier passage : 37 / 38.**
 - **Désaccords au niveau contrôle : 9** — dont **7 relevant de l'ambiguïté du libellé** documentée à
   `b03-005`, 2 perdus par l'auteur des étiquettes et corrigés.
+
+### 40. `b03-001` — l'annotateur valide une décision et corrige une indulgence, sur le même item
+
+| | 1 `exactitude_technique` | 2 `absence_de_bugs` | 3 `respect_consignes` | verdict |
+|---|---|---|---|---|
+| annotateur, premier passage | **F** | F | **F** | **FAIL** |
+| étiquette d'origine | **V** | F | **F** | **FAIL** |
+| **étiquette corrigée** | **F** | F | **F** | **FAIL** |
+
+Motif de l'annotateur nommant les **deux** défauts, ce qu'aucune lecture n'avait fait jusque-là :
+`slice(i, size)` passe une longueur là où `slice` attend un index de fin — `chunk([1..7], 3)` rend
+`[[1,2,3],[],[]]` — et `size <= 0` laisse passer `2.5` alors que la requête exigeait un **entier**
+strictement positif.
+
+**Double portée de ce point de mesure.**
+
+1. **Le F sur le contrôle 3 valide une décision prise seul par l'auteur des étiquettes.** `b03-001` est
+   l'un des deux items retirés de la liste des corrections du 2026-09-20, contre la classification que
+   l'annotateur avait pourtant validée, après lecture du `<thinking>` source. L'annotateur, qui l'ignorait,
+   a tranché dans le même sens. **L'accord sur les requêtes à exigence littérale passe à 8 / 8.**
+2. **Le F sur le contrôle 1 corrige une indulgence de l'étiquette.** Le raisonnement de référence listait
+   les affirmations explicites et les trouvait exactes — ce qui est vrai — mais laissait passer la
+   conclusion « la fonction est générique et compile en mode strict », littéralement vraie et pourtant
+   présentée comme un quitus sur un code au résultat faux. **Étiquette corrigée en F F F**, raisonnement
+   et motif amendés en conséquence.
+
+**Troisième étiquette corrigée à l'initiative de l'annotateur**, après `b09-009` et `b06-008`.
+
+Effets vérifiés : verdict FAIL inchangé, `cas` inchangé, invariants intacts (200 exemples, 104/96,
+80/80/40, golden 24/26). **`b03-001` est dans le golden set et non dans `train` : l'entraînement en cours
+n'est pas affecté**, aucun réentraînement.
+
+### État de la relecture
+
+- **39 items relus sur 50**, 11 restants — 3 hors RAG, plus les 8 RAG en bloc final.
+- **Accord sur le verdict, premier passage : 38 / 39.**
+- **Désaccords au niveau contrôle : 10** — dont 7 relevant de l'ambiguïté du libellé, et **3 perdus par
+  l'auteur des étiquettes et corrigés dans le corpus** (`b09-009`, `b06-008`, `b03-001`).
