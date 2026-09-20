@@ -134,3 +134,23 @@ le verdict, donc un juge peut réussir sans rien comprendre.*
 - *Votre vérité de référence a été écrite par un LLM — est-ce surprenant qu'un LLM y réussisse ?*
   → c'est la limite la plus sérieuse, d'où le κ humain et son intervalle.
 - *Combien de temps au total ?* → chiffrer honnêtement, y compris les trois tours de correction.
+
+---
+
+## Fil conducteur, formulé par l'utilisateur le 2026-09-20
+
+> **« Même le harnais d'évaluation ne doit pas être construit sans observation ni réflexion. »**
+
+C'est le fil qui relie tout le projet, et il est plus fort que « un jeu d'évaluation est un logiciel avec
+des bugs » parce qu'il englobe les instruments eux-mêmes :
+
+| ce qui devait mesurer | ce qui n'allait pas | ce qui l'a révélé |
+|---|---|---|
+| le corpus | trois fuites de surface, dont une déterministe sur 117 des 200 exemples | un test de permutation, puis un humain, puis un balayage |
+| `sweep_surface.py`, écrit pour trouver les fuites | deux bugs : direction non rapportée, coupes à l'intérieur des ex æquo gonflant le résultat | relecture du code au moment d'interpréter un chiffre absurde |
+| le relevé de coût | deux champs faux, durée et mémoire, pollués par une mise en veille | une comparaison avec une seconde méthode déclarée d'avance |
+| le protocole de relecture | convention d'attribution ambiguë, découverte après deux désaccords | suspension de la mesure plutôt qu'accumulation |
+| le correctif de la fuite n°2 | il a créé une fuite pire — 30/30 au lieu de 17/17 | le désaccord d'un relecteur humain, après douze mesures automatiques muettes |
+
+**Aucun instrument de ce projet n'a été juste du premier coup.** Chacun a été corrigé parce qu'on a
+regardé — jamais parce qu'une métrique a protesté. C'est la diapositive de conclusion.

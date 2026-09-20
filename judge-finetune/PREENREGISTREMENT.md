@@ -231,3 +231,50 @@ le golden set et les 21 relectures déjà faites demeurent valides.
 
 **Premier entraînement lancé après ce gel.** Toute modification ultérieure du corpus invalide les
 résultats produits et impose un nouveau pré-enregistrement daté.
+
+---
+
+## Addendum daté — 2026-09-20, choix du point de contrôle
+
+Ajout **additif**, rédigé **avant toute exécution du benchmark**. La métrique principale, la comparaison
+principale, le test et la règle de conclusion sont inchangés.
+
+### Ce que l'entraînement a montré
+
+La perte de validation atteint son minimum à **1,104 à l'itération 250**, puis remonte — 1,207 à 300,
+1,201 à 350, 1,183 à 400 — tandis que la perte d'entraînement continue de descendre jusqu'à 0,587.
+Surapprentissage modéré : même au point le plus surappris, la validation reste à **-35 %** par rapport à
+l'itération 1 (1,816). Les points de contrôle étant sauvegardés toutes les 100 itérations, il n'en existe
+aucun à 250.
+
+### Décision
+
+**Deux variantes sont benchmarkées, et leur statut est fixé ici, avant de connaître leurs résultats.**
+
+| variante | point de contrôle | val loss | statut |
+|---|---|---|---|
+| `14B-finetuned` | `0000200_adapters.safetensors` | 1,126 | **principale** — porte la métrique principale |
+| `14B-finetuned-final` | `0000400_adapters.safetensors` | 1,183 | **secondaire, exploratoire** |
+
+`14B-finetuned` est sélectionné sur la **perte de validation**, jamais sur le golden set : c'est la
+fonction même du jeu de validation, et la pratique standard.
+
+`14B-finetuned-final` est ce qu'obtient quiconque lance `make train-14b` sans regarder la courbe —
+`adapters.safetensors` pointe dessus. Il est rapporté pour chiffrer **le coût de ne pas surveiller sa
+validation**, sur la même tâche et le même jeu de test.
+
+### Interdictions explicites
+
+- **`14B-finetuned-final` ne pourra jamais être promu en variante principale**, quel que soit son score.
+- Il est **interdit** de comparer les deux sur le golden set puis de désigner la meilleure comme
+  principale. Toute la légitimité de cette double mesure tient à l'ordre des opérations, et cet ordre est
+  consigné ici, horodaté, avant la première exécution.
+- Si `14B-finetuned-final` devait obtenir un meilleur score que `14B-finetuned`, ce résultat serait publié
+  tel quel, comme un fait contre-intuitif, sans réattribution de statut.
+
+### Attendu déclaré d'avance
+
+L'écart de perplexité entre les deux vaut 7 %. Sur 50 items et une métrique de verdict, cela représente
+vraisemblablement **zéro à trois items**, soit largement à l'intérieur de l'intervalle de ±12 à 14 points
+annoncé au §5. Il est donc probable que les deux variantes soient **indistinguables**, et ce résultat-là
+sera rapporté comme tel.
