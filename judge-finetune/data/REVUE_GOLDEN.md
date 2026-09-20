@@ -1239,3 +1239,21 @@ protocole qu'elle mesure.
 - **Désaccords au niveau contrôle : 8.** Deux perdus par l'auteur des étiquettes et corrigés
   (`b09-009`, `b06-008`), un provoqué par la présentation (`b01-005`), **six relevant du même glissement
   d'attribution** sur `respect_consignes`.
+
+### 35. `b04-013` — accord complet sur le modèle mémoire Java
+
+| | 1 `exactitude_technique` | 2 `absence_de_bugs` | 3 `respect_consignes` | verdict |
+|---|---|---|---|---|
+| annotateur, premier passage | V | V | V | **PASS** |
+| étiquette | V | V | V | **PASS** |
+
+Vingt-deuxième accord consécutif, et **premier item présenté avec le texte intégral des critères** adopté
+à `b03-003`. Le motif nomme les deux points qui font la valeur de la réponse : les **champs d'objets**,
+contre-exemple qui suffit à défaire le mythe « primitif = pile », et l'**analyse d'échappement**, qui
+montre que la règle ne tient pas davantage au niveau de l'implémentation. Aucune correction du corpus.
+
+### État de la relecture
+
+- **34 items relus sur 50**, 16 restants — dont les 8 RAG, gardés pour un bloc final.
+- **Accord sur le verdict, premier passage : 33 / 34.**
+- **Désaccords au niveau contrôle : 8**, inchangé.
