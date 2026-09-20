@@ -1612,3 +1612,41 @@ réessais existe, **pas la politique** qui le régit. Aucune correction du corpu
 - **45 items relus sur 50**, **5 restants**, tous RAG et tous compromis :
   `b12-007`, `b13-008`, `b12-011`, `b13-009`, `b12-012`.
 - **Accord sur le verdict : 44 / 45.**
+
+### 47. `b12-007` — second désaccord de verdict, étiquette maintenue
+
+| | 1 `contexte_pertinent` | 2 `contexte_suffisant` | 3 `bruit_maitrise` | verdict |
+|---|---|---|---|---|
+| annotateur, premier passage | V | **F** | V | **FAIL** |
+| étiquette | V | **V** | V | **PASS** |
+
+**Deuxième désaccord de verdict de toute la relecture**, après `b07-011`. L'annotateur étend la règle de
+troncature aux questions factuelles ; le corpus ne le fait pas.
+
+**Mesure sur les 15 items `RAG_CONTEXT_RELEVANCE` posant une question de ce genre :**
+
+| type de question | contexte sans corps | `contexte_suffisant` |
+|---|---|---|
+| « how » / « in what order » | 10 items | **F dix fois sur dix** |
+| « what does X do » | 6 items | **V quatre fois**, F deux fois |
+
+Les deux exceptions factuelles, `b12-001` et `b13-005`, échouent pour une raison distincte — symbole visé
+absent ou contexte portant sur une autre classe — et non pour troncature. **La distinction est donc déjà
+appliquée uniformément dans le corpus et n'a pas été forgée pour cet item**, contrairement à celle que
+l'auteur des étiquettes avait taillée pour `b13-007` et reconnue comme motivée.
+
+Le motif de l'annotateur — la troncature « prive du code nécessaire pour expliquer la logique d'exécution
+et d'assemblage » — est exact, mais porte sur ce que la question ne demande pas. « What does `retrieve`
+do » trouve réponse dans le nœud : `public`, `List<Content>`, `@Override` de `ContentRetriever`, arête
+`CALLS` vers `WorkspaceContextRetriever.get()`, quatre champs nommant les sources. « How does it merge »,
+la question de `b12-008`, ne s'y répond pas — et l'annotateur y avait jugé F, à juste titre.
+
+**Étiquette maintenue, premier passage consigné tel quel.** L'annotateur, mis devant la mesure, a accepté
+la distinction sans demander de correction.
+
+**Réserve : point compromis.** Contexte `9fefd8a6`, identique à celui de `b12-008` relu le matin même.
+
+### État de la relecture
+
+- **46 items relus sur 50**, **4 restants** : `b13-008`, `b12-011`, `b13-009`, `b12-012`.
+- **Accord sur le verdict : 44 / 46** — `b07-011` et `b12-007`.
