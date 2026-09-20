@@ -1201,3 +1201,41 @@ demandes de la requête d'explicites ou d'implicites.
 - **32 items relus sur 50**, 18 restants — dont les 8 RAG, gardés pour un bloc final.
 - **Accord sur le verdict, premier passage : 31 / 32.**
 - **Désaccords au niveau contrôle : 7**, inchangé.
+
+### 34. `b03-003` — sixième glissement d'attribution, présentation neutre cette fois
+
+| | 1 `exactitude_technique` | 2 `absence_de_bugs` | 3 `respect_consignes` | verdict |
+|---|---|---|---|---|
+| annotateur, premier passage | F | F | **F** | **FAIL** |
+| étiquette | F | F | **V** | **FAIL** |
+
+Diagnostic de l'annotateur complet et exact, correctifs valides compris : `await items.forEach(...)`
+attend `undefined`, donc une micro-tâche, et n'attend aucune des promesses internes ; les formes correctes
+sont `await Promise.all(items.map(save))` ou une boucle `for...of` avec `await`. Aucune correction du
+corpus.
+
+Sur le contrôle 3, la convention donne V : la requête demandait d'expliquer et de corriger, et la réponse
+a fait les deux — son explication est même **exacte**, seul le correctif est inopérant, ce que mesurent
+les contrôles 1 et 2.
+
+**Différence décisive avec `b01-005` : la présentation était neutre.** Le critère 3 avait été énoncé
+« la requête demande d'expliquer et de corriger », sans qualifier ces demandes. Le glissement n'est donc
+imputable ni à la formulation, ni à un désaccord de fond — l'annotateur a explicitement confirmé la
+convention la veille, et huit étiquettes ont été corrigées sur cette base.
+
+**Constat à verser au REX :** énoncer une convention ne suffit pas à la faire appliquer, même par
+quelqu'un qui vient de la valider. Six occurrences du même réflexe, dont quatre après la clarification.
+La rubrique doit être **sous les yeux au moment du jugement**, pas dans la mémoire.
+
+**Correctif de protocole adopté :** à partir de l'item suivant, l'annotateur reçoit les trois critères
+dans leur **texte intégral**, celui que le modèle reçoit dans son invite, et non une reformulation. Cela
+ne souffle aucune réponse — le juge dispose de la même rubrique — et rend la relecture plus fidèle au
+protocole qu'elle mesure.
+
+### État de la relecture
+
+- **33 items relus sur 50**, 17 restants — dont les 8 RAG.
+- **Accord sur le verdict, premier passage : 32 / 33.**
+- **Désaccords au niveau contrôle : 8.** Deux perdus par l'auteur des étiquettes et corrigés
+  (`b09-009`, `b06-008`), un provoqué par la présentation (`b01-005`), **six relevant du même glissement
+  d'attribution** sur `respect_consignes`.
