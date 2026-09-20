@@ -1718,3 +1718,38 @@ libellé n'exprime pas la convention de vacuité.
 - **48 items relus sur 50**, **2 restants** : `b13-009`, `b12-012`.
 - **Accord sur le verdict : 46 / 48.**
 - Désaccords sur `citations_exactes` : **3**, tous de même forme.
+
+### 50. `b13-009` — l'inférence signalée passe, l'inférence assurée tombe
+
+| | 1 `affirmations_etayees` | 2 `absence_invention` | 3 `citations_exactes` | verdict |
+|---|---|---|---|---|
+| annotateur, premier passage | V | V | V | **PASS** |
+| étiquette | V | V | V | **PASS** |
+
+Accord complet. Motif de l'annotateur : « posture exemplaire en monde fermé : la réponse annonce
+l'insuffisance du contexte, se borne à restituer les seuls champs présents et s'interdit toute
+hallucination comportementale ».
+
+L'item avait été présenté avec un signalement neutre : les deux premières affirmations tirent des
+conclusions de **noms de champs** (« dont le nom indique », « vraisemblablement »). L'annotateur les a
+tenues pour étayées.
+
+**Ce que l'accord établit.** Rapproché de `b13-008`, où des inférences de même nature tombaient sur
+`absence_invention`, le critère qui sépare les deux n'est pas le contenu de l'inférence — à `b13-008`
+elle était *vraie dans la codebase réelle* — mais son **mode d'énonciation** : marquée comme inférence,
+elle passe ; avancée comme un fait, elle tombe. Deux jugements indépendants convergent sur cette ligne
+alors qu'elle ne figure dans aucun des trois libellés de la rubrique.
+
+À verser aux limites : contrairement aux deux désaccords de libellé (`respect_consignes`,
+`citations_exactes`), cette convention-ci n'a **pas** eu besoin d'être écrite pour être partagée. Elle ne
+demande donc aucune correction, mais elle indique que la rubrique sous-spécifie aussi là où elle
+fonctionne — le corpus porte des conventions que le texte n'énonce pas.
+
+**Réserve : point compromis.** Troisième item bâti sur le contexte `9f177235`, après `b13-001` et
+`b13-008`, avec une requête identique.
+
+### État de la relecture
+
+- **49 items relus sur 50**, **1 restant** : `b12-012`.
+- **Accord sur le verdict : 47 / 49.**
+- Désaccords sur `citations_exactes` : **3**, tous de même forme.
