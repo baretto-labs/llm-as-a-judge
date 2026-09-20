@@ -1257,3 +1257,32 @@ montre que la règle ne tient pas davantage au niveau de l'implémentation. Aucu
 - **34 items relus sur 50**, 16 restants — dont les 8 RAG, gardés pour un bloc final.
 - **Accord sur le verdict, premier passage : 33 / 34.**
 - **Désaccords au niveau contrôle : 8**, inchangé.
+
+### 36. `b04-002` — accord complet, y compris sur le contrôle le plus disputé
+
+| | 1 `exactitude_technique` | 2 `absence_de_bugs` | 3 `respect_consignes` | verdict |
+|---|---|---|---|---|
+| annotateur, premier passage | F | F | **F** | **FAIL** |
+| étiquette | F | F | **F** | **FAIL** |
+
+Vingt-troisième accord consécutif. Diagnostic identique : `Arrays.asList` renvoie une vue **de taille
+fixe** et non une liste immuable — `add` et `remove` lèvent, mais `set` écrit dans le tableau sous-jacent.
+Les deux corrections citées par l'annotateur, `List.copyOf` et `Collections.unmodifiableList`, sont celles
+de l'étiquette. Aucune correction du corpus.
+
+**Ce point vaut double.** `b04-002` est l'un des deux items que l'auteur des étiquettes avait **retirés de
+la liste des corrections** le 2026-09-20, contre sa propre classification initiale que l'annotateur avait
+pourtant validée, après avoir lu le `<thinking>` source et constaté que la requête y formule une exigence
+littérale — « empêche l'appelant de modifier la liste ». L'annotateur, qui l'ignorait, a tranché dans le
+même sens.
+
+**C'est aussi le premier item depuis la clarification de convention où `respect_consignes` est jugé F à
+bon droit par les deux parties.** Après six glissements dans l'autre sens, la distinction fonctionne :
+une exigence littérale non satisfaite fait bien tomber le contrôle 3, là où un contenu simplement faux ne
+le fait pas. Présenté avec le texte intégral des critères.
+
+### État de la relecture
+
+- **35 items relus sur 50**, 15 restants — 7 hors RAG, plus les 8 RAG gardés pour un bloc final.
+- **Accord sur le verdict, premier passage : 34 / 35.**
+- **Désaccords au niveau contrôle : 8**, inchangé.
