@@ -104,13 +104,26 @@ public class RagContextJudge {
     private final ChatModel model;
     private final String modelLabel;
 
+    /**
+     * Propriété système, une valeur vide comptant comme absente.
+     *
+     * <p>{@code System.getProperty(cle, defaut)} ne rend le défaut que si la propriété est
+     * <b>null</b>. Or surefire les transmet toutes, y compris non renseignées, donc elles
+     * arrivent comme chaîne vide et le défaut n'est jamais appliqué. Sans ce garde,
+     * {@code jmh.judge.adapter} vaudrait {@code ""}, aucun adaptateur ne serait envoyé, et le
+     * juge interrogerait le <b>modèle de base</b> en se croyant fine-tuné — silencieusement.</p>
+     */
+    private static String prop(String cle, String defaut) {
+        String v = System.getProperty(cle);
+        return (v == null || v.isBlank()) ? defaut : v.trim();
+    }
+
     public RagContextJudge() {
-        String provider = System.getProperty("jmh.judge.provider", PROVIDER_OPENAI);
+        String provider = prop("jmh.judge.provider", PROVIDER_OPENAI);
         boolean openai = PROVIDER_OPENAI.equalsIgnoreCase(provider);
-        String baseUrl = System.getProperty("jmh.judge.url",
-            openai ? DEFAULT_OPENAI_URL : DEFAULT_OLLAMA_URL);
-        String modelName = System.getProperty("jmh.judge.model", DEFAULT_MODEL);
-        String adapter = System.getProperty("jmh.judge.adapter", DEFAULT_ADAPTER);
+        String baseUrl = prop("jmh.judge.url", openai ? DEFAULT_OPENAI_URL : DEFAULT_OLLAMA_URL);
+        String modelName = prop("jmh.judge.model", DEFAULT_MODEL);
+        String adapter = prop("jmh.judge.adapter", DEFAULT_ADAPTER);
 
         if (openai) {
             var builder = OpenAiChatModel.builder()
