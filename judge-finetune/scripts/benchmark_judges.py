@@ -23,6 +23,7 @@ No third-party dependencies.
 
 import argparse
 import json
+import math
 import os
 import random
 import statistics
@@ -140,6 +141,24 @@ def chat_completion(variant, messages, temperature, max_tokens, timeout, retries
             time.sleep(2 ** attempt)
 
 
+def messages_for(variant, item):
+    """Invite envoyée à une variante : celle du corpus, éventuellement suffixée.
+
+    `14B-baseline-conventions` ne diffère de `14B-baseline-nu` que par ce suffixe,
+    les conventions de PROTOCOLE.md reprises mot pour mot. Le corps de l'invite
+    reste celui du corpus — qui est aussi celui vu à l'entraînement : le remplacer
+    ferait mesurer un changement d'invite autant qu'un fine-tuning.
+    """
+    system, user = item["prompt"]
+    suffix = variant.get("system_suffix") or ""
+    if not suffix and variant.get("system_suffix_file"):
+        suffix = Path(variant["system_suffix_file"]).read_text(encoding="utf-8")
+    if not suffix.strip():
+        return [system, user]
+    fondu = system["content"].rstrip() + "\n\n" + suffix.strip()
+    return [{"role": system["role"], "content": fondu}, user]
+
+
 def run_variant(variant, golden, args, runs_dir):
     cache_path = runs_dir / f"{variant['name']}.jsonl"
     done = set()
@@ -157,7 +176,8 @@ def run_variant(variant, golden, args, runs_dir):
     print(f"[{variant['name']}] {len(todo)} generations to run ({len(done)} cached)")
     with cache_path.open("a", encoding="utf-8") as f:
         for n, (p, item) in enumerate(todo, 1):
-            result = chat_completion(variant, item["prompt"], args.temperature, args.max_tokens, args.timeout)
+            result = chat_completion(variant, messages_for(variant, item),
+                                     args.temperature, args.max_tokens, args.timeout)
             f.write(json.dumps({"pass": p, "id": item["id"], **result}, ensure_ascii=False) + "\n")
             f.flush()
             status = "ERR" if result["error"] else f"{result['latency_s']:.1f}s"
@@ -357,21 +377,73 @@ def evaluate(variant, golden, runs, args, rng):
     }
 
 
-def paired_delta(golden, runs_a, runs_b, iterations, rng):
-    """Bootstrap over items of kappa(b) - kappa(a), same resampled items for both variants."""
-    n = len(golden)
-    full = mean_kappa(golden, runs_b, range(n)) - mean_kappa(golden, runs_a, range(n))
-    lo, hi = bootstrap_ci(lambda idx: mean_kappa(golden, runs_b, idx) - mean_kappa(golden, runs_a, idx),
-                          n, iterations, rng)
+# NOTE : `paired_delta`, l'écart apparié sur le κ, a été supprimé le 2026-09-21.
+# C'était la statistique de décision que l'amendement du même jour a destituée.
+# La laisser en place, inutilisée, aurait suffi à la rebrancher par inadvertance.
+# Le κ reste rapporté comme descriptif ; il ne sert plus à comparer deux variantes.
+
+
+# ── Métrique principale : justesse stricte du verdict (PREENREGISTREMENT §4) ──
+#
+# Un verdict par item, obtenu par vote majoritaire sur les passes. Ce choix n'est
+# pas cosmétique : McNemar exige un résultat binaire apparié par item, et la §6.5
+# mesure déjà la répétabilité séparément. Moyenner la justesse sur les passes
+# mélangerait les deux. Un item sans majorité est INVALID, donc compté faux.
+
+def majority_verdicts(golden, runs):
+    out = []
+    for g in golden:
+        votes = [runs[p][g["id"]]["verdict"] if g["id"] in runs[p] else INVALID for p in runs]
+        out.append(majority(votes))
+    return out
+
+
+def strict_accuracy(gold, pred):
+    return sum(g == p for g, p in zip(gold, pred)) / len(gold) if gold else float("nan")
+
+
+def mcnemar_exact(gold, pred_a, pred_b):
+    """McNemar exact bilatéral (PREENREGISTREMENT §5), α = 0,05.
+
+    b = items où A a juste et B faux ; c = l'inverse. Seules ces paires
+    discordantes portent de l'information — à n = 50, leur nombre est le vrai
+    déterminant de la puissance, et il est publié avec le p.
+    """
+    b = sum(1 for g, a, x in zip(gold, pred_a, pred_b) if a == g and x != g)
+    c = sum(1 for g, a, x in zip(gold, pred_a, pred_b) if a != g and x == g)
+    n = b + c
+    if n == 0:
+        return b, c, 1.0
+    queue = sum(math.comb(n, i) for i in range(min(b, c) + 1)) / (2 ** n)
+    return b, c, min(1.0, 2 * queue)
+
+
+def paired_accuracy_delta(golden, runs_a, runs_b, iterations, rng):
+    """Bootstrap apparié par percentiles sur la différence de justesse (B − A)."""
+    gold = [g["gold"]["verdict"] for g in golden]
+    pa, pb = majority_verdicts(golden, runs_a), majority_verdicts(golden, runs_b)
+    full = strict_accuracy(gold, pb) - strict_accuracy(gold, pa)
+
+    def stat(idx):
+        return (strict_accuracy([gold[i] for i in idx], [pb[i] for i in idx])
+                - strict_accuracy([gold[i] for i in idx], [pa[i] for i in idx]))
+
+    lo, hi = bootstrap_ci(stat, len(golden), iterations, rng)
     return full, lo, hi
 
 
 # ── Decision & report ─────────────────────────────────────────────────────────
 
 def qualification(m, args):
+    """Recevabilité opérationnelle — PAS une règle de conclusion.
+
+    La §7 du pré-enregistrement ne déclare aucun seuil : elle tranche sur la seule
+    comparaison principale. Ce filtre dit autre chose, et de purement pratique —
+    une variante qui ne rend pas du JSON exploitable n'est pas utilisable en
+    production, quelle que soit sa justesse. Aucun seuil en κ : le κ est descriptif
+    depuis l'amendement du 2026-09-21.
+    """
     reasons = []
-    if m["kappa_mean"] < args.min_kappa:
-        reasons.append(f"κ {m['kappa_mean']:.2f} < {args.min_kappa}")
     if m["verdict_stability"] < args.min_stability:
         reasons.append(f"stabilité {m['verdict_stability']:.0%} < {args.min_stability:.0%}")
     if m["strict_format_rate"] < args.min_format:
@@ -387,7 +459,7 @@ def fmt(x, pct=False, digits=2):
     return f"{x:.0%}" if pct else f"{x:.{digits}f}"
 
 
-def build_report(metrics, golden, args, rng):
+def build_report(metrics, golden, args, rng, config, selected_names):
     lines = ["# Benchmark LLM-as-a-Judge — 14B vs 32B", ""]
     lines.append(f"Golden set : {len(golden)} items | passes : {args.passes} | température : {args.temperature} | "
                  f"bootstrap : {args.bootstrap}")
@@ -454,61 +526,83 @@ def build_report(metrics, golden, args, rng):
                      f"{fmt(hours, digits=1)} h | ${fmt(m['cost_per_1k_judgments_usd'])} |")
 
     by_name = {m["name"]: m for m in metrics}
-    pairs = []
-    for size in ("14B", "32B"):
-        base = next((m for m in metrics if m["size"] == size and not m["fine_tuned"]), None)
-        tuned = next((m for m in metrics if m["size"] == size and m["fine_tuned"]), None)
-        if base and tuned:
-            pairs.append((base["name"], tuned["name"]))
-    for tuned_flag in (True, False):
-        small = next((m for m in metrics if m["size"] == "14B" and m["fine_tuned"] == tuned_flag), None)
-        large = next((m for m in metrics if m["size"] == "32B" and m["fine_tuned"] == tuned_flag), None)
-        if small and large:
-            pairs.append((small["name"], large["name"]))
-    if pairs:
-        lines += ["", "Écarts de κ appariés (bootstrap sur les items, B − A) :", "",
-                  "| A | B | Δκ | IC95 | Significatif |", "|---|---|---|---|---|"]
-        deltas = {}
-        for a, b in pairs:
-            d, lo, hi = paired_delta(golden, by_name[a]["_runs"], by_name[b]["_runs"], args.bootstrap, rng)
-            deltas[(a, b)] = (d, lo, hi)
-            lines.append(f"| {a} | {b} | {d:+.3f} | [{lo:+.3f}, {hi:+.3f}] | {'oui' if lo > 0 or hi < 0 else 'non'} |")
-    else:
-        deltas = {}
+    gold = [g["gold"]["verdict"] for g in golden]
+    comparaisons = config.get("comparisons") or {}
 
-    lines += ["", "## Décision", ""]
-    qualified = []
+    # Les paires sont DÉCLARÉES, jamais inférées. L'inférence précédente prenait
+    # `next(... not fine_tuned ...)`, donc la première venue dans le JSON : avec
+    # deux 14B non fine-tunées elle pouvait opposer le fine-tune à la variante nue,
+    # l'homme de paille que la §3 interdit — et le biais allait dans le sens
+    # favorable au fine-tuning. Voir l'amendement du 2026-09-21.
+    principale = comparaisons.get("primary")
+    if not principale:
+        sys.exit("[ERROR] le fichier de configuration ne déclare pas comparisons.primary. "
+                 "La paire principale doit être déclarée explicitement, jamais devinée.")
+
+    lines += ["", "## Comparaison principale (PREENREGISTREMENT §5)", ""]
+    a, b = principale["a"], principale["b"]
+    absents = [n for n in (a, b) if n not in by_name]
+    if absents:
+        attendus = [n for n in absents if n in selected_names]
+        if attendus:
+            sys.exit(f"[ERROR] paire principale incomplète : {attendus} sans métriques exploitables. "
+                     "Le rapport refuse de conclure sur une paire amputée.")
+        lines += [f"⚠️ **Non calculée** : {absents} hors de la sélection `--variants`. "
+                  "Aucune conclusion n'est émise.", ""]
+    else:
+        pa = majority_verdicts(golden, by_name[a]["_runs"])
+        pb = majority_verdicts(golden, by_name[b]["_runs"])
+        acc_a, acc_b = strict_accuracy(gold, pa), strict_accuracy(gold, pb)
+        n_b, n_c, p = mcnemar_exact(gold, pa, pb)
+        d, lo, hi = paired_accuracy_delta(golden, by_name[a]["_runs"], by_name[b]["_runs"],
+                                          args.bootstrap, rng)
+        if principale.get("claim"):
+            lines += [f"Affirmation testée : {principale['claim']}.", ""]
+        lines += ["| Variante | Justesse stricte du verdict (vote majoritaire) |", "|---|---|",
+                  f"| {a} | {acc_a:.1%} |", f"| {b} | {acc_b:.1%} |", "",
+                  f"**Δ justesse = {d:+.1%}**, IC95 bootstrap apparié [{lo:+.1%}, {hi:+.1%}] "
+                  f"({args.bootstrap} rééchantillonnages).",
+                  f"**McNemar exact bilatéral : p = {p:.4f}** sur {n_b + n_c} paires discordantes "
+                  f"(*{a}* seul juste {n_b}, *{b}* seul juste {n_c}).", ""]
+        contient_zero = lo <= 0 <= hi
+        if contient_zero:
+            lines.append(f"→ **Non concluant.** L'intervalle [{lo:+.1%}, {hi:+.1%}] contient zéro, "
+                         f"pour une largeur de {hi - lo:.1%}. À n = {len(golden)} items, l'étude ne "
+                         f"pouvait pas détecter une différence inférieure à ~15 points : cette limite "
+                         f"était énoncée en §5 avant les résultats.")
+        elif p < args.alpha and d > 0:
+            lines.append(f"→ **Le fine-tuning améliore la justesse de {d:+.1%}**, IC95 [{lo:+.1%}, {hi:+.1%}].")
+        elif p < args.alpha and d < 0:
+            lines.append(f"→ **Le fine-tuning dégrade la justesse de {d:+.1%}**, IC95 [{lo:+.1%}, {hi:+.1%}]. "
+                         f"Publié tel quel, sans atténuation (§7).")
+        else:
+            lines.append(f"→ L'intervalle exclut zéro mais p = {p:.4f} ≥ {args.alpha} : les deux critères "
+                         f"de la §7 ne sont pas réunis, aucune amélioration n'est revendiquée.")
+
+    autres = comparaisons.get("secondary") or []
+    calculables = [c for c in autres if c["a"] in by_name and c["b"] in by_name]
+    if calculables:
+        lines += ["", "## Comparaisons secondaires, descriptives", "",
+                  "Aucune ne porte de conclusion : la §7 ne tranche que la comparaison principale.", "",
+                  "| A | B | Δ justesse (B − A) | IC95 | McNemar p | Paires discordantes |",
+                  "|---|---|---|---|---|---|"]
+        for c in calculables:
+            x, y = c["a"], c["b"]
+            px = majority_verdicts(golden, by_name[x]["_runs"])
+            py = majority_verdicts(golden, by_name[y]["_runs"])
+            nb2, nc2, p2 = mcnemar_exact(gold, px, py)
+            d2, lo2, hi2 = paired_accuracy_delta(golden, by_name[x]["_runs"], by_name[y]["_runs"],
+                                                 args.bootstrap, rng)
+            lines.append(f"| {x} | {y} | {d2:+.1%} | [{lo2:+.1%}, {hi2:+.1%}] | {p2:.4f} | {nb2 + nc2} |")
+
+    lines += ["", "## Recevabilité opérationnelle", "",
+              "Filtre pratique, **sans pouvoir de décision** : une variante qui ne rend pas du JSON "
+              "exploitable n'est pas utilisable en production, quelle que soit sa justesse. La §7 ne "
+              "déclare aucun seuil de ce genre, et la conclusion de l'étude reste la seule comparaison "
+              "principale ci-dessus.", ""]
     for m in metrics:
         reasons = qualification(m, args)
-        lines.append(f"- **{m['name']}** : " + ("qualifié" if not reasons else "non qualifié — " + "; ".join(reasons)))
-        if not reasons:
-            qualified.append(m)
-    lines.append("")
-    if not qualified:
-        lines.append("Aucune variante ne passe les seuils de qualification. Le gagnant au κ brut est donné à titre indicatif.")
-        qualified = metrics
-    winner = max(qualified, key=lambda m: m["kappa_mean"])
-    lines.append(f"**Gagnant (κ maximal parmi les variantes qualifiées) : {winner['name']}** (κ = {fmt(winner['kappa_mean'])})")
-
-    if winner["size"] == "32B":
-        best_14b = max((m for m in qualified if m["size"] == "14B"), key=lambda m: m["kappa_mean"], default=None)
-        if best_14b is None:
-            lines.append("Aucune variante 14B qualifiée : le 32B est recommandé par défaut.")
-        else:
-            d, lo, hi = paired_delta(golden, best_14b["_runs"], winner["_runs"], args.bootstrap, rng)
-            cost_ratio = (winner["cost_per_1k_judgments_usd"] / best_14b["cost_per_1k_judgments_usd"]
-                          if best_14b["cost_per_1k_judgments_usd"] else float("inf"))
-            justified = lo > 0 and d >= args.min_kappa_gain
-            lines.append(f"Face au meilleur 14B qualifié ({best_14b['name']}) : Δκ = {d:+.3f} [IC95 {lo:+.3f}, {hi:+.3f}], "
-                         f"coût ×{fmt(cost_ratio, digits=1)}, latence p50 ×"
-                         f"{fmt(winner['latency_p50_s'] / best_14b['latency_p50_s'], digits=1)}.")
-            if justified:
-                lines.append(f"→ **Le 32B est justifié** : gain significatif et ≥ {args.min_kappa_gain} point de κ.")
-            else:
-                lines.append(f"→ **Recommandation : {best_14b['name']}**. Le gain de κ du 32B n'est pas significatif "
-                             f"ou reste < {args.min_kappa_gain}, ce qui ne justifie pas son surcoût.")
-    else:
-        lines.append(f"→ Le gagnant est un modèle {winner['size']} : aucun surcoût 32B à justifier.")
+        lines.append(f"- **{m['name']}** : " + ("recevable" if not reasons else "non recevable — " + "; ".join(reasons)))
     if len(golden) < 100:
         lines.append("")
         lines.append(f"⚠️ Avec n = {len(golden)} items, les IC95 de κ sont larges (±0,15 à ±0,25 dès n ≈ 50, bien plus en dessous). "
@@ -526,13 +620,16 @@ def main():
     parser.add_argument("--temperature", type=float, default=0.2)
     parser.add_argument("--max-tokens", type=int, default=1024)
     parser.add_argument("--timeout", type=float, default=300)
-    parser.add_argument("--bootstrap", type=int, default=2000)
+    parser.add_argument("--bootstrap", type=int, default=10000,
+                        help="PREENREGISTREMENT §5 : 10 000 rééchantillonnages déclarés")
     parser.add_argument("--seed", type=int, default=42)
-    parser.add_argument("--min-kappa", type=float, default=0.60, help="qualification: substantial agreement")
-    parser.add_argument("--min-stability", type=float, default=0.95, help="qualification: verdict stability over passes")
-    parser.add_argument("--min-format", type=float, default=0.95, help="qualification: strict output format rate")
-    parser.add_argument("--max-verbose-fpr", type=float, default=0.20, help="qualification: false PASS on verbose buggy answers")
-    parser.add_argument("--min-kappa-gain", type=float, default=0.05, help="minimum kappa gain that justifies the 32B")
+    parser.add_argument("--alpha", type=float, default=0.05,
+                        help="PREENREGISTREMENT §5 : seuil du McNemar exact")
+    # Recevabilité opérationnelle, sans pouvoir de décision : voir qualification().
+    parser.add_argument("--min-stability", type=float, default=0.95, help="recevabilité : stabilité du verdict")
+    parser.add_argument("--min-format", type=float, default=0.95, help="recevabilité : taux de format strict")
+    parser.add_argument("--max-verbose-fpr", type=float, default=0.20,
+                        help="recevabilité : faux PASS sur réponses verbeuses buguées")
     parser.add_argument("--report-only", action="store_true", help="skip inference, recompute metrics from cached runs")
     args = parser.parse_args()
 
@@ -564,7 +661,7 @@ def main():
     if not metrics:
         sys.exit("[ERROR] nothing to report")
 
-    report = build_report(metrics, golden, args, rng)
+    report = build_report(metrics, golden, args, rng, config, [v["name"] for v in variants])
     (out / "report.md").write_text(report, encoding="utf-8")
     serializable = [{k: v for k, v in m.items() if k != "_runs"} for m in metrics]
     (out / "metrics.json").write_text(json.dumps(serializable, indent=2, ensure_ascii=False), encoding="utf-8")
