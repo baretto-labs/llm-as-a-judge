@@ -59,6 +59,25 @@ public class RagContextJudge {
     private static final String DEFAULT_OLLAMA_URL = "http://localhost:11434";
     private static final String DEFAULT_MODEL = "mlx-community/Qwen2.5-Coder-14B-Instruct-4bit";
 
+    /**
+     * Adaptateur LoRA à appliquer, transmis dans le corps de chaque requête.
+     *
+     * <p><b>Le {@code --adapter-path} passé au démarrage de mlx_lm.server ne suffit pas</b>, et
+     * l'échec est silencieux : le serveur l'enregistre sous la clé littérale {@code default_model}
+     * ({@code server.py:316}) et ne l'applique que si la requête demande ce nom-là. Toute requête
+     * nommant un vrai modèle reçoit les poids de base, sans le moindre avertissement — vérifié le
+     * 2026-09-21, le juge rendait alors un JSON au mauvais schéma et chaque jugement aurait compté
+     * INVALID. Le champ {@code adapters} du corps, lui, fonctionne.</p>
+     *
+     * <p><b>Chemin résolu par le serveur, pas par la JVM.</b> Il est relatif au répertoire d'où
+     * {@code mlx_lm.server} a été lancé — {@code judge-finetune/} — et non à la racine du dépôt
+     * d'où Maven s'exécute.</p>
+     *
+     * <p>{@code -Djmh.judge.adapter=} (vide) interroge le modèle de base, ce qui est la façon
+     * d'obtenir la variante {@code 14B-baseline} sans changer de serveur.</p>
+     */
+    private static final String DEFAULT_ADAPTER = "adapters/14b-judge-ckpt200";
+
     /** Repris mot pour mot du corpus : toute variation sort le modèle de sa distribution. */
     private static final String SYSTEM_PROMPT =
         "Tu es un juge IA ultra-rigoureux. TÂCHE: RAG_CONTEXT_RELEVANCE. "
@@ -91,16 +110,24 @@ public class RagContextJudge {
         String baseUrl = System.getProperty("jmh.judge.url",
             openai ? DEFAULT_OPENAI_URL : DEFAULT_OLLAMA_URL);
         String modelName = System.getProperty("jmh.judge.model", DEFAULT_MODEL);
+        String adapter = System.getProperty("jmh.judge.adapter", DEFAULT_ADAPTER);
 
-        this.model = openai
-            ? OpenAiChatModel.builder()
+        if (openai) {
+            var builder = OpenAiChatModel.builder()
                 .baseUrl(baseUrl).apiKey("none").modelName(modelName)
-                .temperature(0.0).timeout(Duration.ofSeconds(120)).build()
-            : OllamaChatModel.builder()
+                .temperature(0.0).timeout(Duration.ofSeconds(120));
+            if (!adapter.isBlank()) {
+                builder.customParameters(Map.of("adapters", adapter));
+            }
+            this.model = builder.build();
+        } else {
+            this.model = OllamaChatModel.builder()
                 .baseUrl(baseUrl).modelName(modelName)
                 .temperature(0.0).timeout(Duration.ofSeconds(120)).build();
-        this.modelLabel = modelName;
-        logger.info("RagContextJudge initialisé : {} sur {} (provider={})", modelName, baseUrl, provider);
+        }
+        this.modelLabel = adapter.isBlank() ? modelName : modelName + "+" + adapter;
+        logger.info("RagContextJudge initialisé : {} sur {} (provider={}, adaptateur={})",
+            modelName, baseUrl, provider, adapter.isBlank() ? "aucun" : adapter);
     }
 
     /** Injection directe, pour les tests. */
