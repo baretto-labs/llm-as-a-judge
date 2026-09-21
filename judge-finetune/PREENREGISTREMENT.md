@@ -527,3 +527,44 @@ d'observations que le κ du verdict.
 
 **Ce qui n'est pas amendé.** La métrique principale de l'étude reste celle de la §3. Le κ est une mesure de
 qualité du corpus de référence, publiée au titre des limites — il ne sert pas à départager les variantes.
+
+---
+
+## Amendement daté — 2026-09-21, défaut de reproductibilité du tirage, corrigé avant l'entraînement final
+
+Relevé en vérifiant, avant de lancer le run unique, que le corpus gelé se régénère bien à l'identique. Il
+ne se régénérait pas à l'identique.
+
+**Le défaut.** `scripts/dataset_tools.py` construisait `data/mlx/valid.jsonl`, `data/mlx/test.jsonl` et
+`data/golden/test.jsonl` en itérant un `set` de noms de familles. L'ordre d'itération d'un ensemble de
+chaînes varie d'un processus à l'autre (randomisation du hachage), si bien que **l'ordre des lignes de ces
+trois fichiers changeait à chaque exécution**. `train.jsonl` était épargné parce qu'il itère un `dict`, qui
+conserve son ordre d'insertion — c'est ce contraste qui a permis d'isoler la cause.
+
+Le `rng.shuffle(part)` appliqué ensuite est pourtant graîné (`SPLIT_SEED=11`). Il ne corrige rien :
+mélanger avec une graine fixe une liste dont l'ordre d'entrée est instable produit une sortie instable. La
+graine protégeait d'un aléa, pas de celui-là.
+
+**Ce qui n'était PAS affecté, et qui est prouvé, pas supposé.** L'appartenance et les étiquettes ont
+toujours été déterministes : comparaison du golden avant et après régénération — mêmes 50 identifiants,
+**0 ligne différente**, seul l'ordre changeant. Le gel du corpus tient donc, et le κ publié plus haut a été
+recalculé sur le golden réordonné : chiffres identiques au bit près, recoupements au vert.
+
+**Ce qui était affecté.** L'ordre des lignes détermine l'ordre des lots d'entraînement. À graine égale,
+deux exécutions produisaient donc des adaptateurs différents. La §9.3 affirme qu'« un adaptateur LoRA est
+figé et rejouable » : cette affirmation était fausse pour la chaîne de données, et elle l'aurait été dans
+le REX si le contrôle n'avait pas été fait.
+
+**Le correctif.** `sorted()` sur les deux ensembles de familles avant construction des listes.
+**Vérification :** trois exécutions dans trois processus distincts, quatre fichiers chacun, empreintes
+SHA-256 identiques. Un premier contrôle avait affiché un faux succès — `shasum` recevant une variable non
+découpée par zsh comparait des fichiers vides — et a été refait avec des noms littéraux.
+
+**Conséquence sur les mesures déjà prises.** Le run d'entraînement du 2026-09-20 a utilisé un ordre non
+reproductible. Il était déjà périmé pour une autre raison — l'échange `b13-004` / `b13-007` postérieur —
+et est archivé sous `adapters/perimes/14b-judge-20260920-2132-avant-echange-b13-004/` et
+`mesures/cout/run-20260920-2132-avant-echange-b13-004/`. Ses chiffres de coût restent valables comme ordre
+de grandeur, les hyperparamètres étant inchangés, mais l'adaptateur lui-même n'est pas rejouable.
+
+**Ce qui n'est pas amendé.** Ni la métrique principale, ni la composition du corpus, ni les paires de
+comparaison déclarées.

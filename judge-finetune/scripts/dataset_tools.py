@@ -301,8 +301,13 @@ def cmd_split(args):
     n_valid = max(1, round(sum(len(m) for m in rest.values()) * args.valid_ratio))
     valid_fams = set(pick_families(rest, rng, n_valid, Counter({s: n_valid for s in strata_counts})))
 
-    test = [ex for f in test_fams for ex in families[f]]
-    valid = [ex for f in valid_fams for ex in rest[f]]
+    # `sorted` n'est pas cosmétique : itérer un set de chaînes donne un ordre qui
+    # varie d'un processus à l'autre (randomisation du hachage), et le shuffle
+    # graîné qui suit ne le rattrape pas — mélanger une entrée instable reste
+    # instable. L'appartenance était déjà déterministe, l'ordre des lignes ne
+    # l'était pas, d'où des lots d'entraînement non reproductibles à graine égale.
+    test = [ex for f in sorted(test_fams) for ex in families[f]]
+    valid = [ex for f in sorted(valid_fams) for ex in rest[f]]
     train = [ex for f, members in rest.items() if f not in valid_fams for ex in members]
     for part in (train, valid, test):
         rng.shuffle(part)
