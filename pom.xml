@@ -13,6 +13,21 @@
         <maven.compiler.target>21</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <langchain4j.version>1.11.0</langchain4j.version>
+
+        <!-- Défauts vides, requis par <systemPropertyVariables> de surefire : sans eux, un
+             ${...} non résolu serait transmis littéralement à la JVM de test. -->
+        <rag.source.dir/>
+        <rag.scenario/>
+        <jmh.judge.enabled/>
+        <jmh.judge.provider/>
+        <jmh.judge.url/>
+        <jmh.judge.model/>
+        <jmh.judge.adapter/>
+        <jmh.difficulty/>
+        <jmh.params/>
+        <jmh.include/>
+        <jmh.result/>
+
         <neo4j.version>2026.01.4</neo4j.version>
         <lucene.version>10.3.2</lucene.version>
     </properties>
@@ -51,6 +66,32 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>3.2.5</version>
+                <configuration>
+                    <!--
+                        Sans ce bloc, les `-D` passés à Maven n'atteignent PAS la JVM de test :
+                        surefire forke et ne transmet rien par défaut. Constaté le 2026-09-21 —
+                        `-Drag.source.dir=...` était ignoré, le banc indexait le corpus synthétique
+                        `com.example.service.Class0Service` au lieu d'OllamAssist, et les 60
+                        questions étaient jugées sur un contexte sans aucun rapport. La mesure
+                        paraissait réussie : BUILD SUCCESS, 120 jugements, hintCoverage 0,000.
+
+                        Les propriétés sont déclarées vides dans <properties> : une valeur absente
+                        arrive donc comme chaîne vide, et le code la traite comme non renseignée.
+                    -->
+                    <systemPropertyVariables>
+                        <rag.source.dir>${rag.source.dir}</rag.source.dir>
+                        <rag.scenario>${rag.scenario}</rag.scenario>
+                        <jmh.judge.enabled>${jmh.judge.enabled}</jmh.judge.enabled>
+                        <jmh.judge.provider>${jmh.judge.provider}</jmh.judge.provider>
+                        <jmh.judge.url>${jmh.judge.url}</jmh.judge.url>
+                        <jmh.judge.model>${jmh.judge.model}</jmh.judge.model>
+                        <jmh.judge.adapter>${jmh.judge.adapter}</jmh.judge.adapter>
+                        <jmh.difficulty>${jmh.difficulty}</jmh.difficulty>
+                        <jmh.params>${jmh.params}</jmh.params>
+                        <jmh.include>${jmh.include}</jmh.include>
+                        <jmh.result>${jmh.result}</jmh.result>
+                    </systemPropertyVariables>
+                </configuration>
             </plugin>
         </plugins>
     </build>

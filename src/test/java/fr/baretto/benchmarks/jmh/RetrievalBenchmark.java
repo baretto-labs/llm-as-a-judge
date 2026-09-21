@@ -125,9 +125,11 @@ public class RetrievalBenchmark {
     @Setup(Level.Trial)
     public void setupTrial() throws Exception {
         // Env var takes priority (inherited by JMH fork), system property as fallback
+        // Une propriété non renseignée arrive comme chaîne vide depuis surefire : la traiter
+        // comme absente, sinon Path.of("") indexerait le répertoire courant.
         String realSourceDir = System.getenv("RAG_SOURCE_DIR");
-        if (realSourceDir == null) realSourceDir = System.getProperty("rag.source.dir");
-        if (realSourceDir != null) {
+        if (realSourceDir == null || realSourceDir.isBlank()) realSourceDir = System.getProperty("rag.source.dir");
+        if (realSourceDir != null && !realSourceDir.isBlank()) {
             sourceDir = Path.of(realSourceDir);
             syntheticSource = false;
         } else {
@@ -154,7 +156,12 @@ public class RetrievalBenchmark {
                 .filter(q -> q.difficulty().name().equalsIgnoreCase(diffFilter))
                 .toList();
 
-        boolean judgeEnabled = !"false".equalsIgnoreCase(System.getProperty("jmh.judge.enabled", "true"));
+        // Désactivé par défaut depuis le 2026-09-21 : juger dans le cycle de vie de JMH produisait
+        // deux défauts — l'échéance de 10 min par itération interrompait le jugement à mi-parcours
+        // (70 INVALID sur 120), et chaque @Benchmark étant son propre essai, Lucene et Neo4j ne
+        // coexistaient jamais, rendant le test apparié impossible. La qualité se mesure désormais
+        // dans RagQualityEvaluation ; ce banc-ci ne mesure plus que des latences.
+        boolean judgeEnabled = "true".equalsIgnoreCase(System.getProperty("jmh.judge.enabled", "false"));
         judge = judgeEnabled ? new RagContextJudge() : null;
         judgeModelName = judge != null ? judge.getModelLabel() : "disabled";
         queryIdx = 0;
