@@ -2,15 +2,21 @@
 """
 Comparative benchmark of LLM-as-a-Judge variants on the golden set.
 
-Variants (configs/variants.json): 14B baseline, 14B fine-tuned, 32B baseline, 32B fine-tuned.
-Every variant is queried through an OpenAI-compatible /v1/chat/completions endpoint
-(mlx_lm.server locally, vLLM or equivalent on the cloud GPU).
+Variants and comparison pairs are DECLARED in configs/variants.json, never inferred
+from the variant list. Every variant is queried through an OpenAI-compatible
+/v1/chat/completions endpoint (mlx_lm.server locally, one variant at a time).
 
-Metrics (see PROTOCOLE.md §4):
-  1. Human alignment   Cohen's kappa + F1 (positive class = FAIL) vs. golden verdicts, bootstrap 95% CI
+Primary metric (PREENREGISTREMENT §4): strict verdict accuracy on the golden set,
+one verdict per item by majority vote over the passes. The primary comparison
+(§5) is tested by exact McNemar with a paired percentile bootstrap on the
+accuracy difference, and the conclusion follows §7's table -- nothing else in
+this report concludes anything.
+
+Secondary, all declared as such in §6 and powerless over the decision:
+  1. Cohen's kappa + F1 (positive class = FAIL), descriptive since the 2026-09-21 amendment
   2. Verbosity bias    false-PASS rate on verbose hidden-bug cases vs. concise FAIL cases (+ verbose PASS control)
   3. Repeatability     verdict / full-decision stability over N passes at temperature T
-  4. Quality/resources latency, tokens, cost per 1000 judgments, paired bootstrap on kappa deltas
+  4. Quality/resources latency, tokens, cost per 1000 judgments
 
 Usage:
   python3 scripts/benchmark_judges.py --config configs/variants.json --golden data/golden/test.jsonl

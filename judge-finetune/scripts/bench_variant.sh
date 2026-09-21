@@ -19,7 +19,9 @@ WAIT_S="${WAIT_S:-1800}"
 PY="$VENV/bin/python"
 
 [ -x "$PY" ] || { echo "venv absent : lance 'make setup'"; exit 1; }
-[ -f "$CONFIG" ] || { echo "config absente : cp configs/variants.example.json $CONFIG"; exit 1; }
+# Ne jamais recréer ce fichier depuis un gabarit : il porte les paires de comparaison
+# déclarées, que le pré-enregistrement exige de fixer avant les résultats.
+[ -f "$CONFIG" ] || { echo "config absente : elle est versionnée, 'git checkout $CONFIG'"; exit 1; }
 [ -f "$GOLDEN" ] || { echo "golden set absent : lance 'make split'"; exit 1; }
 
 # Read serving parameters for this variant out of the shared config.

@@ -632,3 +632,29 @@ comparaison 14B / 32B est rapportée de façon descriptive (écart de justesse, 
 Quatrième instrument du projet trouvé faux avant d'avoir produit un chiffre, après le détecteur de fuites
 de surface, le déterminisme du tirage et le parseur du κ. Ce qui l'a attrapé n'est ni un test ni une
 relecture, mais la confrontation du code à un protocole écrit **avant** lui. À verser au REX.
+
+---
+
+## Rectification datée — 2026-09-21, sur l'amendement du même jour
+
+L'amendement « le harnais de benchmark ne mettait pas en œuvre le protocole déclaré » affirme, au point E,
+que l'appareil de qualification — seuil en κ, élection d'un « gagnant », justification du 32B — était **un
+appareil décisionnel entier inventé par le code**.
+
+**C'est faux, et la vérification le montre sans ambiguïté.** `PROTOCOLE.md` §5, sous-section « Décision »,
+déclarait mot pour mot : « Qualification — κ ≥ 0,60 ; stabilité du verdict ≥ 95 % ; format strict ≥ 95 % ;
+faux PASS sur verbeux ≤ 20 % », « Gagnant — le κ maximal parmi les variantes qualifiées », « Arbitrage
+ressources — le 32B n'est retenu que si la borne basse de l'IC95 du Δκ apparié est > 0 et Δκ ≥ 0,05 ».
+
+Le code transcrivait fidèlement ce texte. Il n'avait rien inventé : **il suivait le mauvais document.**
+
+**Le diagnostic correct.** `PREENREGISTREMENT.md` (2026-09-17) a supplanté `PROTOCOLE.md` §5 sans que
+celui-ci soit mis à jour, et le harnais, écrit auparavant, est resté fidèle au plus ancien des deux. Les
+cinq divergences relevées le matin sont donc réelles et leur correction tient ; seule leur **imputation**
+était fautive. `PROTOCOLE.md` §5 est corrigé ce jour, avec mention explicite de sa supplantation plutôt
+que par réécriture silencieuse.
+
+**Ce que l'épisode ajoute au REX.** Le risque n'était pas un code négligent mais **deux documents
+normatifs divergents**, dont le plus ancien restait exécutable. Un pré-enregistrement ne protège que s'il
+supplante explicitement ce qu'il remplace — sans quoi il coexiste avec lui, et c'est le code qui arbitre,
+en silence.

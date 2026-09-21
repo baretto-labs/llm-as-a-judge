@@ -104,6 +104,21 @@ polarités** : un contrôle supplémentaire doit parfois valoir `true`, sinon le
 « quatrième contrôle ⇒ échec ». État au 2026-09-13 : 8 rubriques distinctes sur 80 exemples, dont 8 exemples
 à quatre contrôles répartis en 3 PASS et 5 FAIL.
 
+**Un contrôle dédié ne double-compte pas avec `respect_consignes`.** Quand un contrôle dédié est présent,
+`respect_consignes` exclut ce que ce contrôle couvre, et le libellé montré au juge le dit :
+
+> `respect_consignes` : Toutes les consignes obligatoires de la requête sont respectées, à l'exception de
+> celles couvertes par un contrôle dédié ci-dessous, qui les évalue séparément.
+
+Le contrôle dédié garde ainsi sa valeur de diagnostic — le benchmark peut dire **quelle** contrainte le juge
+rate, ce qui disparaîtrait si les deux contrôles basculaient toujours ensemble.
+
+Cette convention était appliquée **15 fois sur 15** dans le corpus, mais n'était écrite nulle part et
+contredisait la description montrée au juge ; c'est la relecture du golden set qui l'a mise au jour, la
+lecture littérale de l'annotateur étant la bonne. Arbitrage du 2026-09-15 : corriger la description, pas
+les étiquettes. Mise en œuvre par `RESPECT_CONSIGNES_PERIMETRE_REDUIT` dans `generators/gen_batch_01.py`,
+appliquée aux 28 exemples portant un contrôle dédié, sans modifier aucun `verdict` ni aucun `cas`.
+
 ### Contenu du `<thinking>`
 
 Obligatoire, avant tout verdict. Trois étapes :
@@ -264,53 +279,74 @@ quatre dépassant les 36 Go.
 ## 5. Benchmark
 
 ```bash
-cp configs/variants.example.json configs/variants.json
 make bench-14b && make bench-32b && make report
 ```
 
-3 passes, T = 0,2, `max_tokens` 1024, bootstrap 2000. Les générations brutes sont mises en cache dans
+`configs/variants.json` est versionné : il porte les variantes gelées **et les paires de comparaison
+déclarées**. Ne jamais le recréer depuis un gabarit — ce serait détruire la déclaration des paires, dont
+toute la valeur tient à ce qu'elle a été fixée avant les résultats.
+
+3 passes, T = 0,2, `max_tokens` 1024, bootstrap 10 000 (PREENREGISTREMENT §5). Les générations brutes sont mises en cache dans
 `results/runs/` : une exécution interrompue reprend, et `make report` recalcule sans relancer l'inférence.
 
 ### Métriques
 
 | # | Métrique | Définition |
 |---|---|---|
-| 1 | **κ de Cohen** (principale) | Accord des verdicts avec le golden set sur les 50 items, calculé par passe puis moyenné, avec IC95 par bootstrap. C'est **la** métrique de décision. |
+| 1 | **Justesse stricte du verdict** (principale) | Part des 50 items dont le verdict est identique à l'étiquette, **un seul verdict par item**, par vote majoritaire sur les 3 passes. C'est **la** métrique de décision (PREENREGISTREMENT §4). |
+| 1 bis | κ de Cohen | Accord des verdicts avec le golden set, par passe puis moyenné, IC95 par bootstrap. **Descriptif** depuis l'amendement du 2026-09-21 : il ne qualifie, ne classe et ne tranche rien. Lisible en regard du κ inter-annotateur de la relecture humaine, 0,880. |
 | 2 | F1 | Classe positive `FAIL` (détection de défaut), plus macro-F1. Accord par **contrôle atomique** en diagnostic — c'est lui qui dit *quel* critère le juge rate. |
 | 3 | Biais de verbosité | Faux PASS sur défauts verbeux contre défauts concis ; l'écart est le biais. Contrôle inverse sur les sorties verbeuses correctes. |
 | 4 | Répétabilité | Part des items dont les 3 verdicts sont identiques et valides ; idem pour la décision complète (tous les contrôles + verdict). |
-| 5 | Ressources | RAM, latence p50/p95, débit, temps pour 1000 jugements. Δκ apparié par bootstrap pour l'arbitrage 14B/32B. |
+| 5 | Ressources | RAM, latence p50/p95, débit, temps pour 1000 jugements. L'écart 14B/32B est rapporté en **justesse**, et de façon purement descriptive : la §7 du pré-enregistrement ne déclare aucune règle d'arbitrage entre tailles. |
 
-⚠️ **Le κ ne se décline pas par tâche sur ce golden set.** Le tirage y place 39 `CODE_ANALYSIS`, 5
-`RAG_CONTEXT_RELEVANCE` et 6 `RAG_FAITHFULNESS` : un κ calculé sur 5 ou 6 items a un IC95 qui couvre
+⚠️ **Aucune métrique ne se décline par tâche sur ce golden set.** Le tirage y place 38 `CODE_ANALYSIS`, 6
+`RAG_CONTEXT_RELEVANCE` et 6 `RAG_FAITHFULNESS` : une mesure calculée sur 6 items a un IC95 qui couvre
 presque tout le domaine, et l'annoncer donnerait une précision que la mesure n'a pas. Il faudrait environ
 25 items par tâche, donc un golden set d'une centaine — la moitié du corpus retirée de l'entraînement, ce
 qui n'est pas soutenable à 200 exemples.
 
 La posture monde fermé se surveille donc autrement, et il faut le faire explicitement, car c'est bien elle
-que le fine-tuning vise : **rapporter les 11 items RAG en comptes bruts** (combien de verdicts corrects sur
-11, et lesquels sont ratés), jamais en κ. Les trois cas décisifs sont ceux où la sortie est vraie dans la
+que le fine-tuning vise : **rapporter les 12 items RAG en comptes bruts** (combien de verdicts corrects sur
+12, et lesquels sont ratés), jamais en κ. Les trois cas décisifs sont ceux où la sortie est vraie dans la
 codebase mais absente du contexte — ils doivent être rejetés. Un juge qui les accepte a manqué la posture,
 et cela se voit sur 3 items sans avoir besoin d'un coefficient d'accord.
 
 Parsing : tolérant pour le verdict (dernier objet JSON contenant `verdict`), strict mesuré à part comme
-condition de qualification. Une sortie non parsable vaut `INVALID` et compte comme désaccord.
+condition de **recevabilité opérationnelle**. Une sortie non parsable vaut `INVALID` et compte comme désaccord.
 
 ### Décision
 
-**Qualification** — κ ≥ 0,60 ; stabilité du verdict ≥ 95 % ; format strict ≥ 95 % ; faux PASS sur verbeux ≤ 20 %.
+> **Cette sous-section a été supplantée par `PREENREGISTREMENT.md` (2026-09-17) et n'avait pas été mise à
+> jour.** Elle déclarait le κ métrique de décision, un « gagnant » au κ maximal et un arbitrage 14B/32B au
+> Δκ. Le harnais de benchmark la mettait en œuvre fidèlement — ce n'est pas le code qui avait inventé cet
+> appareil, c'est ce document qui ne suivait plus. Corrigé le 2026-09-21, après l'avoir constaté.
 
-**Gagnant** — le κ maximal parmi les variantes qualifiées.
+**Ce qui tranche** — la comparaison principale de `PREENREGISTREMENT.md` §5 : `14B-finetuned` contre
+`14B-baseline-conventions`, sur la **justesse stricte du verdict**, par McNemar exact bilatéral (α = 0,05)
+et bootstrap apparié à 10 000 rééchantillonnages. La conclusion suit la table de la §7, y compris sa branche
+« non concluant ». Rien d'autre dans le rapport ne conclut.
 
-**Arbitrage ressources** — le 32B n'est retenu que si la borne basse de l'IC95 du Δκ apparié est > 0 **et**
-Δκ ≥ 0,05. Sinon le 14B l'emporte : 8,3 Go de RAM contre 18,4 déterminent si le juge peut tourner en tâche
-de fond sur un poste de développement.
+**Recevabilité opérationnelle**, sans pouvoir de décision — stabilité du verdict ≥ 95 % ; format strict
+≥ 95 % ; faux PASS sur verbeux ≤ 20 %. Une variante qui ne rend pas du JSON exploitable n'est pas utilisable
+en production, quelle que soit sa justesse : c'est tout ce que ce filtre dit. **Aucun seuil en κ.**
+
+**Ressources** — 8,3 Go de RAM contre 18,4 déterminent si le juge peut tourner en tâche de fond sur un poste
+de développement. L'écart de justesse 14B/32B est rapporté avec son intervalle, sans règle d'arbitrage :
+le pré-enregistrement n'en déclare aucune, et en inventer une après coup reviendrait à choisir la règle
+une fois les chiffres connus.
 
 ### Puissance statistique
 
-Sur 50 items, l'IC95 d'un κ s'étend de ±0,15 à ±0,25 : deux variantes séparées de 0,05 sont indiscernables.
-Seuls les **écarts appariés significatifs** permettent de conclure. Le κ par tâche, calculé sur ~12 items
-chacune pour les passes RAG, est un signal qualitatif, pas une mesure.
+Estimée **avant** les résultats, et déclarée en ces termes par `PREENREGISTREMENT.md` §5 : à n = 50 items
+appariés, une différence de **~15 points de justesse ou plus** est détectable ; une différence de **10 points
+ou moins** ne l'est pas et sera rapportée comme **non concluante** ; l'intervalle sur la différence fait
+approximativement **±12 à 14 points**. La limite est structurelle et connue d'avance — elle sera énoncée
+dans le REX y compris si le résultat est favorable.
+
+Le κ, devenu descriptif, souffre de la même étroitesse : son IC95 s'étend de ±0,15 à ±0,25 sur 50 items, et
+deux variantes séparées de 0,05 y sont indiscernables. Aucune métrique n'est déclinée par tâche — voir
+l'avertissement plus haut : les sous-ensembles RAG se rapportent en **comptes bruts**, jamais en coefficient.
 
 ---
 
