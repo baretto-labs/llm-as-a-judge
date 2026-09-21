@@ -658,3 +658,36 @@ que par réécriture silencieuse.
 normatifs divergents**, dont le plus ancien restait exécutable. Un pré-enregistrement ne protège que s'il
 supplante explicitement ce qu'il remplace — sans quoi il coexiste avec lui, et c'est le code qui arbitre,
 en silence.
+
+---
+
+## Correction datée — 2026-09-21, l'ensemble d'exclusion de la passe « format normalisé » compte 6 items, non 5
+
+L'amendement du 2026-09-19 déclare, au point 2 : « **Exclusion obligatoire** de cette passe : les **5**
+items dont la requête impose un format ». Le corpus en porte **six**, et ils portent tous le contrôle
+`format_impose` :
+
+```
+b04-015  b07-011  b08-013  b09-015  b10-015  b11-010
+```
+
+dont **trois figurent au golden set** : `b04-015`, `b07-011`, `b10-015`.
+
+**Aucun n'a été ajouté après l'amendement.** Chacun a reçu `format_impose` dans le commit de création de
+son lot, le plus tardif étant `0cdbb7c` (« Add batch 11 and close the code phase at 150 examples »), et
+`git log -S'format_impose' -- generators/` ne montre aucun commit postérieur touchant ce contrôle. Les six
+existaient donc le 2026-09-19 : **le chiffre déclaré était simplement faux**, et non rendu caduc par une
+évolution du corpus.
+
+**Ce qui est corrigé.** L'exclusion porte sur les **6** items portant `format_impose`, définis par ce
+contrôle et non par un décompte écrit à la main. La passe « format normalisé » s'exécutera donc sur **47
+des 50 items** du golden set, et ce nombre sera publié avec l'écart mesuré.
+
+**Ce qui ne change pas.** Ni la définition de la passe, ni son statut de métrique secondaire, ni la
+décision de mesurer et publier la fuite résiduelle plutôt que de la poursuivre.
+
+**Pourquoi cette correction est écrite maintenant.** La passe n'est pas encore implémentée. Fixer
+l'ensemble d'exclusion après l'avoir exécutée reviendrait à choisir les items exclus en connaissant leur
+effet sur l'écart mesuré. C'est aussi la troisième fois en une journée qu'un nombre écrit à la main est
+démenti par la mesure — après les 42 items du parseur de κ et les 39/5/6 de `PROTOCOLE.md` §5. **Règle à
+retenir : un ensemble déclaré se définit par un prédicat vérifiable, jamais par un décompte recopié.**

@@ -327,6 +327,13 @@ def evaluate(variant, golden, runs, args, rng):
                    "gold": gold[i], "pred": majority_pred[i]}
                   for i in rag_idx if majority_pred[i] != gold[i]]
 
+    # PREENREGISTREMENT §6.4 : justesse sur la seule strate `limite`, où se concentre
+    # la difficulté. Secondaire déclarée, sans pouvoir de décision. L'effectif est
+    # publié avec le chiffre : le golden n'en porte qu'une dizaine, donc il indique
+    # une tendance et ne départage rien.
+    limite_idx = [i for i, g in enumerate(golden) if g["meta"]["cas"] == "limite"]
+    limite_correct = sum(1 for i in limite_idx if majority_pred[i] == gold[i])
+
     verbose_fpr, n_verbose_fail = false_pass_rate(golden, runs, lambda g: g["meta"]["verbeux"])
     concise_fpr, n_concise_fail = false_pass_rate(golden, runs, lambda g: not g["meta"]["verbeux"])
     verbose_pass_items = [g for g in golden if g["gold"]["verdict"] == "PASS" and g["meta"]["verbeux"]]
@@ -361,6 +368,9 @@ def evaluate(variant, golden, runs, args, rng):
         "rag_correct": len(rag_idx) - len(rag_missed),
         "rag_by_task": dict(Counter(golden[i]["meta"]["task"] for i in rag_idx)),
         "rag_missed": rag_missed,
+        "limite_n": len(limite_idx),
+        "limite_correct": limite_correct,
+        "limite_accuracy": limite_correct / len(limite_idx) if limite_idx else float("nan"),
         "json_parse_rate": sum(r["judgment"] is not None for r in all_rows) / len(all_rows) if all_rows else 0.0,
         "strict_format_rate": sum(r["strict_format"] for r in all_rows) / len(all_rows) if all_rows else 0.0,
         "verdict_stability": verdict_stable / n,
@@ -502,6 +512,15 @@ def build_report(metrics, golden, args, rng, config, selected_names):
             missed = m.get("rag_missed") or []
             detail = ", ".join(f"{x['id']} ({x['gold']} → {x['pred']})" for x in missed) or "—"
             lines.append(f"| {m['name']} | {m['rag_correct']}/{n_rag} | {detail} |")
+
+    if metrics and metrics[0].get("limite_n"):
+        n_lim = metrics[0]["limite_n"]
+        lines += ["", f"Justesse sur la seule strate `limite` — {n_lim} items du golden set, là où se "
+                  "concentre la difficulté (PREENREGISTREMENT §6.4). Secondaire déclarée, **sans pouvoir "
+                  "de décision** ; à cet effectif elle indique une tendance et ne départage rien.", "",
+                  "| Variante | Justesse sur `limite` |", "|---|---|"]
+        for m in metrics:
+            lines.append(f"| {m['name']} | {m['limite_correct']}/{n_lim} = {fmt(m['limite_accuracy'], pct=True)} |")
 
     lines += ["", "## 2. Résistance au biais de verbosité", "",
               "| Variante | Faux PASS verbeux+bug (n) | Faux PASS concis+bug (n) | Écart (biais) | Faux FAIL verbeux corrects (n) |",
