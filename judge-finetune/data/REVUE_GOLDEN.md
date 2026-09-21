@@ -1753,3 +1753,182 @@ fonctionne — le corpus porte des conventions que le texte n'énonce pas.
 - **49 items relus sur 50**, **1 restant** : `b12-012`.
 - **Accord sur le verdict : 47 / 49.**
 - Désaccords sur `citations_exactes` : **3**, tous de même forme.
+
+### 51. `b12-012` — la déduction dont les prémisses sont au contexte
+
+| | 1 `affirmations_etayees` | 2 `absence_invention` | 3 `citations_exactes` | verdict |
+|---|---|---|---|---|
+| annotateur, premier passage | V | V | V | **PASS** |
+| étiquette | V | V | V | **PASS** |
+
+Accord complet. Motif de l'annotateur : « réponse irréprochable en monde fermé : elle restitue fidèlement
+les éléments de signature et de structure disponibles sans halluciner la logique d'assemblage absente du
+contexte ».
+
+L'item avait été présenté avec deux signalements neutres : une explication causale de l'annotation
+(`@Override` « s'explique par le fait que » la classe implémente `ContentRetriever`) et une conclusion
+tirée de noms de champs, dont quatre sur sept sont repris.
+
+**Ce que l'accord ajoute à `b13-009`.** La déduction sur `@Override` a ses **deux prémisses dans les
+extraits** — l'annotation figure au nœud de fonction, l'arête `IMPLEMENTS` au nœud de classe — et elle est
+énoncée comme déduction. Elle passe. Deux items consécutifs, jugés indépendamment, confirment la même
+ligne : c'est le mode d'énonciation qui décide, pas le caractère déductif. La reprise partielle des champs
+n'a été tenue pour un défaut par aucun des deux passages : restituer moins que le contexte n'est pas le
+déformer.
+
+**Réserve : point compromis.** Quatrième item bâti sur le contexte `9fefd8a6`, après `b12-008`, `b12-007`
+et `b12-011`, avec la requête de `b12-007` et `b12-011`.
+
+---
+
+## Relecture terminée — 50 items sur 50
+
+- **Accord sur le verdict : 48 / 50.** Désaccords : `b07-011`, `b12-007`.
+- **Désaccords sur un contrôle, verdict identique :** 3 sur `citations_exactes`
+  (`b13-012`, `b13-008`, `b12-011`), tous de même forme, plus la table de contingence
+  `respect_consignes` (7/7 contre 1/7) traitée en amendement.
+- **Étiquettes corrigées sur signalement de l'annotateur :** 6 — `b09-009`, `b06-008`, `b03-001`,
+  `b13-004`, `b12-005`, `b13-007`, dont deux changements de verdict (`b13-004`, `b13-007`).
+- Le κ est calculé par `scripts/kappa_revue.py`, qui extrait les annotations du premier passage
+  depuis ce journal ; il n'existe aucune autre trace machine de ce passage.
+
+**Réserve générale sur la puissance.** Les accords ne sont pas 50 observations indépendantes : le corpus
+RAG regroupe 12 items sur 5 contextes, et 7 des 50 items relus sont des occurrences répétées d'un même
+contexte avec une requête identique (`b13-009`, `b12-011`, `b12-012` notamment). Les intervalles rapportés
+par le bootstrap ne corrigent pas cette dépendance et sont donc optimistes.
+
+---
+
+## Rattrapage — deux items relus dont le journal ne portait pas la table
+
+Relevé en clôturant la relecture, en construisant `scripts/kappa_revue.py` : deux des 50 items n'avaient
+aucune table exploitable. Les entrées ci-dessous sont **reconstituées depuis une source primaire nommée**,
+jamais de mémoire. Leur numérotation suit l'ordre d'écriture, pas l'ordre de passage.
+
+### 52. `b04-015` — relu en session 1, consigné seulement en récapitulatif
+
+| | 1 `exactitude_technique` | 2 `absence_de_bugs` | 3 `respect_consignes` | 4 `format_impose` | verdict |
+|---|---|---|---|---|---|
+| annotateur, premier passage | — | — | **F** | — | **FAIL** |
+| étiquette | V | V | **V** | F | **FAIL** |
+
+**Provenance :** tableau récapitulatif de la session 1, plus haut dans ce journal — ligne
+`| 2 | b04-015 | FAIL | FAIL | ✅ | respect_consignes : annotateur false, étiquette true |`. La session 1
+notait un verdict et l'écart, pas les quatre contrôles un par un.
+
+**Pourquoi trois cellules restent vides.** La colonne « Écart sur les contrôles » n'énumère que les
+divergences ; les trois autres contrôles ont donc vraisemblablement concordé, mais ils ne sont pas
+*attestés* individuellement. Les compter comme des accords gonflerait le κ par contrôle d'une valeur que
+le registre ne porte pas. Ils sont laissés en `—` : le verdict compte, les trois contrôles non.
+
+### 53. `b12-005` — relu le 2026-09-20, jamais transcrit
+
+| | 1 `contexte_pertinent` | 2 `contexte_suffisant` | 3 `bruit_maitrise` | verdict |
+|---|---|---|---|---|
+| annotateur, premier passage | **F** | F | **F** | **FAIL** |
+| étiquette d'origine | **V** | F | **V** | **FAIL** |
+
+**Provenance :** transcript de session, réponse du `2026-09-20T19:28:21Z` — « FFF, le moteur de recherche a
+retourné des composants voisins (`OllamaSettings`, etc.) sans fournir aucun extrait concernant la classe
+`OllamaService` » — répondant au tour de `19:08:15Z` qui présentait `b12-005` (requête *What interfaces
+does `OllamaService` implement?*). L'étiquette telle que présentée est relevée par
+`git show 77ba2fa^:generators/gen_batch_12.py`, soit avant le commit de l'audit élargi.
+
+Accord sur le verdict, **désaccord sur deux contrôles**, et l'annotateur avait raison sur les deux :
+l'audit élargi (entrée 43) a corrigé l'étiquette en `F F F`, exactement dans son sens. C'est la cinquième
+correction à l'initiative de l'annotateur.
+
+**Ce que le trou révèle.** L'item a été présenté, répondu et corrigé, mais son passage aveugle n'a jamais
+été écrit ici : il est passé d'« arbitrage en attente » à « relu » entre deux décomptes, sans table. Le
+journal étant l'unique trace machine du premier passage, un item manquant se serait traduit par un κ
+calculé sur 49 items sans que rien ne le signale. Ce sont les recoupements du script — et non le script —
+qui l'ont fait apparaître.
+
+---
+
+## Résultat du κ inter-annotateur — 50 items, 2026-09-21
+
+Calculé par `scripts/kappa_revue.py`, selon la définition figée par l'amendement du 2026-09-21 **avant**
+exécution : premier passage en aveugle contre **l'étiquette telle que présentée**.
+
+### Verdict
+
+```
+accord brut : 47/50 = 0,940
+kappa       : 0,880   IC95% bootstrap [0,720 ; 1,000]
+marges      : annotateur 23 PASS / 27 FAIL    étiquette 24 PASS / 26 FAIL
+désaccords  : b07-011, b12-007, b13-004
+```
+
+Pour mémoire, contre l'étiquette **après** les corrections issues de la relecture : 48/50, κ 0,919
+[0,794 ; 1,000]. L'écart tient au seul `b13-004`. Ce second chiffre surestime l'accord et n'est jamais
+publié seul.
+
+Les marges sont équilibrées, l'accord attendu par hasard vaut 0,502 : le κ du verdict est ici proche de
+l'accord brut et se lit sans précaution particulière. **L'intervalle reste large** — n = 50 — et le
+bootstrap ne corrige pas la dépendance entre items partageant un contexte.
+
+### Par contrôle
+
+| contrôle | n | accord | κ |
+|---|---|---|---|
+| `respect_consignes` | 37 | 29/37 | +0,386 |
+| `absence_de_bugs` | 36 | 34/36 | +0,880 |
+| `exactitude_technique` | 36 | 32/36 | +0,750 |
+| `affirmations_etayees` | 6 | 6/6 | +1,000 |
+| `absence_invention` | 6 | 6/6 | +1,000 |
+| `contexte_pertinent` | 6 | 5/6 | +0,571 |
+| `bruit_maitrise` | 6 | 5/6 | +0,571 |
+| `contexte_suffisant` | 6 | 4/6 | 0,000 |
+| `citations_exactes` | 6 | 3/6 | 0,000 |
+| 4 contrôles dédiés | 1 chacun | 3/4 | non interprétable |
+
+**Seuls les trois premiers portent assez d'observations pour être lus.** Les autres reposent sur n ≤ 6 :
+leur κ est instable et ne doit pas être cité isolément. Les `0,000` ne signifient pas « accord nul au
+hasard » mais « κ non informatif à cet effectif ».
+
+### Le κ de `respect_consignes` est bas pour une raison qu'il faut publier avec lui
+
+```
+              étiq V   étiq F
+  annot V        25        1
+  annot F         7        4
+```
+
+Accord brut 29/37 = 0,784, mais les marges sont très déséquilibrées — annotateur 26 V / 11 F, étiquette
+32 V / 5 F — ce qui porte l'accord attendu par hasard à 0,648 et écrase le κ à 0,386. **Publier le κ seul
+sous-estimerait l'accord ; publier les 78 % seuls le surestimeraient.** Les deux vont ensemble, avec les
+marges. C'est le contrôle le plus fréquent du corpus, et celui dont le libellé a déjà été identifié comme
+ambigu : les 7 cases « annotateur F / étiquette V » sont cette ambiguïté, mesurée.
+
+### Le résultat le plus important n'est pas le κ du verdict
+
+**17 items sur 50 portent au moins un désaccord de contrôle. 15 sont absorbés par le verdict, 2 seulement
+s'y propagent.**
+
+| | items |
+|---|---|
+| absorbés — FAIL des deux côtés | `b01-005`, `b03-001`, `b03-003`, `b03-005`, `b03-014`, `b04-014`, `b04-015`, `b06-008`, `b08-011`, `b09-009`, `b10-003`, `b12-005`, `b12-011`, `b13-008`, `b13-012` |
+| propagés | `b12-007`, `b13-004` — tous deux sur `contexte_suffisant` |
+
+Le mécanisme est structurel : le verdict est une **conjonction**, PASS si et seulement si tous les
+contrôles sont vrais. Dès qu'un contrôle échoue des deux côtés, un désaccord sur un autre contrôle reste
+sans effet sur le verdict. L'accord de 94 % sur le verdict coexiste donc avec un désaccord sur au moins un
+contrôle dans **34 % des items**.
+
+**Conséquence pour le fine-tuning, à énoncer dans le REX.** Le juge n'apprend pas qu'un verdict : il
+apprend le `<thinking>`, les contrôles et le motif. La qualité de la cible est donc mieux décrite par
+l'accord par contrôle que par l'accord sur le verdict. Le verdict est reproductible ; **les raisons le sont
+beaucoup moins**. C'est un plafond sur ce que l'entraînement peut apprendre, pas un défaut de l'entraînement.
+
+### Une asymétrie, et elle n'est pas du bruit
+
+```
+annotateur F / étiquette V (annotateur plus sévère)   : 16
+annotateur V / étiquette F (annotateur plus indulgent) :  6
+```
+
+**16 désaccords sur 22 vont dans le même sens.** L'annotateur humain est systématiquement plus sévère que
+l'étiquette rédigée par le LLM. Le fait est cohérent avec les six corrections, toutes à l'initiative de
+l'annotateur et toutes dans le sens du durcissement. À publier tel quel : une vérité de référence écrite
+par un LLM puis relue par un humain est **plus indulgente** que ce que l'humain aurait produit seul.

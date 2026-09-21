@@ -491,3 +491,39 @@ corrigé —, aucune relecture supplémentaire n'est requise. Corpus : 200 exemp
 
 **L'adaptateur reste périmé** et le réentraînement demeure reporté à la fin de la relecture, huit items
 restant à présenter.
+
+---
+
+## Amendement daté — 2026-09-21, définition du κ inter-annotateur, avant tout calcul
+
+La §9.1 annonce la publication du κ issu de `data/REVUE_GOLDEN.md` sans dire **contre quelle version de
+l'étiquette** il se mesure. La relecture ayant corrigé six étiquettes, dont deux verdicts, la question
+n'est pas théorique : elle déplace le chiffre. Elle est tranchée ici **avant d'avoir exécuté
+`scripts/kappa_revue.py`**, conformément à la discipline du présent document.
+
+**Définition retenue — l'étiquette telle qu'elle a été présentée.** Le κ mesure l'accord entre le premier
+passage en aveugle de l'annotateur et l'étiquette qui lui a été opposée **à ce moment-là**. Les lignes
+`étiquette d'origine` et `étiquette (corrigée le matin même)` du journal relèvent donc de cette définition :
+dans les deux cas, c'est ce que l'annotateur avait sous les yeux.
+
+**Ce qui est exclu, et pourquoi.**
+
+1. Les lignes `annotateur, après révélation` — un second passage, fait une fois l'étiquette connue. Les
+   compter mêlerait un accord obtenu par ancrage à un accord obtenu en aveugle.
+2. Les corrections d'étiquette **issues de la relecture**. Les intégrer reviendrait à créditer l'étiquette
+   d'un changement que l'annotateur a lui-même provoqué : l'accord mesuré incorporerait le produit de la
+   mesure. Le cas concret est `b13-004`, dont l'étiquette présentée disait PASS et l'annotateur FAIL.
+
+**Conséquence assumée sur le chiffre.** Les décomptes courants tenus dans le journal au fil de la
+relecture appliquaient la convention inverse — « `b13-004` devient un accord après correction ». Le
+chiffre de référence est donc **inférieur d'une unité** à celui que le journal annonçait en cours de route.
+Les deux seront publiés côte à côte, le second explicitement désigné comme surestimation.
+
+**Limite à publier avec le κ.** Deux des 50 items — `b04-015` et `b12-005` — n'avaient aucune table dans le
+journal ; ils ont été reconstitués depuis une source primaire nommée (tableau récapitulatif de session 1,
+transcript horodaté) et consignés en entrées 52 et 53. Pour `b04-015`, seul le contrôle en écart est
+attesté : ses trois autres contrôles ne comptent pas dans le κ par contrôle, qui porte donc sur moins
+d'observations que le κ du verdict.
+
+**Ce qui n'est pas amendé.** La métrique principale de l'étude reste celle de la §3. Le κ est une mesure de
+qualité du corpus de référence, publiée au titre des limites — il ne sert pas à départager les variantes.
