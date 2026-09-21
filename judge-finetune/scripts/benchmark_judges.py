@@ -691,21 +691,36 @@ def build_report(metrics, golden, args, rng, config, selected_names, passe_forma
     # l'homme de paille que la §3 interdit — et le biais allait dans le sens
     # favorable au fine-tuning. Voir l'amendement du 2026-09-21.
     principale = comparaisons.get("primary")
-    if not principale:
-        sys.exit("[ERROR] le fichier de configuration ne déclare pas comparisons.primary. "
-                 "La paire principale doit être déclarée explicitement, jamais devinée.")
-
     lines += ["", "## Comparaison principale (PREENREGISTREMENT §5)", ""]
-    a, b = principale["a"], principale["b"]
-    absents = [n for n in (a, b) if n not in by_name]
-    if absents:
+
+    # Deux situations distinctes, et une seule est une erreur.
+    #
+    #   aucune déclaration du tout  -> aucune conclusion, et le rapport le dit.
+    #   paire déclarée incalculable -> sortie en erreur.
+    #
+    # L'amendement du 2026-09-21 vise « une paire DÉCLARÉE absente des métriques » :
+    # une configuration qui ne déclare rien n'exécute pas l'étude. C'est le cas de
+    # configs/variants.smoke.json, qui valide serveur, adaptateur et client sur un
+    # 0.5B sans rien conclure. Refuser de conclure y préserve les deux garanties —
+    # ne jamais inférer une paire, ne jamais conclure sur une paire amputée — là où
+    # sortir en erreur ne protégerait rien et casserait la passe de fumée.
+    if not principale:
+        lines += ["⚠️ **Aucune comparaison déclarée dans cette configuration : aucune conclusion "
+                  "n'est émise.** Les sections qui suivent sont purement descriptives.", ""]
+        a = b = None
+        absents = []
+    else:
+        a, b = principale["a"], principale["b"]
+        absents = [n for n in (a, b) if n not in by_name]
+
+    if principale and absents:
         attendus = [n for n in absents if n in selected_names]
         if attendus:
             sys.exit(f"[ERROR] paire principale incomplète : {attendus} sans métriques exploitables. "
                      "Le rapport refuse de conclure sur une paire amputée.")
         lines += [f"⚠️ **Non calculée** : {absents} hors de la sélection `--variants`. "
                   "Aucune conclusion n'est émise.", ""]
-    else:
+    elif principale:
         pa = majority_verdicts(golden, by_name[a]["_runs"])
         pb = majority_verdicts(golden, by_name[b]["_runs"])
         acc_a, acc_b = strict_accuracy(gold, pa), strict_accuracy(gold, pb)
