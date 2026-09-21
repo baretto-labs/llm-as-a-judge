@@ -23,7 +23,7 @@ public class QuestionCorpus {
 
     public static final List<Question> QUESTIONS = List.of(
 
-        // ── LOCAL : une seule entité ciblée (10 questions) ───────────────────
+        // ── LOCAL : une seule entité ciblée (20 questions) ───────────────────
 
         new Question(
             "What does the retrieve method do in ContextRetriever?",
@@ -79,7 +79,58 @@ public class QuestionCorpus {
             new String[]{"PrerequisiteService", "checkLocalEmbeddingModel", "DJL"}
         ),
 
-        // ── STRUCTURAL : héritage et relations directes (10 questions) ───────
+        new Question(
+            "How does RRFFusion combine two ranked result lists into one?",
+            Difficulty.LOCAL,
+            new String[]{"RRFFusion", "fuse", "RRF_K"}
+        ),
+        new Question(
+            "How does HybridRetriever run the KNN and BM25 searches?",
+            Difficulty.LOCAL,
+            new String[]{"HybridRetriever", "retrieve", "RRFFusion"}
+        ),
+        new Question(
+            "How does CodeAwareDocumentSplitter split Java files compared to other files?",
+            Difficulty.LOCAL,
+            new String[]{"CodeAwareDocumentSplitter", "split", "fallbackSplit"}
+        ),
+        new Question(
+            "What does SecretDetector return, and how can a line be excluded from detection?",
+            Difficulty.LOCAL,
+            new String[]{"SecretDetector", "detect", "ollamassist-nocheck"}
+        ),
+        new Question(
+            "What transformations does PromptSanitizer apply to tool output?",
+            Difficulty.LOCAL,
+            new String[]{"PromptSanitizer", "sanitize", "sanitizeGoal"}
+        ),
+        new Question(
+            "How does FilePathGuard prevent a write from escaping the project root?",
+            Difficulty.LOCAL,
+            new String[]{"FilePathGuard", "resolveConfined", "PathTraversalException"}
+        ),
+        new Question(
+            "What operations does MyersDiff produce when comparing two lists of lines?",
+            Difficulty.LOCAL,
+            new String[]{"MyersDiff", "computeDiff", "computeCompactDiff"}
+        ),
+        new Question(
+            "How does ModelSizeParser extract a parameter count from a model name?",
+            Difficulty.LOCAL,
+            new String[]{"ModelSizeParser", "extractParamCountBillions"}
+        ),
+        new Question(
+            "How does AgentMemoryService bound the history it keeps?",
+            Difficulty.LOCAL,
+            new String[]{"AgentMemoryService", "MAX_RECORDS", "TTL_DAYS"}
+        ),
+        new Question(
+            "What does UrlHelper do to a user-supplied Ollama URL before it is used?",
+            Difficulty.LOCAL,
+            new String[]{"UrlHelper", "normalizeUrl", "buildApiUrl"}
+        ),
+
+        // ── STRUCTURAL : héritage et relations directes (20 questions) ───────
 
         new Question(
             "What interfaces does OllamaService implement?",
@@ -132,7 +183,58 @@ public class QuestionCorpus {
             new String[]{"ContextRetriever", "ContentRetriever", "retrieve"}
         ),
 
-        // ── CROSS_MODULE : traversée multi-packages (10 questions) ───────────
+        new Question(
+            "Which classes implement the AgentTool interface?",
+            Difficulty.STRUCTURAL,
+            new String[]{"AgentTool", "ReadFileTool", "WriteFileTool", "SearchCodeTool"}
+        ),
+        new Question(
+            "Which classes implement ContentRetriever in OllamAssist?",
+            Difficulty.STRUCTURAL,
+            new String[]{"ContentRetriever", "ContextRetriever", "HybridRetriever"}
+        ),
+        new Question(
+            "Which renderers implement EditorCustomElementRenderer?",
+            Difficulty.STRUCTURAL,
+            new String[]{"EditorCustomElementRenderer", "InlayRenderer", "MultiSuggestionRenderer", "RefactoringInlayRenderer"}
+        ),
+        new Question(
+            "What does ProjectFileListener implement?",
+            Difficulty.STRUCTURAL,
+            new String[]{"ProjectFileListener", "StoreNotifier", "Disposable"}
+        ),
+        new Question(
+            "Which class implements NotificationStorage, and how is its state persisted?",
+            Difficulty.STRUCTURAL,
+            new String[]{"PersistentNotificationStorage", "NotificationStorage", "PersistentStateComponent"}
+        ),
+        new Question(
+            "Which exception does FilePathGuard throw, and what does it extend?",
+            Difficulty.STRUCTURAL,
+            new String[]{"PathTraversalException", "SecurityException", "FilePathGuard"}
+        ),
+        new Question(
+            "What does CorruptedIndexException extend, and where is it raised?",
+            Difficulty.STRUCTURAL,
+            new String[]{"CorruptedIndexException", "RuntimeException"}
+        ),
+        new Question(
+            "Which settings panels extend JBPanel?",
+            Difficulty.STRUCTURAL,
+            new String[]{"RAGConfigPanel", "OllamaConfigPanel", "AgentConfigPanel", "JBPanel"}
+        ),
+        new Question(
+            "Which classes implement ProjectActivity in OllamAssist?",
+            Difficulty.STRUCTURAL,
+            new String[]{"ProjectActivity", "OllamAssistStartup", "NotificationApplicationStartup"}
+        ),
+        new Question(
+            "What do IdStartWithFilter and ShouldBeIndexed implement?",
+            Difficulty.STRUCTURAL,
+            new String[]{"IdStartWithFilter", "ShouldBeIndexed", "PathMatcher"}
+        ),
+
+        // ── CROSS_MODULE : traversée multi-packages (20 questions) ───────────
 
         new Question(
             "How does OllamAssistStartup initialize EditorListener on project load?",
@@ -183,6 +285,56 @@ public class QuestionCorpus {
             "How does DocumentIngestFactory create the embedding model with DJL fallback to Ollama?",
             Difficulty.CROSS_MODULE,
             new String[]{"DocumentIngestFactory", "createEmbeddingModel", "BgeSmallEnV15Quantized", "OllamaEmbeddingModel"}
+        ),
+        new Question(
+            "How does WriteFileTool check content for secrets before writing to disk?",
+            Difficulty.CROSS_MODULE,
+            new String[]{"WriteFileTool", "SecretDetector", "detect"}
+        ),
+        new Question(
+            "How does DeleteFileTool obtain user approval before deleting a file?",
+            Difficulty.CROSS_MODULE,
+            new String[]{"DeleteFileTool", "ToolApprovalHelper", "requestApproval"}
+        ),
+        new Question(
+            "How does ToolApprovalHelper wait for an approval decision?",
+            Difficulty.CROSS_MODULE,
+            new String[]{"ToolApprovalHelper", "FileApprovalNotifier", "ApprovalDecision"}
+        ),
+        new Question(
+            "How does RAGConfigPanel trigger a full reindexation of the project?",
+            Difficulty.CROSS_MODULE,
+            new String[]{"RAGConfigPanel", "StoreNotifier", "ProjectFileListener", "clearDatabaseAndRunIndexation"}
+        ),
+        new Question(
+            "How does CommitMessageGenerator produce a commit message from a diff?",
+            Difficulty.CROSS_MODULE,
+            new String[]{"CommitMessageGenerator", "LightModelAssistant", "MessageCleaner"}
+        ),
+        new Question(
+            "How does DocumentIngestFactory authenticate its requests to Ollama?",
+            Difficulty.CROSS_MODULE,
+            new String[]{"DocumentIngestFactory", "AuthenticationHelper", "authHeaders"}
+        ),
+        new Question(
+            "How does AddToContextAction add a selected file to the workspace context?",
+            Difficulty.CROSS_MODULE,
+            new String[]{"AddToContextAction", "WorkspaceContextRetriever", "addFile"}
+        ),
+        new Question(
+            "How does OllamaContent obtain the RAG sources used for the last answer?",
+            Difficulty.CROSS_MODULE,
+            new String[]{"OllamaContent", "ContextRetriever", "popSources", "RagSource"}
+        ),
+        new Question(
+            "How does EnhancedContextProvider find similar code patterns for completion?",
+            Difficulty.CROSS_MODULE,
+            new String[]{"EnhancedContextProvider", "LuceneEmbeddingStore", "getSimilarCodePatterns"}
+        ),
+        new Question(
+            "How does FontUtils apply the user-configured font size multiplier?",
+            Difficulty.CROSS_MODULE,
+            new String[]{"FontUtils", "OllamAssistUISettings", "getFontSizeMultiplier"}
         )
     );
 
