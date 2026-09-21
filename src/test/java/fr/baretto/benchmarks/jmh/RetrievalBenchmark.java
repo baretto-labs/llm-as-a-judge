@@ -32,8 +32,14 @@ import java.util.stream.Collectors;
  *
  * <p>Sorties :</p>
  * <ul>
- *   <li>{@code target/jmh-judge.jsonl} — synthèse par (strategy, scenario, fileCount, difficulty)</li>
- *   <li>{@code target/jmh-judge-detail.jsonl} — une ligne par question avec contexte généré et score</li>
+ *   <li>{@code benchmarks/jmh-judge.jsonl} — synthèse par (strategy, scenario, fileCount, difficulty)</li>
+ *   <li>{@code benchmarks/jmh-judge-detail.jsonl} — une ligne par question avec contexte et verdict</li>
+ * </ul>
+ *
+ * <p>Écrit sous {@code benchmarks/} et non {@code target/}, qui est un répertoire de build ignoré
+ * par git : ces résultats doivent être versionnés pour que le dépôt serve à reproduire.</p>
+ *
+ * <ul>
  * </ul>
  */
 @BenchmarkMode(Mode.AverageTime)
@@ -74,18 +80,19 @@ public class RetrievalBenchmark {
     private List<QuestionCorpus.Question> questions;
     private int queryIdx;
 
-    // Juge LLM
-    private LLMJudge llmJudge;
-    private String   judgeModelName;
+    // Juge LLM — verdict binaire depuis le 2026-09-21. L'ancien juge gradué
+    // (LLMJudge, échelle 0-10) est déprécié et n'est plus câblé ici.
+    private RagContextJudge judge;
+    private String          judgeModelName;
 
     /**
      * Résultat complet d'une invocation jugée : question posée, contexte retourné, verdict.
      * Stocké hors fenêtre de mesure pour écriture en fin de trial.
      */
     private record TrialResult(
-        QuestionCorpus.Question  question,
-        List<String>             context,
-        LLMJudge.JudgementResult judgement
+        QuestionCorpus.Question    question,
+        List<String>               context,
+        RagContextJudge.Judgement  judgement
     ) {}
 
     /** Paire (question, contexte) collectée pendant la mesure, jugée en batch dans teardownTrial. */
@@ -148,8 +155,8 @@ public class RetrievalBenchmark {
                 .toList();
 
         boolean judgeEnabled = !"false".equalsIgnoreCase(System.getProperty("jmh.judge.enabled", "true"));
-        llmJudge = judgeEnabled ? new LLMJudge() : null;
-        judgeModelName = llmJudge != null ? llmJudge.getModelNamesLabel() : "disabled";
+        judge = judgeEnabled ? new RagContextJudge() : null;
+        judgeModelName = judge != null ? judge.getModelLabel() : "disabled";
         queryIdx = 0;
         luceneTrialResults.clear();
         neo4jTrialResults.clear();
@@ -206,7 +213,7 @@ public class RetrievalBenchmark {
      */
     @TearDown(Level.Invocation)
     public void judgeInvocation() {
-        if (llmJudge == null || pendingJudgeQuestion == null) return;
+        if (judge == null || pendingJudgeQuestion == null) return;
         QuestionCorpus.Question q = pendingJudgeQuestion;
         List<String> lr = pendingLuceneResult;
         if (lr != null) {
@@ -226,18 +233,18 @@ public class RetrievalBenchmark {
      * Déduplique pour éviter de juger N fois la même question — on garde la dernière occurrence.
      */
     private void runBatchJudgements() {
-        if (llmJudge == null) return;
+        if (judge == null) return;
         List<PendingJudgement> luceneDedup = dedupByQuestion(pendingLuceneJudgements);
         List<PendingJudgement> neo4jDedup  = dedupByQuestion(pendingNeo4jJudgements);
         System.out.printf("[Judge] Batch judging %d Lucene + %d Neo4j unique questions...%n",
             luceneDedup.size(), neo4jDedup.size());
         for (PendingJudgement p : luceneDedup) {
             luceneTrialResults.add(new TrialResult(p.question(), p.context(),
-                llmJudge.judge(p.question().text(), p.context(), p.question().expectedFqnHints())));
+                judge.judge(p.question().text(), p.context(), p.question().expectedFqnHints())));
         }
         for (PendingJudgement p : neo4jDedup) {
             neo4jTrialResults.add(new TrialResult(p.question(), p.context(),
-                llmJudge.judge(p.question().text(), p.context(), p.question().expectedFqnHints())));
+                judge.judge(p.question().text(), p.context(), p.question().expectedFqnHints())));
         }
     }
 
@@ -294,29 +301,71 @@ public class RetrievalBenchmark {
     // ── Résumé juge ─────────────────────────────────────────────────────────
 
     private void printJudgeSummary() {
-        if (llmJudge == null) {
+        if (judge == null) {
             System.out.println("[Judge] Désactivé (jmh.judge.enabled=false)");
             return;
         }
         printStrategyJudge("Lucene", luceneTrialResults);
         printStrategyJudge("Neo4j",  neo4jTrialResults);
+        printMcNemar();
         writeJudgeResults();
         writeJudgeDetailResults();
     }
 
     private void printStrategyJudge(String label, List<TrialResult> results) {
         if (results.isEmpty()) return;
-        List<LLMJudge.JudgementResult> valid = results.stream()
+        List<RagContextJudge.Judgement> valid = results.stream()
             .map(TrialResult::judgement)
-            .filter(r -> r.score() >= 0).toList();
+            .filter(j -> !j.isInvalid()).toList();
         if (valid.isEmpty()) { System.out.printf("[Judge] %s: no valid judgements%n", label); return; }
 
-        double avgScore    = valid.stream().mapToInt(LLMJudge.JudgementResult::score).average().orElse(0);
-        double avgCoverage = valid.stream().mapToDouble(LLMJudge.JudgementResult::hintCoverage).average().orElse(0);
-        long unknownCount  = valid.stream().filter(LLMJudge.JudgementResult::suggestsUnknown).count();
+        double passRate    = (double) valid.stream().filter(RagContextJudge.Judgement::isPass).count() / valid.size();
+        double avgCoverage = valid.stream().mapToDouble(RagContextJudge.Judgement::hintCoverage).average().orElse(0);
+        double coherence   = (double) valid.stream().filter(RagContextJudge.Judgement::coherent).count() / valid.size();
+        long invalides     = results.size() - valid.size();
 
-        System.out.printf("[Judge] %s — avg_score=%.2f/10  hint_coverage=%.1f%%  unknown_rate=%.1f%%%n",
-            label, avgScore, avgCoverage * 100, (double) unknownCount / valid.size() * 100);
+        System.out.printf("[Judge] %s — pass_rate=%.1f%%  hint_coverage=%.1f%%  coherence=%.1f%%  invalid=%d/%d%n",
+            label, passRate * 100, avgCoverage * 100, coherence * 100, invalides, results.size());
+    }
+
+    /**
+     * Comparaison appariée des deux stratégies sur les questions communes.
+     *
+     * <p>Les deux répondent aux <b>mêmes</b> questions : le test apparié est donc le bon, et deux
+     * taux comparés indépendamment seraient une erreur. Seules les paires <b>discordantes</b>
+     * portent de l'information — à cet effectif, leur nombre est le vrai déterminant de la
+     * puissance, et il est imprimé avec le p.</p>
+     */
+    private void printMcNemar() {
+        var parQuestion = new java.util.LinkedHashMap<String, Boolean>();
+        for (TrialResult tr : luceneTrialResults) {
+            if (!tr.judgement().isInvalid()) parQuestion.put(tr.question().text(), tr.judgement().isPass());
+        }
+        int b = 0, c = 0;
+        for (TrialResult tr : neo4jTrialResults) {
+            if (tr.judgement().isInvalid()) continue;
+            Boolean lucene = parQuestion.get(tr.question().text());
+            if (lucene == null) continue;
+            boolean neo4j = tr.judgement().isPass();
+            if (lucene && !neo4j) b++;
+            else if (!lucene && neo4j) c++;
+        }
+        int n = b + c;
+        if (n == 0) {
+            System.out.println("[Judge] McNemar : aucune paire discordante, rien à conclure");
+            return;
+        }
+        double queue = 0;
+        for (int i = 0; i <= Math.min(b, c); i++) queue += binomiale(n, i);
+        double p = Math.min(1.0, 2 * queue / Math.pow(2, n));
+        System.out.printf("[Judge] McNemar exact bilatéral : p=%.4f sur %d paires discordantes "
+                + "(Lucene seul PASS %d, Neo4j seul PASS %d)%n", p, n, b, c);
+    }
+
+    private static double binomiale(int n, int k) {
+        double r = 1;
+        for (int i = 0; i < k; i++) r = r * (n - i) / (i + 1);
+        return r;
     }
 
     /**
@@ -325,7 +374,7 @@ public class RetrievalBenchmark {
      */
     private void writeJudgeResults() {
         try {
-            java.nio.file.Path out = java.nio.file.Path.of("target/jmh-judge.jsonl");
+            java.nio.file.Path out = java.nio.file.Path.of("benchmarks/jmh-judge.jsonl");
             java.nio.file.Files.createDirectories(out.getParent());
             StringBuilder sb = new StringBuilder();
             for (String strat : new String[]{"lucene", "neo4j"}) {
@@ -346,19 +395,23 @@ public class RetrievalBenchmark {
     }
 
     private void appendJudgeLine(StringBuilder sb, List<TrialResult> results, String strategy, String difficulty) {
-        List<LLMJudge.JudgementResult> valid = results.stream()
+        List<RagContextJudge.Judgement> valid = results.stream()
             .map(TrialResult::judgement)
-            .filter(r -> r.score() >= 0).toList();
+            .filter(j -> !j.isInvalid()).toList();
         if (valid.isEmpty()) return;
-        double avgScore    = valid.stream().mapToInt(LLMJudge.JudgementResult::score).average().orElse(-1);
-        double avgCoverage = valid.stream().mapToDouble(LLMJudge.JudgementResult::hintCoverage).average().orElse(-1);
-        double unknownRate = (double) valid.stream().filter(LLMJudge.JudgementResult::suggestsUnknown).count() / valid.size();
+        double passRate     = (double) valid.stream().filter(RagContextJudge.Judgement::isPass).count() / valid.size();
+        double avgCoverage  = valid.stream().mapToDouble(RagContextJudge.Judgement::hintCoverage).average().orElse(-1);
+        double coherence    = (double) valid.stream().filter(RagContextJudge.Judgement::coherent).count() / valid.size();
+        double insuffisant  = (double) valid.stream()
+            .filter(j -> Boolean.FALSE.equals(j.checks().get("contexte_suffisant"))).count() / valid.size();
         sb.append(String.format(Locale.ROOT,
             "{\"ts\":\"%s\",\"strategy\":\"%s\",\"scenario\":\"%s\",\"fileCount\":%d," +
-            "\"difficulty\":\"%s\",\"avgScore\":%.2f,\"avgHintCoverage\":%.3f,\"unknownRate\":%.3f," +
-            "\"n\":%d,\"judgeModel\":\"%s\"}%n",
+            "\"difficulty\":\"%s\",\"passRate\":%.3f,\"avgHintCoverage\":%.3f," +
+            "\"contexteInsuffisantRate\":%.3f,\"coherenceRate\":%.3f," +
+            "\"n\":%d,\"nInvalid\":%d,\"schema\":\"binaire-v1\",\"judgeModel\":\"%s\"}%n",
             java.time.Instant.now(), strategy, scenario, fileCount,
-            difficulty, avgScore, avgCoverage, unknownRate, valid.size(), judgeModelName));
+            difficulty, passRate, avgCoverage, insuffisant, coherence,
+            valid.size(), results.size() - valid.size(), judgeModelName));
     }
 
     /**
@@ -368,7 +421,7 @@ public class RetrievalBenchmark {
      */
     private void writeJudgeDetailResults() {
         try {
-            java.nio.file.Path out = java.nio.file.Path.of("target/jmh-judge-detail.jsonl");
+            java.nio.file.Path out = java.nio.file.Path.of("benchmarks/jmh-judge-detail.jsonl");
             java.nio.file.Files.createDirectories(out.getParent());
             StringBuilder sb = new StringBuilder();
             appendDetailLines(sb, luceneTrialResults, "lucene");
@@ -383,7 +436,7 @@ public class RetrievalBenchmark {
 
     private void appendDetailLines(StringBuilder sb, List<TrialResult> results, String strategy) {
         for (TrialResult tr : results) {
-            if (tr.judgement().score() < 0) continue;
+            RagContextJudge.Judgement j = tr.judgement();
             String generatedCtx = String.join("\n---\n", tr.context());
             if (generatedCtx.length() > 3000) {
                 generatedCtx = generatedCtx.substring(0, 3000) + "\n[...]";
@@ -391,20 +444,26 @@ public class RetrievalBenchmark {
             String expectedJson = Arrays.stream(tr.question().expectedFqnHints())
                 .map(h -> "\"" + jsonEscape(h) + "\"")
                 .collect(Collectors.joining(",", "[", "]"));
+            // Les contrôles atomiques sont écrits un par un : c'est eux qui disent *quel*
+            // critère la stratégie rate, là où le seul verdict ne dit que qu'elle rate.
+            String checksJson = RagContextJudge.CONTROLES.stream()
+                .map(c -> "\"" + c + "\":" + j.checks().getOrDefault(c, false))
+                .collect(Collectors.joining(",", "{", "}"));
             sb.append(String.format(Locale.ROOT,
                 "{\"ts\":\"%s\",\"strategy\":\"%s\",\"scenario\":\"%s\",\"fileCount\":%d," +
                 "\"question\":\"%s\",\"difficulty\":\"%s\",\"expected\":%s," +
-                "\"generated\":\"%s\",\"score\":%d,\"rationale\":\"%s\"," +
-                "\"hintCoverage\":%.3f,\"suggestsUnknown\":%b,\"judgeModel\":\"%s\"}%n",
+                "\"generated\":\"%s\",\"verdict\":\"%s\",\"checks\":%s,\"reason\":\"%s\"," +
+                "\"hintCoverage\":%.3f,\"coherent\":%b,\"schema\":\"binaire-v1\",\"judgeModel\":\"%s\"}%n",
                 java.time.Instant.now(), strategy, scenario, fileCount,
                 jsonEscape(tr.question().text()),
                 tr.question().difficulty().name(),
                 expectedJson,
                 jsonEscape(generatedCtx),
-                tr.judgement().score(),
-                jsonEscape(tr.judgement().rationale()),
-                tr.judgement().hintCoverage(),
-                tr.judgement().suggestsUnknown(),
+                j.verdict(),
+                checksJson,
+                jsonEscape(j.reason()),
+                j.hintCoverage(),
+                j.coherent(),
                 judgeModelName));
         }
     }

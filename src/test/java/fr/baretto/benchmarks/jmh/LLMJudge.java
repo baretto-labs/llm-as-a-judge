@@ -35,6 +35,14 @@ import java.util.List;
  * {@code /v1/chat/completions}. {@code OllamaChatModel} ne convient pas là : il parle
  * l'API native d'Ollama ({@code /api/chat}), donc changer l'URL ne suffit pas.</p>
  *
+ * @deprecated Remplacée par {@link RagContextJudge}. Cette classe rend une <b>note graduée</b>
+ * ({@code score} 0-10, {@code rationale}, {@code suggestsUnknown}), format abandonné le 2026-09-13
+ * au profit d'un <b>verdict binaire</b> {@code {checks, verdict, reason}} avec la règle
+ * {@code PASS ⟺ tous les contrôles vrais}. Une échelle 0-10 sans ancrage produit du bruit entre
+ * juges et entre exécutions, et ne se teste pas : deux stratégies se comparent sur des verdicts
+ * appariés, pas sur des moyennes de notes. La classe reste compilable et utilisable — elle est
+ * l'artefact du chemin parcouru — mais n'est plus câblée dans {@code RetrievalBenchmark}.
+ *
  * <p><b>Attention — le schéma de cette classe est celui abandonné le 2026-09-13.</b>
  * {@link JudgementOutput} porte une note graduée ({@code score}, {@code rationale},
  * {@code suggestsUnknown}) alors que le juge fine-tuné de {@code judge-finetune/} rend
@@ -58,6 +66,7 @@ import java.util.List;
  *   <li>{@code hintCoverage} — fraction des expectedFqnHints trouvés (calcul programmatique)</li>
  * </ul>
  */
+@Deprecated(since = "2026-09-21")
 public class LLMJudge {
 
     private static final Logger logger = LoggerFactory.getLogger(LLMJudge.class);
