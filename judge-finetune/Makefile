@@ -101,13 +101,24 @@ train-32b: data/mlx/train.jsonl
 	MODEL=$(MODEL_32B) ADAPTER=adapters/32b-judge ./scripts/train_variant.sh 32b $(LORA_ARGS)
 
 # Une variante à la fois : le serveur est démarré puis arrêté par le script.
+# Les noms viennent de PREENREGISTREMENT.md §3 et doivent correspondre exactement à
+# configs/variants.json — `14B-baseline` et `32B-baseline` n'existent plus depuis le
+# gel des variantes, et les cibles échouaient sur « variante inconnue ».
+#
+# BENCH_ARGS porte la passe « format normalisé » (amendement du 2026-09-19), activée
+# par défaut : sans elle, une métrique secondaire déclarée ne serait produite par
+# aucune commande. Elle double le volume d'inférence — contrainte pratique, non
+# protocolaire — d'où `make bench-14b BENCH_ARGS=` pour s'en passer.
+BENCH_ARGS ?= --format-normalise
+
 bench-14b:
-	./scripts/bench_variant.sh 14B-baseline
-	./scripts/bench_variant.sh 14B-finetuned
+	./scripts/bench_variant.sh 14B-baseline-nu $(BENCH_ARGS)
+	./scripts/bench_variant.sh 14B-baseline-conventions $(BENCH_ARGS)
+	./scripts/bench_variant.sh 14B-finetuned $(BENCH_ARGS)
 
 bench-32b:
-	./scripts/bench_variant.sh 32B-baseline
-	./scripts/bench_variant.sh 32B-finetuned
+	./scripts/bench_variant.sh 32B-baseline-conventions $(BENCH_ARGS)
+	./scripts/bench_variant.sh 32B-finetuned $(BENCH_ARGS)
 
 bench: bench-14b bench-32b report
 
