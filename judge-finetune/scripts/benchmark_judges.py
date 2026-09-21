@@ -32,6 +32,7 @@ import json
 import math
 import os
 import random
+import re
 import statistics
 import sys
 import time
@@ -106,6 +107,86 @@ def load_golden(path):
                 "gold": gold,
             })
     return items
+
+
+# ── Passe « format normalisé » (PREENREGISTREMENT, amendement du 2026-09-19) ──
+#
+# Le benchmark est rejoué sur des réponses dépouillées de leur Markdown, et
+# l'écart entre les deux passes mesure la part de forme dans le score du juge.
+# C'est une mesure de la fuite résiduelle, publiée telle quelle plutôt que
+# poursuivie par un nettoyage sans fin du corpus.
+
+DEB_SORTIE = "### SORTIE À ÉVALUER"
+FIN_SORTIE = "### CRITÈRES DE VALIDATION"
+
+# L'amendement nomme quatre constructions, et le dépouillement s'y tient :
+# titres, puces, gras, tableaux. Sont délibérément CONSERVÉS — les retirer
+# dépasserait le transformation déclarée, et pour les deux derniers altérerait
+# ce qui est jugé plutôt que sa forme :
+#   listes numérotées, italiques, blocs de code délimités, code inline.
+# Le code inline marque des identifiants dans 41 des 50 sorties du golden : il
+# relève du fond.
+FENCE = re.compile(r"^```.*?^```", re.M | re.S)
+TITRE = re.compile(r"^#{1,6}[ \t]+", re.M)
+PUCE = re.compile(r"^[ \t]*[-*][ \t]+", re.M)
+GRAS = re.compile(r"\*\*([^*\n]+)\*\*")
+LIGNE_TABLEAU = re.compile(r"^[ \t]*\|.*\|[ \t]*$")
+SEP_TABLEAU = re.compile(r"^[ \t]*\|[\s:|-]+\|[ \t]*$")
+
+
+def _depouille_segment(texte):
+    lignes = []
+    for ligne in texte.split("\n"):
+        if SEP_TABLEAU.match(ligne):
+            continue  # la ligne de séparation n'a pas de contenu
+        if LIGNE_TABLEAU.match(ligne):
+            cellules = [c.strip() for c in ligne.strip().strip("|").split("|")]
+            ligne = " ; ".join(c for c in cellules if c)
+        lignes.append(ligne)
+    texte = "\n".join(lignes)
+    texte = TITRE.sub("", texte)
+    texte = PUCE.sub("", texte)
+    return GRAS.sub(r"\1", texte)
+
+
+def strip_markdown(texte):
+    """Dépouille titres, puces, gras et tableaux, hors blocs de code délimités.
+
+    Les blocs ``` sont recopiés verbatim : une ligne commençant par `-` ou `|`
+    y est du code, pas une puce ni un tableau. Le golden set n'en contient
+    aucun cas aujourd'hui — vérifié, 0 bloc sur 24 — mais la garantie ne doit
+    pas dépendre de cette vérification.
+    """
+    morceaux, fin = [], 0
+    for m in FENCE.finditer(texte):
+        morceaux.append(_depouille_segment(texte[fin:m.start()]))
+        morceaux.append(m.group(0))
+        fin = m.end()
+    morceaux.append(_depouille_segment(texte[fin:]))
+    return "".join(morceaux)
+
+
+def normalise_golden(golden):
+    """Golden dépouillé, moins les items dont la requête impose un format.
+
+    L'exclusion est définie par un **prédicat vérifiable** — porter le contrôle
+    `format_impose` — et non par un décompte écrit à la main : l'amendement du
+    2026-09-19 en annonçait 5, le corpus en porte 6 (correction du 2026-09-21).
+    Sur ces items la forme *est* le critère, et les dépouiller les rendrait
+    injugeables.
+    """
+    exclus = sorted(g["id"] for g in golden if "format_impose" in (g["gold"].get("checks") or {}))
+    hors = set(exclus)
+    out = []
+    for g in golden:
+        if g["id"] in hors:
+            continue
+        system, user = g["prompt"]
+        avant, reste = user["content"].split(DEB_SORTIE, 1)
+        corps, apres = reste.split(FIN_SORTIE, 1)
+        contenu = avant + DEB_SORTIE + strip_markdown(corps) + FIN_SORTIE + apres
+        out.append({**g, "prompt": [system, {**user, "content": contenu}]})
+    return out, exclus
 
 
 # ── Inference ─────────────────────────────────────────────────────────────────
