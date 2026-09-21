@@ -4,7 +4,15 @@ results/
 results-smoke/
 data/mlx/
 data/mlx-smoke/
-# régénéré par `make split` ; à commiter délibérément une fois le corpus complet et relu
-data/golden/
-configs/variants.json
+# `data/golden/` et `configs/variants.json` étaient ignorés ici ; suivis depuis le 2026-09-21.
+#
+# Le golden set : la condition posée par la ligne qu'il remplaçait — « à commiter
+# délibérément une fois le corpus complet et relu » — est atteinte. 50 items relus sur 50,
+# κ inter-annotateur publié, et tirage rendu déterministe le même jour, ce qui est ce qui
+# donne un sens à le figer. Une étude pré-enregistrée dont la référence d'évaluation n'est
+# pas versionnée n'est pas vérifiable.
+#
+# variants.json : il porte la déclaration des paires de comparaison. Le pré-enregistrement
+# exige qu'elles soient fixées avant les résultats ; non versionnées, elles ne seraient pas
+# opposables. Aucun secret : `api_key_env` nomme une variable d'environnement, sans sa valeur.
 __pycache__/

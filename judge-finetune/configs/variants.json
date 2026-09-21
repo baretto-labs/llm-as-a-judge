@@ -1,0 +1,96 @@
+{
+  "_comment": "Les cinq variantes locales gelées par PREENREGISTREMENT.md §3. gemini-flash et gemini-pro y sont également gelées mais différées faute de clé d'API : leur ajout exigera un amendement daté avant toute exécution. Un serveur à la fois (scripts/bench_variant.sh), le port étant lu dans base_url.",
+  "_conventions": "system_suffix_file ajoute les conventions de PROTOCOLE.md à l'invite du corpus, mot pour mot. Trois des quatre conventions sont invisibles depuis l'invite seule — préférence non bloquante, portée de citations_exactes, règle PASS ⟺ tous les contrôles vrais — ce qui fait de 14B-baseline-conventions un concurrent sérieux et non un homme de paille (§3).",
+  "_checkpoint": "14B-finetuned sert le checkpoint 200, désigné principal par l'option C : la perte de validation atteint son minimum à l'itération 250 puis remonte. Le répertoire servable est fabriqué depuis 0000200_adapters.safetensors après l'entraînement.",
+  "variants": [
+    {
+      "name": "14B-baseline-nu",
+      "size": "14B",
+      "fine_tuned": false,
+      "base_url": "http://127.0.0.1:8080/v1",
+      "model": "mlx-community/Qwen2.5-Coder-14B-Instruct-4bit",
+      "serve_model": "mlx-community/Qwen2.5-Coder-14B-Instruct-4bit",
+      "serve_adapter": null,
+      "system_suffix_file": null,
+      "ram_gb": 8.3,
+      "api_key_env": null,
+      "cost_per_hour_usd": 0.05
+    },
+    {
+      "name": "14B-baseline-conventions",
+      "size": "14B",
+      "fine_tuned": false,
+      "base_url": "http://127.0.0.1:8081/v1",
+      "model": "mlx-community/Qwen2.5-Coder-14B-Instruct-4bit",
+      "serve_model": "mlx-community/Qwen2.5-Coder-14B-Instruct-4bit",
+      "serve_adapter": null,
+      "system_suffix_file": "configs/conventions.md",
+      "ram_gb": 8.3,
+      "api_key_env": null,
+      "cost_per_hour_usd": 0.05
+    },
+    {
+      "name": "14B-finetuned",
+      "size": "14B",
+      "fine_tuned": true,
+      "base_url": "http://127.0.0.1:8082/v1",
+      "model": "mlx-community/Qwen2.5-Coder-14B-Instruct-4bit",
+      "serve_model": "mlx-community/Qwen2.5-Coder-14B-Instruct-4bit",
+      "serve_adapter": "adapters/14b-judge-ckpt200",
+      "system_suffix_file": null,
+      "ram_gb": 8.3,
+      "api_key_env": null,
+      "cost_per_hour_usd": 0.05
+    },
+    {
+      "name": "32B-baseline-conventions",
+      "size": "32B",
+      "fine_tuned": false,
+      "base_url": "http://127.0.0.1:8083/v1",
+      "model": "mlx-community/Qwen2.5-Coder-32B-Instruct-4bit",
+      "serve_model": "mlx-community/Qwen2.5-Coder-32B-Instruct-4bit",
+      "serve_adapter": null,
+      "system_suffix_file": "configs/conventions.md",
+      "ram_gb": 18.4,
+      "api_key_env": null,
+      "cost_per_hour_usd": 0.05
+    },
+    {
+      "name": "32B-finetuned",
+      "size": "32B",
+      "fine_tuned": true,
+      "base_url": "http://127.0.0.1:8084/v1",
+      "model": "mlx-community/Qwen2.5-Coder-32B-Instruct-4bit",
+      "serve_model": "mlx-community/Qwen2.5-Coder-32B-Instruct-4bit",
+      "serve_adapter": "adapters/32b-judge",
+      "system_suffix_file": null,
+      "ram_gb": 18.4,
+      "api_key_env": null,
+      "cost_per_hour_usd": 0.05
+    }
+  ],
+  "comparisons": {
+    "primary": {
+      "a": "14B-baseline-conventions",
+      "b": "14B-finetuned",
+      "claim": "le fine-tuning améliore la justesse du juge"
+    },
+    "secondary": [
+      {
+        "a": "14B-baseline-nu",
+        "b": "14B-baseline-conventions",
+        "note": "isole ce que les conventions apportent seules, sans fine-tuning"
+      },
+      {
+        "a": "14B-baseline-conventions",
+        "b": "32B-baseline-conventions",
+        "note": "effet de la taille, à conventions identiques"
+      },
+      {
+        "a": "14B-finetuned",
+        "b": "32B-finetuned",
+        "note": "effet de la taille, à fine-tuning identique"
+      }
+    ]
+  }
+}
