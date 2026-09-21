@@ -104,13 +104,15 @@ MAX_RSS="$(awk '/maximum resident set size/{print $1; exit}' "$TIMELOG")"
 PEAK_FOOT="$(awk '/peak memory footprint/{print $1; exit}' "$TIMELOG")"
 
 # ── Relevé. Les versions et la machine sont épinglées : sans elles le chiffre n'est pas reproductible.
+# Le journal est passé au relevé : il porte le débit mesuré par mlx-lm, seule source
+# permettant de détecter une mise en veille de la machine pendant l'entraînement.
 "$PY" - "$REPORT" "$NAME" "$MODEL" "$ADAPTER" "$DEBUT_ISO" "$FIN_ISO" \
-       "$REAL_S" "$MAX_RSS" "$PEAK_FOOT" "$FETCH_S" "$CACHED_BEFORE" "$TOKENS_JSON" "$@" <<'PYEOF'
-import json, platform, subprocess, sys
+       "$REAL_S" "$MAX_RSS" "$PEAK_FOOT" "$FETCH_S" "$CACHED_BEFORE" "$TOKENS_JSON" "$LOG" "$@" <<'PYEOF'
+import json, platform, re, statistics, subprocess, sys
 from importlib.metadata import version
 
 (rapport, nom, modele, adapter, debut, fin,
- real_s, max_rss, peak_foot, fetch_s, cache_avant, tokens_json, *lora_args) = sys.argv[1:]
+ real_s, max_rss, peak_foot, fetch_s, cache_avant, tokens_json, log_path, *lora_args) = sys.argv[1:]
 
 def sysctl(cle):
     try:
@@ -136,6 +138,34 @@ iters = int(args.get("--iters", 0) or 0)
 batch = int(args.get("--batch-size", 1) or 1)
 moyenne = tokens["train"]["jetons_total"] / max(tokens["train"]["exemples"], 1)
 
+# ── Détection de veille machine, seuil ×1,5 arrêté le 2026-09-21.
+#
+# Trois entraînements consécutifs ont été faussés par une mise en veille — jusqu'à
+# ×7,6 sur la durée — et chacun a été corrigé À LA MAIN après coup, parce que ce
+# script écrivait l'horloge brute dans le champ qui fait foi. Le journal de mlx-lm
+# porte le débit réellement obtenu : il suffit de le comparer.
+#
+# La durée dérivée inclut les passes de validation (amendement du 2026-09-21) :
+# l'utilisateur les attend aussi, et les exclure sous-estimait le coût de 19 %.
+SEUIL_VEILLE = 1.5
+journal = open(log_path, encoding="utf-8", errors="replace").read()
+its = [float(x) for x in re.findall(r"It/sec ([\d.]+)", journal)]
+vals = [float(x) for x in re.findall(r"Val took ([\d.]+)s", journal)]
+pics = [float(x) for x in re.findall(r"Peak mem ([\d.]+) GB", journal)]
+
+d_train = (iters / statistics.fmean(its)) if (its and iters) else 0.0
+d_val = sum(vals)
+derivee = d_train + d_val
+horloge = float(real_s)
+veille = derivee > 0 and horloge > derivee * SEUIL_VEILLE
+duree = derivee if veille else horloge
+
+# Le pic mémoire vient de mlx-lm quand il est disponible : `peak memory footprint`
+# de /usr/bin/time mesure le processus entier et rapporte systématiquement plus
+# (12,78 contre 11,32 Go sur le dernier run). Ce n'est PAS un effet de la veille,
+# c'est une autre grandeur — elle est conservée à part, pas écrasée.
+pic_go = max(pics) if pics else go(peak_foot)
+
 releve = {
     "variante": nom,
     "modele": modele,
@@ -143,9 +173,13 @@ releve = {
     "debut": debut,
     "fin": fin,
     "entrainement": {
-        "duree_s": float(real_s),
-        "duree_lisible": f"{int(float(real_s)) // 60} min {int(float(real_s)) % 60} s",
-        "memoire_pic_go": go(peak_foot),
+        "duree_s": duree,
+        "duree_lisible": f"{int(duree) // 60} min {int(duree) % 60} s",
+        "duree_s_entrainement_seul": round(d_train, 1) if d_train else None,
+        "duree_s_validation": round(d_val, 1),
+        "passes_de_validation": len(vals),
+        "memoire_pic_go": pic_go,
+        "memoire_pic_go_time_l": go(peak_foot),
         "memoire_rss_max_go": go(max_rss),
         "note_memoire": ("le chiffre à retenir est `memoire_pic_go` (peak memory footprint). Sur Apple "
                          "Silicon, les allocations Metal n'apparaissent pas dans le RSS, si bien que "
@@ -153,7 +187,7 @@ releve = {
                          "de l'entraînement"),
         "iterations": iters,
         "batch_size": batch,
-        "s_par_iteration": round(float(real_s) / iters, 2) if iters else None,
+        "s_par_iteration": round(duree / iters, 2) if iters else None,
         "jetons_vus_estimes": int(moyenne * iters * batch) if iters else None,
     },
     "poids": {
@@ -175,6 +209,20 @@ releve = {
         "systeme": f"macOS {platform.mac_ver()[0]}",
     },
 }
+if veille:
+    e = releve["entrainement"]
+    e["duree_s_horloge_INVALIDE"] = horloge
+    e["duree_lisible_horloge_INVALIDE"] = f"{int(horloge) // 60} min {int(horloge) % 60} s"
+    e["correction"] = (
+        f"VEILLE MACHINE DETECTEE AUTOMATIQUEMENT (seuil x{SEUIL_VEILLE}). L'horloge de "
+        f"/usr/bin/time -l affiche {horloge / 60:.1f} min pour {derivee / 60:.1f} min de calcul reel, "
+        f"soit un facteur {horloge / derivee:.1f}. Les champs sous suffixe _INVALIDE NE DOIVENT PAS "
+        f"ETRE PUBLIES. Substituts selon la methode declaree le 2026-09-19, amendee le 2026-09-21 pour "
+        f"inclure la validation : duree = {iters} / {statistics.fmean(its):.4f} it/s + {d_val:.0f} s de "
+        f"validation sur {len(vals)} passes, a partir des {len(its)} rapports du journal."
+    )
+    print(f"\n[{nom}] ATTENTION : veille detectee, horloge invalidee (facteur {horloge / derivee:.1f})")
+
 with open(rapport, "w") as f:
     json.dump(releve, f, ensure_ascii=False, indent=2)
 
