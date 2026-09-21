@@ -611,10 +611,16 @@ def build_report(metrics, golden, args, rng, config, selected_names, passe_forma
         par_nom = {m["name"]: m for m in mn}
         ids_com = [g["id"] for g in gn]
         or_com = [g["gold"]["verdict"] for g in gn]
+        # La clause d'exclusion disparaît quand il n'y a rien à exclure : sans ce
+        # garde, un corpus sans `format_impose` produisait « 0 exclus car leur requête
+        # impose un format — la forme y *est* le critère : . », scorie d'une liste vide
+        # dans un rapport publié.
+        clause = ("" if not exclus else
+                  f", {len(exclus)} exclus car leur requête impose un format — la forme y *est* "
+                  f"le critère : {', '.join(exclus)}")
         lines += ["", "### Passe « format normalisé » — part de forme dans le score", "",
                   f"Mêmes items, sorties dépouillées de leur Markdown (titres, puces, gras, tableaux). "
-                  f"**{len(ids_com)} items comparés des deux côtés**, {len(exclus)} exclus car leur "
-                  f"requête impose un format — la forme y *est* le critère : {', '.join(exclus)}.", "",
+                  f"**{len(ids_com)} items comparés des deux côtés**{clause}.", "",
                   "La justesse de la passe normale est **recalculée sur ces mêmes items**, sans quoi "
                   "l'écart confondrait l'exclusion avec l'effet de forme.", "",
                   "| Variante | Formaté | Dépouillé | Écart |", "|---|---|---|---|"]
