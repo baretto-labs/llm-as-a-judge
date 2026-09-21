@@ -76,6 +76,21 @@
             <version>${langchain4j.version}</version>
         </dependency>
 
+        <!--
+            Client OpenAI-compatible, pour interroger le juge fine-tuné servi par
+            mlx_lm.server (endpoint /v1/chat/completions).
+
+            OllamaChatModel ne convient pas ici : il parle l'API native d'Ollama
+            (/api/chat). Changer l'URL ne suffit donc pas, il faut changer de classe.
+            On garde les deux : la pipeline RAG continue de générer via Ollama, seul
+            le juge bascule.
+        -->
+        <dependency>
+            <groupId>dev.langchain4j</groupId>
+            <artifactId>langchain4j-open-ai</artifactId>
+            <version>${langchain4j.version}</version>
+        </dependency>
+
         <!-- LangChain4j Embedding Model (local ONNX) -->
         <dependency>
             <groupId>dev.langchain4j</groupId>
