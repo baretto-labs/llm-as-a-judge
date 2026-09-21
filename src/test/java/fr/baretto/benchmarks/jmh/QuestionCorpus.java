@@ -53,7 +53,10 @@ public class QuestionCorpus {
         new Question(
             "What authentication header does AuthenticationHelper generate?",
             Difficulty.LOCAL,
-            new String[]{"AuthenticationHelper", "createBasicAuthHeader", "Base64"}
+            // `createBasicAuthHeader` n'existe pas dans la codebase : indice inventé,
+            // repéré le 2026-09-21 par scripts/verify_question_hints.py. Le hintCoverage
+            // de cette question plafonnait donc à 2/3 sans que rien ne le signale.
+            new String[]{"AuthenticationHelper", "buildAuthorizationHeaderValue", "AUTHORIZATION_HEADER"}
         ),
         new Question(
             "How does SuggestionCache generate cache keys for completion requests?",
