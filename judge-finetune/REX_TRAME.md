@@ -91,8 +91,18 @@ le verdict, donc un juge peut réussir sans rien comprendre.*
   **ce qui sera déclaré non concluant**. Formulations interdites listées noir sur blanc.
 - **Relecture humaine à deux colonnes** : le premier passage alimente le κ, fatigue comprise ;
   l'arbitrage à froid fixe l'étiquette. Les deux ne se mélangent jamais.
-- **κ = 0,901, IC 95 % [0,674 — 1,000]** sur 21 items. Et le chiffre qu'il faut donner en premier :
-  l'accord **complet, contrôle par contrôle**, n'est que de **16/21 = 76 %**.
+- **κ = 0,880, IC 95 % [0,720 — 1,000]** sur les **50 items**, relecture close le 2026-09-21, accord de
+  verdict 47/50. Le chiffre à donner juste après, parce qu'il dit l'inverse : **17 items sur 50 portent
+  un désaccord sur au moins un contrôle**, dont **15 que le verdict absorbe**. Le verdict est une
+  conjonction — dès qu'un contrôle échoue des deux côtés, un désaccord sur un autre devient invisible.
+- **Le verdict est reproductible ; les raisons le sont beaucoup moins.** Or le juge est entraîné sur les
+  raisons, pas sur le seul verdict. C'est un plafond sur ce que le fine-tuning peut apprendre — une
+  propriété du corpus, pas un défaut de la méthode.
+- Le contrôle le plus fréquent, `respect_consignes`, tombe à **κ = 0,386 pour 78 % d'accord brut** :
+  marges très déséquilibrées. Publier le κ seul sous-estime l'accord, publier les 78 % seuls le
+  surestime. Les deux vont ensemble, avec les marges.
+- Une asymétrie qui n'est pas du bruit : **16 désaccords sur 22 vont dans le même sens**, l'annotateur
+  humain plus sévère que l'étiquette rédigée par le LLM.
 - **Tirages à graine déclarée**, et rejets documentés avec leur motif (un lot à 7 java sur 8 quand le
   vivier en compte 42 % ; un lot contenant des items déjà relus, dont le texte porte une mesure).
 - Le corpus n'est jamais édité à la main : tout passe par les générateurs et `make regen`.
