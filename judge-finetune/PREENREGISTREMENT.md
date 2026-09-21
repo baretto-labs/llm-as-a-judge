@@ -725,3 +725,24 @@ lui-même, calculée à l'exécution sur les données présentes plutôt que rec
 **Ce qui n'est pas amendé.** Ni l'exclusion, qui reste obligatoire et justifiée — sur ces items la forme
 *est* le critère évalué —, ni le statut secondaire de la passe, ni la décision de publier la fuite
 résiduelle telle quelle.
+
+---
+
+## Amendement daté — 2026-09-21, la durée publiée excluait les passes de validation
+
+La méthode de substitution déclarée le 2026-09-19, appliquée quand l'horloge est invalidée par une veille
+machine, dérive la durée du **débit d'itérations** relevé par mlx-lm : `durée = itérations / débit moyen`.
+
+**Elle ne mesure que les itérations d'entraînement.** Les passes de validation — 9 sur ce run,
+14.7 minutes cumulées — en sont absentes. Le chiffre publié valait donc 76.3 min là où
+l'utilisateur attend **91.0 min**, soit une sous-estimation de **19%**.
+
+**Correction retenue.** `duree_s` vaut désormais entraînement **plus** validation. Les deux composantes
+restent relevées séparément, pour que le partage soit vérifiable.
+
+**Pourquoi c'est légitime après coup.** Le changement rend le coût **moins** favorable à l'étude : 91 min
+se défend moins bien que 76. Modifier une définition dans le sens qui dessert son propre argument est
+l'inverse d'un choix opportuniste. Il est néanmoins daté et consigné, comme toute autre correction.
+
+**Portée.** Le seuil de détection automatique de veille introduit le même jour dans `train_variant.sh`
+compare l'horloge à cette durée **validation incluse**, par cohérence.

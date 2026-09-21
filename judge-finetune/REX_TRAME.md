@@ -142,14 +142,19 @@ biais de juge ; (2) un **banc d'essai des stratégies de récupération** ; (3) 
 
 | | |
 |---|---|
-| Durée d'entraînement | **76 min 15 s** (11,44 s/itération) |
+| Durée d'entraînement | **90 min 58 s** (13,65 s/itération) — dont 76 min d'itérations et 14,7 min de validation |
 | Pic mémoire | **11,32 Go** sur 36 Go |
 | Itérations | 400, batch 1 |
 | Jetons entraînés | 169 513 |
 | Adaptateur | **43,8 Mo** — 11,5 M paramètres sur 14,77 Md, soit **0,078 %** |
 | Coût en jetons facturés | **zéro** |
 
-**76 minutes sur un portable.** C'est l'argument « le fine-tuning n'est pas si coûteux », mesuré.
+**91 minutes sur un portable.** C'est l'argument « le fine-tuning n'est pas si coûteux », mesuré.
+
+Et une correction à raconter : j'ai d'abord publié **76 minutes**. La méthode de substitution déclarée ne
+dérivait la durée que des itérations d'entraînement et **excluait les 9 passes de validation**, soit
+14,7 minutes. L'utilisateur attend 91 minutes, pas 76. Corriger rendait le chiffre **moins** flatteur —
+c'est précisément ce qui rend la correction crédible.
 
 ⚠️ **À dire, parce que c'est un REX** : ce relevé était **faux** au premier jet. L'horloge annonçait
 690 minutes — un facteur **9,1** — la machine ayant été suspendue pendant l'entraînement. Pour la

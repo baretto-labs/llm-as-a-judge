@@ -5,20 +5,20 @@
   "debut": "2026-09-21T07:45:06+02:00",
   "fin": "2026-09-21T19:15:30+02:00",
   "entrainement": {
-    "duree_s": 4575.4,
-    "duree_lisible": "76 min 15 s",
+    "duree_s": 5458.7,
+    "duree_lisible": "90 min 58 s",
     "memoire_pic_go": 11.32,
     "memoire_rss_max_go": 4.51,
     "note_memoire": "le chiffre à retenir est `memoire_pic_go` (peak memory footprint). Sur Apple Silicon, les allocations Metal n'apparaissent pas dans le RSS, si bien que `memoire_rss_max_go` est très inférieur et ne mesure pas l'empreinte réelle de l'entraînement",
     "iterations": 400,
     "batch_size": 1,
-    "s_par_iteration": 11.44,
+    "s_par_iteration": 13.65,
     "jetons_vus_estimes": 396921,
     "duree_s_horloge_INVALIDE": 41424.54,
     "duree_lisible_horloge_INVALIDE": "690 min 24 s",
     "s_par_iteration_horloge_INVALIDE": 103.56,
     "memoire_pic_go_horloge_INVALIDE": 12.78,
-    "correction": "La machine a ete suspendue pendant l'entrainement pour la troisieme fois : l'horloge de /usr/bin/time -l affiche 690 min contre 76 min de calcul reel, soit un facteur 9.1. Ces champs sont conserves sous suffixe _INVALIDE et NE DOIVENT PAS ETRE PUBLIES. Substituts calcules selon la methode declaree le 2026-09-19, avant la premiere veille : duree = 400 / 0.0874 it/s = 4575 s, a partir des 40 rapports du journal, tous retenus. Le pic memoire est le maximum des rapports mlx-lm (11.320 Go) ; l'ecart avec le 'peak memory footprint' de /usr/bin/time (12.78 Go) n'est PAS un artefact de veille mais une grandeur differente, l'outil systeme mesurant l'empreinte du processus entier. Le meme ecart existe dans le run archive : 12.76 contre 11.32. train_variant.sh ne detecte pas la veille ; cette correction est manuelle, comme les precedentes.",
+    "correction": "La machine a ete suspendue pendant l'entrainement pour la troisieme fois : l'horloge de /usr/bin/time -l affiche 690 min contre 76 min de calcul reel, soit un facteur 9.1. Ces champs sont conserves sous suffixe _INVALIDE et NE DOIVENT PAS ETRE PUBLIES. Substituts calcules selon la methode declaree le 2026-09-19, avant la premiere veille : duree = 400 / 0.0874 it/s = 4575 s, a partir des 40 rapports du journal, tous retenus. Le pic memoire est le maximum des rapports mlx-lm (11.320 Go) ; l'ecart avec le 'peak memory footprint' de /usr/bin/time (12.78 Go) n'est PAS un artefact de veille mais une grandeur differente, l'outil systeme mesurant l'empreinte du processus entier. Le meme ecart existe dans le run archive : 12.76 contre 11.32. train_variant.sh ne detecte pas la veille ; cette correction est manuelle, comme les precedentes. CORRECTION du 2026-09-21 : la methode declaree le 2026-09-19 derivait la duree des seules iterations d'entrainement (76.3 min) et EXCLUAIT les 9 passes de validation (14.7 min). Le chiffre publie sous-estimait donc de 19% ce que l'utilisateur attend reellement. `duree_s` vaut desormais entrainement + validation = 91.0 min. Le detail des deux composantes est conserve. Ce changement rend le cout MOINS flatteur : il va contre l'argument de l'etude, ce qui est precisement pourquoi il est applique.",
     "surapprentissage": {
       "constat": "minimum de validation 1,103 a l'iteration 250, puis remontee 1,200 / 1,199 / 1,183",
       "courbe_validation": {
@@ -34,7 +34,10 @@
       },
       "reproductibilite": "troisieme run presentant la meme courbe : minimum vers 250 puis remontee. Le surapprentissage a 150 exemples est reproductible, ce n'est pas un accident de tirage",
       "points_de_controle": "100, 200, 300, 400 ; aucun a 250 ou se situe le minimum reel"
-    }
+    },
+    "duree_s_entrainement_seul": 4575.4,
+    "duree_s_validation": 883.4,
+    "passes_de_validation": 9
   },
   "poids": {
     "integralement_en_cache_avant": true,
