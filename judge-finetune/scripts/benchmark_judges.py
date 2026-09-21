@@ -246,8 +246,11 @@ def messages_for(variant, item):
     return [{"role": system["role"], "content": fondu}, user]
 
 
-def run_variant(variant, golden, args, runs_dir):
-    cache_path = runs_dir / f"{variant['name']}.jsonl"
+def run_variant(variant, golden, args, runs_dir, suffixe=""):
+    # Le suffixe sépare les caches des deux passes : la passe « format normalisé »
+    # interroge les mêmes items avec des sorties dépouillées, et mélanger les deux
+    # dans un même fichier rendrait l'écart mesuré incohérent sans rien signaler.
+    cache_path = runs_dir / f"{variant['name']}{suffixe}.jsonl"
     done = set()
     if cache_path.exists():
         with cache_path.open(encoding="utf-8") as f:
@@ -271,10 +274,10 @@ def run_variant(variant, golden, args, runs_dir):
             print(f"  pass {p} {n}/{len(todo)} {item['id']} {status}", flush=True)
 
 
-def load_runs(variant, golden, passes, runs_dir):
+def load_runs(variant, golden, passes, runs_dir, suffixe=""):
     """Returns {pass: {id: row}} keeping the last successful row per (pass, id)."""
     runs = {p: {} for p in range(1, passes + 1)}
-    path = runs_dir / f"{variant['name']}.jsonl"
+    path = runs_dir / f"{variant['name']}{suffixe}.jsonl"
     if not path.exists():
         return runs
     ids = {item["id"] for item in golden}
@@ -556,7 +559,7 @@ def fmt(x, pct=False, digits=2):
     return f"{x:.0%}" if pct else f"{x:.{digits}f}"
 
 
-def build_report(metrics, golden, args, rng, config, selected_names):
+def build_report(metrics, golden, args, rng, config, selected_names, passe_format=None):
     lines = ["# Benchmark LLM-as-a-Judge — 14B vs 32B", ""]
     lines.append(f"Golden set : {len(golden)} items | passes : {args.passes} | température : {args.temperature} | "
                  f"bootstrap : {args.bootstrap}")
@@ -602,6 +605,53 @@ def build_report(metrics, golden, args, rng, config, selected_names):
                   "| Variante | Justesse sur `limite` |", "|---|---|"]
         for m in metrics:
             lines.append(f"| {m['name']} | {m['limite_correct']}/{n_lim} = {fmt(m['limite_accuracy'], pct=True)} |")
+
+    if passe_format:
+        gn, mn, exclus = passe_format["golden"], passe_format["metrics"], passe_format["exclus"]
+        par_nom = {m["name"]: m for m in mn}
+        ids_com = [g["id"] for g in gn]
+        or_com = [g["gold"]["verdict"] for g in gn]
+        lines += ["", "### Passe « format normalisé » — part de forme dans le score", "",
+                  f"Mêmes items, sorties dépouillées de leur Markdown (titres, puces, gras, tableaux). "
+                  f"**{len(ids_com)} items comparés des deux côtés**, {len(exclus)} exclus car leur "
+                  f"requête impose un format — la forme y *est* le critère : {', '.join(exclus)}.", "",
+                  "La justesse de la passe normale est **recalculée sur ces mêmes items**, sans quoi "
+                  "l'écart confondrait l'exclusion avec l'effet de forme.", "",
+                  "| Variante | Formaté | Dépouillé | Écart |", "|---|---|---|---|"]
+        for m in metrics:
+            n = par_nom.get(m["name"])
+            if not n:
+                lines.append(f"| {m['name']} | — | — | passe absente |")
+                continue
+            # Les deux passes portent exactement les mêmes items : le golden
+            # dépouillé sert donc d'index dans les deux jeux de runs, et la passe
+            # formatée est bien recalculée sur ces items-là, pas sur les 50.
+            pf = majority_verdicts(gn, m["_runs"])
+            pn = majority_verdicts(gn, n["_runs"])
+            af, an = strict_accuracy(or_com, pf), strict_accuracy(or_com, pn)
+            # L'écart est annoncé en POINTS : af et an sont des fractions, donc
+            # sans le facteur 100 la colonne afficherait des centièmes de point.
+            lines.append(f"| {m['name']} | {af:.1%} | {an:.1%} | {(an - af) * 100:+.1f} pt |")
+        lines += ["", "Un écart proche de zéro est une **preuve positive** que le juge a appris autre "
+                  "chose que la forme ; un écart marqué mesure la fuite résiduelle, publiée telle "
+                  "quelle plutôt que poursuivie par un nettoyage sans fin du corpus."]
+
+        # Limite calculée sur les données présentes, jamais recopiée : l'exclusion
+        # n'est pas un tirage quelconque. Un item dont la requête impose un format
+        # est presque par construction un cas `limite`, la contrainte de forme
+        # étant souvent le seul contrôle qui sépare PASS de FAIL.
+        lim_t = sum(1 for g in golden if g["meta"]["cas"] == "limite")
+        lim_c = sum(1 for g in gn if g["meta"]["cas"] == "limite")
+        fail_t = sum(1 for g in golden if g["gold"]["verdict"] == "FAIL")
+        fail_c = sum(1 for g in gn if g["gold"]["verdict"] == "FAIL")
+        if lim_t and lim_c < lim_t:
+            lines += ["", f"⚠️ **L'exclusion corrèle avec la difficulté.** La strate `limite` passe de "
+                      f"{lim_t} à {lim_c} items, soit {(lim_t - lim_c) / lim_t:.0%} de la strate la plus "
+                      f"difficile retirée, et la part de FAIL de {fail_t / len(golden):.0%} à "
+                      f"{fail_c / len(gn):.0%}. La comparaison reste appariée sur des items identiques "
+                      f"des deux côtés, donc l'écart est interprétable ; mais il est mesuré sur un "
+                      f"sous-ensemble **amputé des items où la forme compte le plus**, et son niveau "
+                      f"absolu porte sur un golden plus facile que le complet."]
 
     lines += ["", "## 2. Résistance au biais de verbosité", "",
               "| Variante | Faux PASS verbeux+bug (n) | Faux PASS concis+bug (n) | Écart (biais) | Faux FAIL verbeux corrects (n) |",
@@ -737,6 +787,10 @@ def main():
     parser.add_argument("--max-verbose-fpr", type=float, default=0.20,
                         help="recevabilité : faux PASS sur réponses verbeuses buguées")
     parser.add_argument("--report-only", action="store_true", help="skip inference, recompute metrics from cached runs")
+    parser.add_argument("--format-normalise", action="store_true",
+                        help="ajoute la passe « format normalisé » (amendement du 2026-09-19) : "
+                             "les mêmes items, sorties dépouillées de leur Markdown, dans la même "
+                             "invocation donc sous un seul démarrage de serveur")
     args = parser.parse_args()
 
     config = json.loads(Path(args.config).read_text(encoding="utf-8"))
@@ -752,22 +806,39 @@ def main():
     runs_dir = out / "runs"
     runs_dir.mkdir(parents=True, exist_ok=True)
 
+    SUFFIXE_NORM = "--format-normalise"
+    golden_norm, exclus = (normalise_golden(golden) if args.format_normalise else (None, []))
+    if golden_norm is not None:
+        print(f"[format normalisé] {len(golden_norm)} items dépouillés, "
+              f"{len(exclus)} exclus (format imposé) : {', '.join(exclus)}")
+
     if not args.report_only:
         for variant in variants:
             run_variant(variant, golden, args, runs_dir)
+            if golden_norm is not None:
+                run_variant(variant, golden_norm, args, runs_dir, SUFFIXE_NORM)
 
     rng = random.Random(args.seed)
-    metrics = []
+    metrics, metrics_norm = [], []
     for variant in variants:
         runs = load_runs(variant, golden, args.passes, runs_dir)
         if not any(runs.values()):
             print(f"[WARN] no cached runs for {variant['name']}, skipped")
             continue
         metrics.append(evaluate(variant, golden, runs, args, rng))
+        if golden_norm is not None:
+            runs_n = load_runs(variant, golden_norm, args.passes, runs_dir, SUFFIXE_NORM)
+            if any(runs_n.values()):
+                metrics_norm.append(evaluate(variant, golden_norm, runs_n, args, rng))
+            else:
+                print(f"[WARN] passe « format normalisé » absente pour {variant['name']}")
     if not metrics:
         sys.exit("[ERROR] nothing to report")
 
-    report = build_report(metrics, golden, args, rng, config, [v["name"] for v in variants])
+    passe_format = ({"golden": golden_norm, "metrics": metrics_norm, "exclus": exclus}
+                    if golden_norm is not None and metrics_norm else None)
+    report = build_report(metrics, golden, args, rng, config, [v["name"] for v in variants],
+                          passe_format)
     (out / "report.md").write_text(report, encoding="utf-8")
     serializable = [{k: v for k, v in m.items() if k != "_runs"} for m in metrics]
     (out / "metrics.json").write_text(json.dumps(serializable, indent=2, ensure_ascii=False), encoding="utf-8")

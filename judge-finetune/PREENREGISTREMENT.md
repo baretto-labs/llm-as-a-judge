@@ -691,3 +691,37 @@ l'ensemble d'exclusion après l'avoir exécutée reviendrait à choisir les item
 effet sur l'écart mesuré. C'est aussi la troisième fois en une journée qu'un nombre écrit à la main est
 démenti par la mesure — après les 42 items du parseur de κ et les 39/5/6 de `PROTOCOLE.md` §5. **Règle à
 retenir : un ensemble déclaré se définit par un prédicat vérifiable, jamais par un décompte recopié.**
+
+---
+
+## Limite datée — 2026-09-21, l'exclusion de la passe « format normalisé » corrèle avec la difficulté
+
+Relevée en câblant la passe, **avant toute exécution**. Les 3 items du golden set exclus parce que leur
+requête impose un format — `b04-015`, `b07-011`, `b10-015` — ne forment pas un sous-ensemble quelconque :
+
+```
+tous trois  cas = limite        tous trois  CODE_ANALYSIS        tous trois  verdict = FAIL
+```
+
+**Effet sur la composition.** La strate `limite` tombe de 10 à 7 items, soit **30 % de la strate la plus
+difficile retirée**, et la part de FAIL de 54 % à 51 %. Le golden dépouillé est donc plus facile et
+légèrement plus orienté PASS que le complet.
+
+**Pourquoi ce n'est pas un hasard.** Un item dont la requête impose un format est presque par construction
+un cas `limite` : la contrainte de forme y est souvent le seul contrôle qui sépare PASS de FAIL. La
+corrélation est structurelle, et elle resterait vraie sur un autre tirage.
+
+**Ce qui reste valide.** L'écart entre les deux passes est **apparié sur des items identiques des deux
+côtés** — la justesse de la passe formatée est recalculée sur ces 47 items, jamais sur les 50. L'écart est
+donc interprétable comme un effet de forme, et non comme un artefact de l'exclusion. Un contrôle
+automatique le vérifie : une variante juste sur les 47 et fausse sur les 3 exclus doit afficher 100 % du
+côté formaté ; si elle affichait 94 %, le calcul porterait sur les 50.
+
+**Ce qui est limité.** Le **niveau absolu** des deux passes porte sur un golden amputé, et l'effet de forme
+est mesuré sur un sous-ensemble privé précisément des items où la forme compte le plus. L'écart publié est
+donc une **borne basse plausible** de la sensibilité au format. Cette réserve est imprimée dans le rapport
+lui-même, calculée à l'exécution sur les données présentes plutôt que recopiée.
+
+**Ce qui n'est pas amendé.** Ni l'exclusion, qui reste obligatoire et justifiée — sur ces items la forme
+*est* le critère évalué —, ni le statut secondaire de la passe, ni la décision de publier la fuite
+résiduelle telle quelle.
