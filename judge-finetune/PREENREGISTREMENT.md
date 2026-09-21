@@ -568,3 +568,67 @@ de grandeur, les hyperparamètres étant inchangés, mais l'adaptateur lui-même
 
 **Ce qui n'est pas amendé.** Ni la métrique principale, ni la composition du corpus, ni les paires de
 comparaison déclarées.
+
+---
+
+## Amendement daté — 2026-09-21, le harnais de benchmark ne mettait pas en œuvre le protocole déclaré
+
+Relevé en confrontant `scripts/benchmark_judges.py` au présent document, **avant toute exécution du
+benchmark** et pendant l'entraînement du 14B. Aucun résultat n'existe à cette date : aucune des décisions
+ci-dessous ne peut avoir été influencée par un chiffre.
+
+Cet amendement **ne modifie aucune quantité déclarée**. Les §4, §5 et §7 restent mot pour mot ce qu'elles
+étaient. Il constate que le code en divergeait, et fixe la manière de l'y ramener.
+
+### A. Le κ perd tout pouvoir de décision, et est déclaré secondaire descriptif
+
+Le harnais choisissait la variante gagnante par `max(qualified, key=kappa_mean)`, calculait ses écarts
+appariés sur le κ et portait un seuil de gain `--min-kappa-gain` en κ. Or la §4 déclare **une** métrique
+principale, la justesse stricte du verdict, et la §6 ne cite pas même le κ parmi les six secondaires.
+
+**Décision.** Le κ est ajouté aux métriques secondaires de la §6, comme **mesure descriptive**. Il continue
+d'être rapporté — il est directement comparable au κ inter-annotateur de la relecture du golden, ce qui est
+informatif — mais il ne qualifie, ne classe et ne tranche rien. Toute décision se prend sur la justesse
+stricte.
+
+### B. La paire de comparaison est déclarée, jamais inférée
+
+Le harnais retenait le comparant par `next((m for m in metrics if m["size"] == size and not
+m["fine_tuned"]), None)`. Avec deux variantes 14B non fine-tunées — `14B-baseline-nu` et
+`14B-baseline-conventions` — ce `next` choisit **selon l'ordre du JSON**. Il pouvait donc opposer le
+fine-tune à `14B-baseline-nu`, soit exactement l'homme de paille que la §3 interdit, et le biais allait
+dans le sens favorable au fine-tuning.
+
+**Décision.** Les paires de comparaison sont déclarées explicitement dans `configs/variants.json`, et la
+paire principale y est nommée. Si une paire déclarée est absente des métriques, le rapport **échoue
+bruyamment** ; il ne retombe jamais sur une inférence.
+
+### C. McNemar exact est implémenté
+
+Déclaré en §5, absent du code. Binomial bilatéral exact sur les seules paires discordantes, α = 0,05,
+appliqué à la comparaison principale. Le nombre de paires discordantes est publié avec le p : à n = 50, il
+est le vrai déterminant de la puissance.
+
+### D. Le bootstrap passe à 10 000 rééchantillonnages
+
+La §5 déclare 10 000, la valeur par défaut du code était 2 000. Le défaut du code est aligné sur le
+document. Le bootstrap apparié porte désormais sur la **différence de justesse**, non sur celle du κ.
+
+### E. L'appareil de qualification n'est pas une règle de conclusion
+
+Le harnais portait des seuils — `min_kappa 0,60`, `min_stability 0,95`, `min_format 0,95`,
+`max_verbose_fpr 0,20` — puis élisait un « gagnant » et statuait que « le 32B est justifié ». **La §7 ne
+déclare rien de tout cela.** Sa règle de conclusion porte sur la seule comparaison principale et sur la
+seule justesse.
+
+**Décision.** Ces seuils sont conservés comme **filtre descriptif de recevabilité opérationnelle** — une
+variante qui ne rend pas du JSON exploitable n'est pas utilisable en production, indépendamment de sa
+justesse — et le rapport les présente comme tels. Le seuil en κ est supprimé, le κ n'ayant plus de pouvoir.
+La conclusion de l'étude est la table de la §7 appliquée à la paire principale, et rien d'autre. La
+comparaison 14B / 32B est rapportée de façon descriptive (écart de justesse, coût, latence) sans verdict.
+
+### Ce que cela dit du dispositif
+
+Quatrième instrument du projet trouvé faux avant d'avoir produit un chiffre, après le détecteur de fuites
+de surface, le déterminisme du tirage et le parseur du κ. Ce qui l'a attrapé n'est ni un test ni une
+relecture, mais la confrontation du code à un protocole écrit **avant** lui. À verser au REX.
