@@ -100,6 +100,42 @@ biais de juge ; (2) un **banc d'essai des stratégies de récupération** ; (3) 
     36 Go. À répéter avant le jour J.
 - **Le banc d'essai** : Lucene contre GraphRAG-Neo4j, jugés par le même juge, sur les mêmes questions.
 
+### Le résultat, mesuré le 2026-09-23
+
+Scénario `hybrid|hybrid-graph`, 60 questions sur la codebase réelle, juge 14B fine-tuné au
+checkpoint 200. Une heure de calcul, **1 jugement invalide sur 60 par stratégie**.
+
+| | Lucene | Neo4j |
+|---|---|---|
+| **Justesse (taux de PASS)** | **55,9 %** | **23,7 %** |
+| `hintCoverage` — **sans LLM** | **0,721** | 0,596 |
+| Cohérence du juge | 100 % | 96,6 % |
+
+**McNemar exact bilatéral : p = 0,0009 sur 28 paires discordantes** — Lucene seul juste sur 23,
+Neo4j seul juste sur 5.
+
+**Le chiffre qui donne du poids au reste :** `hintCoverage` classe les deux stratégies dans le même
+ordre, et cette métrique **ne passe pas par le juge** — elle compte des identifiants attendus dans le
+contexte récupéré. La conclusion ne repose donc pas sur l'instrument seul. C'est une validation
+croisée qui ne coûte rien, et elle concorde.
+
+**Et un motif contre-intuitif, qu'une moyenne aurait noyé :**
+
+| strate | Lucene | Neo4j | p |
+|---|---|---|---|
+| `LOCAL` | 52,6 % | 31,6 % | 0,508 — **non concluant** |
+| `STRUCTURAL` | 70,0 % | 30,0 % | 0,039 |
+| `CROSS_MODULE` | 45,0 % | 10,0 % | 0,016 |
+
+**Le graphe perd le plus là où il devait gagner** — structure et traversée inter-modules — et l'écart
+n'est pas concluant sur la strate la plus simple.
+
+> **Réserve à énoncer, elle limite ce que le chiffre autorise à dire.** Le scénario oppose Lucene en
+> preset `hybrid` à Neo4j en preset `hybrid-graph` : **deux moteurs ET deux presets diffèrent**. Les 32
+> points d'écart peuvent venir du moteur, de l'expansion K-hop, ou des deux. Le scénario
+> `hybrid|hybrid` — le contrôle d'équité — sépare les deux causes ; tant qu'il n'a pas tourné, « le
+> graphe est mal implémenté » reste une hypothèse de départ et non une conclusion de la mesure.
+
 ## Partie 4 & Conclusion (3 min) — Calibration & triage humain dans la boucle
 
 - **Mesurer la fiabilité du juge — et distinguer deux κ qu'on confond tout le temps :**
@@ -242,6 +278,8 @@ Trois cas tirés d'**extractions réelles** sur ma propre codebase, gardées tel
 | le protocole de relecture | convention d'attribution ambiguë | suspension de la mesure plutôt qu'accumulation |
 | le correctif de la fuite n°2 | il a créé une fuite pire — 30/30 au lieu de 17/17 | le désaccord d'un relecteur humain, après douze mesures muettes |
 | le parseur du κ | rendait **42 items sur 50** en silence, et manquait les 3 désaccords d'un contrôle | des recoupements contre des décomptes notés pendant la relecture |
+| le banc d'essai RAG | **trois runs consécutifs invalides**, trois causes distinctes : corpus synthétique indexé au lieu de la vraie codebase, adaptateur perdu sur une propriété vide donc juge de base, et jugement étranglé par l'échéance de JMH. **Les trois ont rendu `BUILD SUCCESS`** | une sonde du contexte récupéré avant de lire les chiffres — `hintCoverage` à 0,000 partout ne pouvait pas être un résultat |
+| la durée publiée du fine-tuning | 76 min annoncées, **91 réelles** : la méthode de substitution excluait les 9 passes de validation | un recoupement du débit relevé au journal contre l'horloge |
 | le tirage « déterministe » | ordre des lignes dépendant du processus : adaptateurs non rejouables à graine égale | un contrôle d'empreintes avant l'entraînement final |
 | **deux documents normatifs divergents** | le plus ancien restait exécutable, et le code le suivait fidèlement | la confrontation du code au protocole écrit **avant** lui |
 
@@ -264,12 +302,15 @@ regardé — jamais parce qu'une métrique a protesté. **C'est la diapositive d
    l'ingénierie des rubriques. Le correctif qui aggrave est retenu : c'est celui qui porte le fil
    conducteur. Les deux autres restent rédigées ci-dessus, permutables sans recherche.
 
-## Ce qui n'est pas encore construit
+## Ce qui reste à produire
 
-- **Le juge Java au schéma binaire** — parseur tolérant (le bloc `<thinking>` interdit la sortie
-  structurée), contrat d'invite, agrégation en taux de PASS, McNemar apparié. **C'est la pièce dont dépend
-  la démo promise par l'abstract.**
-- **Le benchmark lui-même**, donc le κ du juge et le verdict Lucene / Neo4j.
-- Piste gratuite à ne pas oublier : `hintCoverage` est **déterministe, sans LLM**. S'il désigne le même
-  gagnant que le juge, c'est une validation croisée qui ne coûte rien ; s'il diverge, c'est encore plus
-  intéressant.
+Le juge Java binaire et le banc RAG sont **faits et mesurés** (voir le résultat en Partie 3). Restent :
+
+- **Le κ du juge** — l'accord entre le juge et l'étalon, à ne pas confondre avec le κ du corpus déjà
+  publié. Il sort du banc du juge, `make bench-14b`.
+- **La comparaison `14B-finetuned` contre `14B-baseline-conventions`** — c'est elle qui porte
+  l'affirmation « le fine-tuning améliore la qualité du juge », et **elle n'a aucune donnée à ce jour**.
+- **Le contrôle d'équité `hybrid|hybrid`**, qui attribuerait l'écart RAG au moteur ou au graphe.
+  *Lancé le 2026-09-23, résultat attendu dans l'heure.*
+- **Le 32B n'est pas entraîné** — `make train-32b` n'a jamais été lancé, et sa faisabilité en QLoRA sur
+  36 Go reste ouverte. Le plus propre est de le déclarer non réalisé plutôt que de le taire.
