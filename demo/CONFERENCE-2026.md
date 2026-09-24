@@ -510,3 +510,47 @@ verdict masque — dès qu'un contrôle échoue des deux côtés, un désaccord 
 autre devient invisible. Le verdict est reproductible, les raisons beaucoup
 moins, et c'est un plafond sur ce que le fine-tuning peut apprendre.
 -->
+
+---
+
+## L'ordre des champs décide du comportement
+
+```
+  ✗  {                        ✓  {
+       "verdict": "PASS",          "checks": { … },
+       "checks": { … }             "verdict": "FAIL"
+     }                           }
+
+     décide, puis justifie       constate, puis conclut
+```
+
+Un LLM génère **de gauche à droite**. Il ne revient pas en arrière.
+
+Verdict en premier : les contrôles sont écrits pour être **cohérents avec une
+décision déjà prise**.
+
+<!--
+Validé le 2026-09-24.
+
+C'est la meilleure diapositive de la Partie 1, peut-être du talk : gratuite à
+implémenter, contre-intuitive, vérifiable, et elle donne à la salle quelque chose
+à changer lundi matin. Les talks de méthode manquent presque toujours de ça.
+
+À dire : c'est la chose la moins intuitive de tout le talk, et c'est deux
+caractères dans un schéma JSON. Aucun modèle, aucun fine-tuning, aucun prompt ne
+rattrape un mauvais ordre de champs — le texte déjà écrit conditionne le texte
+suivant, et jamais l'inverse.
+
+LE <thinking> OBÉIT À LA MÊME LOGIQUE, à dire en une phrase : raisonnement avant
+les contrôles, contrôles avant le verdict, donc chaque étape conditionne la
+suivante dans le bon sens. Le schéma entier est ordonné par cette seule idée —
+ce n'est pas trois décisions, c'en est une.
+
+HONNÊTETÉ À TENIR, puisque c'est la règle du talk : l'écart entre les deux ordres
+n'a PAS été mesuré ici, le bon ordre a été choisi dès le départ. C'est donc un
+raisonnement sur le fonctionnement de la génération, pas un résultat
+expérimental. Le dire comme tel : « je n'ai pas mesuré l'inverse, et je ne l'ai
+pas fait parce que je ne voulais pas dépenser 90 minutes à prouver une
+évidence ». Personne ne le reprochera, et ça protège de la seule question qui
+pourrait coincer sur cette diapositive.
+-->
