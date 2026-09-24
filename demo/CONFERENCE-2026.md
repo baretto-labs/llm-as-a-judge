@@ -897,6 +897,64 @@ preuve positive.
 
 ---
 
+## « On est d'accord 9 fois sur 10 »
+
+100 réponses à juger. **90 sont mauvaises.**
+
+Deux relecteurs répondent **FAIL à tout**, sans rien lire.
+
+→ ils sont **d'accord 9 fois sur 10.**
+
+L'accord brut ne mesure pas la compétence.
+Il mesure surtout **le déséquilibre des données.**
+
+<!--
+C'est le piège le plus facile à tomber dedans, et le plus flatteur : on annonce
+un fort taux d'accord, et on croit avoir prouvé que son étalon est fiable.
+
+Or dès qu'une classe domine, l'accord est presque gratuit. Il faut donc enlever
+la part du hasard avant de parler de fiabilité.
+
+Le même raisonnement vaut pour une exactitude : 90 % de bonnes réponses sur un
+jeu où 90 % des cas sont de la même classe, c'est zéro information.
+-->
+
+---
+
+## Le κ de Cohen : enlever le hasard
+
+```
+            accord observé  −  accord dû au hasard
+   κ   =   ──────────────────────────────────────────
+                  1  −  accord dû au hasard
+```
+
+**κ = 1** → accord parfait.  **κ = 0** → pas mieux que le hasard.
+
+Sur mon contrôle le plus fréquent : **78 % d'accord brut, mais κ = 0,386.**
+
+Les deux chiffres sont vrais. **Donner l'un sans l'autre trompe** — dans les
+deux sens.
+
+<!--
+Lire la formule à voix haute, une fois : on retire du numérateur ce que le hasard
+aurait donné, et on rapporte ça à la marge de progression qui restait. Ce qui
+reste est ce que les deux juges ont apporté en plus du hasard.
+
+L'échelle usuelle : au-dessus de 0,8 l'accord est fort, entre 0,6 et 0,8 il est
+correct, entre 0,4 et 0,6 il est moyen.
+
+Et le piège fonctionne dans les deux sens. Ici, 78 % d'accord brut pour un κ de
+0,386 : les marges sont très déséquilibrées, donc le κ paraît médiocre alors que
+les deux relecteurs se trompent rarement. Publier le κ seul sous-estime l'accord.
+Publier les 78 % seuls le surestime. Les deux vont ensemble, avec les marges.
+
+C'est le genre de nuance qu'on a envie de sauter. C'est aussi celle qui fait la
+différence entre un chiffre qu'on affiche et un chiffre qu'on comprend.
+-->
+
+---
+
 ## Deux κ qu'on confond tout le temps
 
 | | ce qu'il mesure | valeur |
