@@ -788,6 +788,41 @@ ils disent lequel échoue.
 
 ---
 
+## Pourquoi 36 questions sur 60 ne comptent pas
+
+Sur 60 questions, les deux stratégies font **pareil 36 fois** :
+soit les deux réussissent, soit les deux échouent.
+
+Ces 36 ne départagent rien. **Il reste 24 questions** où l'une gagne
+et l'autre perd.
+
+```
+      Lucene gagne     19
+      Neo4j  gagne      5
+```
+
+S'il n'y avait aucune différence, on attendrait **12 – 12.**
+Obtenir 19 – 5, c'est tirer **19 fois pile sur 24 lancers.**
+
+→ **p = 0,0066.** Le test, c'est exactement ce calcul. Rien de plus.
+
+<!--
+C'est la diapositive qui démystifie le test apparié. McNemar n'est pas une boîte
+noire : c'est une pièce lancée autant de fois qu'il y a de questions qui
+départagent.
+
+Insister sur le fait que les 36 questions identiques ne sont pas perdues — elles
+disent que les deux stratégies se valent là-dessus. Elles ne peuvent simplement
+pas servir à trancher.
+
+La conséquence pratique, et c'est pour ça que je donne toujours le nombre de
+paires avec le p : doubler le nombre de questions ne sert à rien si elles sont
+faciles. Ce qui compte, c'est combien de questions font diverger les deux
+systèmes.
+-->
+
+---
+
 ## Le contrôle qui ne passe pas par le juge
 
 `hintCoverage` — on compte les identifiants attendus
@@ -841,22 +876,27 @@ matière. Ce n'est pas la même critique, et ce n'est pas le même correctif.
 
 ## Par niveau : ce qui conclut, et ce qui ne conclut pas
 
-| niveau | Lucene | Neo4j | p | paires discordantes |
+| niveau | Lucene | Neo4j | qui gagne les paires | p |
 |---|---|---|---|---|
-| `LOCAL` | 31,6 % | 20,0 % | 0,453 — **non concluant** | 7 |
-| `STRUCTURAL` | 63,2 % | 42,1 % | 0,508 — **non concluant** | 9 |
-| `CROSS_MODULE` | **50,0 %** | **10,0 %** | **0,0078** | 8 |
+| `LOCAL` | 31,6 % | 20,0 % | 5 – 2 | 0,453 |
+| `STRUCTURAL` | 63,2 % | 42,1 % | 6 – 3 | 0,508 |
+| `CROSS_MODULE` | **50,0 %** | **10,0 %** | **8 – 0** | **0,0078** |
 
-**Un seul écart tient.** Les deux autres ne concluent pas — et c'est une limite
-de puissance **annoncée d'avance**, pas une surprise.
+**5 piles sur 7, c'est banal. 6 sur 9 aussi. 8 sur 8, non.**
+
+Un seul écart tient — et c'est une limite **annoncée d'avance**, pas une surprise.
 
 <!--
 Il aurait été facile de présenter les trois lignes comme trois résultats : les
-écarts bruts vont tous dans le même sens. Mais 7 ou 9 paires discordantes ne
-suffisent pas, et je le savais avant de lancer.
+écarts bruts vont tous dans le même sens. Mais 5 ou 6 paires gagnées ne
+départagent rien, et je le savais avant de lancer.
+
+La colonne du milieu est la seule qui décide. 8 – 0 veut dire que sur les huit
+questions inter-modules où les deux stratégies ont divergé, Lucene a gagné les
+huit. C'est huit piles d'affilée.
 
 Dire un écart « non concluant » n'est pas un aveu de faiblesse, c'est ce qui
-donne du poids aux deux qui concluent.
+donne du poids au seul qui conclut.
 
 ⚠ Réserve de portée à énoncer : ces chiffres valent pour CETTE implémentation
 Neo4j, à ces réglages, sur CETTE codebase. « GraphRAG fait moins bien » serait un
@@ -1067,6 +1107,37 @@ pouvoir dire « je ne sais pas » sans que ce soit un échec, et sans céder à 
 tentation de redécouper les données jusqu'à trouver un p inférieur à 0,05.
 
 Troisième : ce qu'il a acheté est ailleurs, et c'est la diapositive suivante.
+-->
+
+---
+
+## « Non concluant » ne veut pas dire « identique »
+
+12 questions départagent les deux juges. **6 – 6.**
+
+C'est 6 piles et 6 faces sur 12 lancers : **exactement ce que donne une pièce
+équilibrée.**
+
+Je ne peux pas dire que le fine-tuning n'apporte rien.
+Je peux seulement dire que **mes 50 items ne voient pas la différence.**
+
+Avec 50 items, tout écart de moins de ~15 points est invisible.
+→ intervalle de confiance : **de −14 à +14 points.**
+
+<!--
+C'est la distinction que tout le monde saute, et elle change tout. « Pas de
+différence détectée » et « pas de différence » sont deux affirmations
+différentes. La première parle de mon dispositif, la seconde parlerait du monde.
+
+Traduire l'intervalle à voix haute : la vérité peut être que le fine-tuning fait
+perdre 14 points, ou qu'il en fait gagner 14. Mes données ne savent pas
+départager. Pour le savoir, il faudrait plus d'items — pas un autre calcul.
+
+Et c'est précisément ce que le pré-enregistrement protège : la limite était
+écrite avant les résultats, donc « je ne sais pas » est une issue déclarée et non
+un échec. Sans ça, la tentation est de redécouper les données jusqu'à trouver un
+p inférieur à 0,05 — et avec 13 contrôles et 3 strates, on finit toujours par en
+trouver un.
 -->
 
 ---
