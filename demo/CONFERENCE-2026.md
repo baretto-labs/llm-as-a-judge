@@ -45,7 +45,7 @@ style: |
 
 ## votre chatbot passe devant le juge
 
-Mehdi El Ketroussi
+Mehdi Elketroussi
 Novembre 2026
 
 <!--
@@ -510,8 +510,7 @@ récupéré, fidélité au contexte. Le même moteur, trois grilles.
 | **Verbosité** | **mesuré chez moi** — taux de faux PASS sur défauts verbeux contre défauts concis |
 | **Position** | **mesuré chez moi** — 12 verdicts sur 60 basculent au seul réordonnancement du contexte |
 | **Auto-préférence** | *littérature seule.* Pas mesuré ici. |
-
-**La colonne de droite est le sujet de cette diapositive.**
+no
 
 <!--
 La discipline tient en une règle : ne jamais présenter un biais cité comme un
@@ -527,28 +526,68 @@ Dire que c'est une limite connue et assumée, pas un détail caché.
 
 ---
 
-## Verbosité : +8,8 σ, et pourquoi c'était faux
+## Le chiffre spectaculaire
 
-La longueur prédisait le verdict à **75 %** pour une base de 53 %.
-Annoncé : **+8,8 σ.** Spectaculaire.
+**La question :** est-ce que la simple **longueur** d'une réponse suffit à
+deviner son verdict ?
 
-**Sauf que le seuil avait été choisi après coup** — maximisé sur 145 seuils
-et deux directions, puis comparé à un taux de base.
+Si oui, le juge n'a plus besoin de comprendre — **il compte les caractères.**
 
-Test de permutation, en rejouant le **même maximum** sur des étiquettes
-mélangées : **+1,3 σ, p = 0,132.**
+J'ai essayé 145 seuils de longueur, dans les deux sens. **290 essais.**
+
+Le meilleur devinait le verdict **3 fois sur 4** — le hasard en fait 1 sur 2.
+
+→ un effet **quasi impossible à devoir au hasard.**
+
+<!--
+Pourquoi la question compte : une fuite de ce genre dispense le modèle
+d'apprendre. Le raccourci le plus facile est toujours celui qu'il prendra.
+
+« Dans les deux sens » : plus long ⇒ PASS, et plus long ⇒ FAIL. On ne savait pas
+a priori quel sens chercher, donc les deux ont été testés.
+
+Marquer un temps sur la dernière ligne : c'est le chiffre que j'ai annoncé, et
+c'est celui qui était faux.
+
+⚠ Chiffres exacts si la question vient : 75 % de bonne prédiction contre un taux
+de base de 53 %, annoncé à +8,8 σ. Le « quasi impossible » est la traduction de
+ce 8,8 σ.
+-->
+
+---
+
+## …et pourquoi il ne valait rien
+
+**J'ai jugé mon meilleur essai comme si c'était mon seul essai.**
+
+Le meilleur de 290 tirages est bon **même quand il n'y a rien à trouver.**
+
+Le bon test : **mélanger les étiquettes**, refaire **les 290 essais**, garder le
+meilleur. Mille fois.
+
+→ **p = 0,132.** Mon « 3 sur 4 » est ce que le hasard produit couramment.
 
 **Du bruit.**
 
 <!--
-La règle que j'en ai tirée, et c'est la plus utile du talk pour qui manipule des
-chiffres : tout seuil choisi après coup doit se comparer à un tirage de
-permutation du MÊME maximum. Pas à un taux de base.
+L'image à donner : le tireur qui mitraille un mur de grange, puis dessine la
+cible autour du groupe le plus serré. Pour un public de développeurs : un seuil
+optimisé sur les données, puis évalué comme s'il avait été choisi avant de les
+voir. De l'overfitting, mais sur une statistique.
 
-Sinon on mesure sa propre liberté de choix, pas un effet.
+Pourquoi mélanger les étiquettes : ça détruit tout lien réel s'il en existait un.
+Ce qui reste est la seule référence utile — à quoi ressemble le meilleur de 290
+essais quand il n'y a rien à trouver. Réponse : à 3 sur 4.
 
-C'est un piège qui ne se voit pas : le calcul était juste, la statistique était
-juste, c'est la référence de comparaison qui était fausse.
+La règle à emporter, et c'est la plus transférable du talk pour qui manipule des
+chiffres : tout seuil choisi après coup se compare à un tirage de permutation du
+MÊME maximum. Jamais à un taux de base. Sinon on mesure sa propre liberté de
+choix, pas un effet.
+
+Le piège ne se voit pas : le calcul était juste, la statistique était juste.
+C'est la référence de comparaison qui était fausse.
+
+⚠ Le test de permutation ramène l'effet à +1,3 σ, p = 0,132.
 -->
 
 ---
