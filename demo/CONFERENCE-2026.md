@@ -1142,31 +1142,77 @@ trouver un.
 
 ---
 
-## Ce qu'il a acheté : le format, pas le jugement
+## Ce qu'il a acheté : le contrat, pas le jugement
 
-La baseline rend un verdict valide mais des **clés plates** — 0 objet `checks`
-sur 150 générations.
-Le fine-tuné rend le schéma imbriqué **150 fois sur 150.**
+La baseline **décompose déjà** — elle rend un objet de contrôles.
+Mais sous **son propre nom de clé**, et avec **le verdict avant.**
 
-C'est la **seule** variante sur laquelle je peux mesurer un accord **par
-contrôle** : `validation_entree` 100 %, `contexte_pertinent` 89 %,
-`absence_invention` 83 %… et `format_impose` 33 %.
+```
+   baseline    { "verdict": "PASS",  "controls": { … } }     138 / 150
+   fine-tuné   { "checks": { … },    "verdict": "FAIL" }     150 / 150
+```
 
-**Et le contre-chiffre : la stabilité du verdict baisse, 76 % → 58 %.**
+Le fine-tuning ne lui a pas appris à décomposer. Il lui a appris **le contrat
+exact** — les bons noms, et les contrôles **avant** le verdict.
+
+C'est ça qui rend deux exécutions comparables.
 
 <!--
 91 minutes de fine-tuning pour découvrir que le gain de justesse tenait dans
-quatre phrases d'invite, et que le fine-tuning servait à autre chose que ce que
-je croyais : l'auditabilité.
+quatre phrases d'invite, et que le fine-tuning servait à autre chose que ce que je
+croyais.
 
-Le contre-chiffre va sur la même diapositive que le gain, jamais sur la suivante.
+Le modèle de base sait décomposer, si on le lui demande. Ce qu'il ne sait pas,
+c'est tenir un nom de clé et un ordre — donc sa sortie n'est pas comparable d'une
+exécution à l'autre, et les 13 accords par contrôle ne se calculent que sur le
+fine-tuné : validation_entree 100 %, contexte_pertinent 89 %, absence_invention
+83 %, et format_impose 33 %.
 
-Et il faut le dire en entier : aucune de mes trois variantes ne passe le filtre
-de recevabilité que j'avais fixé — au mieux 76 % de stabilité pour un seuil à
-95 %. Le juge que je vous présente n'est pas prêt pour la production.
+C'est une leçon d'intégration, pas d'intelligence : un juge sert dans une chaîne
+automatisée, et une chaîne a besoin d'un contrat, pas de bonne volonté.
+-->
 
-⚠ Ne pas dire « le 32B fait mieux » : il n'a jamais été entraîné. Le déclarer
-non réalisé.
+---
+
+## Le contre-chiffre : la stabilité baisse
+
+**76 % → 58 %** de verdicts identiques sur trois passes.
+
+Ce n'est pas le juge qui devient capricieux. C'est **le nombre de choses qui
+peuvent bouger** :
+
+```
+   baseline    1 engagement pris tôt : le verdict
+   fine-tuné   3 contrôles, puis leur ET
+```
+
+Mesuré : son verdict ne bouge **jamais** sans qu'un contrôle bouge — **0 item
+sur 50.** Et 8 fois, la conjonction **absorbe** la variation.
+
+La baseline est stable parce qu'elle **décide avant de regarder.**
+
+<!--
+Les deux chiffres ne mesurent pas le même objet. D'un côté la constance d'un seul
+jeton écrit tôt ; de l'autre la constance d'une conjonction de trois décisions.
+Un seul des trois contrôles qui bascule fait basculer le verdict.
+
+Le détail, si la question vient : sur les 29 items où les contrôles varient, 1,8
+contrôle bascule en moyenne. 21 fois le verdict suit, 8 fois la conjonction
+absorbe. Et jamais l'inverse.
+
+Donc la stabilité de la baseline est moins chère — et elle n'achète aucune
+justesse : les deux sont à 76,0 % exactement.
+
+⚠ Un piège à ne pas tendre soi-même : la cohérence entre verdict et contrôles est
+de 99,3 % DANS LES DEUX CAS. Elle ne départage donc pas les deux ordres, et ne
+peut pas servir de preuve ici.
+
+Et il faut le dire en entier : aucune des trois variantes ne passe le filtre de
+recevabilité fixé d'avance — au mieux 76 % de stabilité pour un seuil à 95 %. Le
+juge présenté ici n'est pas prêt pour la production.
+
+⚠ Ne pas dire « le 32B fait mieux » : il n'a jamais été entraîné. Le déclarer non
+réalisé.
 -->
 
 ---
@@ -1186,9 +1232,16 @@ passes.
 Un item instable n'est pas un échec du juge.
 **C'est un item qui mérite un humain.**
 
+Et le signal fonctionne : **83 %** de verdicts justes sur les items stables,
+**67 %** sur les instables.
+
 <!--
 Ça ne s'invente pas, ça se lit dans le harnais : je fais déjà trois passes pour
 mesurer la répétabilité. Le même chiffre sert à trier.
+
+⚠ Réserve à énoncer : 29 items stables contre 21 instables. C'est une tendance,
+pas un effet établi — mais elle va dans le même sens sur les deux variantes
+mesurées, baseline comprise (79 % contre 67 %), ce qui la rend défendable.
 
 Et ça referme la partie 2 : c'est un humain qui a trouvé la fuite que douze
 mesures avaient manquée, parce qu'il a changé d'avis sur un item. L'instabilité
