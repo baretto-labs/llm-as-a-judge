@@ -746,3 +746,36 @@ l'inverse d'un choix opportuniste. Il est néanmoins daté et consigné, comme t
 
 **Portée.** Le seuil de détection automatique de veille introduit le même jour dans `train_variant.sh`
 compare l'horloge à cette durée **validation incluse**, par cohérence.
+
+---
+
+## Amendement daté — 2026-09-24, un run du banc invalidé : l'adaptateur n'était pas servi
+
+`make bench-14b` a produit le 2026-09-24, de 14h54 à 16h52, les 450 générations des trois variantes 14B.
+Le rapport en a tiré la comparaison principale : **« le fine-tuning dégrade la justesse de -76.0 %,
+IC95 [-88.0 %, -64.0 %], McNemar exact p = 0.0000 sur 38 paires discordantes »**.
+
+**Cette conclusion est retirée. Elle ne mesurait rien.** `scripts/bench_variant.sh` lançait bien
+`mlx_lm.server --adapter-path adapters/14b-judge-ckpt200`, et le serveur a néanmoins répondu avec le
+**modèle de base** : aucune erreur, aucun avertissement, 150 réponses plausibles, `BUILD` propre.
+
+**Preuve du diagnostic.** Le même adaptateur, chargé en processus par `mlx_lm.load(adapter_path=...)` et
+interrogé sur le même item du golden set avec le même template, rend le format d'entraînement exact —
+prose sobre, JSON nu, `{"checks": {...}, "verdict": ..., "reason": ...}` — là où le modèle de base rend
+des clés plates dans une clôture markdown, sans `checks` ni `verdict`. Les 150 générations écartées sont
+toutes de la seconde forme ; 11 sur 150 seulement contenaient la chaîne `verdict`, contre 150 sur 150
+pour `14B-baseline-conventions`. Les trois invites système du golden set sont par ailleurs identiques à
+celles de l'entraînement : l'hypothèse d'une dérive d'invite est écartée.
+
+**Ce qui reste valable.** `14B-baseline-nu` et `14B-baseline-conventions` n'utilisent aucun adaptateur :
+leurs 300 générations sont intactes, et la comparaison secondaire qui les oppose — **+76.0 points de
+justesse pour les conventions seules**, κ passant de 0.00 à 0.48 — tient sans réserve.
+
+**Correction.** L'adaptateur est transmis dans le **corps de la requête** (`"adapters"`), voie déjà
+validée côté Java dans `RagContextJudge` sans avoir été reportée ici. Et `sonde_adaptateur()` exige
+désormais une **preuve positive** avant de dépenser une heure : un premier appel dont la sortie ne
+présente pas le format imbriqué arrête le banc, au lieu de laisser un 0 % être imputé au fine-tuning.
+
+**Portée.** Les générations écartées sont conservées sous `results/runs-invalides/` avec leur notice, et
+non supprimées. Le banc de `14B-finetuned` est relancé le 2026-09-24 à 18h47 ; la comparaison principale
+reste indécidée jusqu'à son terme.

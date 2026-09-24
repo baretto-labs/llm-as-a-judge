@@ -192,12 +192,24 @@ def normalise_golden(golden):
 # ── Inference ─────────────────────────────────────────────────────────────────
 
 def chat_completion(variant, messages, temperature, max_tokens, timeout, retries=3):
-    body = json.dumps({
+    requete = {
         "model": variant["model"],
         "messages": messages,
         "temperature": temperature,
         "max_tokens": max_tokens,
-    }).encode("utf-8")
+    }
+    # L'adaptateur voyage dans le corps de la requête, pas seulement par
+    # `--adapter-path` au lancement du serveur. Constaté le 2026-09-24 : le banc
+    # des trois variantes 14B a tourné avec `--adapter-path adapters/14b-judge-ckpt200`
+    # et mlx_lm.server a néanmoins répondu avec le modèle de base — sans erreur,
+    # sans avertissement. `14B-finetuned` a donc rendu 0 % de JSON exploitable et le
+    # rapport a conclu « le fine-tuning dégrade la justesse de -76 % », qui ne
+    # mesurait rien. Chargé en processus via mlx_lm.load(adapter_path=...), le même
+    # adaptateur rend le format d'entraînement exact. Le même piège avait déjà été
+    # corrigé côté Java (RagContextJudge) sans être reporté ici.
+    if variant.get("serve_adapter"):
+        requete["adapters"] = variant["serve_adapter"]
+    body = json.dumps(requete).encode("utf-8")
     headers = {"Content-Type": "application/json"}
     if variant.get("api_key_env"):
         key = os.environ.get(variant["api_key_env"])
@@ -246,6 +258,34 @@ def messages_for(variant, item):
     return [{"role": system["role"], "content": fondu}, user]
 
 
+def sonde_adaptateur(variant, golden, args):
+    """Preuve positive que l'adaptateur est bien en vigueur, avant de dépenser une heure.
+
+    Une variante fine-tunée servie sans son adaptateur ne produit pas d'erreur : elle
+    répond en modèle de base, avec des clés plates dans une clôture markdown, et le
+    banc la note 0 % en la présentant comme un effet du fine-tuning. Le contrôle est
+    donc une sonde et non une assertion de style : le format imbriqué
+    `{"checks": {...}, "verdict": ...}` n'apparaît jamais chez le modèle de base et
+    toujours chez l'adaptateur, ce qui en fait un discriminant fiable sur un seul appel.
+    """
+    if not variant.get("serve_adapter"):
+        return
+    item = golden[0]
+    r = chat_completion(variant, messages_for(variant, item),
+                        args.temperature, args.max_tokens, args.timeout)
+    texte = r.get("text") or ""
+    if r.get("error"):
+        sys.exit(f"[ERREUR] {variant['name']} : la sonde d'adaptateur a échoué — {r['error']}")
+    if '"checks"' not in texte or '"verdict"' not in texte:
+        sys.exit(
+            f"[ERREUR] {variant['name']} : l'adaptateur {variant['serve_adapter']} n'est pas en vigueur.\n"
+            f"  La sonde a rendu une sortie sans `checks` ni `verdict` imbriqués, c'est-à-dire du modèle de base.\n"
+            f"  Le banc s'arrête : le laisser tourner produirait un 0 % attribué à tort au fine-tuning.\n"
+            f"  Sortie reçue (200 premiers caractères) : {texte[:200]!r}"
+        )
+    print(f"[{variant['name']}] sonde d'adaptateur : format d'entraînement confirmé", flush=True)
+
+
 def run_variant(variant, golden, args, runs_dir, suffixe=""):
     # Le suffixe sépare les caches des deux passes : la passe « format normalisé »
     # interroge les mêmes items avec des sorties dépouillées, et mélanger les deux
@@ -264,6 +304,7 @@ def run_variant(variant, golden, args, runs_dir, suffixe=""):
         print(f"[{variant['name']}] cached, nothing to run")
         return
     print(f"[{variant['name']}] {len(todo)} generations to run ({len(done)} cached)")
+    sonde_adaptateur(variant, golden, args)
     with cache_path.open("a", encoding="utf-8") as f:
         for n, (p, item) in enumerate(todo, 1):
             result = chat_completion(variant, messages_for(variant, item),
