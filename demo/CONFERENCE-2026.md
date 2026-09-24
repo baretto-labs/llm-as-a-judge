@@ -14,28 +14,26 @@ style: |
   h2 { font-size: 1.7rem; font-weight: 600; margin-bottom: 0.8em; }
   ul { line-height: 1.8; }
   strong { font-weight: 600; }
+  table { font-size: 0.95rem; }
   .ref { font-size: 0.85rem; color: #666; }
   section.title { justify-content: center; }
 ---
 
 <!--
-Support de la conférence de novembre 2026.
+Support de la conférence de novembre 2026. 20 min.
 
-ÉTAT : introduction seule (4 diapositives). Les parties 1 à 4 restent à écrire.
-Le contenu de référence — chiffres, réserves, formulations à ne pas employer —
-est dans judge-finetune/REX_TRAME.md, qui fait foi. Ce fichier-ci en est la mise
-en scène, pas la source.
+Les chiffres font foi dans judge-finetune/REX_TRAME.md ; ce fichier en est la
+mise en scène. Les commentaires sous chaque diapositive sont les NOTES ORATEUR :
+ce qui se dit, pas ce qui s'affiche. Les lignes ⚠ sont des garde-fous factuels.
 
-ATTENTION : demo/SLIDES.md est un AUTRE deck, celui du talk précédent sur le
-benchmark RAG. Il note la qualité sur 10, avec le juge gradué abandonné le
-2026-09-13. Ne pas y reprendre de chiffres.
+ATTENTION : demo/SLIDES.md est un AUTRE deck, celui du talk précédent. Il note la
+qualité sur 10 avec le juge gradué abandonné le 2026-09-13. N'y reprendre aucun
+chiffre — sauf la diapositive « Ce que j'ai présenté il y a quelques mois », qui
+le cite exprès.
 
 RENDU (marp-cli via docker, voir demo/SUPPORT.md) :
   docker run --rm -v "$(pwd)/demo:/home/marp/app" marpteam/marp-cli \
     CONFERENCE-2026.md --html --output CONFERENCE-2026.html
-
-Les blocs en commentaire HTML sous chaque diapositive sont les notes orateur :
-Marp les exporte en notes, elles ne s'affichent pas à l'écran.
 -->
 
 <!-- _class: title -->
@@ -48,15 +46,11 @@ Mehdi El Ketroussi
 Novembre 2026
 
 <!--
-Titre figé par l'abstract retenu (REX_TRAME.md, section « Titre »).
+Lire le titre à voix haute dès la première seconde : « RAGots » est un jeu de
+mots qui se perd à l'écrit, la moitié de la salle ne le verra pas.
 
-Validé le 2026-09-24 : pas de logo ni de nom de conférence pour l'instant —
-à revoir seulement si l'organisateur impose un gabarit.
-
-À dire : lire le titre à voix haute dès la première seconde. « RAGots » est un
-jeu de mots qui se perd à l'écrit — la moitié de la salle ne le verra pas.
-Et « passe devant le juge » porte les deux sens du talk : le juge automatique
-qu'on construit, et le tribunal — ce que la diapositive 3 vient refermer.
+« Passe devant le juge » porte les deux sens du talk : le juge automatique qu'on
+construit, et le tribunal.
 -->
 
 ---
@@ -78,29 +72,22 @@ Le tribunal :
 <span class="ref">Moffatt v. Air Canada, 2024 BCCRT 149</span>
 
 <!--
-Validé le 2026-09-24. Citation gardée EN ANGLAIS (choix assumé) : c'est
-l'original, donc vérifiable, et « remarkable » dans la bouche d'un juge est sec
-d'une façon qu'une traduction perd. La traduire à l'oral en la commentant.
-
-À dire — c'est ici qu'on raconte, la diapositive ne raconte pas :
-novembre 2022, Jake Moffatt réserve un vol pour les funérailles de sa
+Novembre 2022. Jake Moffatt réserve un vol pour les funérailles de sa
 grand-mère. Le chatbot lui indique qu'il peut demander le tarif deuil après le
 voyage. La politique réelle exige de le demander avant. Il paie le plein tarif
 et se retourne contre la compagnie.
 
-Le récit humain est plus fort dit que lu, et il ne prend pas de place à l'écran.
-La diapositive ne tient que la confrontation — la défense, puis la réponse du
-tribunal — parce que la phrase du tribunal est la seule chose que la salle doit
-pouvoir relire : c'est la punchline, elle n'est pas de nous, elle est opposable.
+Le montant est dérisoire, et c'est ce qui rend la décision intéressante : ce
+n'est pas le préjudice qui compte, c'est le principe de responsabilité posé.
+Une entreprise répond de ce que son chatbot affirme.
 
-État de vérification (2026-09-24) : la phrase est celle de la décision. Membre
-Christopher C. Rivers, 14 février 2024, 650,88 $ CA de dommages — l'écart entre
-le tarif deuil et ce qui a été payé.
-NON vérifiés sur pièce, donc volontairement absents de l'écran : le délai exact
-annoncé par le chatbot (90 jours selon plusieurs sources secondaires) et le
-total incluant intérêts et frais de tribunal, légèrement supérieur. CanLII
-renvoie un 403 et les PDF ne s'extraient pas. Pour les ajouter, lire la décision
-directement : canlii.org/en/bc/bccrt/doc/2024/2024bccrt149/2024bccrt149.html
+Traduire la citation à l'oral en la commentant — elle reste en anglais à l'écran
+parce que c'est l'original, donc vérifiable.
+
+⚠ Vérifié sur la décision : membre Christopher C. Rivers, 14 février 2024,
+650,88 $ CA. NE PAS citer de mémoire le délai annoncé par le chatbot (90 jours
+selon des sources secondaires) ni le total avec intérêts et frais : non vérifiés
+sur pièce, donc volontairement absents de l'écran.
 -->
 
 ---
@@ -128,39 +115,24 @@ directement : canlii.org/en/bc/bccrt/doc/2024/2024bccrt149/2024bccrt149.html
   accepte de vendre un véhicule pour **1 $**.
 
 <!--
-Validé le 2026-09-24. DIAPOSITIVE À SURVOLER, deux secondes minimum à l'écran —
-en dessous, la salle ne perçoit pas qu'elle est dense et l'effet de volume tombe.
+Diapositive à survoler, deux secondes minimum à l'écran — en dessous, la salle
+ne perçoit pas qu'elle est dense et l'effet de volume tombe.
 
-Densité assumée : celle-ci est faite pour être LUE APRÈS COUP, dans le deck
-partagé. C'est la seule du talk où la densité est un choix et non un défaut,
-donc elle doit être auto-suffisante — références complètes, compréhensible sans
-nous avoir entendu.
+« J'aurais pu en remplir beaucoup plus — mais je ne garde que ceux que je peux
+prouver. » Survol assumé : « je ne m'arrête pas, vous les retrouverez », jamais
+« je n'ai pas le temps ».
 
-Phrase de survol : « J'aurais pu en remplir beaucoup plus — mais je ne garde que
-ceux que je peux prouver. » Le survol doit être ASSUMÉ, pas subi : « je ne
-m'arrête pas, vous les retrouverez » et non « je n'ai pas le temps ». Le premier
-est un choix, le second dit à la salle qu'elle rate quelque chose.
+Dire pourquoi la diapositive est coupée en deux : un talk sur la mesure
+rigoureuse range ses propres anecdotes par niveau de preuve.
 
-La séparation documenté / rapporté est le vrai moment de l'introduction : un
-talk sur la mesure rigoureuse qui range ses propres anecdotes par niveau de
-preuve fait la démonstration avant l'argument.
+⚠ Mata v. Avianca : SIX décisions inventées (Varghese, Shaboon, Petersen,
+Martinez, Estate of Durden, Miller). Des résumés en annoncent neuf — les trois
+autres noms qui circulent (Zicherman, Ehrlich, In re Air Crash Disaster) sont de
+VRAIES décisions citées à l'intérieur des fausses. Ne pas se tromper en public.
 
-État de vérification (2026-09-24) :
-- Mata v. Avianca : VÉRIFIÉ sur le texte de l'opinion. Caption, docket, juge,
-  date, sanction de 5 000 $ solidairement contre LoDuca, Schwartz et le cabinet
-  Levidow, Levidow & Oberman. Mauvaise foi constatée en ces termes : « acts of
-  conscious avoidance and false and misleading statements to the Court ».
-  Le compte est SIX décisions inventées (Varghese, Shaboon, Petersen, Martinez,
-  Estate of Durden, Miller) — pas neuf : les trois autres noms qui circulent
-  (Zicherman, Ehrlich, In re Air Crash Disaster) sont de VRAIES décisions,
-  citées à l'intérieur des fausses. Ne pas se tromper là-dessus en public.
-- Deloitte : concordant sur AP, Fortune et CFO Dive. La source primaire — le
-  rapport révisé et sa mention d'Azure OpenAI — est sur le site du DEWR et n'a
-  pas pu être ouverte le 2026-09-24 (timeout deux fois). À confirmer avant
-  l'oral, sinon basculer la ligne dans la section RAPPORTÉ.
-- NYC MyCity et Chevrolet : presse et captures d'écran seulement, d'où
-  l'étiquette. Le « 1 $ » est gardé parce qu'il est parlant, et il est couvert
-  par l'étiquette.
+⚠ Deloitte : concordant sur AP, Fortune et CFO Dive, mais la source primaire
+(rapport révisé du DEWR) n'a pas pu être ouverte le 2026-09-24. La confirmer
+avant l'oral, sinon basculer la ligne dans RAPPORTÉ.
 -->
 
 ---
@@ -178,24 +150,16 @@ preuve fait la démonstration avant l'argument.
 - Il n'y a pas d'oracle : la même question admet dix bonnes réponses
 
 <!--
-Validé le 2026-09-24.
+Un avocat ne relit pas une citation bien formatée. « 925 F.3d 1339 (11th Cir.
+2019) » a la forme d'une vraie référence, et c'est tout ce que notre œil
+vérifie.
 
-Titre retitré : c'était « Nos tests ne voient pas les erreurs qui comptent », une
-thèse à défendre. Placée APRÈS les exemples, la diapositive répond à la question
-que la salle se pose déjà au lieu de l'asséner.
+La conséquence pratique : on livre en se fiant à l'impression qu'on a en
+relisant trois sorties à la main.
 
-BLEU / ROUGE volontairement RETIRÉS et remplacés par la formulation en clair :
-les nommer coûte plus qu'il ne rapporte — qui connaît n'apprend rien, qui ne
-connaît pas paie vingt secondes d'acronyme qui ne resservira pas dans le talk.
-
-À dire : un avocat ne relit pas une citation bien formatée. « 925 F.3d 1339
-(11th Cir. 2019) » a la forme d'une vraie référence, et c'est tout ce que notre
-œil vérifie. La conséquence pratique : on livre en se fiant à l'impression qu'on
-a en relisant trois sorties à la main.
-
-Le gain du réordonnancement : les six citations inventées SONT la démonstration
-de la deuxième puce. Plus besoin d'argumenter que la forme trompe — on vient de
-le montrer sur un avocat, un ministère et une compagnie aérienne.
+Les six citations inventées sont la démonstration du deuxième point — inutile
+d'argumenter que la forme trompe, on vient de le montrer sur un avocat, un
+ministère et une compagnie aérienne.
 -->
 
 ---
@@ -214,48 +178,18 @@ le montrer sur un avocat, un ministère et une compagnie aérienne.
   Modifier, livrer, et ne jamais savoir si j'ai amélioré ou dégradé.
 
 <!--
-Validé le 2026-09-24. La crainte est la formulation de Mehdi : « comment être sûr
-que j'améliore mon assistant et que je ne le dégrade pas ? Je ne veux pas avancer
-à l'aveugle dans mes modifications et me créer un tunnel et ne pas avoir de
-feedback. » Gardée en question à l'oral, en affirmation à l'écran.
+Trois rôles en conflit : auteur du système, sélectionneur des cas de test, et
+juge.
 
-Pourquoi elle porte : c'est une crainte de DÉVELOPPEUR, pas de chercheur —
-l'instinct du test de non-régression appliqué à un système non déterministe. La
-salle n'a pas besoin qu'on la lui explique, elle la vit.
+Le mot exact, c'est TUNNEL. Pas de boucle de retour, donc chaque modification
+est un pari, et les paris s'accumulent sans qu'on sache lequel a coûté quoi.
 
-« choisis par moi » n'est pas un détail : trois rôles en conflit — auteur du
-système, sélectionneur des cas de test, et juge.
-
-À dire : le mot exact, c'est TUNNEL. Pas de boucle de retour, donc chaque
-modification est un pari, et les paris s'accumulent sans qu'on sache lequel a
-coûté quoi.
-
-CALLBACK À PRÉPARER POUR LA CONCLUSION : cette crainte se vérifie à la fin du
-talk. 91 minutes de fine-tuning pour une justesse de 76,0 % contre 76,0 % —
-exactement « j'ai modifié sans savoir si j'améliorais ». La différence, c'est que
-cette fois on l'a su. L'introduction pose la peur, la conclusion montre que
-l'outillage l'a attrapée sur notre propre modification. Le talk se referme sur
-nous, pas sur une leçon abstraite.
-
-Transition vers la Partie 1 : « Avant d'écrire une ligne de juge, il y a quatre
-questions à se poser — et la première, c'est ce qu'il ne faut surtout pas lui
-donner à évaluer. »
+Cette crainte se vérifie à la fin du talk : 91 minutes de fine-tuning pour une
+justesse de 76,0 % contre 76,0 %. Exactement « j'ai modifié sans savoir si
+j'améliorais » — sauf que cette fois, je l'ai su.
 -->
 
 ---
-
-<!--
-PARTIE 1 (4 min) — La méthode : les questions à se poser avant de construire
-son juge.
-
-Les deux diapositives qui suivent ont été ajoutées le 2026-09-24 : le plan
-attaquait « les questions à se poser » sans avoir montré ce qu'était un juge.
-On ne peut pas poser de bonnes questions sur un objet qu'on n'a pas présenté.
-
-BUDGET : elles coûtent 60 à 75 s, et le plan tombait à 20 min pile sans marge
-(3+4+4+6+3). Dépassement assumé — Mehdi taillera après la présentation à ses
-associés. Ne pas l'oublier au moment de la répétition chronométrée.
--->
 
 ## LLM-as-a-Judge, en une image
 
@@ -272,25 +206,16 @@ associés. Ne pas l'oublier au moment de la répétition chronométrée.
 → un modèle plus petit suffit, et ça change le prix
 
 <!--
-Validé le 2026-09-24.
+L'idée tient en une phrase, et c'est précisément pour ça qu'elle est dangereuse :
+elle a l'air gratuite.
 
-TROIS entrées, pas une. Si on ne montre que « réponse → juge », on perd ce qui
-fait tout le talk : le juge voit aussi LE CONTEXTE RÉCUPÉRÉ, et c'est ce qui lui
-permet de dire « cette réponse est peut-être vraie, mais rien dans le contexte ne
-l'étaye ». Tout le banc Lucene/Neo4j repose là-dessus.
+Insister sur les TROIS entrées. Le juge voit aussi le contexte récupéré, et
+c'est ce qui lui permet de dire « cette réponse est peut-être vraie, mais rien
+dans le contexte ne l'étaye ». Tout le banc Lucene/Neo4j repose là-dessus.
 
-La sortie est PASS / FAIL, jamais une note sur 10 : le juge gradué a été
-abandonné le 2026-09-13. Annoncer une note ici contredirait la Partie 2 dès la
-sixième diapositive.
-
-« Il ne génère pas, il juge » est la ligne la plus utile : c'est la confusion
-numéro un dans la salle. On croit qu'on demande au modèle de refaire le travail,
-alors qu'on lui demande de VÉRIFIER — deux tâches d'une difficulté très
-différente. L'analogie du livre porte le même argument, et la conséquence
-économique en découle au lieu d'être un point séparé.
-
-À dire : l'idée tient en une phrase, et c'est précisément pour ça qu'elle est
-dangereuse — elle a l'air gratuite.
+La confusion numéro un dans la salle : on croit qu'on demande au modèle de
+refaire le travail, alors qu'on lui demande de vérifier. Deux tâches d'une
+difficulté très différente.
 -->
 
 ---
@@ -310,22 +235,16 @@ Le juge applique une **grille de critères**
 → pas de corrigé à écrire. **Tout repose sur la grille.**
 
 <!--
-Validé le 2026-09-24.
+Sur du code, le corrigé est exactement ce que je n'ai pas : si je savais écrire
+la bonne réponse à mes 60 questions, je n'aurais pas besoin de RAG.
 
-À dire : sur du code, le corrigé est exactement ce que je n'ai pas — si je savais
-écrire la bonne réponse à mes 60 questions, je n'aurais pas besoin de RAG.
+La troisième approche déplace le problème sur la grille — et c'est le sujet de
+la partie suivante.
 
-Pourquoi ce découpage sert le plan : la troisième approche déplace le problème
-sur la grille, et « l'ingénierie des rubriques » est le titre de la Partie 2.
-Cette diapositive pose donc la question à laquelle la Partie 2 répond, sans
-avoir à l'annoncer.
-
-PRÉCISION À NE PAS CONFONDRE EN PUBLIC : le « A contre B, puis B contre A » de
-l'approche 1 neutralise le biais de position ENTRE DEUX RÉPONSES. Ce qui a été
-mesuré dans ce projet est un biais de position SUR L'ORDRE DES CONTEXTES
-RÉCUPÉRÉS — 12 verdicts sur 60 basculent au seul réordonnancement. Même
-phénomène de fond, dispositif différent. Le rapprochement est permis à condition
-de dire lequel a été mesuré.
+⚠ Le « A contre B, puis B contre A » neutralise le biais de position ENTRE DEUX
+RÉPONSES. Ce que j'ai mesuré est un biais de position sur L'ORDRE DES CONTEXTES
+RÉCUPÉRÉS (12 verdicts sur 60). Même phénomène, dispositif différent : dire
+lequel a été mesuré.
 -->
 
 ---
@@ -346,36 +265,21 @@ Mon filtre à moi : l'équilibrage des parenthèses et des accolades.
 C'est tout. **Ce n'est pas un filtre L0, c'est un début.**
 
 <!--
-Validé le 2026-09-24.
+Un compilateur répond en cinquante millisecondes, ne coûte rien et n'a pas
+d'humeur. Demander ça à un LLM, c'est payer pour une réponse moins fiable.
 
-Renversement assumé : on attend d'un talk sur les juges qu'il explique ce qu'on
-peut leur confier, et on ouvre sur ce qu'il faut leur RETIRER. C'est l'argument
-le plus solide de la partie, parce qu'il tient à la fois sur le prix et sur la
-fiabilité, sans compromis entre les deux.
+L'aveu, et pourquoi il est utile : si mon filtre est aussi mince, c'est que ce
+que je fais juger n'est pas du code compilable, ce sont des explications en prose
+qui contiennent du code. « Est-ce que ça compile » ne s'applique pas
+directement — il faudrait extraire les blocs et les compiler à part. Je ne l'ai
+pas fait. C'est une raison, pas une excuse.
 
-À dire : un compilateur répond en cinquante millisecondes, ne coûte rien et n'a
-pas d'humeur. Demander ça à un LLM, c'est payer pour une réponse moins fiable.
+L'action concrète à donner à la salle : extraire les blocs de code de la réponse
+et les passer au compilateur avant le juge. Faisable en une après-midi.
 
-À dire — l'aveu, et c'est là qu'il devient utile : si mon filtre est aussi mince,
-c'est que ce que je fais juger n'est pas du code compilable. Ce sont des
-explications en prose qui contiennent du code. « Est-ce que ça compile » ne
-s'applique donc pas directement — il faudrait extraire les blocs et les compiler
-à part. Je ne l'ai pas fait. C'est une raison, pas une excuse.
-
-Pourquoi l'aveu vaut mieux que le principe seul : un principe énoncé sans coût
-vécu s'écoute poliment ; suivi de « et moi je ne l'ai pas appliqué, voilà
-pourquoi », il se retient — la salle est dans la même situation. Même registre
-que l'aveu sur l'échelle 0-10 (quatrième point de la Partie 1).
-
-ACTION CONCRÈTE à proposer, ce qui manque souvent aux talks de méthode : extraire
-les blocs de code de la réponse et les passer au compilateur avant le juge.
-Faisable en une après-midi, mesurable, et personne dans la salle ne le fait.
-
-CARTE À REJOUER EN PARTIE 3 : la même idée reparaît sous une autre forme —
-hintCoverage, contrôle déterministe SANS LLM, qui classe Lucene et Neo4j dans le
-même ordre que le juge. Le filtre déterministe n'est donc pas seulement un
-économiseur de jetons en amont, c'est un instrument de validation croisée en
-aval. Poser l'idée proprement ici fait gagner la seconde occurrence.
+Cette idée reviendra en partie 3 sous une autre forme : hintCoverage, un contrôle
+déterministe sans LLM, qui classera les deux stratégies dans le même ordre que
+le juge.
 -->
 
 ---
@@ -393,26 +297,16 @@ Juge un échantillon des vraies conversations.
 Moi : **100 % offline.** Aucun échantillonnage de production.
 
 <!--
-Validé le 2026-09-24.
+La vraie opposition n'est pas le moment, c'est le coût. L'offline exige un jeu
+figé, donc un corpus à construire, et c'est là que part tout l'effort : 200
+exemples, un golden set de 50. L'online ne demande aucun corpus mais ne donne
+aucune comparabilité — les conversations de mardi ne sont pas celles de lundi,
+donc rien ne s'attribue à ma modification.
 
-La vraie opposition n'est pas le moment, c'est LE COÛT — d'où les deux lignes en
-« → ». L'offline exige un jeu figé, donc un corpus à construire, et c'est là que
-part tout l'effort de ce projet : 200 exemples, un golden set de 50. L'online ne
-demande aucun corpus mais ne donne aucune comparabilité — les conversations de
-mardi ne sont pas celles de lundi, donc rien ne s'attribue à la modification.
-
-AVEU, même registre que le L0 : ce projet est entièrement offline, il n'y a aucun
-échantillonnage de production. Le dire coûte deux secondes et évite qu'on le
-demande.
-
-À dire : c'est l'offline qui ferme le tunnel de la diapositive 5. Rejouer les
+C'est l'offline qui ferme le tunnel dont je parlais tout à l'heure. Rejouer les
 MÊMES questions est la seule façon de savoir si une modification améliore ou
-dégrade — et la seule façon de comparer deux stratégies, puisque Lucene et Neo4j
-doivent répondre aux mêmes 60 questions pour être comparables.
-
-Un rappel oral d'une demi-phrase vers la crainte du tunnel suffit à faire le
-lien, et c'est ce qui donne au talk sa structure : la peur est posée en
-introduction, le mécanisme qui la lève est nommé ici.
+dégrade, et la seule façon de comparer deux stratégies : Lucene et Neo4j doivent
+répondre aux mêmes 60 questions pour être comparables.
 -->
 
 ---
@@ -433,32 +327,19 @@ Biais de position, de verbosité, d'auto-préférence.
 **Ça, je ne l'ai pas mesuré. Je m'appuie sur la littérature.**
 
 <!--
-Validé le 2026-09-24. Resserré de 11 à 8 lignes plutôt que découpé : les
-références SONT la justification, les séparer de l'affirmation l'affaiblirait.
+La dernière ligne est la plus importante de la diapositive : c'est la seule du
+talk où je m'appuie sur la littérature plutôt que sur ma mesure, et je l'affiche.
 
-RÉFÉRENCES VÉRIFIÉES le 2026-09-24 :
-- CheckEval: A reliable LLM-as-a-Judge framework for evaluating text generation
-  using checklists. Yukyung Lee, JoongHoon Kim, Jaehee Kim, Hyowon Cho,
-  Jaewook Kang, Pilsung Kang, Najoung Kim. EMNLP 2025.
-  aclanthology.org/2025.emnlp-main.796/
-  L'abstract attribue explicitement les incohérences de notation aux « subjective
-  evaluation criteria combined with Likert scale scoring », et mesure
-  « improves the average agreement across evaluator models by 0.45 and reduces
-  the score variance » sur 12 modèles évaluateurs. C'est précisément
-  l'affirmation qu'on voulait pouvoir faire.
-- Judging LLM-as-a-Judge with MT-Bench and Chatbot Arena. Lianmin Zheng et al.
-  NeurIPS 2023, Datasets and Benchmarks Track. arxiv.org/abs/2306.05685
-  Référence canonique des biais de position, de verbosité et d'auto-préférence.
+Je n'ai pas fait combattre le gradué contre le binaire chez moi. J'ai abandonné
+le gradué, je ne l'ai pas battu en duel — la nuance compte, et quelqu'un dans la
+salle la verra.
 
-LA DERNIÈRE LIGNE EST LA PLUS IMPORTANTE DE LA DIAPOSITIVE. C'est la seule du
-talk où l'on s'appuie sur la littérature plutôt que sur sa propre mesure, et on
-l'affiche. Dans un exposé qui passe vingt minutes à distinguer ce qui est mesuré
-de ce qui est cru, cette ligne vaut plus que les deux références au-dessus :
-elle prouve que la séparation n'est pas un slogan.
-
-À dire : je n'ai pas fait combattre le gradué contre le binaire chez moi. J'ai
-abandonné le gradué, je ne l'ai pas battu en duel — la nuance compte, et
-quelqu'un dans la salle la verra.
+⚠ Références exactes :
+- CheckEval, EMNLP 2025, Lee, Kim, Kim, Cho, Kang, Kang, Kim.
+  aclanthology.org/2025.emnlp-main.796/ — l'abstract attribue les incohérences
+  aux « subjective evaluation criteria combined with Likert scale scoring » et
+  mesure « improves the average agreement across evaluator models by 0.45 ».
+- Zheng et al., NeurIPS 2023, Datasets and Benchmarks. arxiv.org/abs/2306.05685
 -->
 
 ---
@@ -483,32 +364,19 @@ quelqu'un dans la salle la verra.
 **PASS ⟺ tous les contrôles vrais.** Un seul `false` ⇒ FAIL.
 
 <!--
-Validé le 2026-09-24. Découpée en deux : cette diapositive porte le schéma et la
-règle de conjonction, la suivante porte l'ordre des champs, qui se démontre
-visuellement.
+Pas de demi-mesure, pas de « globalement acceptable ». Le verdict n'est pas
+jugé, il est CALCULÉ — donc vérifiable : je peux recalculer chaque verdict depuis
+les contrôles et détecter un juge qui se contredit. C'est comme ça que je mesure
+sa cohérence.
 
-À dire : pas de demi-mesure, pas de « globalement acceptable ». Le verdict n'est
-pas jugé, il est CALCULÉ — donc vérifiable : on peut recalculer chaque verdict
-depuis les contrôles et détecter un juge qui se contredit. C'est exactement
-comme ça que la cohérence du juge est mesurée (coherenceRate du banc RAG).
-
-LE VRAI GAIN DE LA DÉCOMPOSITION N'EST PAS LA FIABILITÉ. Une note globale dit
+Le vrai gain de la décomposition n'est pas la fiabilité. Une note globale dit
 QU'une réponse échoue ; les contrôles atomiques disent LEQUEL échoue. C'est ce
-qui a permis en Partie 3 de conclure que Neo4j souffre d'un défaut de rappel —
-66 % de contextes jugés insuffisants contre 39,7 % — et non d'un problème de
-bruit mal maîtrisé. Sans contrôles atomiques : un écart de 25 points sans
-explication. À dire ici, ça prépare la Partie 3.
+qui me permettra, tout à l'heure, de conclure que Neo4j souffre d'un défaut de
+rappel et non d'un problème de bruit. Sans eux : un écart de 25 points sans
+explication.
 
-`reason` vient en DERNIER et ce n'est pas un détail : le champ existe pour
-l'humain qui relira, pas pour la machine, et venant après le verdict il ne peut
-pas l'influencer. Cohérent avec la règle de la diapositive suivante.
-
-CONTRE-CHIFFRE À NE PAS TAIRE, il appartient à la Partie 4 mais c'est ici qu'il
-devient compréhensible : la conjonction ABSORBE les désaccords. Sur les 50 items
-du golden set, 17 portent un désaccord sur au moins un contrôle, dont 15 que le
-verdict masque — dès qu'un contrôle échoue des deux côtés, un désaccord sur un
-autre devient invisible. Le verdict est reproductible, les raisons beaucoup
-moins, et c'est un plafond sur ce que le fine-tuning peut apprendre.
+« reason » vient en dernier : le champ existe pour l'humain qui relira, pas pour
+la machine, et venant après le verdict il ne peut pas l'influencer.
 -->
 
 ---
@@ -530,27 +398,656 @@ Verdict en premier : les contrôles sont écrits pour être **cohérents avec un
 décision déjà prise**.
 
 <!--
-Validé le 2026-09-24.
+C'est la chose la moins intuitive de tout le talk, et c'est deux caractères dans
+un schéma JSON. Aucun modèle, aucun fine-tuning, aucun prompt ne rattrape un
+mauvais ordre de champs : le texte déjà écrit conditionne le texte suivant, et
+jamais l'inverse.
 
-C'est la meilleure diapositive de la Partie 1, peut-être du talk : gratuite à
-implémenter, contre-intuitive, vérifiable, et elle donne à la salle quelque chose
-à changer lundi matin. Les talks de méthode manquent presque toujours de ça.
+Le bloc <thinking> obéit à la même logique. Raisonnement avant les contrôles,
+contrôles avant le verdict : chaque étape conditionne la suivante dans le bon
+sens. Ce n'est pas trois décisions, c'en est une.
 
-À dire : c'est la chose la moins intuitive de tout le talk, et c'est deux
-caractères dans un schéma JSON. Aucun modèle, aucun fine-tuning, aucun prompt ne
-rattrape un mauvais ordre de champs — le texte déjà écrit conditionne le texte
-suivant, et jamais l'inverse.
+⚠ Je n'ai PAS mesuré l'écart entre les deux ordres : j'ai choisi le bon dès le
+départ. C'est un raisonnement sur le fonctionnement de la génération, pas un
+résultat expérimental. Le dire tel quel.
+-->
 
-LE <thinking> OBÉIT À LA MÊME LOGIQUE, à dire en une phrase : raisonnement avant
-les contrôles, contrôles avant le verdict, donc chaque étape conditionne la
-suivante dans le bon sens. Le schéma entier est ordonné par cette seule idée —
-ce n'est pas trois décisions, c'en est une.
+---
 
-HONNÊTETÉ À TENIR, puisque c'est la règle du talk : l'écart entre les deux ordres
-n'a PAS été mesuré ici, le bon ordre a été choisi dès le départ. C'est donc un
-raisonnement sur le fonctionnement de la génération, pas un résultat
-expérimental. Le dire comme tel : « je n'ai pas mesuré l'inverse, et je ne l'ai
-pas fait parce que je ne voulais pas dépenser 90 minutes à prouver une
-évidence ». Personne ne le reprochera, et ça protège de la seule question qui
-pourrait coincer sur cette diapositive.
+## Ce que j'ai présenté il y a quelques mois
+
+```
+  Lucene knn-only      1,8 / 10
+  Lucene hybrid        4,5 / 10
+
+        « +154 % en ajoutant BM25 »
+```
+
+Que vaut 4,5 ? Et 4,6 ? **Je ne savais pas répondre. Le juge non plus** —
+d'une exécution à l'autre, il ne redonnait pas 4,5.
+
+Un pourcentage d'augmentation sur une échelle sans ancrage **ne mesure rien**.
+
+Aujourd'hui, même question, instrument remplacé :
+**Lucene 48,3 % contre Neo4j 23,7 %, p = 0,0066.**
+
+<!--
+Je ne vous montre pas une erreur de débutant, je vous montre une diapositive que
+j'ai projetée.
+
+L'argument décisif n'est pas la fiabilité, c'est la décidabilité : une échelle
+0-10 sans ancrage ne se TESTE pas. Deux stratégies se comparent sur des verdicts
+appariés, pas sur des moyennes de notes.
+
+La classe LLMJudge est marquée @deprecated depuis le 2026-09-13, avec la raison
+écrite dans le code. Elle reste compilable : c'est l'artefact du chemin parcouru.
+-->
+
+---
+
+## Une rubrique, pas une consigne
+
+**Raisonner d'abord, trancher ensuite** — le bloc `<thinking>` avant le JSON.
+
+**Décomposer en critères atomiques**, vrai ou faux, jamais « plutôt bien ».
+
+```
+  ✗  « La réponse est-elle de bonne qualité ? »
+
+  ✓  exactitude_technique      les API citées existent et font ce qui est dit
+  ✓  absence_de_bugs           le code proposé ne casse pas à l'exécution
+  ✓  contexte_suffisant        le contexte permet de répondre sans deviner
+```
+
+Un critère qu'on ne peut pas trancher seul est un critère **mal écrit**.
+
+<!--
+Le test d'un bon critère : deux personnes qui lisent la même réponse doivent
+répondre pareil, sans se parler. Si elles hésitent, ce n'est pas la réponse qui
+est ambiguë, c'est le critère.
+
+« contexte_suffisant » est le critère qui porte tout le banc RAG : il ne demande
+pas si la réponse est vraie, il demande si le contexte permettait d'y répondre.
+C'est ce qui distingue un défaut de récupération d'un défaut de génération.
+-->
+
+---
+
+## Séparer le moteur de la grille
+
+```
+   ┌──────────────────────┐        ┌──────────────────────┐
+   │  MOTEUR DE JUGEMENT  │   +    │       GRILLE         │
+   │                      │        │                      │
+   │  fiable, neutre,     │        │  spécifique au       │
+   │  colle à la grille   │        │  domaine             │
+   └──────────────────────┘        └──────────────────────┘
+        un seul modèle                 change par usage
+```
+
+Le modèle n'apprend pas **mon** domaine.
+Il apprend à **suivre une grille** — et la grille porte le domaine.
+
+<!--
+C'est ce qui rend le juge réutilisable. Si j'avais entraîné le modèle sur « ce
+qu'est une bonne réponse pour OllamAssist », il ne servirait qu'à OllamAssist.
+Entraîné à coller à une grille, il change de domaine en changeant de grille.
+
+Conséquence directe sur le corpus : mes exemples d'entraînement portent trois
+marqueurs de tâche différents — analyse de code, pertinence du contexte
+récupéré, fidélité au contexte. Le même moteur, trois grilles.
+-->
+
+---
+
+## Les biais : ce que je mesure, ce que je cite
+
+| Biais | Statut |
+|---|---|
+| **Verbosité** | **mesuré chez moi** — taux de faux PASS sur défauts verbeux contre défauts concis |
+| **Position** | **mesuré chez moi** — 12 verdicts sur 60 basculent au seul réordonnancement du contexte |
+| **Auto-préférence** | *littérature seule.* Pas mesuré ici. |
+
+**La colonne de droite est le sujet de cette diapositive.**
+
+<!--
+La discipline tient en une règle : ne jamais présenter un biais cité comme un
+biais mesuré. C'est la seule chose qui sépare un retour d'expérience d'une revue
+de littérature mal digérée.
+
+Sur la position : le mélange des extraits le mitige, mais 12 verdicts sur 60
+basculent quand même au seul réordonnancement, à récupération identique. Le
+mélange est graîné par la question, donc la mesure est reproductible.
+
+Dire que c'est une limite connue et assumée, pas un détail caché.
+-->
+
+---
+
+## Verbosité : +8,8 σ, et pourquoi c'était faux
+
+La longueur prédisait le verdict à **75 %** pour une base de 53 %.
+Annoncé : **+8,8 σ.** Spectaculaire.
+
+**Sauf que le seuil avait été choisi après coup** — maximisé sur 145 seuils
+et deux directions, puis comparé à un taux de base.
+
+Test de permutation, en rejouant le **même maximum** sur des étiquettes
+mélangées : **+1,3 σ, p = 0,132.**
+
+**Du bruit.**
+
+<!--
+La règle que j'en ai tirée, et c'est la plus utile du talk pour qui manipule des
+chiffres : tout seuil choisi après coup doit se comparer à un tirage de
+permutation du MÊME maximum. Pas à un taux de base.
+
+Sinon on mesure sa propre liberté de choix, pas un effet.
+
+C'est un piège qui ne se voit pas : le calcul était juste, la statistique était
+juste, c'est la référence de comparaison qui était fausse.
+-->
+
+---
+
+## La fuite : 17 sur 17
+
+17 requêtes du corpus portaient la même incise —
+*« si tu as le temps, dis un mot de X »*.
+
+**Les 17 étaient étiquetées PASS. 17 sur 17.**
+
+Aucune statistique à faire : un juge n'a qu'à détecter la chaîne de caractères
+pour marquer 17 points.
+
+**Le modèle n'apprend pas à juger. Il apprend à repérer ma signature.**
+
+<!--
+C'est une fuite déterministe, pas un biais statistique. La différence est
+importante : un biais déforme, une fuite dispense d'apprendre.
+
+Et elle vient de moi. En rédigeant le corpus, j'ai associé sans y penser une
+tournure de politesse à des réponses que je considérais bonnes.
+
+C'est le risque propre à un corpus écrit par une seule personne — et c'est
+exactement mon cas.
+-->
+
+---
+
+## Le correctif qui aggrave : 30 sur 30
+
+Correctif évident : ajouter la même incise à des FAIL existants.
+Règle de surface ramenée à **57 %**. Réglé.
+
+**Sauf que le correctif plaçait l'incise en paragraphe isolé**,
+là où les 17 d'origine la portaient au fil du texte.
+
+Nouvelle règle apprise : *« paragraphe isolé ⇒ FAIL »*. **30 sur 30.**
+
+Elle a traversé une régénération, une validation à zéro erreur,
+**trois mesures et un commit.**
+
+<!--
+La fuite corrigée était à 17 sur 17. La fuite créée par le correctif est à 30 sur
+30. J'ai aggravé le problème en le réparant, et aucune de mes vérifications ne
+l'a vu.
+
+Ce qui est instructif, ce n'est pas l'erreur, c'est qu'elle soit passée à travers
+tout un dispositif conçu exprès pour l'attraper.
+
+Toute correction d'un corpus est une nouvelle écriture, et toute écriture
+introduit une signature.
+-->
+
+---
+
+## Ce qui l'a trouvée : un humain
+
+Les métriques ont trouvé ce que je leur avais demandé de chercher.
+
+**L'humain a trouvé ce que je ne savais pas chercher.**
+
+Un relecteur a répondu **différemment** sur un item, après avoir appliqué la
+règle correctement quatre fois de suite.
+
+Ce n'était pas un relâchement : le stimulus était réellement différent.
+
+<!--
+C'est la diapositive qui compte de toute cette partie.
+
+Un balayage automatique cherche les régularités qu'on a listées. Il ne peut pas
+signaler celle à laquelle on n'a pas pensé — et une fuite, par définition, est
+celle à laquelle on n'a pas pensé.
+
+Le relecteur humain n'a pas trouvé la fuite en la cherchant. Il a trouvé une
+incohérence dans son propre comportement, et c'est en la creusant que la règle
+est apparue.
+
+C'est l'argument central pour garder un humain dans la boucle, même quand tout
+est automatisé — et j'y reviens à la fin, avec le triage.
+-->
+
+---
+
+## Tout en local, et pourquoi
+
+Un MacBook Pro M3 Pro, 36 Go. **Aucun service cloud, aucun jeton facturé.**
+
+| | |
+|---|---|
+| Modèle | Qwen2.5-Coder-14B, quantifié 4 bits — **8,3 Go** |
+| Entraînement | QLoRA via MLX, 400 itérations |
+| Durée | **90 min 58 s** |
+| Pic mémoire | **11,32 Go** sur 36 |
+| Adaptateur produit | **43,8 Mo** — 0,078 % des paramètres |
+
+**Le fine-tuning d'un juge n'est pas un projet d'infrastructure.
+C'est une soirée.**
+
+<!--
+Le message de cette diapositive est le prix d'entrée, pas la performance. Tout
+le monde dans la salle a la machine qu'il faut.
+
+Et une correction à raconter : j'ai d'abord publié 76 minutes. Ma méthode de
+calcul excluait les 9 passes de validation, soit 14,7 minutes. La vraie durée
+que l'utilisateur attend est 91 minutes. Corriger rendait mon chiffre moins
+flatteur, et c'est précisément ce qui rend la correction crédible.
+
+Pire : le tout premier relevé annonçait 690 minutes — un facteur 9 — parce que la
+machine s'était mise en veille pendant l'entraînement. Rien ne l'a signalé.
+Troisième fois que ça arrivait.
+-->
+
+---
+
+## Le corpus : c'est là que part le travail
+
+**200 exemples** écrits à la main, **50** mis de côté comme étalon.
+
+Chaque exemple : une requête, un contexte, une réponse à évaluer,
+et le jugement attendu — contrôles, verdict, raison.
+
+**Accord entre annotateurs humains sur l'étalon : κ = 0,880**
+<span class="ref">IC 95 % [0,720 — 1,000] — accord de verdict 47 items sur 50</span>
+
+Le modèle s'entraîne en 91 minutes.
+**Le corpus a pris des semaines.**
+
+<!--
+Si vous ne retenez qu'une chose de cette partie : le coût n'est pas le GPU,
+c'est l'étalon.
+
+Le κ de Cohen mesure l'accord en retirant l'accord dû au hasard. 0,880, c'est un
+accord fort — mais c'est l'accord sur MON étalon, entre un humain et des
+étiquettes. Ce n'est pas encore l'accord du juge. J'y reviens à la fin, parce
+que ces deux κ se confondent tout le temps.
+
+Les contextes RAG des exemples ne sont pas inventés : ce sont de vraies
+extractions Lucene et Neo4j sur ma codebase, gardées telles quelles, avec leurs
+quasi-homonymes et leurs corps tronqués.
+-->
+
+---
+
+## Le banc d'essai : 60 questions, 3 niveaux
+
+| Niveau | Ce qu'il teste |
+|---|---|
+| **LOCAL** | une méthode précise, dans un seul fichier |
+| **STRUCTURAL** | héritage, interfaces, ce qui implémente quoi |
+| **CROSS_MODULE** | une chaîne qui traverse plusieurs paquets |
+
+Les **mêmes** 60 questions pour les deux stratégies, dans la **même** exécution.
+
+Mélange du contexte **graîné par la question** → la mesure est reproductible.
+
+<!--
+Poser les deux stratégies face à la même question dans la même boucle, c'est ce
+qui autorise un test apparié — et un test apparié est beaucoup plus puissant à
+effectif égal.
+
+Les trois niveaux ne sont pas décoratifs : ils séparent ce qu'une recherche
+lexicale trouve facilement de ce qui demande de suivre des liens. C'est là qu'on
+attend le graphe.
+
+Le mélange graîné par la question n'est pas un détail : sans graine, les runs de
+la veille faisaient bouger le même bras de 55,9 % à 43,3 %. Une mesure qui ne se
+rejoue pas n'est pas une mesure.
+-->
+
+---
+
+## Le résultat
+
+| | Lucene | Neo4j |
+|---|---|---|
+| **Justesse (taux de PASS)** | **48,3 %** | **23,7 %** |
+| Contexte jugé insuffisant | 39,7 % | **66,1 %** |
+| Cohérence du juge | 100 % | 98,3 % |
+
+**McNemar exact bilatéral : p = 0,0066 sur 24 paires discordantes**
+— Lucene seul juste sur 19, Neo4j seul juste sur 5.
+
+<!--
+Seules les paires discordantes portent de l'information : les questions où les
+deux stratégies font pareil ne départagent rien. Leur nombre est le vrai
+déterminant de la puissance à cet effectif, donc je le donne avec le p, jamais
+sans.
+
+Et la deuxième ligne du tableau dit le mécanisme : ce n'est pas un problème de
+bruit mal maîtrisé, c'est un DÉFAUT DE RAPPEL. Le moteur ne rapporte pas assez
+de matière. Sans critères atomiques, j'aurais un écart de 25 points sans
+explication.
+
+C'est exactement ce que les critères atomiques apportent sur une note globale :
+ils disent lequel échoue.
+-->
+
+---
+
+## Le contrôle qui ne passe pas par le juge
+
+`hintCoverage` — on compte les identifiants attendus
+présents dans le contexte récupéré. **Aucun LLM.**
+
+| | Lucene | Neo4j |
+|---|---|---|
+| Taux de PASS (par le juge) | 48,3 % | 23,7 % |
+| `hintCoverage` (**sans juge**) | **0,697** | 0,596 |
+
+**Même ordre. La conclusion ne repose donc pas sur l'instrument seul.**
+
+<!--
+C'est le filtre déterministe du début du talk, qui revient sous une autre forme.
+En amont il économise des jetons ; en aval il sert de validation croisée.
+
+Et ça ne coûte rien : une liste d'identifiants attendus par question, un
+comptage. Si les deux méthodes s'étaient contredites, je n'aurais rien conclu du
+tout — c'est le genre de garde-fou qu'on construit avant de connaître le
+résultat, pas après.
+-->
+
+---
+
+## Moteur ou graphe ? Le contrôle d'équité
+
+Deux scénarios. Dans les deux, **Lucene est configuré à l'identique** :
+son taux **doit** être le même.
+
+| scénario | Lucene | Neo4j | écart |
+|---|---|---|---|
+| avec expansion K-hop | **48,3 %** | 22,0 % | +26,3 pts |
+| **sans** expansion K-hop | **48,3 %** | 23,7 % | +24,6 pts |
+
+Retirer le parcours de graphe rapporte à Neo4j **1,7 point — une question
+sur 59.**
+
+**L'écart vient du moteur de récupération, pas de la traversée de graphe.**
+
+<!--
+Le bras témoin n'a pas bougé d'une décimale entre les deux exécutions, et sur
+chacun des trois niveaux. C'est ça qui autorise l'attribution : si Lucene avait
+bougé, je n'aurais rien pu conclure du tout.
+
+Et ça affine l'hypothèse de départ au lieu de la confirmer. Je ne dis pas « le
+graphe est mal implémenté » : je dis que le pipeline Neo4j rappelle moins de
+matière. Ce n'est pas la même critique, et ce n'est pas le même correctif.
+-->
+
+---
+
+## Par niveau : ce qui conclut, et ce qui ne conclut pas
+
+| niveau | Lucene | Neo4j | p | paires discordantes |
+|---|---|---|---|---|
+| `LOCAL` | 31,6 % | 20,0 % | 0,453 — **non concluant** | 7 |
+| `STRUCTURAL` | 63,2 % | 42,1 % | 0,508 — **non concluant** | 9 |
+| `CROSS_MODULE` | **50,0 %** | **10,0 %** | **0,0078** | 8 |
+
+**Un seul écart tient.** Les deux autres ne concluent pas — et c'est une limite
+de puissance **annoncée d'avance**, pas une surprise.
+
+<!--
+Il aurait été facile de présenter les trois lignes comme trois résultats : les
+écarts bruts vont tous dans le même sens. Mais 7 ou 9 paires discordantes ne
+suffisent pas, et je le savais avant de lancer.
+
+Dire un écart « non concluant » n'est pas un aveu de faiblesse, c'est ce qui
+donne du poids aux deux qui concluent.
+
+⚠ Réserve de portée à énoncer : ces chiffres valent pour CETTE implémentation
+Neo4j, à ces réglages, sur CETTE codebase. « GraphRAG fait moins bien » serait un
+abus ; « ce pipeline-ci rappelle moins que Lucene sur ce corpus » est ce que la
+mesure soutient.
+-->
+
+---
+
+## Cinq fois, mon banc a mesuré le vide
+
+Et cinq fois, il a affiché **BUILD SUCCESS**.
+
+| Ce qui était cassé | Ce que ça a produit |
+|---|---|
+| Les `-D` non transmis par surefire | un corpus synthétique indexé à la place du vrai |
+| Une propriété vide au lieu de l'adaptateur | le modèle de base, jugé comme s'il était fine-tuné |
+| Un `pgrep` qui matchait son propre script | ~5 heures perdues |
+| Un mélange non graîné | 21 questions sur 60 divergentes à récupération identique |
+| `--adapter-path` accepté puis ignoré | *« le fine-tuning dégrade de 76 % »* — un résultat qui ne mesurait rien |
+
+**Aucune erreur. Aucun avertissement. Des résultats plausibles.**
+
+<!--
+La cinquième est la plus instructive : le rapport annonçait une dégradation de
+76 points avec intervalle de confiance et p-value à quatre zéros. Publiable tel
+quel. Entièrement faux.
+
+Ce qui l'a révélée n'est pas une métrique, c'est un détail de style : des clés
+plates dans un bloc markdown, là où mes exemples d'entraînement portent tous un
+JSON nu et imbriqué. Le modèle ne parlait pas la langue que je lui avais apprise.
+
+La leçon, et c'est le correctif que j'ai mis en place : avant de dépenser une
+heure de calcul, faire UN appel et vérifier une propriété qui ne peut pas
+apparaître par hasard si la plomberie est cassée. Pas l'absence d'erreur — une
+preuve positive.
+-->
+
+---
+
+## Deux κ qu'on confond tout le temps
+
+| | ce qu'il mesure | valeur |
+|---|---|---|
+| **κ du corpus** | l'humain contre mes étiquettes de référence | **0,880** <span class="ref">[0,720 — 1,000]</span> |
+| **κ du juge** | le juge contre l'étalon | **0,44** <span class="ref">[0,27 — 0,60]</span> |
+
+Le premier dit *« mon étalon est-il fiable ? »*
+Le second dit *« mon juge est-il aligné ? »*
+
+**0,880 entre humains. 0,44 pour le juge.**
+Le plafond n'est pas le modèle — c'est ce que le corpus enseigne.
+
+<!--
+Présenter le premier comme le second est l'erreur la plus fréquente, et la plus
+flatteuse : on annonce un alignement qu'on n'a jamais mesuré.
+
+L'écart entre les deux est la vraie information de cette diapositive. Mon juge
+est nettement moins aligné sur l'étalon que deux humains ne le sont entre eux.
+
+Et un κ bas ne veut pas toujours dire ce qu'on croit : mon contrôle le plus
+fréquent tombe à κ = 0,386 pour 78 % d'accord brut, simplement parce que les
+marges sont très déséquilibrées. Publier le κ seul sous-estime l'accord, publier
+les 78 % seuls le surestime. Les deux vont ensemble.
+-->
+
+---
+
+## Ce que le verdict cache
+
+**17 items sur 50** portent un désaccord sur au moins un contrôle.
+**15 d'entre eux : le verdict est identique quand même.**
+
+Le verdict est une conjonction — dès qu'un contrôle échoue des deux côtés,
+un désaccord sur un autre devient **invisible**.
+
+**Le verdict est reproductible. Les raisons le sont beaucoup moins.**
+
+Or c'est sur les raisons que le juge s'entraîne.
+
+<!--
+C'est le contre-chiffre de ma propre méthode, et je préfère le donner moi-même.
+
+Ce n'est pas un défaut de la conjonction — la conjonction fait exactement ce
+qu'on lui demande. C'est un plafond sur ce que le fine-tuning peut apprendre, et
+c'est une propriété de mon corpus.
+
+Une asymétrie qui n'est pas du bruit, et qui mérite d'être dite : 16 désaccords
+sur 22 vont dans le même sens, l'annotateur humain plus sévère que l'étiquette
+rédigée par le modèle. Une vérité de référence écrite par un LLM puis relue est
+plus indulgente que ce qu'un humain aurait produit seul.
+-->
+
+---
+
+## Le fine-tuning a-t-il amélioré mon juge ?
+
+| | Justesse | Format exploitable | Stabilité du verdict |
+|---|---|---|---|
+| Invite nue | 0 % | **0 %** | 0 % |
+| **+ conventions écrites** | **76,0 %** | 100 % | **76 %** |
+| **Fine-tuné** (91 min) | **76,0 %** | 100 % | 58 % |
+
+**Δ = 0,0 %. McNemar p = 1,0000 sur 12 paires discordantes — 6 d'un côté,
+6 de l'autre.**
+
+**Non concluant** — et cette issue était **écrite avant** de lancer la mesure.
+
+<!--
+Trois résultats, et aucun n'est celui que j'attendais.
+
+Premier : l'invite nue ne rend AUCUN JSON exploitable. Zéro sur 150. Le seul
+ajout de quatre phrases de conventions fait passer la justesse de 0 à 76 %.
+Avant de fine-tuner quoi que ce soit : écrivez vos conventions.
+
+Deuxième : le fine-tuning n'améliore pas la justesse. À 50 items, mon étude ne
+pouvait pas détecter moins de 15 points d'écart, et c'était écrit dans mon
+protocole avant les résultats. La branche « non concluant » était pré-enregistrée
+avec sa formulation — c'est exactement ce à quoi sert un pré-enregistrement :
+pouvoir dire « je ne sais pas » sans que ce soit un échec, et sans céder à la
+tentation de redécouper les données jusqu'à trouver un p inférieur à 0,05.
+
+Troisième : ce qu'il a acheté est ailleurs, et c'est la diapositive suivante.
+-->
+
+---
+
+## Ce qu'il a acheté : le format, pas le jugement
+
+La baseline rend un verdict valide mais des **clés plates** — 0 objet `checks`
+sur 150 générations.
+Le fine-tuné rend le schéma imbriqué **150 fois sur 150.**
+
+C'est la **seule** variante sur laquelle je peux mesurer un accord **par
+contrôle** : `validation_entree` 100 %, `contexte_pertinent` 89 %,
+`absence_invention` 83 %… et `format_impose` 33 %.
+
+**Et le contre-chiffre : la stabilité du verdict baisse, 76 % → 58 %.**
+
+<!--
+91 minutes de fine-tuning pour découvrir que le gain de justesse tenait dans
+quatre phrases d'invite, et que le fine-tuning servait à autre chose que ce que
+je croyais : l'auditabilité.
+
+Le contre-chiffre va sur la même diapositive que le gain, jamais sur la suivante.
+
+Et il faut le dire en entier : aucune de mes trois variantes ne passe le filtre
+de recevabilité que j'avais fixé — au mieux 76 % de stabilité pour un seuil à
+95 %. Le juge que je vous présente n'est pas prêt pour la production.
+
+⚠ Ne pas dire « le 32B fait mieux » : il n'a jamais été entraîné. Le déclarer
+non réalisé.
+-->
+
+---
+
+## Garder l'humain, mais au bon endroit
+
+**Automatiser les décisions nettes. Router les cas ambigus.**
+
+Le signal de confiance existe déjà : **la stabilité du verdict** sur plusieurs
+passes.
+
+```
+   verdict stable sur 3 passes   →  décision automatique
+   verdict instable              →  file de relecture humaine
+```
+
+Un item instable n'est pas un échec du juge.
+**C'est un item qui mérite un humain.**
+
+<!--
+Ça ne s'invente pas, ça se lit dans le harnais : je fais déjà trois passes pour
+mesurer la répétabilité. Le même chiffre sert à trier.
+
+Et ça referme la partie 2 : c'est un humain qui a trouvé la fuite que douze
+mesures avaient manquée, parce qu'il a changé d'avis sur un item. L'instabilité
+est un signal, chez le juge comme chez le relecteur.
+
+L'objectif n'est pas de retirer l'humain de la boucle. C'est d'arrêter de lui
+faire relire ce qui est évident, pour qu'il regarde ce qui ne l'est pas.
+-->
+
+---
+
+## Aucun instrument n'a été juste du premier coup
+
+| ce qui devait mesurer | ce qui l'a révélé |
+|---|---|
+| le corpus | un test de permutation, puis **un humain** |
+| le script écrit pour trouver les fuites | la relecture du code devant un chiffre absurde |
+| le relevé de coût — faux **trois fois** | une comparaison avec le débit du journal |
+| le correctif de la fuite | le désaccord d'un relecteur, après douze mesures muettes |
+| le banc d'essai — **cinq fois** | une sonde du contexte avant de lire les chiffres |
+
+**Chacun a été corrigé parce qu'on a regardé.
+Jamais parce qu'une métrique a protesté.**
+
+<!--
+C'est la conclusion, et c'est la phrase que je veux qu'on retienne : même le
+harnais d'évaluation ne doit pas être construit sans observation ni réflexion.
+
+On construit un juge pour arrêter d'avancer à l'aveugle. Mais le juge est
+lui-même un instrument, et un instrument se vérifie. Sinon on a simplement
+déplacé l'aveuglement d'un cran.
+
+Aucune de ces erreurs n'a été signalée par le dispositif. Toutes ont été trouvées
+en regardant quelque chose qui ne collait pas.
+-->
+
+---
+
+## Trois choses à faire lundi
+
+**1. Écrivez vos conventions avant de fine-tuner.**
+Quatre phrases m'ont rapporté 76 points. Le fine-tuning, zéro.
+
+**2. Décomposez en critères atomiques, contrôles avant verdict.**
+Un LLM génère de gauche à droite. L'ordre des champs change le comportement.
+
+**3. Exigez une preuve positive avant de dépenser du calcul.**
+Un banc qui ne sait pas prouver qu'il a mesuré la bonne chose ne mesure rien —
+et il le fait silencieusement.
+
+<span class="ref">Tout le corpus, le protocole et les mesures sont dans le dépôt.</span>
+
+<!--
+Les trois sont applicables sans rien installer et sans budget.
+
+La troisième est celle que j'aurais voulu entendre il y a six mois : elle m'a
+coûté cinq mesures nulles et une conclusion publiable entièrement fausse.
+
+Le dépôt contient tout ce qui permet de rejouer les chiffres de ce talk — le
+corpus, le protocole pré-enregistré avec ses amendements datés, et les
+générations écartées avec la raison de leur mise à l'écart.
 -->
