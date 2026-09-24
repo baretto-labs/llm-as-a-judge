@@ -377,3 +377,86 @@ même ordre que le juge. Le filtre déterministe n'est donc pas seulement un
 économiseur de jetons en amont, c'est un instrument de validation croisée en
 aval. Poser l'idée proprement ici fait gagner la seconde occurrence.
 -->
+
+---
+
+## Deuxième question : quand évaluer ?
+
+**OFFLINE** — dans la CI, sur un jeu de questions figé
+Rejoue les **mêmes** questions à chaque modification.
+→ détecte la régression. **Exige un corpus.**
+
+**ONLINE** — en production, par échantillonnage
+Juge un échantillon des vraies conversations.
+→ détecte l'imprévu. **Ne compare rien.**
+
+Moi : **100 % offline.** Aucun échantillonnage de production.
+
+<!--
+Validé le 2026-09-24.
+
+La vraie opposition n'est pas le moment, c'est LE COÛT — d'où les deux lignes en
+« → ». L'offline exige un jeu figé, donc un corpus à construire, et c'est là que
+part tout l'effort de ce projet : 200 exemples, un golden set de 50. L'online ne
+demande aucun corpus mais ne donne aucune comparabilité — les conversations de
+mardi ne sont pas celles de lundi, donc rien ne s'attribue à la modification.
+
+AVEU, même registre que le L0 : ce projet est entièrement offline, il n'y a aucun
+échantillonnage de production. Le dire coûte deux secondes et évite qu'on le
+demande.
+
+À dire : c'est l'offline qui ferme le tunnel de la diapositive 5. Rejouer les
+MÊMES questions est la seule façon de savoir si une modification améliore ou
+dégrade — et la seule façon de comparer deux stratégies, puisque Lucene et Neo4j
+doivent répondre aux mêmes 60 questions pour être comparables.
+
+Un rappel oral d'une demi-phrase vers la crainte du tunnel suffit à faire le
+lien, et c'est ce qui donne au talk sa structure : la peur est posée en
+introduction, le mécanisme qui la lève est nommé ici.
+-->
+
+---
+
+## Troisième question : quel format de verdict ?
+
+Pas une note sur 10. **PASS / FAIL.**
+
+Chez un juge LLM, les échelles graduées donnent un **faible accord entre juges**
+et une **forte variance** des notes.
+
+Décomposer en questions binaires : **+0,45 d'accord moyen** entre 12 modèles
+évaluateurs. <span class="ref">CheckEval, EMNLP 2025 — Lee et al.</span>
+
+Biais de position, de verbosité, d'auto-préférence.
+<span class="ref">Zheng et al., NeurIPS 2023 — MT-Bench</span>
+
+**Ça, je ne l'ai pas mesuré. Je m'appuie sur la littérature.**
+
+<!--
+Validé le 2026-09-24. Resserré de 11 à 8 lignes plutôt que découpé : les
+références SONT la justification, les séparer de l'affirmation l'affaiblirait.
+
+RÉFÉRENCES VÉRIFIÉES le 2026-09-24 :
+- CheckEval: A reliable LLM-as-a-Judge framework for evaluating text generation
+  using checklists. Yukyung Lee, JoongHoon Kim, Jaehee Kim, Hyowon Cho,
+  Jaewook Kang, Pilsung Kang, Najoung Kim. EMNLP 2025.
+  aclanthology.org/2025.emnlp-main.796/
+  L'abstract attribue explicitement les incohérences de notation aux « subjective
+  evaluation criteria combined with Likert scale scoring », et mesure
+  « improves the average agreement across evaluator models by 0.45 and reduces
+  the score variance » sur 12 modèles évaluateurs. C'est précisément
+  l'affirmation qu'on voulait pouvoir faire.
+- Judging LLM-as-a-Judge with MT-Bench and Chatbot Arena. Lianmin Zheng et al.
+  NeurIPS 2023, Datasets and Benchmarks Track. arxiv.org/abs/2306.05685
+  Référence canonique des biais de position, de verbosité et d'auto-préférence.
+
+LA DERNIÈRE LIGNE EST LA PLUS IMPORTANTE DE LA DIAPOSITIVE. C'est la seule du
+talk où l'on s'appuie sur la littérature plutôt que sur sa propre mesure, et on
+l'affiche. Dans un exposé qui passe vingt minutes à distinguer ce qui est mesuré
+de ce qui est cru, cette ligne vaut plus que les deux références au-dessus :
+elle prouve que la séparation n'est pas un slogan.
+
+À dire : je n'ai pas fait combattre le gradué contre le binaire chez moi. J'ai
+abandonné le gradué, je ne l'ai pas battu en duel — la nuance compte, et
+quelqu'un dans la salle la verra.
+-->
