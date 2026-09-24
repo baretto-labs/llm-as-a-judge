@@ -460,3 +460,53 @@ elle prouve que la séparation n'est pas un slogan.
 abandonné le gradué, je ne l'ai pas battu en duel — la nuance compte, et
 quelqu'un dans la salle la verra.
 -->
+
+---
+
+## Le verdict n'est pas une opinion, c'est une conjonction
+
+```json
+<thinking>
+  1. …   2. …   3. …
+</thinking>
+{
+  "checks": {
+    "exactitude_technique": true,
+    "absence_de_bugs":      false,
+    "respect_consignes":    true
+  },
+  "verdict": "FAIL",
+  "reason":  "Diagnostic exact mais correctif faux : …"
+}
+```
+
+**PASS ⟺ tous les contrôles vrais.** Un seul `false` ⇒ FAIL.
+
+<!--
+Validé le 2026-09-24. Découpée en deux : cette diapositive porte le schéma et la
+règle de conjonction, la suivante porte l'ordre des champs, qui se démontre
+visuellement.
+
+À dire : pas de demi-mesure, pas de « globalement acceptable ». Le verdict n'est
+pas jugé, il est CALCULÉ — donc vérifiable : on peut recalculer chaque verdict
+depuis les contrôles et détecter un juge qui se contredit. C'est exactement
+comme ça que la cohérence du juge est mesurée (coherenceRate du banc RAG).
+
+LE VRAI GAIN DE LA DÉCOMPOSITION N'EST PAS LA FIABILITÉ. Une note globale dit
+QU'une réponse échoue ; les contrôles atomiques disent LEQUEL échoue. C'est ce
+qui a permis en Partie 3 de conclure que Neo4j souffre d'un défaut de rappel —
+66 % de contextes jugés insuffisants contre 39,7 % — et non d'un problème de
+bruit mal maîtrisé. Sans contrôles atomiques : un écart de 25 points sans
+explication. À dire ici, ça prépare la Partie 3.
+
+`reason` vient en DERNIER et ce n'est pas un détail : le champ existe pour
+l'humain qui relira, pas pour la machine, et venant après le verdict il ne peut
+pas l'influencer. Cohérent avec la règle de la diapositive suivante.
+
+CONTRE-CHIFFRE À NE PAS TAIRE, il appartient à la Partie 4 mais c'est ici qu'il
+devient compréhensible : la conjonction ABSORBE les désaccords. Sur les 50 items
+du golden set, 17 portent un désaccord sur au moins un contrôle, dont 15 que le
+verdict masque — dès qu'un contrôle échoue des deux côtés, un désaccord sur un
+autre devient invisible. Le verdict est reproductible, les raisons beaucoup
+moins, et c'est un plafond sur ce que le fine-tuning peut apprendre.
+-->
