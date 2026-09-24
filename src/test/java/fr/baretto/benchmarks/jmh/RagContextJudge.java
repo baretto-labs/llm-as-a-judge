@@ -188,8 +188,20 @@ public class RagContextJudge {
             return new Judgement(Map.of(), "FAIL", "Aucun contexte retourné", 0.0, true);
         }
 
+        // Mélange GRAÎNÉ PAR LA QUESTION, et non aléatoire.
+        //
+        // La version non graînée rendait la mesure irreproductible, constaté le 2026-09-24 en
+        // comparant deux runs : `hintCoverage` — fonction pure du contexte et des indices —
+        // différait sur 21 questions sur 60 alors que la récupération était identique au bit près.
+        // La cause était l'interaction du mélange avec la troncature à 6000 caractères, qui
+        // intervient APRÈS : selon le tirage, ce ne sont pas les mêmes extraits qui survivent,
+        // donc ni la même invite ni le même verdict.
+        //
+        // La graine dérive du texte de la question : l'ordre reste brassé — le biais de position
+        // est toujours atténué — mais il est identique d'un run à l'autre ET identique pour les
+        // deux stratégies sur une même question, ce qui est indispensable à un test apparié.
         List<String> shuffled = new ArrayList<>(retrievedContext);
-        Collections.shuffle(shuffled);
+        Collections.shuffle(shuffled, new java.util.Random(question.hashCode()));
         String contextText = String.join("\n---\n", shuffled);
         if (contextText.length() > 6000) {
             contextText = contextText.substring(0, 6000) + "\n[... truncated ...]";
