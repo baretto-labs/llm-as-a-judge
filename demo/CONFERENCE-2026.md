@@ -40,93 +40,202 @@ Marp les exporte en notes, elles ne s'affichent pas à l'écran.
 
 <!-- _class: title -->
 
-# Évaluer un système LLM sans se mentir
+# RAGots et Hallucinations
 
-## LLM-as-a-Judge : construire son juge, et mesurer ce qu'il vaut
+## votre chatbot passe devant le juge
 
 Mehdi El Ketroussi
 Novembre 2026
 
 <!--
-Reprendre ici le titre et le sous-titre exacts de l'abstract retenu
-(REX_TRAME.md, section « Abstract — retenu, verbatim, ne pas retoucher »).
-Ce qui est écrit ci-dessus n'est qu'un gabarit.
+Titre figé par l'abstract retenu (REX_TRAME.md, section « Titre »).
+
+Validé le 2026-09-24 : pas de logo ni de nom de conférence pour l'instant —
+à revoir seulement si l'organisateur impose un gabarit.
+
+À dire : lire le titre à voix haute dès la première seconde. « RAGots » est un
+jeu de mots qui se perd à l'écrit — la moitié de la salle ne le verra pas.
+Et « passe devant le juge » porte les deux sens du talk : le juge automatique
+qu'on construit, et le tribunal — ce que la diapositive 3 vient refermer.
 -->
 
 ---
 
-## Nos tests ne voient pas les erreurs qui comptent
+## Air Canada, 2024
+
+Le chatbot du site invente une politique de tarif deuil.
+
+Air Canada plaide que le chatbot est
+**« une entité juridique distincte, responsable de ses propres actes »**.
+
+Le tribunal :
+
+> « This is a remarkable submission. While a chatbot has an interactive
+> component, it is still just a part of Air Canada's website. »
+
+**650,88 $ CA** — négligence dans la présentation d'informations
+
+<span class="ref">Moffatt v. Air Canada, 2024 BCCRT 149</span>
+
+<!--
+Validé le 2026-09-24. Citation gardée EN ANGLAIS (choix assumé) : c'est
+l'original, donc vérifiable, et « remarkable » dans la bouche d'un juge est sec
+d'une façon qu'une traduction perd. La traduire à l'oral en la commentant.
+
+À dire — c'est ici qu'on raconte, la diapositive ne raconte pas :
+novembre 2022, Jake Moffatt réserve un vol pour les funérailles de sa
+grand-mère. Le chatbot lui indique qu'il peut demander le tarif deuil après le
+voyage. La politique réelle exige de le demander avant. Il paie le plein tarif
+et se retourne contre la compagnie.
+
+Le récit humain est plus fort dit que lu, et il ne prend pas de place à l'écran.
+La diapositive ne tient que la confrontation — la défense, puis la réponse du
+tribunal — parce que la phrase du tribunal est la seule chose que la salle doit
+pouvoir relire : c'est la punchline, elle n'est pas de nous, elle est opposable.
+
+État de vérification (2026-09-24) : la phrase est celle de la décision. Membre
+Christopher C. Rivers, 14 février 2024, 650,88 $ CA de dommages — l'écart entre
+le tarif deuil et ce qui a été payé.
+NON vérifiés sur pièce, donc volontairement absents de l'écran : le délai exact
+annoncé par le chatbot (90 jours selon plusieurs sources secondaires) et le
+total incluant intérêts et frais de tribunal, légèrement supérieur. CanLII
+renvoie un 403 et les PDF ne s'extraient pas. Pour les ajouter, lire la décision
+directement : canlii.org/en/bc/bccrt/doc/2024/2024bccrt149/2024bccrt149.html
+-->
+
+---
+
+## Et ce n'est pas un cas isolé
+
+**DOCUMENTÉ** — décision de justice ou document public
+
+- **Mata v. Avianca, 2023** — un avocat dépose **six décisions de justice
+  inventées** par ChatGPT, citations d'apparence normale. Le juge constate
+  « conscious avoidance ». 5 000 $ de sanction.
+  <span class="ref">S.D.N.Y., 22-cv-1461 (PKC), juge P. Kevin Castel, 22 juin 2023</span>
+
+- **Deloitte Australie, 2025** — rapport à 440 000 AUD remis au *Department of
+  Employment and Workplace Relations*. Références fabriquées, dont une citation
+  attribuée à un juge fédéral. ~97 000 AUD remboursés. La version corrigée
+  mentionne l'usage d'Azure OpenAI.
+
+**RAPPORTÉ PAR LA PRESSE** — non vérifié sur source primaire
+
+- **NYC MyCity, 2024** — le chatbot municipal conseille des pratiques contraires
+  au droit du travail.
+
+- **Chevrolet de Watsonville, 2023** — chatbot détourné par injection de prompt,
+  accepte de vendre un véhicule pour **1 $**.
+
+<!--
+Validé le 2026-09-24. DIAPOSITIVE À SURVOLER, deux secondes minimum à l'écran —
+en dessous, la salle ne perçoit pas qu'elle est dense et l'effet de volume tombe.
+
+Densité assumée : celle-ci est faite pour être LUE APRÈS COUP, dans le deck
+partagé. C'est la seule du talk où la densité est un choix et non un défaut,
+donc elle doit être auto-suffisante — références complètes, compréhensible sans
+nous avoir entendu.
+
+Phrase de survol : « J'aurais pu en remplir beaucoup plus — mais je ne garde que
+ceux que je peux prouver. » Le survol doit être ASSUMÉ, pas subi : « je ne
+m'arrête pas, vous les retrouverez » et non « je n'ai pas le temps ». Le premier
+est un choix, le second dit à la salle qu'elle rate quelque chose.
+
+La séparation documenté / rapporté est le vrai moment de l'introduction : un
+talk sur la mesure rigoureuse qui range ses propres anecdotes par niveau de
+preuve fait la démonstration avant l'argument.
+
+État de vérification (2026-09-24) :
+- Mata v. Avianca : VÉRIFIÉ sur le texte de l'opinion. Caption, docket, juge,
+  date, sanction de 5 000 $ solidairement contre LoDuca, Schwartz et le cabinet
+  Levidow, Levidow & Oberman. Mauvaise foi constatée en ces termes : « acts of
+  conscious avoidance and false and misleading statements to the Court ».
+  Le compte est SIX décisions inventées (Varghese, Shaboon, Petersen, Martinez,
+  Estate of Durden, Miller) — pas neuf : les trois autres noms qui circulent
+  (Zicherman, Ehrlich, In re Air Crash Disaster) sont de VRAIES décisions,
+  citées à l'intérieur des fausses. Ne pas se tromper là-dessus en public.
+- Deloitte : concordant sur AP, Fortune et CFO Dive. La source primaire — le
+  rapport révisé et sa mention d'Azure OpenAI — est sur le site du DEWR et n'a
+  pas pu être ouverte le 2026-09-24 (timeout deux fois). À confirmer avant
+  l'oral, sinon basculer la ligne dans la section RAPPORTÉ.
+- NYC MyCity et Chevrolet : presse et captures d'écran seulement, d'où
+  l'étiquette. Le « 1 $ » est gardé parce qu'il est parlant, et il est couvert
+  par l'étiquette.
+-->
+
+---
+
+## Pourquoi personne n'a rien vu
+
+**Le faux avait exactement la forme du vrai.**
 
 - Un test unitaire vérifie une valeur de retour, **pas un raisonnement**
 
-- BLEU / ROUGE comparent des mots, pas du sens :
+- Comparer mot à mot la réponse attendue et la réponse obtenue :
   une réponse **juste** formulée autrement est pénalisée,
   une réponse **fausse** bien formulée passe
 
 - Il n'y a pas d'oracle : la même question admet dix bonnes réponses
 
 <!--
-À dire, pas à écrire : la conséquence pratique, c'est qu'on livre en se fiant à
-l'impression qu'on a en relisant trois sorties à la main.
--->
+Validé le 2026-09-24.
 
----
+Titre retitré : c'était « Nos tests ne voient pas les erreurs qui comptent », une
+thèse à défendre. Placée APRÈS les exemples, la diapositive répond à la question
+que la salle se pose déjà au lieu de l'asséner.
 
-## Trois fois, ça a tenu jusqu'en production
+BLEU / ROUGE volontairement RETIRÉS et remplacés par la formulation en clair :
+les nommer coûte plus qu'il ne rapporte — qui connaît n'apprend rien, qui ne
+connaît pas paie vingt secondes d'acronyme qui ne resservira pas dans le talk.
 
-- **Air Canada, 2024** — le chatbot invente une politique de remboursement.
-  Le tribunal juge l'entreprise responsable de ce que son chatbot affirme.
-  <span class="ref">Moffatt v. Air Canada, 2024 BCCRT 149</span>
+À dire : un avocat ne relit pas une citation bien formatée. « 925 F.3d 1339
+(11th Cir. 2019) » a la forme d'une vraie référence, et c'est tout ce que notre
+œil vérifie. La conséquence pratique : on livre en se fiant à l'impression qu'on
+a en relisant trois sorties à la main.
 
-- **Mata v. Avianca, 2023** — un avocat dépose **six décisions de justice
-  inventées** par ChatGPT, avec des citations d'apparence normale.
-  5 000 $ de sanction.
-  <span class="ref">S.D.N.Y., 22-cv-1461 (PKC), juge P. Kevin Castel, 22 juin 2023</span>
-
-- **Deloitte Australie, 2025** — rapport à 440 000 AUD remis à un ministère,
-  références fabriquées dont une citation attribuée à un juge fédéral.
-  ~97 000 AUD remboursés.
-  <span class="ref">Targeted Compliance Framework Assurance Review, DEWR</span>
-
-<!--
-À dire : dans les trois cas, personne n'a rien vu — non par négligence, mais
-parce que le faux avait exactement la forme du vrai. Un avocat ne relit pas une
-citation bien formatée. C'est le problème que le reste du talk essaie de résoudre.
-
-État de vérification (2026-09-24) :
-- Mata v. Avianca : VÉRIFIÉ sur le texte de l'opinion. Caption, docket, juge,
-  date, montant, et la mauvaise foi constatée en ces termes : « acts of conscious
-  avoidance and false and misleading statements to the Court ». Le compte est
-  SIX décisions inventées (Varghese, Shaboon, Petersen, Martinez, Estate of
-  Durden, Miller) — pas neuf. Les trois autres noms qui circulent (Zicherman,
-  Ehrlich, In re Air Crash Disaster) sont de VRAIES décisions, citées à
-  l'intérieur des fausses.
-- Air Canada : citation du jugement à confirmer sur la décision elle-même
-  (montant exact des dommages, date).
-- Deloitte : concordant sur AP, Fortune et CFO Dive ; la source primaire — le
-  rapport révisé et sa mention d'usage d'Azure OpenAI — est sur le site du DEWR
-  et n'a pas pu être ouverte le 2026-09-24 (timeout). À confirmer avant l'oral.
-
-Écartés faute de source opposable : NYC MyCity (presse seule) et Chevy Chatbot
-(captures d'écran sur les réseaux).
+Le gain du réordonnancement : les six citations inventées SONT la démonstration
+de la deuxième puce. Plus besoin d'argumenter que la forme trompe — on vient de
+le montrer sur un avocat, un ministère et une compagnie aérienne.
 -->
 
 ---
 
 ## Pourquoi j'ai voulu mesurer
 
-**OllamAssist**, mon propre assistant de code
+**OllamAssist**, mon assistant de code
 
-- J'avais deux stratégies de RAG et **aucun moyen de les départager**
+- J'avais deux stratégies de RAG — Lucene et un graphe Neo4j —
+  et **aucun moyen de les départager**
 
-- Le seul juge disponible, c'était moi, sur quelques exemples choisis
+- Le seul juge disponible, c'était moi,
+  sur quelques exemples **choisis par moi**
 
-- Ma crainte : *[à compléter — ta formulation]*
+- Ma crainte : **avancer à l'aveugle.**
+  Modifier, livrer, et ne jamais savoir si j'ai amélioré ou dégradé.
 
 <!--
-La troisième puce est à écrire par Mehdi : c'est la crainte initiale, elle ne
-figure nulle part dans les notes du projet. C'est la puce qui fait basculer le
-talk du général au vécu.
+Validé le 2026-09-24. La crainte est la formulation de Mehdi : « comment être sûr
+que j'améliore mon assistant et que je ne le dégrade pas ? Je ne veux pas avancer
+à l'aveugle dans mes modifications et me créer un tunnel et ne pas avoir de
+feedback. » Gardée en question à l'oral, en affirmation à l'écran.
+
+Pourquoi elle porte : c'est une crainte de DÉVELOPPEUR, pas de chercheur —
+l'instinct du test de non-régression appliqué à un système non déterministe. La
+salle n'a pas besoin qu'on la lui explique, elle la vit.
+
+« choisis par moi » n'est pas un détail : trois rôles en conflit — auteur du
+système, sélectionneur des cas de test, et juge.
+
+À dire : le mot exact, c'est TUNNEL. Pas de boucle de retour, donc chaque
+modification est un pari, et les paris s'accumulent sans qu'on sache lequel a
+coûté quoi.
+
+CALLBACK À PRÉPARER POUR LA CONCLUSION : cette crainte se vérifie à la fin du
+talk. 91 minutes de fine-tuning pour une justesse de 76,0 % contre 76,0 % —
+exactement « j'ai modifié sans savoir si j'améliorais ». La différence, c'est que
+cette fois on l'a su. L'introduction pose la peur, la conclusion montre que
+l'outillage l'a attrapée sur notre propre modification. Le talk se referme sur
+nous, pas sur une leçon abstraite.
 
 Transition vers la Partie 1 : « Avant d'écrire une ligne de juge, il y a quatre
 questions à se poser — et la première, c'est ce qu'il ne faut surtout pas lui
