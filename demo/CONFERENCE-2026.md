@@ -1,4 +1,24 @@
 ---
+# ---------------------------------------------------------------------------
+# Support de la conférence de novembre 2026. 20 min.
+#
+# Les chiffres font foi dans judge-finetune/REX_TRAME.md ; ce fichier en est la
+# mise en scène. Les commentaires HTML sous chaque diapositive sont les NOTES
+# ORATEUR : ce qui se dit, pas ce qui s'affiche. Les lignes ⚠ sont des garde-fous
+# factuels.
+#
+# ATTENTION : demo/SLIDES.md est un AUTRE deck, celui du talk précédent. Il note
+# la qualité sur 10 avec le juge gradué abandonné le 2026-09-13. N'y reprendre
+# aucun chiffre — sauf la diapositive « Ce que j'ai présenté il y a quelques
+# mois », qui le cite exprès.
+#
+# RENDU (marp-cli via docker, voir demo/SUPPORT.md) :
+#   docker run --rm -v "$(pwd)/demo:/home/marp/app" marpteam/marp-cli \
+#     CONFERENCE-2026.md --html --output CONFERENCE-2026.html
+#
+# Ces lignes sont dans le front-matter et non en commentaire HTML : un
+# commentaire HTML placé avant la première diapositive devient sa note orateur.
+# ---------------------------------------------------------------------------
 marp: true
 theme: default
 paginate: true
@@ -18,23 +38,6 @@ style: |
   .ref { font-size: 0.85rem; color: #666; }
   section.title { justify-content: center; }
 ---
-
-<!--
-Support de la conférence de novembre 2026. 20 min.
-
-Les chiffres font foi dans judge-finetune/REX_TRAME.md ; ce fichier en est la
-mise en scène. Les commentaires sous chaque diapositive sont les NOTES ORATEUR :
-ce qui se dit, pas ce qui s'affiche. Les lignes ⚠ sont des garde-fous factuels.
-
-ATTENTION : demo/SLIDES.md est un AUTRE deck, celui du talk précédent. Il note la
-qualité sur 10 avec le juge gradué abandonné le 2026-09-13. N'y reprendre aucun
-chiffre — sauf la diapositive « Ce que j'ai présenté il y a quelques mois », qui
-le cite exprès.
-
-RENDU (marp-cli via docker, voir demo/SUPPORT.md) :
-  docker run --rm -v "$(pwd)/demo:/home/marp/app" marpteam/marp-cli \
-    CONFERENCE-2026.md --html --output CONFERENCE-2026.html
--->
 
 <!-- _class: title -->
 
