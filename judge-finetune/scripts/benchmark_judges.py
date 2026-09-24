@@ -441,7 +441,16 @@ def evaluate(variant, golden, runs, args, rng):
                 judgment = rows[g["id"]]["judgment"]
                 if judgment is None:
                     continue
-                pairs.append((gold_checks[k], (judgment.get("checks") or {}).get(k)))
+                prediction = (judgment.get("checks") or {}).get(k)
+                # Un contrôle que la variante n'a pas émis n'est pas un désaccord : il n'y a
+                # rien à comparer. Compter la paire quand même faisait rendre 0 % sur les
+                # treize contrôles à `14B-baseline-conventions`, qui rend un verdict valide
+                # mais des clés plates, sans objet `checks` (0 sur 150 générations). Lu dans
+                # un tableau, ce zéro se confond avec un désaccord total alors qu'il ne
+                # mesure qu'une absence — déjà dite par `format strict = 0 %`.
+                if not isinstance(prediction, bool):
+                    continue
+                pairs.append((gold_checks[k], prediction))
         criteria_acc[k] = sum(a == b for a, b in pairs) / len(pairs) if pairs else float("nan")
 
     # Posture monde fermé, en comptes bruts. Le golden set ne porte qu'une dizaine d'items RAG :

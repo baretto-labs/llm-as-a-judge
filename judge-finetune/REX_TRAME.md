@@ -157,9 +157,15 @@ Les deux autres ne concluent pas — 7 à 10 paires discordantes ne suffisent pa
 puissance annoncée d'avance, pas une surprise.
 
 > **Réserve de portée.** Ces chiffres valent pour *cette* implémentation Neo4j, à ces presets, sur
-> *cette* codebase, jugés par un juge dont l'alignement propre repose sur 6 items du golden set. Dire
-> « GraphRAG fait moins bien » serait un abus ; « ce pipeline-ci rappelle moins que Lucene sur ce
-> corpus » est ce que la mesure soutient.
+> *cette* codebase. Dire « GraphRAG fait moins bien » serait un abus ; « ce pipeline-ci rappelle moins
+> que Lucene sur ce corpus » est ce que la mesure soutient.
+>
+> **Et la réserve sur l'instrument, maintenant chiffrée** (banc du juge du 2026-09-24) : ce juge
+> s'accorde à l'étalon humain à **κ = 0,44** et ne rend le même verdict que **58 %** du temps sur trois
+> passes à T = 0,2. Un écart de 25 points survit largement à ce bruit — c'est pourquoi la conclusion
+> tient — mais **les écarts par strate de 7 à 10 paires discordantes, non. C'est une deuxième raison,
+> indépendante de l'effectif, de ne rien conclure sur `LOCAL` et `STRUCTURAL`.** Le garde-fou reste
+> `hintCoverage`, qui classe les deux stratégies dans le même ordre **sans passer par le juge**.
 
 ## Partie 4 & Conclusion (3 min) — Calibration & triage humain dans la boucle
 
@@ -168,10 +174,16 @@ puissance annoncée d'avance, pas une surprise.
   | κ | ce qu'il mesure | état |
   |---|---|---|
   | **κ du corpus** | accord entre l'annotateur humain et les étiquettes de référence | **mesuré : 0,880, IC 95 % [0,720 — 1,000]**, accord de verdict 47/50 sur les 50 items |
-  | **κ du juge** | accord entre le juge et l'étalon | **n'existe pas encore** — il sort du benchmark, pas de la relecture |
+  | **κ du juge** | accord entre le juge et l'étalon | **mesuré le 2026-09-24 : 0,44** IC 95 % [0,27 — 0,60] pour le fine-tuné, **0,48** [0,29 — 0,66] pour la baseline à conventions |
 
   Ne pas présenter le premier comme le second. Le premier dit *« mon étalon est-il fiable ? »*, le second
-  *« mon juge est-il aligné ? »*.
+  *« mon juge est-il aligné ? »*. Et l'écart entre les deux est la diapositive : **0,880 entre humains,
+  0,44 pour le juge.** Le plafond n'est pas le modèle, c'est ce que le corpus enseigne.
+
+- **Le verdict du banc du juge — et la branche « non concluant » qui était écrite d'avance.** Voir le
+  détail en Matière : à effectif égal, le fine-tuning **n'améliore pas la justesse** (76,0 % contre
+  76,0 %, p = 1,0000) mais achète le **format auditable** (0 % → 100 %). C'est le moment où le
+  pré-enregistrement paie : la conclusion « non concluant » était une issue déclarée, pas un échec.
 
 - **Le chiffre qui dit l'inverse, et qu'il faut donner juste après** : **17 items sur 50 portent un
   désaccord sur au moins un contrôle, dont 15 que le verdict absorbe.** Le verdict est une conjonction :
@@ -229,6 +241,73 @@ le champ qui fait foi. La correction est manuelle, comme les deux précédentes.
 → 250: 1,103  ← minimum
 → 300: 1,200 → 350: 1,199 → 400: 1,183
 ```
+
+## Le banc du juge — mesuré le 2026-09-24, 450 générations
+
+Trois variantes, 50 items du golden set, 3 passes, T = 0,2, bootstrap 10 000. Un serveur à la fois sur
+le M3 Pro. `14B-baseline-nu` et `14B-baseline-conventions` ne diffèrent **que** par un suffixe d'invite :
+les quatre conventions de PROTOCOLE.md, reprises mot pour mot.
+
+| | κ du juge | Justesse | JSON exploitable | Format strict | Stabilité du verdict |
+|---|---|---|---|---|---|
+| **Invite nue** | 0,00 | 0 % | **0 %** | 0 % | 0 % |
+| **+ conventions** | **0,48** [0,29 — 0,66] | **76,0 %** | 100 % | 0 % | **76 %** |
+| **Fine-tuné (ckpt 200)** | 0,44 [0,27 — 0,60] | **76,0 %** | 100 % | **100 %** | 58 % |
+
+**Trois résultats, et aucun n'est celui que j'attendais.**
+
+**1. L'invite vaut plus que le modèle.** L'invite nue ne rend **aucun JSON exploitable** : 0 sur 150. Le
+seul ajout des quatre conventions fait passer la justesse de 0 à 76 %, soit **+76 points**, McNemar
+p = 0,0000 sur 38 paires discordantes. Avant de fine-tuner quoi que ce soit, écrire ses conventions.
+
+**2. La comparaison principale est non concluante — et c'était une issue déclarée.**
+
+> `14B-baseline-conventions` **76,0 %** contre `14B-finetuned` **76,0 %**.
+> Δ = **+0,0 %**, IC 95 % apparié **[-14,0 %, +14,0 %]**, McNemar exact **p = 1,0000** sur
+> **12 paires discordantes** — 6 d'un côté, 6 de l'autre. Symétrie parfaite.
+
+À n = 50, l'étude ne pouvait pas détecter moins de ~15 points d'écart, et **cette limite était écrite en
+§5 avant les résultats**. La branche « non concluant » était pré-enregistrée avec sa formulation. C'est
+exactement ce à quoi sert un pré-enregistrement : pouvoir dire « je ne sais pas » sans que ce soit un
+échec, et sans céder à la tentation de re-découper les données jusqu'à trouver un p < 0,05.
+
+**3. Ce que le fine-tuning a réellement acheté : le format, pas le jugement.** La baseline à conventions
+rend un verdict valide mais des **clés plates** — 0 objet `checks` sur 150 générations. Le fine-tuné rend
+le schéma imbriqué **150 fois sur 150**. C'est la seule variante sur laquelle on puisse mesurer un accord
+**par contrôle** : `validation_entree` 100 %, `contexte_pertinent` 89 %, `absence_invention` 83 %, et à
+l'autre bout `format_impose` 33 %, `bruit_maitrise` 50 %. Sur les deux autres variantes, ces treize
+colonnes sont `n/a` — il n'y a rien à comparer.
+
+**Et le contre-chiffre, à donner dans la même diapositive** : la stabilité du verdict **baisse**, 76 % → 58 %,
+et la résistance au biais de verbosité ne bouge pas (46 % de faux PASS des deux côtés). Le fine-tuning
+a acheté l'**auditabilité**, pas la justesse ni la constance. Aucune des trois variantes ne passe le
+filtre de recevabilité opérationnelle — à dire aussi.
+
+> **La diapositive qui compte :** j'ai passé 91 minutes à fine-tuner un juge pour découvrir que le gain
+> tient dans quatre phrases d'invite, et que le fine-tuning sert à autre chose que ce que je croyais.
+
+### ⚠️ Le cinquième `BUILD SUCCESS` sur du vide — à raconter, c'est le fil du REX
+
+Le premier rapport de ce banc annonçait, tableaux et intervalles à l'appui : **« le fine-tuning dégrade
+la justesse de -76,0 %, IC 95 % [-88 %, -64 %], McNemar p = 0,0000 »**. Publiable tel quel. Faux de bout
+en bout.
+
+`mlx_lm.server` avait reçu `--adapter-path adapters/14b-judge-ckpt200` et **répondait avec le modèle de
+base** : aucune erreur, aucun avertissement, 150 réponses plausibles, deux heures de calcul. Ce qui a mis
+la puce à l'oreille n'est pas une métrique, c'est un **détail de style** — des clés plates dans une
+clôture markdown, là où les 135 cibles d'entraînement portent toutes un JSON nu et imbriqué.
+
+La preuve a tenu en un test : le même adaptateur, chargé en processus par `mlx_lm.load(adapter_path=...)`,
+sur le même item, avec le même template, rend le format d'entraînement exact. L'adaptateur était bon ;
+la plomberie ne l'était pas. Pire : **j'avais déjà corrigé ce bug côté Java** en passant l'adaptateur dans
+le corps de la requête, sans reporter la correction côté Python.
+
+**Le compte, pour ce seul projet : cinq mesures rendues sur du vide, toutes avec un `BUILD SUCCESS`.**
+`-D` non transmis par surefire, adaptateur arrivant en chaîne vide, `pgrep` matchant son propre script,
+mélange non graîné, et celle-ci. *Le point du talk : un banc d'évaluation qui ne sait pas prouver qu'il a
+mesuré la bonne chose ne mesure rien — et il le fait silencieusement.* Correctif retenu : `sonde_adaptateur()`
+exige une **preuve positive** sur un appel avant d'en dépenser cent cinquante, et les générations écartées
+sont **conservées** sous `results/runs-invalides/` avec leur notice, pas supprimées.
 
 ## La fuite retenue — le correctif qui aggrave
 
@@ -329,13 +408,25 @@ regardé — jamais parce qu'une métrique a protesté. **C'est la diapositive d
 
 ## Ce qui reste à produire
 
-Le juge Java binaire et le banc RAG sont **faits et mesurés** (voir le résultat en Partie 3). Restent :
+Au 2026-09-24 au soir, **toutes les mesures du plan sont faites**. Le juge Java binaire, le banc RAG, le
+contrôle d'équité et le banc du juge sont mesurés et reproductibles (Partie 3 et Matière).
 
-- **Le κ du juge** — l'accord entre le juge et l'étalon, à ne pas confondre avec le κ du corpus déjà
-  publié. Il sort du banc du juge, `make bench-14b`.
-- **La comparaison `14B-finetuned` contre `14B-baseline-conventions`** — c'est elle qui porte
-  l'affirmation « le fine-tuning améliore la qualité du juge », et **elle n'a aucune donnée à ce jour**.
-- **Le contrôle d'équité `hybrid|hybrid`**, qui attribuerait l'écart RAG au moteur ou au graphe.
-  *Lancé le 2026-09-23, résultat attendu dans l'heure.*
+Réglés depuis la version précédente de cette trame :
+
+- ~~Le κ du juge~~ → **0,44** [0,27 — 0,60] fine-tuné, **0,48** [0,29 — 0,66] baseline à conventions.
+- ~~La comparaison `14B-finetuned` contre `14B-baseline-conventions`~~ → **non concluante**, Δ = 0,0 %,
+  p = 1,0000 sur 12 paires discordantes, dans la branche pré-enregistrée. Le fine-tuning achète le
+  format (0 % → 100 %), pas la justesse.
+- ~~Le contrôle d'équité `hybrid|hybrid`~~ → **témoin invariant à la décimale** sur les trois strates,
+  l'écart RAG est imputable au moteur et non au parcours de graphe.
+
+Restent, et il faut les **déclarer** plutôt que les taire :
+
 - **Le 32B n'est pas entraîné** — `make train-32b` n'a jamais été lancé, et sa faisabilité en QLoRA sur
-  36 Go reste ouverte. Le plus propre est de le déclarer non réalisé plutôt que de le taire.
+  36 Go reste ouverte. Les deux lignes `32B-*` de `configs/variants.json` restent gelées, sans données.
+- **La passe « format normalisé » n'a pas été jouée** (`BENCH_ARGS=`), pour tenir le temps de calcul de
+  la soirée. Elle mesurerait la part de l'écart imputable à la mise en forme plutôt qu'au fond. À dire
+  comme une limite, pas comme un oubli.
+- **Aucune des trois variantes ne passe la recevabilité opérationnelle** : au mieux 76 % de stabilité de
+  verdict pour un seuil à 95 %. Le juge mesuré ici **n'est pas prêt pour la production**, et c'est une
+  conclusion en soi.
