@@ -73,9 +73,15 @@ biais de juge ; (2) un **banc d'essai des stratégies de récupération** ; (3) 
 - **Les biais systématiques.** Distinguer nettement ce que **je mesure** de ce que **la littérature
   documente** :
   - **Verbosité — mesuré chez moi.** Taux de faux PASS sur défauts verbeux contre défauts concis.
-  - **Position, auto-préférence — littérature.** Le biais de position est *mitigé* chez moi (mélange des
-    extraits) mais **jamais quantifié**. L'auto-préférence n'est pas mesurée du tout. À citer comme connus,
-    jamais comme mes résultats.
+  - **Position — mesuré chez moi depuis le 2026-09-23.** Le mélange des extraits le *mitige*, et il est
+    désormais **quantifié : 12 verdicts sur 60 basculent au seul réordonnancement du contexte**, à
+    récupération identique. Deux précisions à tenir en public : c'est un biais de position sur **l'ordre
+    des extraits récupérés**, pas sur l'ordre de deux réponses comparées comme dans le dispositif
+    *pairwise* ; et le mélange est **graîné par la question**, donc la mesure est reproductible.
+    *(Ce paragraphe disait « jamais quantifié » jusqu'au 2026-09-24 — c'était vrai à la rédaction, et
+    devenu faux. Corrigé pour ne pas s'interdire en public un chiffre qu'on possède.)*
+  - **Auto-préférence — littérature.** Pas mesurée du tout ici. À citer comme connue, jamais comme un
+    résultat propre.
 - **REX — une seule fuite, racontée en entier** : voir « La fuite retenue » plus bas.
 
 ## Partie 3 (6 min) — Le choix de l'infrastructure & l'implémentation (cas d'étude local)

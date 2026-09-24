@@ -327,3 +327,53 @@ RÉCUPÉRÉS — 12 verdicts sur 60 basculent au seul réordonnancement. Même
 phénomène de fond, dispositif différent. Le rapprochement est permis à condition
 de dire lequel a été mesuré.
 -->
+
+---
+
+## Première question : que ne PAS lui donner à juger
+
+Avant de dépenser un seul jeton :
+
+```
+  Est-ce que ça compile ?           →  le compilateur
+  Est-ce que le JSON est valide ?   →  un parseur
+  Est-ce que le style tient ?       →  le linter
+```
+
+Déterministe. Gratuit. Instantané. **Et ça ne se trompe jamais.**
+
+Mon filtre à moi : l'équilibrage des parenthèses et des accolades.
+C'est tout. **Ce n'est pas un filtre L0, c'est un début.**
+
+<!--
+Validé le 2026-09-24.
+
+Renversement assumé : on attend d'un talk sur les juges qu'il explique ce qu'on
+peut leur confier, et on ouvre sur ce qu'il faut leur RETIRER. C'est l'argument
+le plus solide de la partie, parce qu'il tient à la fois sur le prix et sur la
+fiabilité, sans compromis entre les deux.
+
+À dire : un compilateur répond en cinquante millisecondes, ne coûte rien et n'a
+pas d'humeur. Demander ça à un LLM, c'est payer pour une réponse moins fiable.
+
+À dire — l'aveu, et c'est là qu'il devient utile : si mon filtre est aussi mince,
+c'est que ce que je fais juger n'est pas du code compilable. Ce sont des
+explications en prose qui contiennent du code. « Est-ce que ça compile » ne
+s'applique donc pas directement — il faudrait extraire les blocs et les compiler
+à part. Je ne l'ai pas fait. C'est une raison, pas une excuse.
+
+Pourquoi l'aveu vaut mieux que le principe seul : un principe énoncé sans coût
+vécu s'écoute poliment ; suivi de « et moi je ne l'ai pas appliqué, voilà
+pourquoi », il se retient — la salle est dans la même situation. Même registre
+que l'aveu sur l'échelle 0-10 (quatrième point de la Partie 1).
+
+ACTION CONCRÈTE à proposer, ce qui manque souvent aux talks de méthode : extraire
+les blocs de code de la réponse et les passer au compilateur avant le juge.
+Faisable en une après-midi, mesurable, et personne dans la salle ne le fait.
+
+CARTE À REJOUER EN PARTIE 3 : la même idée reparaît sous une autre forme —
+hintCoverage, contrôle déterministe SANS LLM, qui classe Lucene et Neo4j dans le
+même ordre que le juge. Le filtre déterministe n'est donc pas seulement un
+économiseur de jetons en amont, c'est un instrument de validation croisée en
+aval. Poser l'idée proprement ici fait gagner la seconde occurrence.
+-->
