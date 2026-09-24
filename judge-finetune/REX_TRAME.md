@@ -100,41 +100,66 @@ biais de juge ; (2) un **banc d'essai des stratégies de récupération** ; (3) 
     36 Go. À répéter avant le jour J.
 - **Le banc d'essai** : Lucene contre GraphRAG-Neo4j, jugés par le même juge, sur les mêmes questions.
 
-### Le résultat, mesuré le 2026-09-23
+### Le résultat, mesuré le 2026-09-24
 
-Scénario `hybrid|hybrid-graph`, 60 questions sur la codebase réelle, juge 14B fine-tuné au
-checkpoint 200. Une heure de calcul, **1 jugement invalide sur 60 par stratégie**.
+Deux scénarios, 60 questions sur la codebase réelle, juge 14B fine-tuné au checkpoint 200, mélange
+du contexte **graîné par la question** — donc reproductible. Une heure par scénario.
+
+**Le contrôle d'équité d'abord**, parce qu'il valide tout le reste. Lucene est configuré à
+l'identique dans les deux scénarios : son taux **doit** être le même. Il l'est, au chiffre près —
+**48,3 %**, `hintCoverage` **0,697**, 2 invalides, dans les deux. La mesure est reproductible, et ce
+n'est pas un acquis : les runs de la veille, au mélange non graîné, faisaient bouger ce même bras de
+55,9 % à 43,3 %.
 
 | | Lucene | Neo4j |
 |---|---|---|
-| **Justesse (taux de PASS)** | **55,9 %** | **23,7 %** |
-| `hintCoverage` — **sans LLM** | **0,721** | 0,596 |
-| Cohérence du juge | 100 % | 96,6 % |
+| **Justesse (taux de PASS)** | **48,3 %** | **23,7 %** |
+| `hintCoverage` — **sans LLM** | **0,697** | 0,596 |
+| Contexte jugé insuffisant | 39,7 % | **66,1 %** |
+| Cohérence du juge | 100 % | 98,3 % |
 
-**McNemar exact bilatéral : p = 0,0009 sur 28 paires discordantes** — Lucene seul juste sur 23,
-Neo4j seul juste sur 5.
+**McNemar exact bilatéral : p = 0,0066 sur 24 paires discordantes** — Lucene seul juste sur 19,
+Neo4j seul juste sur 5. Seules les paires discordantes portent de l'information, et leur nombre est
+le vrai déterminant de la puissance à cet effectif : il est donné avec le p, jamais sans.
 
 **Le chiffre qui donne du poids au reste :** `hintCoverage` classe les deux stratégies dans le même
 ordre, et cette métrique **ne passe pas par le juge** — elle compte des identifiants attendus dans le
 contexte récupéré. La conclusion ne repose donc pas sur l'instrument seul. C'est une validation
 croisée qui ne coûte rien, et elle concorde.
 
-**Et un motif contre-intuitif, qu'une moyenne aurait noyé :**
+**L'attribution, tranchée par le contrôle d'équité :**
 
-| strate | Lucene | Neo4j | p |
-|---|---|---|---|
-| `LOCAL` | 52,6 % | 31,6 % | 0,508 — **non concluant** |
-| `STRUCTURAL` | 70,0 % | 30,0 % | 0,039 |
-| `CROSS_MODULE` | 45,0 % | 10,0 % | 0,016 |
+| scénario | Neo4j | écart | p | discordantes |
+|---|---|---|---|---|
+| `hybrid|hybrid-graph` — avec expansion K-hop | 22,0 % | +26,3 pts | 0,0041 | 25 |
+| `hybrid|hybrid` — **même preset des deux côtés** | 23,7 % | +24,6 pts | 0,0066 | 24 |
 
-**Le graphe perd le plus là où il devait gagner** — structure et traversée inter-modules — et l'écart
-n'est pas concluant sur la strate la plus simple.
+Retirer l'expansion de graphe ne fait gagner à Neo4j que **1,7 point, soit une question sur 59** —
+du bruit. **L'écart de ~25 points n'est donc pas imputable à la traversée de graphe : il vient du
+moteur de récupération lui-même.** C'est une nuance qui *affine* l'hypothèse de départ au lieu de la
+confirmer : ce n'est pas « le graphe est mal implémenté », c'est le pipeline Neo4j qui rappelle moins.
 
-> **Réserve à énoncer, elle limite ce que le chiffre autorise à dire.** Le scénario oppose Lucene en
-> preset `hybrid` à Neo4j en preset `hybrid-graph` : **deux moteurs ET deux presets diffèrent**. Les 32
-> points d'écart peuvent venir du moteur, de l'expansion K-hop, ou des deux. Le scénario
-> `hybrid|hybrid` — le contrôle d'équité — sépare les deux causes ; tant qu'il n'a pas tourné, « le
-> graphe est mal implémenté » reste une hypothèse de départ et non une conclusion de la mesure.
+**Et le mécanisme est lisible dans les contrôles atomiques** : le contexte Neo4j est jugé
+**insuffisant dans 66 % des cas** contre 39,7 % pour Lucene. Ce n'est pas un problème de bruit mal
+maîtrisé, c'est un **défaut de rappel** — le moteur ne rapporte pas assez de matière. C'est
+exactement ce que les critères atomiques apportent sur une note globale : ils disent *lequel* échoue.
+
+**Par strate, et il faut être honnête sur ce qui conclut :**
+
+| strate | Lucene | Neo4j | p | discordantes |
+|---|---|---|---|---|
+| `LOCAL` | 31,6 % | 20,0 % | 0,453 — **non concluant** | 7 |
+| `STRUCTURAL` | 63,2 % | 42,1 % | 0,508 — **non concluant** | 9 |
+| `CROSS_MODULE` | **50,0 %** | **10,0 %** | **0,0078** | 8 |
+
+**Un seul écart tient par strate : `CROSS_MODULE`**, et il est identique dans les deux scénarios.
+Les deux autres ne concluent pas — 7 à 10 paires discordantes ne suffisent pas, et c'est la limite de
+puissance annoncée d'avance, pas une surprise.
+
+> **Réserve de portée.** Ces chiffres valent pour *cette* implémentation Neo4j, à ces presets, sur
+> *cette* codebase, jugés par un juge dont l'alignement propre repose sur 6 items du golden set. Dire
+> « GraphRAG fait moins bien » serait un abus ; « ce pipeline-ci rappelle moins que Lucene sur ce
+> corpus » est ce que la mesure soutient.
 
 ## Partie 4 & Conclusion (3 min) — Calibration & triage humain dans la boucle
 
