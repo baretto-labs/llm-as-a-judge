@@ -921,33 +921,62 @@ jeu où 90 % des cas sont de la même classe, c'est zéro information.
 
 ---
 
-## Le κ de Cohen : enlever le hasard
+## κ de Cohen, sur un cas réel
 
 ```
-            accord observé  −  accord dû au hasard
-   κ   =   ──────────────────────────────────────────
-                  1  −  accord dû au hasard
+                       B dit PASS   B dit FAIL
+      A dit PASS            15           5      →   20
+      A dit FAIL             5          75      →   80
+                            20          80         100
 ```
 
-**κ = 1** → accord parfait.  **κ = 0** → pas mieux que le hasard.
+Ils sont d'accord sur **90 réponses sur 100.**
 
-Sur mon contrôle le plus fréquent : **78 % d'accord brut, mais κ = 0,386.**
+Le hasard seul en donnait déjà **68** :
+tous deux PASS → `20 % × 20 % = 4` · tous deux FAIL → `80 % × 80 % = 64`
 
-Les deux chiffres sont vrais. **Donner l'un sans l'autre trompe** — dans les
-deux sens.
+Il restait **32 points** à gagner. Ils en ont gagné **22.**
+
+**κ = 22 / 32 = 0,69**
 
 <!--
-Lire la formule à voix haute, une fois : on retire du numérateur ce que le hasard
-aurait donné, et on rapporte ça à la marge de progression qui restait. Ce qui
-reste est ce que les deux juges ont apporté en plus du hasard.
+Le résumé de la formule en une phrase : κ, c'est ce qu'on a gagné divisé par ce
+qu'il restait à gagner.
+
+Suivre le tableau à voix haute. Les deux relecteurs disent PASS une fois sur cinq
+chacun. Donc même en répondant au hasard, ils tomberaient d'accord 68 fois sur
+100 — 4 fois sur un PASS commun, 64 fois sur un FAIL commun. L'accord gratuit,
+c'est ça.
+
+Partant de 68, il ne restait que 32 points à conquérir. Ils en ont pris 22. D'où
+0,69, alors que l'accord brut affichait 90 %.
 
 L'échelle usuelle : au-dessus de 0,8 l'accord est fort, entre 0,6 et 0,8 il est
 correct, entre 0,4 et 0,6 il est moyen.
+-->
 
-Et le piège fonctionne dans les deux sens. Ici, 78 % d'accord brut pour un κ de
-0,386 : les marges sont très déséquilibrées, donc le κ paraît médiocre alors que
-les deux relecteurs se trompent rarement. Publier le κ seul sous-estime l'accord.
-Publier les 78 % seuls le surestime. Les deux vont ensemble, avec les marges.
+---
+
+## Et le piège marche dans les deux sens
+
+Sur mon contrôle le plus fréquent :
+
+**78 % d'accord brut.  κ = 0,386.**
+
+Les marges sont très déséquilibrées — donc le κ paraît médiocre
+alors que les deux relecteurs se trompent rarement.
+
+**Donner le κ seul sous-estime l'accord.
+Donner le pourcentage seul le surestime.**
+
+Les deux vont ensemble. Avec les marges.
+
+<!--
+C'est le contre-exemple de la diapositive précédente : là, le pourcentage
+flattait. Ici, c'est le κ qui accable à tort.
+
+Un κ bas ne veut donc pas toujours dire ce qu'on croit. Il faut regarder la
+répartition avant de juger le chiffre.
 
 C'est le genre de nuance qu'on a envie de sauter. C'est aussi celle qui fait la
 différence entre un chiffre qu'on affiche et un chiffre qu'on comprend.
