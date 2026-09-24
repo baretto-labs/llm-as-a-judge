@@ -241,3 +241,89 @@ Transition vers la Partie 1 : « Avant d'écrire une ligne de juge, il y a quatr
 questions à se poser — et la première, c'est ce qu'il ne faut surtout pas lui
 donner à évaluer. »
 -->
+
+---
+
+<!--
+PARTIE 1 (4 min) — La méthode : les questions à se poser avant de construire
+son juge.
+
+Les deux diapositives qui suivent ont été ajoutées le 2026-09-24 : le plan
+attaquait « les questions à se poser » sans avoir montré ce qu'était un juge.
+On ne peut pas poser de bonnes questions sur un objet qu'on n'a pas présenté.
+
+BUDGET : elles coûtent 60 à 75 s, et le plan tombait à 20 min pile sans marge
+(3+4+4+6+3). Dépassement assumé — Mehdi taillera après la présentation à ses
+associés. Ne pas l'oublier au moment de la répétition chronométrée.
+-->
+
+## LLM-as-a-Judge, en une image
+
+```
+  Question           ┐
+  Contexte récupéré  ├──►   JUGE   ──►   PASS / FAIL  + pourquoi
+  Réponse produite   ┘    (un LLM)
+```
+
+**Il ne génère pas la réponse. Il la juge.**
+
+Écrire un livre est difficile. Le lire et dire s'il est bon, beaucoup moins.
+
+→ un modèle plus petit suffit, et ça change le prix
+
+<!--
+Validé le 2026-09-24.
+
+TROIS entrées, pas une. Si on ne montre que « réponse → juge », on perd ce qui
+fait tout le talk : le juge voit aussi LE CONTEXTE RÉCUPÉRÉ, et c'est ce qui lui
+permet de dire « cette réponse est peut-être vraie, mais rien dans le contexte ne
+l'étaye ». Tout le banc Lucene/Neo4j repose là-dessus.
+
+La sortie est PASS / FAIL, jamais une note sur 10 : le juge gradué a été
+abandonné le 2026-09-13. Annoncer une note ici contredirait la Partie 2 dès la
+sixième diapositive.
+
+« Il ne génère pas, il juge » est la ligne la plus utile : c'est la confusion
+numéro un dans la salle. On croit qu'on demande au modèle de refaire le travail,
+alors qu'on lui demande de VÉRIFIER — deux tâches d'une difficulté très
+différente. L'analogie du livre porte le même argument, et la conséquence
+économique en découle au lieu d'être un point séparé.
+
+À dire : l'idée tient en une phrase, et c'est précisément pour ça qu'elle est
+dangereuse — elle a l'air gratuite.
+-->
+
+---
+
+## Trois façons de juger
+
+**1. Comparaison par paires**
+A contre B, puis B contre A pour neutraliser l'ordre
+→ classe deux systèmes. **Ne dit pas si l'un des deux est bon.**
+
+**2. Évaluation unique, avec référence**
+On fournit le corrigé attendu
+→ fiable, mais il faut **produire un corrigé par question**.
+
+**3. Évaluation unique, sans référence** ← *mon choix*
+Le juge applique une **grille de critères**
+→ pas de corrigé à écrire. **Tout repose sur la grille.**
+
+<!--
+Validé le 2026-09-24.
+
+À dire : sur du code, le corrigé est exactement ce que je n'ai pas — si je savais
+écrire la bonne réponse à mes 60 questions, je n'aurais pas besoin de RAG.
+
+Pourquoi ce découpage sert le plan : la troisième approche déplace le problème
+sur la grille, et « l'ingénierie des rubriques » est le titre de la Partie 2.
+Cette diapositive pose donc la question à laquelle la Partie 2 répond, sans
+avoir à l'annoncer.
+
+PRÉCISION À NE PAS CONFONDRE EN PUBLIC : le « A contre B, puis B contre A » de
+l'approche 1 neutralise le biais de position ENTRE DEUX RÉPONSES. Ce qui a été
+mesuré dans ce projet est un biais de position SUR L'ORDRE DES CONTEXTES
+RÉCUPÉRÉS — 12 verdicts sur 60 basculent au seul réordonnancement. Même
+phénomène de fond, dispositif différent. Le rapprochement est permis à condition
+de dire lequel a été mesuré.
+-->
