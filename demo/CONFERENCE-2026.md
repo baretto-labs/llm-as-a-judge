@@ -16,6 +16,18 @@
 #   docker run --rm -v "$(pwd)/demo:/home/marp/app" marpteam/marp-cli \
 #     CONFERENCE-2026.md --html --output CONFERENCE-2026.html
 #
+# STYLE — règle arrêtée le 2026-09-30, gouverne toute réécriture :
+#   · rien de pompeux, phrases courtes, une idée par phrase
+#   · une MÉTAPHORE explique, un exemple OLLAMASSIST illustre
+#   · famille de métaphores unique : le CORRECTEUR DE COPIES et son barème
+#       la grille = le barème · κ = deux correcteurs sur la même copie
+#       accord dû au hasard = deux correcteurs qui recalent tout le monde
+#       erreurs ratées = un correcteur indulgent
+#       verdict instable = deux notes pour la même copie
+#       renvoi à l'humain = la double correction
+#       filtre L0 = la copie hors-sujet, écartée avant lecture
+#   · les chiffres exacts, σ et intervalles descendent dans les notes orateur
+#
 # Ces lignes sont dans le front-matter et non en commentaire HTML : un
 # commentaire HTML placé avant la première diapositive devient sa note orateur.
 # ---------------------------------------------------------------------------
@@ -1143,6 +1155,45 @@ plus indulgente que ce qu'un humain aurait produit seul.
 
 ---
 
+## Un correcteur indulgent a l'air fiable
+
+Un correcteur qui valide presque tout se trompe rarement.
+Il ne se trompe que sur les copies qu'il aurait dû recaler.
+
+```
+   27 mauvaises copies   →  il en recale 16.  Il en laisse passer 11.
+   23 bonnes copies      →  il en valide 22.
+```
+
+**76 % de décisions justes. Et 4 défauts sur 10 qui passent.**
+
+Le même juge. Deux chiffres. **Ne publiez jamais le premier sans le second.**
+
+<!--
+C'est le piège le plus courant, et il est flatteur. Un juge qui répondrait PASS à
+tout sur un corpus où 95 % des réponses sont bonnes afficherait 95 %
+d'exactitude — et attraperait zéro erreur.
+
+Exemple OllamAssist : un défaut qui passe, c'est une explication fausse sur ma
+propre codebase livrée à l'utilisateur. Un bon code recalé, c'est juste une
+relecture inutile. Les deux erreurs n'ont pas le même prix, donc elles ne se
+résument pas en un seul pourcentage.
+
+Si le juge est une porte, c'est le taux d'erreurs attrapées qui décide. S'il est
+un thermomètre, l'exactitude suffit.
+
+⚠ Chiffres, si la question vient : 16 erreurs détectées sur 27 (59 %) et 22
+bonnes réponses validées sur 23 (96 %) pour le fine-tuné ; 17 sur 27 (63 %) et 21
+sur 23 (91 %) pour la baseline. L'écart entre les deux variantes est d'UN item :
+c'est du bruit, ne pas l'interpréter.
+
+Et ça recoupe deux autres mesures qui disent la même chose : 46 % de faux PASS
+sur les défauts verbeux, et un juge qui rend PASS 64 % du temps là où l'étalon en
+compte 46 %. Trois mesures indépendantes, un même diagnostic : il est indulgent.
+-->
+
+---
+
 ## Le fine-tuning a-t-il amélioré mon juge ?
 
 | | Justesse | Format exploitable | Stabilité du verdict |
@@ -1153,6 +1204,8 @@ plus indulgente que ce qu'un humain aurait produit seul.
 
 **Δ = 0,0 %. McNemar p = 1,0000 sur 12 paires discordantes — 6 d'un côté,
 6 de l'autre.**
+
+Et les deux **ratent 4 erreurs sur 10.** L'exactitude ne le dit pas.
 
 **Non concluant** — et cette issue était **écrite avant** de lancer la mesure.
 
