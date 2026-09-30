@@ -457,21 +457,85 @@ La classe LLMJudge est marquée @deprecated depuis le 2026-09-13, avec la raison
 ```
   ✗  « La réponse est-elle de bonne qualité ? »
 
-  ✓  exactitude_technique      les API citées existent et font ce qui est dit
-  ✓  absence_de_bugs           le code proposé ne casse pas à l'exécution
-  ✓  contexte_suffisant        le contexte permet de répondre sans deviner
+  ✓  trois questions auxquelles on répond par oui ou non
 ```
 
-Un critère qu'on ne peut pas trancher seul est un critère **mal écrit**.
+Et un critère se formule comme **une question sur le texte**,
+jamais comme une propriété du monde.
 
 <!--
-Le test d'un bon critère : deux personnes qui lisent la même réponse doivent
-répondre pareil, sans se parler. Si elles hésitent, ce n'est pas la réponse qui
-est ambiguë, c'est le critère.
+Personne ne peut démontrer qu'un code n'a pas de bugs. On peut seulement dire si
+on en a repéré un. La nuance décide de tout : on détecte, on ne démontre pas.
 
-« contexte_suffisant » est le critère qui porte tout le banc RAG : il ne demande
-pas si la réponse est vraie, il demande si le contexte permettait d'y répondre.
-C'est ce qui distingue un défaut de récupération d'un défaut de génération.
+Le test d'un bon critère : deux personnes qui lisent la même réponse répondent
+pareil, sans se parler. Si elles hésitent, ce n'est pas la réponse qui est
+ambiguë, c'est le critère.
+-->
+
+---
+
+## Mes critères, et d'où ils viennent
+
+Ils ne sont **pas une liste que j'ai choisie.**
+
+```
+  GÉNÉRIQUES — toute analyse de code            sur 150 / 150 exemples
+    les faits techniques affirmés sont-ils vrais ?
+    un défaut visible rend-il la réponse fausse ?
+    la réponse fait-elle ce qui était demandé ?
+
+  PAR TYPE DE TÂCHE — ici, juger un contexte RAG       25 exemples
+    le contexte est-il pertinent ?
+    permet-il de répondre sans rien supposer ?
+    le bruit reste-t-il maîtrisé ?
+
+  DICTÉS PAR LA REQUÊTE — lus dans la demande       9 critères
+    « sans dépendance externe »  →  aucune_dependance_externe
+    « sans changer la signature » →  signature_publique_inchangee
+```
+
+<!--
+C'est la réponse à « comment savez-vous que ce sont les bons critères ». Je ne le
+décide pas pour la troisième catégorie : je la lis dans la requête. Si la demande
+impose une contrainte, elle devient un critère nommé. Sinon il n'existe pas.
+
+Exemple OllamAssist : « refactorise cette méthode avec l'API Stream, sans changer
+la signature publique ». La contrainte est dans la phrase. Le critère aussi.
+
+Il y a neuf critères de ce type dans mon corpus, chacun apparaissant deux à six
+fois. Ce sont les cas où la requête était précise.
+-->
+
+---
+
+## Les trois tests d'un bon critère
+
+**1. Décidable** — la réponse se lit dans ce qui est fourni.
+
+**2. Falsifiable** — je sais dire ce qui le rendrait faux.
+
+**3. Reproductible** — deux personnes répondent pareil.
+**Et celui-là, il se mesure.**
+
+Mon plus mauvais critère : **`respect_consignes`, κ = 0,386.**
+
+C'est aussi **le seul qui n'a pas de définition propre** — il hérite de la
+requête. Ce n'est pas un hasard.
+
+<!--
+Les deux premiers tests sont des règles d'écriture. Le troisième est une mesure —
+et c'est le seul qui tranche vraiment.
+
+L'aveu, et il vaut mieux que n'importe quelle justification : mon critère le plus
+ambigu est celui qui n'en est pas vraiment un. « respect_consignes » est un
+fourre-tout, il change de sens à chaque requête, et il a le pire accord entre
+relecteurs de toute ma grille.
+
+Le correctif est déjà dans le corpus : quand la contrainte est explicite, je la
+sors en critère nommé. Les neuf critères dictés par la requête sont exactement la
+décomposition de ce fourre-tout.
+
+Un critère qui échoue au troisième test doit être réécrit ou découpé. Pas défendu.
 -->
 
 ---
@@ -1217,23 +1281,92 @@ réalisé.
 
 ---
 
-## Garder l'humain, mais au bon endroit
-
-**Automatiser les décisions nettes. Router les cas ambigus.**
-
-Le signal de confiance existe déjà : **la stabilité du verdict** sur plusieurs
-passes.
+## Qui décide quoi
 
 ```
-   verdict stable sur 3 passes   →  décision automatique
-   verdict instable              →  file de relecture humaine
+  déterministe ?     →  le compilateur, le parseur, le linter
+                        ni juge, ni humain
+
+  juge d'accord      →  automatique
+  avec lui-même ?       PASS ⟺ tous les contrôles vrais
+
+  juge instable ?    →  un humain
+                        le seul cas légitime
 ```
 
-Un item instable n'est pas un échec du juge.
-**C'est un item qui mérite un humain.**
+Un humain n'intervient pas « parfois ». Il intervient quand **le juge s'est
+contredit d'une passe à l'autre** — ce qui est mesuré, pas ressenti.
 
 Et le signal fonctionne : **83 %** de verdicts justes sur les items stables,
 **67 %** sur les instables.
+
+<!--
+« Parfois un humain » n'est pas une politique. Il faut un déclencheur mesurable,
+et il existe déjà dans le harnais : je fais trois passes pour mesurer la
+répétabilité, le même chiffre sert à trier.
+
+⚠ Réserve sur le 83 / 67 : 29 items stables contre 21 instables. C'est une
+tendance, pas un effet établi — mais elle va dans le même sens sur les deux
+variantes mesurées, baseline comprise (79 % contre 67 %).
+
+Ça referme aussi la partie sur la fuite : c'est un humain qui a trouvé ce que
+douze mesures avaient manqué, parce qu'il a changé d'avis sur un item.
+L'instabilité est un signal, chez le juge comme chez le relecteur.
+-->
+
+---
+
+## Et quand il n'y a pas d'humain ?
+
+Parce que c'est le cas par défaut.
+
+**Une porte** — la CI, la non-régression
+→ l'item instable compte **FAIL**. On bloque.
+Un doute doit coûter, sinon il ne sert à rien.
+
+**Une mesure** — un échantillonnage descriptif
+→ l'item instable est **exclu du taux, et compté à part.**
+On ne le force pas, on le déclare.
+
+**Même signal. Deux politiques.** Parce que se tromper ne coûte pas pareil.
+
+<!--
+C'est la question qu'on m'a posée et à laquelle je n'avais pas répondu : on ne
+peut pas demander une relecture humaine à chaque fois. Personne ne fait vérifier
+ses tests unitaires par un collègue à chaque échec.
+
+Donc la règle par défaut doit être déclarée à l'avance, et elle dépend de ce que
+le juge garde : une porte ou un thermomètre.
+
+Le piège à éviter dans les deux cas : compter l'item douteux comme un succès.
+C'est le seul choix qui se retourne toujours contre vous.
+-->
+
+---
+
+## Le seuil n'est pas statistique. C'est votre budget.
+
+Mon filtre de recevabilité exigeait **95 % de verdicts stables.**
+
+**95 % de stabilité = 1 item sur 20 à relire.**
+Si vous pouvez en relire un sur vingt, il vous faut 95 %.
+
+Mon juge est à **58 %** — soit **21 items sur 50.**
+Quatre fois mon budget.
+
+**C'est pour ça qu'il n'est pas prêt pour la production.**
+
+<!--
+Ce seuil avait l'air arbitraire quand je l'ai écrit. Il ne l'est pas : il se
+déduit de la quantité de relecture humaine qu'on peut réellement fournir.
+
+Et le raisonnement s'inverse : commencez par votre budget. Combien d'items par
+semaine un humain peut-il relire ? Ça vous donne le taux de stabilité qu'il faut
+atteindre, et donc si votre juge est utilisable ou pas.
+
+Je préfère finir là-dessus qu'en annonçant une réussite : le juge que je viens de
+vous présenter échoue à son propre filtre, et je peux vous dire de combien.
+-->
 
 <!--
 Ça ne s'invente pas, ça se lit dans le harnais : je fais déjà trois passes pour
