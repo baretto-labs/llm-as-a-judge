@@ -845,18 +845,17 @@ est automatisé — et j'y reviens à la fin, avec le triage.
 
 Un MacBook Pro M3 Pro, 36 Go. **Aucun service cloud, aucun jeton facturé.**
 
-| | |
-|---|---|
-| Modèle | Qwen2.5-Coder-14B, quantifié 4 bits — **8,3 Go** |
-| Entraînement | QLoRA via MLX, 400 itérations |
-| Durée | **90 min 58 s** |
-| Pic mémoire | **11,32 Go** sur 36 |
-| Adaptateur produit | **43,8 Mo** — 0,078 % des paramètres |
+**91 minutes** d'entraînement.
+**11,3 Go** de mémoire au pic, sur 36 disponibles.
+**43,8 Mo** d'adaptateur produit — 0,078 % des paramètres du modèle.
 
 **Le fine-tuning d'un juge n'est pas un projet d'infrastructure.
 C'est une soirée.**
 
 <!--
+Les chiffres exacts, si la question vient : Qwen2.5-Coder-14B quantifié en 4 bits,
+8,3 Go sur disque, QLoRA via MLX, 400 itérations, 13,65 s par itération, 169 513
+jetons entraînés.
 Le message de cette diapositive est le prix d'entrée, pas la performance. Tout
 le monde dans la salle a la machine qu'il faut.
 
@@ -933,14 +932,16 @@ rejoue pas n'est pas une mesure.
 
 | | Lucene | Neo4j |
 |---|---|---|
-| **Justesse (taux de PASS)** | **48,3 %** | **23,7 %** |
+| **Réponses justes** | **48,3 %** | **23,7 %** |
 | Contexte jugé insuffisant | 39,7 % | **66,1 %** |
-| Cohérence du juge | 100 % | 98,3 % |
 
 **McNemar exact bilatéral : p = 0,0066 sur 24 paires discordantes**
 — Lucene seul juste sur 19, Neo4j seul juste sur 5.
 
 <!--
+Chiffre retiré de l'écran mais disponible : la cohérence du juge, c'est-à-dire la
+part des verdicts qui correspondent bien à ses propres contrôles, est de 100 %
+pour Lucene et 98,3 % pour Neo4j.
 Seules les paires discordantes portent de l'information : les questions où les
 deux stratégies font pareil ne départagent rien. Leur nombre est le vrai
 déterminant de la puissance à cet effectif, donc je le donne avec le p, jamais
@@ -997,12 +998,11 @@ systèmes.
 `hintCoverage` — on compte les identifiants attendus
 présents dans le contexte récupéré. **Aucun LLM.**
 
-| | Lucene | Neo4j |
-|---|---|---|
-| Taux de PASS (par le juge) | 48,3 % | 23,7 % |
-| `hintCoverage` (**sans juge**) | **0,697** | 0,596 |
+**Lucene 0,697. Neo4j 0,596.**
 
-**Même ordre. La conclusion ne repose donc pas sur l'instrument seul.**
+Le même ordre que le juge — sans juge.
+
+**La conclusion ne repose donc pas sur l'instrument seul.**
 
 <!--
 C'est le filtre déterministe du début du talk, qui revient sous une autre forme.
@@ -1018,16 +1018,12 @@ résultat, pas après.
 
 ## Moteur ou graphe ? Le contrôle d'équité
 
-Deux scénarios. Dans les deux, **Lucene est configuré à l'identique** :
-son taux **doit** être le même.
+J'ai rejoué les 60 questions **sans** le parcours de graphe.
 
-| scénario | Lucene | Neo4j | écart |
-|---|---|---|---|
-| avec expansion K-hop | **48,3 %** | 22,0 % | +26,3 pts |
-| **sans** expansion K-hop | **48,3 %** | 23,7 % | +24,6 pts |
+Lucene est configuré à l'identique : son taux **doit** être le même.
+Il l'est. **48,3 %, à la décimale, et sur chacun des trois niveaux.**
 
-Retirer le parcours de graphe rapporte à Neo4j **1,7 point — une question
-sur 59.**
+Le témoin n'a pas bougé. Neo4j, lui, gagne **1,7 point — une question sur 59.**
 
 **L'écart vient du moteur de récupération, pas de la traversée de graphe.**
 
@@ -1045,17 +1041,20 @@ matière. Ce n'est pas la même critique, et ce n'est pas le même correctif.
 
 ## Par niveau : ce qui conclut, et ce qui ne conclut pas
 
-| niveau | Lucene | Neo4j | qui gagne les paires | p |
-|---|---|---|---|---|
-| `LOCAL` | 31,6 % | 20,0 % | 5 – 2 | 0,453 |
-| `STRUCTURAL` | 63,2 % | 42,1 % | 6 – 3 | 0,508 |
-| `CROSS_MODULE` | **50,0 %** | **10,0 %** | **8 – 0** | **0,0078** |
+Sur les trois niveaux, un seul écart tient : les questions **inter-modules**.
 
-**5 piles sur 7, c'est banal. 6 sur 9 aussi. 8 sur 8, non.**
+Là, sur les 8 questions où les deux stratégies ont divergé,
+**Lucene a gagné les 8.** Huit piles d'affilée.
 
-Un seul écart tient — et c'est une limite **annoncée d'avance**, pas une surprise.
+Sur les deux autres niveaux : 5 piles sur 7, et 6 sur 9. **Banal.**
+
+**Deux écarts sur trois ne concluent pas** — et c'était une limite annoncée
+d'avance, pas une surprise.
 
 <!--
+Les chiffres par niveau, si on les demande : LOCAL 31,6 % contre 20,0 %, 5 paires
+contre 2, p = 0,453. STRUCTURAL 63,2 % contre 42,1 %, 6 contre 3, p = 0,508.
+CROSS_MODULE 50,0 % contre 10,0 %, 8 contre 0, p = 0,0078.
 Il aurait été facile de présenter les trois lignes comme trois résultats : les
 écarts bruts vont tous dans le même sens. Mais 5 ou 6 paires gagnées ne
 départagent rien, et je le savais avant de lancer.
@@ -1289,11 +1288,13 @@ compte 46 %. Trois mesures indépendantes, un même diagnostic : il est indulgen
 
 ## Le fine-tuning a-t-il amélioré mon juge ?
 
-| | Justesse | Format exploitable | Stabilité du verdict |
-|---|---|---|---|
-| Invite nue | 0 % | **0 %** | 0 % |
-| **+ conventions écrites** | **76,0 %** | 100 % | **76 %** |
-| **Fine-tuné** (91 min) | **76,0 %** | 100 % | 58 % |
+| | Réponses justes | Format exploitable |
+|---|---|---|
+| Invite nue | 0 % | **0 %** |
+| **+ conventions écrites** | **76,0 %** | 100 % |
+| **Fine-tuné** (91 min) | **76,0 %** | 100 % |
+
+La stabilité du verdict, elle, **baisse** — j'y viens juste après.
 
 **Δ = 0,0 %. McNemar p = 1,0000 sur 12 paires discordantes — 6 d'un côté,
 6 de l'autre.**

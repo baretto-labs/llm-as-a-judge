@@ -1195,36 +1195,9 @@ section.title { justify-content: center; }
 ;background-color:#ffffff;background-image:none;" data-marpit-pagination-total="49">
 <h2 id="tout-en-local-et-pourquoi">Tout en local, et pourquoi</h2>
 <p>Un MacBook Pro M3 Pro, 36 Go. <strong>Aucun service cloud, aucun jeton facturé.</strong></p>
-<table>
-<thead>
-<tr>
-<th></th>
-<th></th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Modèle</td>
-<td>Qwen2.5-Coder-14B, quantifié 4 bits — <strong>8,3 Go</strong></td>
-</tr>
-<tr>
-<td>Entraînement</td>
-<td>QLoRA via MLX, 400 itérations</td>
-</tr>
-<tr>
-<td>Durée</td>
-<td><strong>90 min 58 s</strong></td>
-</tr>
-<tr>
-<td>Pic mémoire</td>
-<td><strong>11,32 Go</strong> sur 36</td>
-</tr>
-<tr>
-<td>Adaptateur produit</td>
-<td><strong>43,8 Mo</strong> — 0,078 % des paramètres</td>
-</tr>
-</tbody>
-</table>
+<p><strong>91 minutes</strong> d'entraînement.<br />
+<strong>11,3 Go</strong> de mémoire au pic, sur 36 disponibles.<br />
+<strong>43,8 Mo</strong> d'adaptateur produit — 0,078 % des paramètres du modèle.</p>
 <p><strong>Le fine-tuning d'un juge n'est pas un projet d'infrastructure.<br />
 C'est une soirée.</strong></p>
 </section>
@@ -1373,7 +1346,7 @@ section.title { justify-content: center; }
 </thead>
 <tbody>
 <tr>
-<td><strong>Justesse (taux de PASS)</strong></td>
+<td><strong>Réponses justes</strong></td>
 <td><strong>48,3 %</strong></td>
 <td><strong>23,7 %</strong></td>
 </tr>
@@ -1381,11 +1354,6 @@ section.title { justify-content: center; }
 <td>Contexte jugé insuffisant</td>
 <td>39,7 %</td>
 <td><strong>66,1 %</strong></td>
-</tr>
-<tr>
-<td>Cohérence du juge</td>
-<td>100 %</td>
-<td>98,3 %</td>
 </tr>
 </tbody>
 </table>
@@ -1473,28 +1441,9 @@ section.title { justify-content: center; }
 <h2 id="le-contr%C3%B4le-qui-ne-passe-pas-par-le-juge">Le contrôle qui ne passe pas par le juge</h2>
 <p><code>hintCoverage</code> — on compte les identifiants attendus<br />
 présents dans le contexte récupéré. <strong>Aucun LLM.</strong></p>
-<table>
-<thead>
-<tr>
-<th></th>
-<th>Lucene</th>
-<th>Neo4j</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Taux de PASS (par le juge)</td>
-<td>48,3 %</td>
-<td>23,7 %</td>
-</tr>
-<tr>
-<td><code>hintCoverage</code> (<strong>sans juge</strong>)</td>
-<td><strong>0,697</strong></td>
-<td>0,596</td>
-</tr>
-</tbody>
-</table>
-<p><strong>Même ordre. La conclusion ne repose donc pas sur l'instrument seul.</strong></p>
+<p><strong>Lucene 0,697. Neo4j 0,596.</strong></p>
+<p>Le même ordre que le juge — sans juge.</p>
+<p><strong>La conclusion ne repose donc pas sur l'instrument seul.</strong></p>
 </section>
 </foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="32" data-paginate="true" data-background-color="#ffffff" data-theme="default" data-style="section {
   font-family: 'Segoe UI', system-ui, sans-serif;
@@ -1530,34 +1479,10 @@ section.title { justify-content: center; }
 .carte img { border: 1px solid #e5e5e5; border-radius: 6px; flex: none; }
 ;background-color:#ffffff;background-image:none;" data-marpit-pagination-total="49">
 <h2 id="moteur-ou-graphe--le-contr%C3%B4le-d%C3%A9quit%C3%A9">Moteur ou graphe ? Le contrôle d'équité</h2>
-<p>Deux scénarios. Dans les deux, <strong>Lucene est configuré à l'identique</strong> :<br />
-son taux <strong>doit</strong> être le même.</p>
-<table>
-<thead>
-<tr>
-<th>scénario</th>
-<th>Lucene</th>
-<th>Neo4j</th>
-<th>écart</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>avec expansion K-hop</td>
-<td><strong>48,3 %</strong></td>
-<td>22,0 %</td>
-<td>+26,3 pts</td>
-</tr>
-<tr>
-<td><strong>sans</strong> expansion K-hop</td>
-<td><strong>48,3 %</strong></td>
-<td>23,7 %</td>
-<td>+24,6 pts</td>
-</tr>
-</tbody>
-</table>
-<p>Retirer le parcours de graphe rapporte à Neo4j <strong>1,7 point — une question<br />
-sur 59.</strong></p>
+<p>J'ai rejoué les 60 questions <strong>sans</strong> le parcours de graphe.</p>
+<p>Lucene est configuré à l'identique : son taux <strong>doit</strong> être le même.<br />
+Il l'est. <strong>48,3 %, à la décimale, et sur chacun des trois niveaux.</strong></p>
+<p>Le témoin n'a pas bougé. Neo4j, lui, gagne <strong>1,7 point — une question sur 59.</strong></p>
 <p><strong>L'écart vient du moteur de récupération, pas de la traversée de graphe.</strong></p>
 </section>
 </foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="33" data-paginate="true" data-background-color="#ffffff" data-theme="default" data-style="section {
@@ -1594,42 +1519,12 @@ section.title { justify-content: center; }
 .carte img { border: 1px solid #e5e5e5; border-radius: 6px; flex: none; }
 ;background-color:#ffffff;background-image:none;" data-marpit-pagination-total="49">
 <h2 id="par-niveau--ce-qui-conclut-et-ce-qui-ne-conclut-pas">Par niveau : ce qui conclut, et ce qui ne conclut pas</h2>
-<table>
-<thead>
-<tr>
-<th>niveau</th>
-<th>Lucene</th>
-<th>Neo4j</th>
-<th>qui gagne les paires</th>
-<th>p</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>LOCAL</code></td>
-<td>31,6 %</td>
-<td>20,0 %</td>
-<td>5 – 2</td>
-<td>0,453</td>
-</tr>
-<tr>
-<td><code>STRUCTURAL</code></td>
-<td>63,2 %</td>
-<td>42,1 %</td>
-<td>6 – 3</td>
-<td>0,508</td>
-</tr>
-<tr>
-<td><code>CROSS_MODULE</code></td>
-<td><strong>50,0 %</strong></td>
-<td><strong>10,0 %</strong></td>
-<td><strong>8 – 0</strong></td>
-<td><strong>0,0078</strong></td>
-</tr>
-</tbody>
-</table>
-<p><strong>5 piles sur 7, c'est banal. 6 sur 9 aussi. 8 sur 8, non.</strong></p>
-<p>Un seul écart tient — et c'est une limite <strong>annoncée d'avance</strong>, pas une surprise.</p>
+<p>Sur les trois niveaux, un seul écart tient : les questions <strong>inter-modules</strong>.</p>
+<p>Là, sur les 8 questions où les deux stratégies ont divergé,<br />
+<strong>Lucene a gagné les 8.</strong> Huit piles d'affilée.</p>
+<p>Sur les deux autres niveaux : 5 piles sur 7, et 6 sur 9. <strong>Banal.</strong></p>
+<p><strong>Deux écarts sur trois ne concluent pas</strong> — et c'était une limite annoncée<br />
+d'avance, pas une surprise.</p>
 </section>
 </foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="34" data-paginate="true" data-background-color="#ffffff" data-theme="default" data-style="section {
   font-family: 'Segoe UI', system-ui, sans-serif;
@@ -2006,9 +1901,8 @@ section.title { justify-content: center; }
 <thead>
 <tr>
 <th></th>
-<th>Justesse</th>
+<th>Réponses justes</th>
 <th>Format exploitable</th>
-<th>Stabilité du verdict</th>
 </tr>
 </thead>
 <tbody>
@@ -2016,22 +1910,20 @@ section.title { justify-content: center; }
 <td>Invite nue</td>
 <td>0 %</td>
 <td><strong>0 %</strong></td>
-<td>0 %</td>
 </tr>
 <tr>
 <td><strong>+ conventions écrites</strong></td>
 <td><strong>76,0 %</strong></td>
 <td>100 %</td>
-<td><strong>76 %</strong></td>
 </tr>
 <tr>
 <td><strong>Fine-tuné</strong> (91 min)</td>
 <td><strong>76,0 %</strong></td>
 <td>100 %</td>
-<td>58 %</td>
 </tr>
 </tbody>
 </table>
+<p>La stabilité du verdict, elle, <strong>baisse</strong> — j'y viens juste après.</p>
 <p><strong>Δ = 0,0 %. McNemar p = 1,0000 sur 12 paires discordantes — 6 d'un côté,<br />
 6 de l'autre.</strong></p>
 <p>Et les deux <strong>ratent 4 erreurs sur 10.</strong> L'exactitude ne le dit pas.</p>
@@ -2671,7 +2563,10 @@ incohérence dans son propre comportement, et c'est en la creusant que la règle
 est apparue.
 
 C'est l'argument central pour garder un humain dans la boucle, même quand tout
-est automatisé — et j'y reviens à la fin, avec le triage.</p></div><div class="bespoke-marp-note" data-index="25" tabindex="0"><p>Le message de cette diapositive est le prix d'entrée, pas la performance. Tout
+est automatisé — et j'y reviens à la fin, avec le triage.</p></div><div class="bespoke-marp-note" data-index="25" tabindex="0"><p>Les chiffres exacts, si la question vient : Qwen2.5-Coder-14B quantifié en 4 bits,
+8,3 Go sur disque, QLoRA via MLX, 400 itérations, 13,65 s par itération, 169 513
+jetons entraînés.
+Le message de cette diapositive est le prix d'entrée, pas la performance. Tout
 le monde dans la salle a la machine qu'il faut.
 
 Et une correction à raconter : j'ai d'abord publié 76 minutes. Ma méthode de
@@ -2701,7 +2596,10 @@ attend le graphe.
 
 Le mélange graîné par la question n'est pas un détail : sans graine, les runs de
 la veille faisaient bouger le même bras de 55,9 % à 43,3 %. Une mesure qui ne se
-rejoue pas n'est pas une mesure.</p></div><div class="bespoke-marp-note" data-index="28" tabindex="0"><p>Seules les paires discordantes portent de l'information : les questions où les
+rejoue pas n'est pas une mesure.</p></div><div class="bespoke-marp-note" data-index="28" tabindex="0"><p>Chiffre retiré de l'écran mais disponible : la cohérence du juge, c'est-à-dire la
+part des verdicts qui correspondent bien à ses propres contrôles, est de 100 %
+pour Lucene et 98,3 % pour Neo4j.
+Seules les paires discordantes portent de l'information : les questions où les
 deux stratégies font pareil ne départagent rien. Leur nombre est le vrai
 déterminant de la puissance à cet effectif, donc je le donne avec le p, jamais
 sans.
@@ -2735,7 +2633,10 @@ bougé, je n'aurais rien pu conclure du tout.
 
 Et ça affine l'hypothèse de départ au lieu de la confirmer. Je ne dis pas « le
 graphe est mal implémenté » : je dis que le pipeline Neo4j rappelle moins de
-matière. Ce n'est pas la même critique, et ce n'est pas le même correctif.</p></div><div class="bespoke-marp-note" data-index="32" tabindex="0"><p>Il aurait été facile de présenter les trois lignes comme trois résultats : les
+matière. Ce n'est pas la même critique, et ce n'est pas le même correctif.</p></div><div class="bespoke-marp-note" data-index="32" tabindex="0"><p>Les chiffres par niveau, si on les demande : LOCAL 31,6 % contre 20,0 %, 5 paires
+contre 2, p = 0,453. STRUCTURAL 63,2 % contre 42,1 %, 6 contre 3, p = 0,508.
+CROSS_MODULE 50,0 % contre 10,0 %, 8 contre 0, p = 0,0078.
+Il aurait été facile de présenter les trois lignes comme trois résultats : les
 écarts bruts vont tous dans le même sens. Mais 5 ou 6 paires gagnées ne
 départagent rien, et je le savais avant de lancer.
 
