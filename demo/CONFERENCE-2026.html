@@ -377,15 +377,12 @@ section.title { justify-content: center; }
 .carte img { border: 1px solid #e5e5e5; border-radius: 6px; flex: none; }
 ;background-color:#ffffff;background-image:none;" data-marpit-pagination-total="49">
 <h2 id="trois-fa%C3%A7ons-de-juger">Trois façons de juger</h2>
-<p><strong>1. Comparaison par paires</strong><br />
-A contre B, puis B contre A pour neutraliser l'ordre<br />
-→ classe deux systèmes. <strong>Ne dit pas si l'un des deux est bon.</strong></p>
-<p><strong>2. Évaluation unique, avec référence</strong><br />
-On fournit le corrigé attendu<br />
-→ fiable, mais il faut <strong>produire un corrigé par question</strong>.</p>
-<p><strong>3. Évaluation unique, sans référence</strong> ← <em>mon choix</em><br />
-Le juge applique une <strong>grille de critères</strong><br />
-→ pas de corrigé à écrire. <strong>Tout repose sur la grille.</strong></p>
+<p><strong>1. Deux copies côte à côte</strong> — « laquelle est la meilleure ? »<br />
+Je sais les classer. <strong>Je ne sais pas si l'une mérite la moyenne.</strong></p>
+<p><strong>2. Le corrigé type</strong> — je compare la copie au corrigé.<br />
+Fiable. Mais il faut <strong>écrire le corrigé de chaque question.</strong></p>
+<p><strong>3. Le barème seul</strong> — pas de corrigé, une liste de points à vérifier.<br />
+← <em>mon choix</em> · <strong>Tout repose alors sur le barème.</strong></p>
 </section>
 </foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="9" data-paginate="true" data-background-color="#ffffff" data-theme="default" data-style="section {
   font-family: 'Segoe UI', system-ui, sans-serif;
@@ -421,14 +418,12 @@ section.title { justify-content: center; }
 .carte img { border: 1px solid #e5e5e5; border-radius: 6px; flex: none; }
 ;background-color:#ffffff;background-image:none;" data-marpit-pagination-total="49">
 <h2 id="premi%C3%A8re-question--que-ne-pas-lui-donner-%C3%A0-juger">Première question : que ne PAS lui donner à juger</h2>
-<p>Avant de dépenser un seul jeton :</p>
-<pre is="marp-pre" data-auto-scaling="downscale-only"><code>  Est-ce que ça compile ?           →  le compilateur
-  Est-ce que le JSON est valide ?   →  un parseur
-  Est-ce que le style tient ?       →  le linter
-</code></pre>
-<p>Déterministe. Gratuit. Instantané. <strong>Et ça ne se trompe jamais.</strong></p>
-<p>Mon filtre à moi : l'équilibrage des parenthèses et des accolades.<br />
-C'est tout. <strong>Ce n'est pas un filtre L0, c'est un début.</strong></p>
+<p><strong>Tout ce qui est déterministe ne passe pas par le juge.</strong></p>
+<p>Ça compile ? Le JSON est valide ? Le style tient ?<br />
+→ <strong>le compilateur, un parseur, le linter.</strong></p>
+<p>La copie hors-sujet est écartée <strong>avant</strong> d'être lue.</p>
+<p>Mon filtre à moi : l'équilibrage des parenthèses.<br />
+C'est tout. <strong>Ce n'est pas un filtre, c'est un début.</strong></p>
 </section>
 </foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="10" data-paginate="true" data-background-color="#ffffff" data-theme="default" data-style="section {
   font-family: 'Segoe UI', system-ui, sans-serif;
@@ -464,13 +459,14 @@ section.title { justify-content: center; }
 .carte img { border: 1px solid #e5e5e5; border-radius: 6px; flex: none; }
 ;background-color:#ffffff;background-image:none;" data-marpit-pagination-total="49">
 <h2 id="deuxi%C3%A8me-question--quand-%C3%A9valuer">Deuxième question : quand évaluer ?</h2>
-<p><strong>OFFLINE</strong> — dans la CI, sur un jeu de questions figé<br />
-Rejoue les <strong>mêmes</strong> questions à chaque modification.<br />
-→ détecte la régression. <strong>Exige un corpus.</strong></p>
-<p><strong>ONLINE</strong> — en production, par échantillonnage<br />
-Juge un échantillon des vraies conversations.<br />
-→ détecte l'imprévu. <strong>Ne compare rien.</strong></p>
-<p>Moi : <strong>100 % offline.</strong> Aucun échantillonnage de production.</p>
+<p><strong>Dans la CI, à chaque modification — la non-régression.</strong><br />
+Les <strong>mêmes</strong> questions, rejouées. Le corrigé type ou le barème : les deux<br />
+marchent, puisque les questions ne changent pas.</p>
+<p><strong>En production, par échantillonnage.</strong><br />
+Là, plus de questions figées : <strong>le barème seul.</strong><br />
+Combien, à quelle fréquence ? Ça dépend de trop de choses.<br />
+<strong>Un échantillon suffit.</strong></p>
+<p>Moi : <strong>100 % dans la CI.</strong> Aucun échantillonnage de production.</p>
 </section>
 </foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="11" data-paginate="true" data-background-color="#ffffff" data-theme="default" data-style="section {
   font-family: 'Segoe UI', system-ui, sans-serif;
@@ -507,13 +503,13 @@ section.title { justify-content: center; }
 ;background-color:#ffffff;background-image:none;" data-marpit-pagination-total="49">
 <h2 id="troisi%C3%A8me-question--quel-format-de-verdict">Troisième question : quel format de verdict ?</h2>
 <p>Pas une note sur 10. <strong>PASS / FAIL.</strong></p>
-<p>Chez un juge LLM, les échelles graduées donnent un <strong>faible accord entre juges</strong><br />
-et une <strong>forte variance</strong> des notes.</p>
-<p>Décomposer en questions binaires : <strong>+0,45 d'accord moyen</strong> entre 12 modèles<br />
-évaluateurs. <span class="ref">CheckEval, EMNLP 2025 — Lee et al.</span></p>
-<p>Biais de position, de verbosité, d'auto-préférence.<br />
-<span class="ref">Zheng et al., NeurIPS 2023 — MT-Bench</span></p>
-<p><strong>Ça, je ne l'ai pas mesuré. Je m'appuie sur la littérature.</strong></p>
+<p><strong>Parce que « 13/20 », ça ne veut rien dire.</strong><br />
+Est-ce qu'on livre, ou pas ? La note ne répond pas.</p>
+<p>Et une note invite les cinq erreurs du correcteur d'un coup :<br />
+la longueur impressionne, la main glisse vers le milieu,<br />
+et personne ne peut dire ce qui sépare 13 de 14.</p>
+<p><strong>Une question binaire force la décision.</strong> Elle se discute, donc elle se corrige.</p>
+<p><span class="ref">Mesuré ailleurs : décomposer en questions binaires fait gagner 0,45 d'accord entre 12 modèles évaluateurs — CheckEval, EMNLP 2025</span></p>
 </section>
 </foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="12" data-paginate="true" data-background-color="#ffffff" data-theme="default" data-style="section {
   font-family: 'Segoe UI', system-ui, sans-serif;
@@ -823,16 +819,15 @@ section.title { justify-content: center; }
 .carte img { border: 1px solid #e5e5e5; border-radius: 6px; flex: none; }
 ;background-color:#ffffff;background-image:none;" data-marpit-pagination-total="49">
 <h2 id="s%C3%A9parer-le-moteur-de-la-grille">Séparer le moteur de la grille</h2>
-<pre is="marp-pre" data-auto-scaling="downscale-only"><code>   ┌──────────────────────┐        ┌──────────────────────┐
-   │  MOTEUR DE JUGEMENT  │   +    │       GRILLE         │
-   │                      │        │                      │
-   │  fiable, neutre,     │        │  spécifique au       │
-   │  colle à la grille   │        │  domaine             │
-   └──────────────────────┘        └──────────────────────┘
-        un seul modèle                 change par usage
+<p><strong>Un seul correcteur. Deux barèmes.</strong></p>
+<pre is="marp-pre" data-auto-scaling="downscale-only"><code>  BARÈME « CODE »                    BARÈME « DOCUMENTATION »
+
+  les API citées existent            les étapes sont dans l'ordre
+  un défaut visible fausse tout      aucune commande inventée
+  la consigne est respectée          les prérequis sont dits
 </code></pre>
 <p>Le modèle n'apprend pas <strong>mon</strong> domaine.<br />
-Il apprend à <strong>suivre une grille</strong> — et la grille porte le domaine.</p>
+Il apprend à <strong>suivre un barème</strong> — et c'est le barème qui porte le domaine.</p>
 </section>
 </foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="19" data-paginate="true" data-background-color="#ffffff" data-theme="default" data-style="section {
   font-family: 'Segoe UI', system-ui, sans-serif;
@@ -1357,8 +1352,9 @@ section.title { justify-content: center; }
 </tr>
 </tbody>
 </table>
-<p><strong>McNemar exact bilatéral : p = 0,0066 sur 24 paires discordantes</strong><br />
-— Lucene seul juste sur 19, Neo4j seul juste sur 5.</p>
+<p>Sur les 60 questions, <strong>24 les départagent.</strong><br />
+<strong>Lucene en gagne 19. Neo4j en gagne 5.</strong></p>
+<p>Le hasard seul donnerait 12 – 12. → <strong>p = 0,0066</strong></p>
 </section>
 </foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="30" data-paginate="true" data-background-color="#ffffff" data-theme="default" data-style="section {
   font-family: 'Segoe UI', system-ui, sans-serif;
@@ -1627,11 +1623,11 @@ section.title { justify-content: center; }
 .carte img { border: 1px solid #e5e5e5; border-radius: 6px; flex: none; }
 ;background-color:#ffffff;background-image:none;" data-marpit-pagination-total="49">
 <h2 id="%C2%AB-on-est-daccord-9-fois-sur-10-%C2%BB">« On est d'accord 9 fois sur 10 »</h2>
-<p>100 réponses à juger. <strong>90 sont mauvaises.</strong></p>
-<p>Deux relecteurs répondent <strong>FAIL à tout</strong>, sans rien lire.</p>
+<p>100 copies à corriger. <strong>90 sont mauvaises.</strong></p>
+<p>Deux correcteurs <strong>recalent tout le monde</strong>, sans rien lire.</p>
 <p>→ ils sont <strong>d'accord 9 fois sur 10.</strong></p>
 <p>L'accord brut ne mesure pas la compétence.<br />
-Il mesure surtout <strong>le déséquilibre des données.</strong></p>
+Il mesure surtout <strong>le déséquilibre du paquet de copies.</strong></p>
 </section>
 </foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="36" data-paginate="true" data-background-color="#ffffff" data-theme="default" data-style="section {
   font-family: 'Segoe UI', system-ui, sans-serif;
@@ -1667,16 +1663,15 @@ section.title { justify-content: center; }
 .carte img { border: 1px solid #e5e5e5; border-radius: 6px; flex: none; }
 ;background-color:#ffffff;background-image:none;" data-marpit-pagination-total="49">
 <h2 id="%CE%BA-de-cohen-sur-un-cas-r%C3%A9el">κ de Cohen, sur un cas réel</h2>
-<pre is="marp-pre" data-auto-scaling="downscale-only"><code>                       B dit PASS   B dit FAIL
-      A dit PASS            15           5      →   20
-      A dit FAIL             5          75      →   80
-                            20          80         100
+<p>Deux correcteurs, 100 copies. Ils sont d'accord sur <strong>90.</strong></p>
+<p>Chacun valide une copie sur cinq. Donc <strong>même en cochant au hasard</strong>,<br />
+ils tomberaient d'accord <strong>68 fois sur 100.</strong></p>
+<pre is="marp-pre" data-auto-scaling="downscale-only"><code>  0                                        68          90        100
+  ├──────── donné par le hasard ────────────┼─ conquis ─┼─ raté ──┤
+                                               22           10
 </code></pre>
-<p>Ils sont d'accord sur <strong>90 réponses sur 100.</strong></p>
-<p>Le hasard seul en donnait déjà <strong>68</strong> :<br />
-tous deux PASS → <code>20 % × 20 % = 4</code> · tous deux FAIL → <code>80 % × 80 % = 64</code></p>
-<p>Il restait <strong>32 points</strong> à gagner. Ils en ont gagné <strong>22.</strong></p>
-<p><strong>κ = 22 / 32 = 0,69</strong></p>
+<p><strong>κ = 22 conquis / 32 qui restaient = 0,69</strong></p>
+<p>κ, c'est <strong>la part conquise de ce qu'il restait à conquérir.</strong></p>
 </section>
 </foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="37" data-paginate="true" data-background-color="#ffffff" data-theme="default" data-style="section {
   font-family: 'Segoe UI', system-ui, sans-serif;
@@ -1712,10 +1707,10 @@ section.title { justify-content: center; }
 .carte img { border: 1px solid #e5e5e5; border-radius: 6px; flex: none; }
 ;background-color:#ffffff;background-image:none;" data-marpit-pagination-total="49">
 <h2 id="et-le-pi%C3%A8ge-marche-dans-les-deux-sens">Et le piège marche dans les deux sens</h2>
-<p>Sur mon contrôle le plus fréquent :</p>
+<p>Sur mon critère le plus fréquent :</p>
 <p><strong>78 % d'accord brut.  κ = 0,386.</strong></p>
-<p>Les marges sont très déséquilibrées — donc le κ paraît médiocre<br />
-alors que les deux relecteurs se trompent rarement.</p>
+<p>Le paquet est très déséquilibré — donc le κ paraît médiocre<br />
+alors que les deux correcteurs se trompent rarement.</p>
 <p><strong>Donner le κ seul sous-estime l'accord.<br />
 Donner le pourcentage seul le surestime.</strong></p>
 <p>Les deux vont ensemble. Avec les marges.</p>
@@ -1924,8 +1919,8 @@ section.title { justify-content: center; }
 </tbody>
 </table>
 <p>La stabilité du verdict, elle, <strong>baisse</strong> — j'y viens juste après.</p>
-<p><strong>Δ = 0,0 %. McNemar p = 1,0000 sur 12 paires discordantes — 6 d'un côté,<br />
-6 de l'autre.</strong></p>
+<p><strong>12 items les départagent. 6 d'un côté, 6 de l'autre.</strong><br />
+Une pièce équilibrée. → <strong>p = 1,0000</strong></p>
 <p>Et les deux <strong>ratent 4 erreurs sur 10.</strong> L'exactitude ne le dit pas.</p>
 <p><strong>Non concluant</strong> — et cette issue était <strong>écrite avant</strong> de lancer la mesure.</p>
 </section>
@@ -2381,8 +2376,13 @@ dans le contexte ne l'étaye ». Tout le banc Lucene/Neo4j repose là-dessus.
 
 La confusion numéro un dans la salle : on croit qu'on demande au modèle de
 refaire le travail, alors qu'on lui demande de vérifier. Deux tâches d'une
-difficulté très différente.</p></div><div class="bespoke-marp-note" data-index="7" tabindex="0"><p>Sur du code, le corrigé est exactement ce que je n'ai pas : si je savais écrire
-la bonne réponse à mes 60 questions, je n'aurais pas besoin de RAG.
+difficulté très différente.</p></div><div class="bespoke-marp-note" data-index="7" tabindex="0"><p>Pourquoi le corrigé type est hors de portée chez moi : si je savais écrire la
+bonne réponse à mes 60 questions sur OllamAssist, je n'aurais pas besoin de RAG.
+Le corrigé, c'est justement ce que je cherche.
+
+Et la première méthode ne répond pas à ma question. Je ne veux pas savoir laquelle
+de mes deux stratégies est la moins mauvaise, je veux savoir si l'une des deux est
+utilisable.
 
 La troisième approche déplace le problème sur la grille — et c'est le sujet de
 la partie suivante.
@@ -2413,8 +2413,13 @@ donc rien ne s'attribue à ma modification.
 C'est l'offline qui ferme le tunnel dont je parlais tout à l'heure. Rejouer les
 MÊMES questions est la seule façon de savoir si une modification améliore ou
 dégrade, et la seule façon de comparer deux stratégies : Lucene et Neo4j doivent
-répondre aux mêmes 60 questions pour être comparables.</p></div><div class="bespoke-marp-note" data-index="10" tabindex="0"><p>La dernière ligne est la plus importante de la diapositive : c'est la seule du
-talk où je m'appuie sur la littérature plutôt que sur ma mesure, et je l'affiche.
+répondre aux mêmes 60 questions pour être comparables.</p></div><div class="bespoke-marp-note" data-index="10" tabindex="0"><p>À dire clairement : ce point-là, je ne l'ai pas mesuré. Je m'appuie sur la
+littérature. C'est la seule affirmation du talk dans ce cas, et autant le dire
+plutôt que le laisser croire.
+
+Exemple OllamAssist : « cette explication de ma classe RagService, elle vaut
+13 ou 14 sur 20 ? » La question n'a pas de réponse. « Est-ce qu'elle cite une
+méthode qui n'existe pas ? » en a une.
 
 Je n'ai pas fait combattre le gradué contre le binaire chez moi. J'ai abandonné
 le gradué, je ne l'ai pas battu en duel — la nuance compte, et quelqu'un dans la

@@ -287,21 +287,23 @@ difficulté très différente.
 
 ## Trois façons de juger
 
-**1. Comparaison par paires**
-A contre B, puis B contre A pour neutraliser l'ordre
-→ classe deux systèmes. **Ne dit pas si l'un des deux est bon.**
+**1. Deux copies côte à côte** — « laquelle est la meilleure ? »
+Je sais les classer. **Je ne sais pas si l'une mérite la moyenne.**
 
-**2. Évaluation unique, avec référence**
-On fournit le corrigé attendu
-→ fiable, mais il faut **produire un corrigé par question**.
+**2. Le corrigé type** — je compare la copie au corrigé.
+Fiable. Mais il faut **écrire le corrigé de chaque question.**
 
-**3. Évaluation unique, sans référence** ← *mon choix*
-Le juge applique une **grille de critères**
-→ pas de corrigé à écrire. **Tout repose sur la grille.**
+**3. Le barème seul** — pas de corrigé, une liste de points à vérifier.
+← *mon choix* · **Tout repose alors sur le barème.**
 
 <!--
-Sur du code, le corrigé est exactement ce que je n'ai pas : si je savais écrire
-la bonne réponse à mes 60 questions, je n'aurais pas besoin de RAG.
+Pourquoi le corrigé type est hors de portée chez moi : si je savais écrire la
+bonne réponse à mes 60 questions sur OllamAssist, je n'aurais pas besoin de RAG.
+Le corrigé, c'est justement ce que je cherche.
+
+Et la première méthode ne répond pas à ma question. Je ne veux pas savoir laquelle
+de mes deux stratégies est la moins mauvaise, je veux savoir si l'une des deux est
+utilisable.
 
 La troisième approche déplace le problème sur la grille — et c'est le sujet de
 la partie suivante.
@@ -316,18 +318,15 @@ lequel a été mesuré.
 
 ## Première question : que ne PAS lui donner à juger
 
-Avant de dépenser un seul jeton :
+**Tout ce qui est déterministe ne passe pas par le juge.**
 
-```
-  Est-ce que ça compile ?           →  le compilateur
-  Est-ce que le JSON est valide ?   →  un parseur
-  Est-ce que le style tient ?       →  le linter
-```
+Ça compile ? Le JSON est valide ? Le style tient ?
+→ **le compilateur, un parseur, le linter.**
 
-Déterministe. Gratuit. Instantané. **Et ça ne se trompe jamais.**
+La copie hors-sujet est écartée **avant** d'être lue.
 
-Mon filtre à moi : l'équilibrage des parenthèses et des accolades.
-C'est tout. **Ce n'est pas un filtre L0, c'est un début.**
+Mon filtre à moi : l'équilibrage des parenthèses.
+C'est tout. **Ce n'est pas un filtre, c'est un début.**
 
 <!--
 Un compilateur répond en cinquante millisecondes, ne coûte rien et n'a pas
@@ -351,15 +350,16 @@ le juge.
 
 ## Deuxième question : quand évaluer ?
 
-**OFFLINE** — dans la CI, sur un jeu de questions figé
-Rejoue les **mêmes** questions à chaque modification.
-→ détecte la régression. **Exige un corpus.**
+**Dans la CI, à chaque modification — la non-régression.**
+Les **mêmes** questions, rejouées. Le corrigé type ou le barème : les deux
+marchent, puisque les questions ne changent pas.
 
-**ONLINE** — en production, par échantillonnage
-Juge un échantillon des vraies conversations.
-→ détecte l'imprévu. **Ne compare rien.**
+**En production, par échantillonnage.**
+Là, plus de questions figées : **le barème seul.**
+Combien, à quelle fréquence ? Ça dépend de trop de choses.
+**Un échantillon suffit.**
 
-Moi : **100 % offline.** Aucun échantillonnage de production.
+Moi : **100 % dans la CI.** Aucun échantillonnage de production.
 
 <!--
 La vraie opposition n'est pas le moment, c'est le coût. L'offline exige un jeu
@@ -380,20 +380,25 @@ répondre aux mêmes 60 questions pour être comparables.
 
 Pas une note sur 10. **PASS / FAIL.**
 
-Chez un juge LLM, les échelles graduées donnent un **faible accord entre juges**
-et une **forte variance** des notes.
+**Parce que « 13/20 », ça ne veut rien dire.**
+Est-ce qu'on livre, ou pas ? La note ne répond pas.
 
-Décomposer en questions binaires : **+0,45 d'accord moyen** entre 12 modèles
-évaluateurs. <span class="ref">CheckEval, EMNLP 2025 — Lee et al.</span>
+Et une note invite les cinq erreurs du correcteur d'un coup :
+la longueur impressionne, la main glisse vers le milieu,
+et personne ne peut dire ce qui sépare 13 de 14.
 
-Biais de position, de verbosité, d'auto-préférence.
-<span class="ref">Zheng et al., NeurIPS 2023 — MT-Bench</span>
+**Une question binaire force la décision.** Elle se discute, donc elle se corrige.
 
-**Ça, je ne l'ai pas mesuré. Je m'appuie sur la littérature.**
+<span class="ref">Mesuré ailleurs : décomposer en questions binaires fait gagner 0,45 d'accord entre 12 modèles évaluateurs — CheckEval, EMNLP 2025</span>
 
 <!--
-La dernière ligne est la plus importante de la diapositive : c'est la seule du
-talk où je m'appuie sur la littérature plutôt que sur ma mesure, et je l'affiche.
+À dire clairement : ce point-là, je ne l'ai pas mesuré. Je m'appuie sur la
+littérature. C'est la seule affirmation du talk dans ce cas, et autant le dire
+plutôt que le laisser croire.
+
+Exemple OllamAssist : « cette explication de ma classe RagService, elle vaut
+13 ou 14 sur 20 ? » La question n'a pas de réponse. « Est-ce qu'elle cite une
+méthode qui n'existe pas ? » en a une.
 
 Je n'ai pas fait combattre le gradué contre le binaire chez moi. J'ai abandonné
 le gradué, je ne l'ai pas battu en duel — la nuance compte, et quelqu'un dans la
@@ -604,18 +609,18 @@ Un critère qui échoue au troisième test doit être réécrit ou découpé. Pa
 
 ## Séparer le moteur de la grille
 
+**Un seul correcteur. Deux barèmes.**
+
 ```
-   ┌──────────────────────┐        ┌──────────────────────┐
-   │  MOTEUR DE JUGEMENT  │   +    │       GRILLE         │
-   │                      │        │                      │
-   │  fiable, neutre,     │        │  spécifique au       │
-   │  colle à la grille   │        │  domaine             │
-   └──────────────────────┘        └──────────────────────┘
-        un seul modèle                 change par usage
+  BARÈME « CODE »                    BARÈME « DOCUMENTATION »
+
+  les API citées existent            les étapes sont dans l'ordre
+  un défaut visible fausse tout      aucune commande inventée
+  la consigne est respectée          les prérequis sont dits
 ```
 
 Le modèle n'apprend pas **mon** domaine.
-Il apprend à **suivre une grille** — et la grille porte le domaine.
+Il apprend à **suivre un barème** — et c'est le barème qui porte le domaine.
 
 <!--
 C'est ce qui rend le juge réutilisable. Si j'avais entraîné le modèle sur « ce
@@ -935,8 +940,10 @@ rejoue pas n'est pas une mesure.
 | **Réponses justes** | **48,3 %** | **23,7 %** |
 | Contexte jugé insuffisant | 39,7 % | **66,1 %** |
 
-**McNemar exact bilatéral : p = 0,0066 sur 24 paires discordantes**
-— Lucene seul juste sur 19, Neo4j seul juste sur 5.
+Sur les 60 questions, **24 les départagent.**
+**Lucene en gagne 19. Neo4j en gagne 5.**
+
+Le hasard seul donnerait 12 – 12. → **p = 0,0066**
 
 <!--
 Chiffre retiré de l'écran mais disponible : la cohérence du juge, c'est-à-dire la
@@ -1107,14 +1114,14 @@ preuve positive.
 
 ## « On est d'accord 9 fois sur 10 »
 
-100 réponses à juger. **90 sont mauvaises.**
+100 copies à corriger. **90 sont mauvaises.**
 
-Deux relecteurs répondent **FAIL à tout**, sans rien lire.
+Deux correcteurs **recalent tout le monde**, sans rien lire.
 
 → ils sont **d'accord 9 fois sur 10.**
 
 L'accord brut ne mesure pas la compétence.
-Il mesure surtout **le déséquilibre des données.**
+Il mesure surtout **le déséquilibre du paquet de copies.**
 
 <!--
 C'est le piège le plus facile à tomber dedans, et le plus flatteur : on annonce
@@ -1131,21 +1138,20 @@ jeu où 90 % des cas sont de la même classe, c'est zéro information.
 
 ## κ de Cohen, sur un cas réel
 
+Deux correcteurs, 100 copies. Ils sont d'accord sur **90.**
+
+Chacun valide une copie sur cinq. Donc **même en cochant au hasard**,
+ils tomberaient d'accord **68 fois sur 100.**
+
 ```
-                       B dit PASS   B dit FAIL
-      A dit PASS            15           5      →   20
-      A dit FAIL             5          75      →   80
-                            20          80         100
+  0                                        68          90        100
+  ├──────── donné par le hasard ────────────┼─ conquis ─┼─ raté ──┤
+                                               22           10
 ```
 
-Ils sont d'accord sur **90 réponses sur 100.**
+**κ = 22 conquis / 32 qui restaient = 0,69**
 
-Le hasard seul en donnait déjà **68** :
-tous deux PASS → `20 % × 20 % = 4` · tous deux FAIL → `80 % × 80 % = 64`
-
-Il restait **32 points** à gagner. Ils en ont gagné **22.**
-
-**κ = 22 / 32 = 0,69**
+κ, c'est **la part conquise de ce qu'il restait à conquérir.**
 
 <!--
 Le résumé de la formule en une phrase : κ, c'est ce qu'on a gagné divisé par ce
@@ -1167,12 +1173,12 @@ correct, entre 0,4 et 0,6 il est moyen.
 
 ## Et le piège marche dans les deux sens
 
-Sur mon contrôle le plus fréquent :
+Sur mon critère le plus fréquent :
 
 **78 % d'accord brut.  κ = 0,386.**
 
-Les marges sont très déséquilibrées — donc le κ paraît médiocre
-alors que les deux relecteurs se trompent rarement.
+Le paquet est très déséquilibré — donc le κ paraît médiocre
+alors que les deux correcteurs se trompent rarement.
 
 **Donner le κ seul sous-estime l'accord.
 Donner le pourcentage seul le surestime.**
@@ -1296,8 +1302,8 @@ compte 46 %. Trois mesures indépendantes, un même diagnostic : il est indulgen
 
 La stabilité du verdict, elle, **baisse** — j'y viens juste après.
 
-**Δ = 0,0 %. McNemar p = 1,0000 sur 12 paires discordantes — 6 d'un côté,
-6 de l'autre.**
+**12 items les départagent. 6 d'un côté, 6 de l'autre.**
+Une pièce équilibrée. → **p = 1,0000**
 
 Et les deux **ratent 4 erreurs sur 10.** L'exactitude ne le dit pas.
 
