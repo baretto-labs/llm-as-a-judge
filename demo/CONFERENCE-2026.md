@@ -51,7 +51,7 @@ style: |
   section.title { justify-content: center; }
   .carte { display: flex; gap: 2.5rem; align-items: flex-start; }
   .carte > .texte { flex: 1; min-width: 0; }
-  .carte iframe { border: 0; flex: none; }
+  .carte img { border: 1px solid #e5e5e5; border-radius: 6px; flex: none; }
 ---
 
 <!-- _class: title -->
@@ -204,14 +204,16 @@ surtout du modèle.
 **Elle dépend de ce qu'il a trouvé.**
 
 </div>
-<iframe width="384" height="319" src="https://plugins.jetbrains.com/embeddable/card/26388" loading="lazy" title="OllamAssist sur la JetBrains Marketplace"></iframe>
+<img src="img/ollamassist-marketplace.png" width="384" height="319" alt="Carte OllamAssist sur la JetBrains Marketplace">
 </div>
 
 <!--
-⚠ La carte de droite est un iframe de la JetBrains Marketplace : elle a besoin
-du RÉSEAU au moment de présenter, et elle n'apparaîtra PAS à l'export PDF. Le
-texte de gauche doit donc suffire à lui seul. Prévoir une capture d'écran de
-secours si la salle n'a pas de wifi fiable.
+⚠ À FAIRE LA VEILLE : l'image de droite est un gabarit. Prendre une capture de
+la carte sur plugins.jetbrains.com/plugin/26388, et ÉCRASER le fichier
+demo/img/ollamassist-marketplace.png — même nom, idéalement 768 x 638. Puis
+relancer le rendu. Aucune modification du markdown.
+Un iframe a été écarté : il exigeait du réseau pendant la présentation et ne
+s'exportait pas en PDF.
 
 Les faits, si on demande : c'est un plugin JetBrains, publié sur la Marketplace,
 propulsé par Ollama, avec un mode entièrement hors-ligne. Chat dans l'IDE,
@@ -627,25 +629,68 @@ récupéré, fidélité au contexte. Le même moteur, trois grilles.
 
 ---
 
-## Les biais : ce que je mesure, ce que je cite
+## Cinq façons de se tromper sans être incompétent
 
-| Biais | Statut |
-|---|---|
-| **Verbosité** | **mesuré chez moi** — taux de faux PASS sur défauts verbeux contre défauts concis |
-| **Position** | **mesuré chez moi** — 12 verdicts sur 60 basculent au seul réordonnancement du contexte |
-| **Auto-préférence** | *littérature seule.* Pas mesuré ici. |
-no
+Un correcteur honnête, fatigué par 200 copies :
+
+```
+  il se laisse impressionner par la longueur    4 pages, ça fait sérieux
+
+  il note selon l'ordre des copies              la 1re et la 20e
+
+  il préfère son propre style                   il se reconnaît dedans
+
+  il a reconnu l'écriture                       il note l'auteur, pas la copie
+
+  il préfère valider que recaler                c'est moins coûteux
+```
+
+**Aucune de ces cinq erreurs n'est une faute de compétence.
+Toutes déforment la note.**
 
 <!--
-La discipline tient en une règle : ne jamais présenter un biais cité comme un
-biais mesuré. C'est la seule chose qui sépare un retour d'expérience d'une revue
-de littérature mal digérée.
+C'est la diapositive à poser avant de parler de mesure, parce qu'elle explique
+pourquoi une note globale ne suffit pas. Un juge LLM fait exactement ces cinq
+choses, et pour les mêmes raisons qu'un humain fatigué.
 
-Sur la position : le mélange des extraits le mitige, mais 12 verdicts sur 60
-basculent quand même au seul réordonnancement, à récupération identique. Le
-mélange est graîné par la question, donc la mesure est reproductible.
+La quatrième est la plus vicieuse et c'est celle qui m'est arrivée : le modèle
+avait appris à reconnaître MA tournure de phrase. Il ne jugeait plus la réponse,
+il me reconnaissait.
 
-Dire que c'est une limite connue et assumée, pas un détail caché.
+La cinquième est celle qu'on ne voit jamais dans les tableaux, parce qu'elle
+améliore l'exactitude globale au lieu de la dégrader.
+-->
+
+---
+
+## Comment je m'en protège
+
+| l'erreur | la parade | chez moi |
+|---|---|---|
+| la longueur | comparer les faux PASS sur défauts **verbeux** et **concis** | **mesuré** — 46 % |
+| l'ordre | mélanger le contexte, **graine tirée de la question** | **mesuré** — 12 / 60 |
+| son propre style | ne pas faire juger un modèle par sa propre famille | *cité* |
+| l'écriture reconnue | un **relecteur humain**, et un test de permutation | **mesuré** — 17 / 17 |
+| l'indulgence | publier le **taux d'erreurs attrapées**, pas l'exactitude | **mesuré** — 59 % |
+
+**La dernière colonne est le sujet de cette diapositive.**
+Ne jamais présenter un biais **cité** comme un biais **mesuré**.
+
+<!--
+Quatre des cinq parades sont des mesures, une seule est une précaution reprise de
+la littérature. C'est la seule chose qui sépare un retour d'expérience d'une revue
+de littérature mal digérée — et c'est aussi ce qui me permet de dire « je ne sais
+pas » sur l'auto-préférence sans que ça décrédibilise le reste.
+
+Sur l'ordre : le mélange atténue le biais, il ne le supprime pas. 12 verdicts sur
+60 basculent encore au seul réordonnancement, à récupération identique. Et la
+graine vient de la question, donc la mesure se rejoue à l'identique.
+
+Sur l'écriture reconnue : aucune métrique ne l'a trouvée. C'est un relecteur
+humain qui a changé d'avis sur un item. J'y reviens juste après.
+
+Les parades coûtent peu. Ce sont des comparaisons appariées et un mélange graîné,
+pas des instruments de recherche.
 -->
 
 ---
