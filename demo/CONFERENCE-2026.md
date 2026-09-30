@@ -179,9 +179,38 @@ ministère et une compagnie aérienne.
 
 ---
 
-## Pourquoi j'ai voulu mesurer
+## OllamAssist
 
-**OllamAssist**, mon assistant de code
+**Un assistant de code dans mon IDE. Il tourne entièrement sur ma machine.**
+
+Pourquoi je l'ai écrit : pour comprendre ce que l'IA fait vraiment,
+plutôt que de le lire. **Un labo.**
+
+D'abord un **chatbot** — je pose une question, il répond avec ce qu'il sait.
+
+Puis un **agent** — il lit mon workspace, et répond sur **mon** code.
+
+Et là, tout change : sa réponse ne dépend plus surtout du modèle.
+**Elle dépend de ce qu'il a trouvé.**
+
+<!--
+Les faits, si on demande : c'est un plugin JetBrains, publié sur la Marketplace,
+propulsé par Ollama, avec un mode entièrement hors-ligne. Chat dans l'IDE,
+autocomplétion expérimentale, messages de commit générés depuis le diff.
+
+La codebase qu'il indexe fait 162 fichiers Java. C'est la mienne — donc je vois
+quand il se trompe. C'est ce qui rend l'exercice possible : sur du code que je ne
+connais pas, je n'aurais aucun moyen de juger le juge.
+
+La dernière ligne est la charnière de tout l'exposé. Tant que c'est un chatbot,
+la qualité vient du modèle. Dès qu'il lit le workspace, elle vient d'abord de ce
+que la récupération a rapporté. C'est ce déplacement qui justifie de mesurer le
+RAG et pas seulement le modèle.
+-->
+
+---
+
+## Comment mesurer la qualité des réponses de mon assistant ?
 
 - J'avais deux stratégies de RAG — Lucene et un graphe Neo4j —
   et **aucun moyen de les départager**
