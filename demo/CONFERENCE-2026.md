@@ -49,6 +49,9 @@ style: |
   table { font-size: 0.95rem; }
   .ref { font-size: 0.85rem; color: #666; }
   section.title { justify-content: center; }
+  .carte { display: flex; gap: 2.5rem; align-items: flex-start; }
+  .carte > .texte { flex: 1; min-width: 0; }
+  .carte iframe { border: 0; flex: none; }
 ---
 
 <!-- _class: title -->
@@ -181,19 +184,35 @@ ministère et une compagnie aérienne.
 
 ## OllamAssist
 
-**Un assistant de code dans mon IDE. Il tourne entièrement sur ma machine.**
+<div class="carte">
+<div class="texte">
 
-Pourquoi je l'ai écrit : pour comprendre ce que l'IA fait vraiment,
-plutôt que de le lire. **Un labo.**
+**Un assistant de code dans mon IDE.
+Il tourne entièrement sur ma machine.**
 
-D'abord un **chatbot** — je pose une question, il répond avec ce qu'il sait.
+Pourquoi je l'ai écrit : pour comprendre ce que
+l'IA fait vraiment, plutôt que de le lire. **Un labo.**
 
-Puis un **agent** — il lit mon workspace, et répond sur **mon** code.
+D'abord un **chatbot** — je pose une question,
+il répond avec ce qu'il sait.
 
-Et là, tout change : sa réponse ne dépend plus surtout du modèle.
+Puis un **agent** — il lit mon workspace,
+et répond sur **mon** code.
+
+Et là, tout change : sa réponse ne dépend plus
+surtout du modèle.
 **Elle dépend de ce qu'il a trouvé.**
 
+</div>
+<iframe width="384" height="319" src="https://plugins.jetbrains.com/embeddable/card/26388" loading="lazy" title="OllamAssist sur la JetBrains Marketplace"></iframe>
+</div>
+
 <!--
+⚠ La carte de droite est un iframe de la JetBrains Marketplace : elle a besoin
+du RÉSEAU au moment de présenter, et elle n'apparaîtra PAS à l'export PDF. Le
+texte de gauche doit donc suffire à lui seul. Prévoir une capture d'écran de
+secours si la salle n'a pas de wifi fiable.
+
 Les faits, si on demande : c'est un plugin JetBrains, publié sur la Marketplace,
 propulsé par Ollama, avec un mode entièrement hors-ligne. Chat dans l'IDE,
 autocomplétion expérimentale, messages de commit générés depuis le diff.
