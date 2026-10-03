@@ -60,7 +60,9 @@ style: |
   .deux { display: grid; grid-template-columns: 1fr 1fr; gap: 2.2rem; }
 ---
 
-<!-- _class: title -->
+<!--
+▸ Lire le titre à voix haute. « RAGots » se perd à l'écrit.
+ _class: title -->
 
 # RAGots et Hallucinations
 
@@ -96,6 +98,8 @@ Le tribunal :
 <span class="ref">Moffatt v. Air Canada, 2024 BCCRT 149</span>
 
 <!--
+▸ Raconter : les funérailles, le chatbot, la politique qui n'existe pas. Puis laisser la phrase du tribunal.
+
 Novembre 2022. Jake Moffatt réserve un vol pour les funérailles de sa
 grand-mère. Le chatbot lui indique qu'il peut demander le tarif deuil après le
 voyage. La politique réelle exige de le demander avant. Il paie le plein tarif
@@ -116,7 +120,9 @@ sur pièce, donc volontairement absents de l'écran.
 
 ---
 
-<!-- _class: dense -->
+<!--
+▸ Survoler — 2 secondes minimum. « J'aurais pu en remplir beaucoup plus. Je ne garde que ce que je peux prouver. »
+ _class: dense -->
 
 ## Et ce n'est pas un cas isolé
 
@@ -177,6 +183,8 @@ avant l'oral, sinon basculer la ligne dans RAPPORTÉ.
 - Il n'y a pas d'oracle : la même question admet dix bonnes réponses
 
 <!--
+▸ Le faux avait la forme du vrai. Un avocat ne relit pas une citation bien formatée.
+
 Un avocat ne relit pas une citation bien formatée. « 925 F.3d 1339 (11th Cir.
 2019) » a la forme d'une vraie référence, et c'est tout ce que notre œil
 vérifie.
@@ -217,6 +225,8 @@ surtout du modèle.
 </div>
 
 <!--
+▸ Ma codebase, donc je vois quand il se trompe. Appuyer sur la dernière ligne : la réponse dépend de ce qu'il a trouvé.
+
 ⚠ À FAIRE LA VEILLE : l'image de droite est un gabarit. Prendre une capture de
 la carte sur plugins.jetbrains.com/plugin/26388, et ÉCRASER le fichier
 demo/img/ollamassist-marketplace.png — même nom, idéalement 768 x 638. Puis
@@ -252,6 +262,8 @@ RAG et pas seulement le modèle.
   Modifier, livrer, et ne jamais savoir si j'ai amélioré ou dégradé.
 
 <!--
+▸ Trois rôles en conflit : auteur, sélectionneur, juge. Le mot à dire, c'est TUNNEL.
+
 Trois rôles en conflit : auteur du système, sélectionneur des cas de test, et
 juge.
 
@@ -280,6 +292,8 @@ j'améliorais » — sauf que cette fois, je l'ai su.
 → un modèle plus petit suffit, et ça change le prix
 
 <!--
+▸ Trois entrées, pas une. Il ne génère pas la réponse, il la juge.
+
 L'idée tient en une phrase, et c'est précisément pour ça qu'elle est dangereuse :
 elle a l'air gratuite.
 
@@ -306,6 +320,8 @@ Fiable. Mais il faut **écrire le corrigé de chaque question.**
 ← *mon choix* · **Tout repose alors sur le barème.**
 
 <!--
+▸ Le corrigé type est ce que je n'ai pas : si je savais écrire la réponse, je n'aurais pas besoin de RAG.
+
 Pourquoi le corrigé type est hors de portée chez moi : si je savais écrire la
 bonne réponse à mes 60 questions sur OllamAssist, je n'aurais pas besoin de RAG.
 Le corrigé, c'est justement ce que je cherche.
@@ -338,6 +354,8 @@ Mon filtre à moi : l'équilibrage des parenthèses.
 C'est tout. **Ce n'est pas un filtre, c'est un début.**
 
 <!--
+▸ Un compilateur répond en 50 ms et n'a pas d'humeur. Puis l'aveu : mon filtre à moi est mince.
+
 Un compilateur répond en cinquante millisecondes, ne coûte rien et n'a pas
 d'humeur. Demander ça à un LLM, c'est payer pour une réponse moins fiable.
 
@@ -371,6 +389,8 @@ Combien, à quelle fréquence ? Ça dépend de trop de choses.
 Moi : **100 % dans la CI.** Aucun échantillonnage de production.
 
 <!--
+▸ C'est l'offline qui ferme le tunnel. Moi : 100 % CI, aucun échantillonnage.
+
 La vraie opposition n'est pas le moment, c'est le coût. L'offline exige un jeu
 figé, donc un corpus à construire, et c'est là que part tout l'effort : 200
 exemples, un golden set de 50. L'online ne demande aucun corpus mais ne donne
@@ -405,6 +425,8 @@ Avec des questions binaires, **0,48**.
 <span class="ref">CheckEval, EMNLP 2025 — Lee et al.</span>
 
 <!--
+▸ « 13/20, ça ne veut rien dire. » Et dire que ce point-là vient de la littérature, pas de ma mesure.
+
 ⚠ Les chiffres exacts, vérifiés dans le papier (arXiv 2403.18771, tables IEA) :
 Krippendorff α passe de 0,09 à 0,48 sur SummEval, et de 0,06 à 0,45 sur
 Topical-Chat, entre une notation en échelle (G-Eval) et les questions binaires.
@@ -470,6 +492,8 @@ Et le verdict ne s'opine pas, il se calcule :
 **PASS si et seulement si tous les contrôles sont vrais.** Un seul `false` ⇒ FAIL.
 
 <!--
+▸ La chose la moins intuitive du talk, et ça tient en deux caractères. Je n'ai pas mesuré l'inverse — le dire.
+
 C'est la chose la moins intuitive de tout le talk, et c'est deux caractères dans
 un schéma JSON. Aucun modèle, aucun fine-tuning, aucun prompt ne rattrape un
 mauvais ordre de champs : le texte déjà écrit conditionne le texte suivant, et
@@ -524,6 +548,8 @@ propriété du monde. Et ils ne sont **pas une liste que j'ai choisie.**
 ```
 
 <!--
+▸ Je ne choisis pas la troisième catégorie : je la lis dans la requête.
+
 Le modèle n'apprend pas mon domaine, il apprend à suivre un barème — et c'est le
 barème qui porte le domaine. C'est pour ça que mes trois types de tâche partagent
 le même moteur : un seul correcteur, trois barèmes. Changer de domaine, c'est
@@ -561,6 +587,8 @@ nommé. *« sans dépendance externe »*, *« sans changer la signature »*.
 **Neuf fois dans mon corpus.**
 
 <!--
+▸ Test, diagnostic, correctif. Le message est que le test a fonctionné — pas que j'ai un mauvais critère.
+
 Les deux premiers tests sont des règles d'écriture. Le troisième est une mesure,
 et c'est le seul qui tranche.
 
@@ -600,6 +628,8 @@ Un correcteur honnête, fatigué par 200 copies :
 Toutes déforment la note.**
 
 <!--
+▸ Un correcteur honnête fatigué par 200 copies. La quatrième m'est arrivée.
+
 C'est la diapositive à poser avant de parler de mesure, parce qu'elle explique
 pourquoi une note globale ne suffit pas. Un juge LLM fait exactement ces cinq
 choses, et pour les mêmes raisons qu'un humain fatigué.
@@ -627,6 +657,8 @@ améliore l'exactitude globale au lieu de la dégrader.
 Quatre de ces cinq, je les ai **mesurés chez moi**. Le cinquième, non — je le **cite**.
 
 <!--
+▸ Quatre mesurés chez moi, un seul cité. Le dire à voix haute.
+
 La règle, à dire plutôt qu'à afficher : ne jamais présenter un biais cité comme
 un biais mesuré.
 
@@ -664,6 +696,8 @@ aveugle par deux personnes : **47 verdicts identiques sur 50.**
 <span class="ref">corpus, protocole et mesures : judge-finetune/ dans le dépôt</span>
 
 <!--
+▸ C'est un PARI, pas une conclusion. La partie 4 dira s'il était bon — et la réponse m'a surpris.
+
 C'est l'accroche qui manquait : jusqu'ici personne n'a dit qu'on entraînait quoi
 que ce soit. Sans elle, les trois diapositives qui suivent parlent d'un corpus et
 d'un modèle qui apprend une signature, sans qu'on sache pourquoi il y a un
@@ -699,6 +733,8 @@ Le meilleur devinait le verdict **3 fois sur 4** — le hasard en fait 1 sur 2.
 → un effet **quasi impossible à devoir au hasard.**
 
 <!--
+▸ Marquer un temps sur la dernière ligne : c'est le chiffre que j'ai annoncé, et il était faux.
+
 Pourquoi la question compte : une fuite de ce genre dispense le modèle
 d'apprendre. Le raccourci le plus facile est toujours celui qu'il prendra.
 
@@ -729,6 +765,8 @@ meilleur. Mille fois.
 **Du bruit.**
 
 <!--
+▸ Le tireur qui mitraille un mur puis dessine la cible. De l'overfitting, mais sur une statistique.
+
 L'image à donner : le tireur qui mitraille un mur de grange, puis dessine la
 cible autour du groupe le plus serré. Pour un public de développeurs : un seuil
 optimisé sur les données, puis évalué comme s'il avait été choisi avant de les
@@ -767,6 +805,8 @@ Elle a traversé une régénération, une validation à zéro erreur,
 **trois mesures et un commit.**
 
 <!--
+▸ Toute correction d'un corpus est une nouvelle écriture, et toute écriture laisse une signature.
+
 La fuite corrigée était à 17 sur 17. Celle que le correctif a créée est à 30 sur
 30. J'ai aggravé le problème en le réparant, et aucune de mes vérifications ne
 l'a vu — tout un dispositif conçu exprès pour l'attraper.
@@ -798,6 +838,8 @@ règle correctement quatre fois de suite.
 Ce n'était pas un relâchement : le stimulus était réellement différent.
 
 <!--
+▸ La diapositive qui compte de toute la partie. Ralentir.
+
 C'est la diapositive qui compte de toute cette partie.
 
 Un balayage automatique cherche les régularités qu'on a listées. Il ne peut pas
@@ -827,6 +869,8 @@ Le corpus a pris des semaines. **Le modèle, lui : une soirée.**
 **Entraîner un juge n'est pas un projet d'infrastructure.**
 
 <!--
+▸ Le message est le prix d'entrée, pas la performance. Tout le monde ici a la machine qu'il faut.
+
 Les chiffres exacts, si la question vient : Qwen2.5-Coder-14B quantifié en 4 bits,
 8,3 Go sur disque, QLoRA via MLX, 400 itérations, 13,65 s par itération, 169 513
 jetons entraînés.
@@ -858,6 +902,8 @@ Les **mêmes** 60 questions pour les deux stratégies, dans la **même** exécut
 Mélange du contexte **graîné par la question** → la mesure est reproductible.
 
 <!--
+▸ Mêmes questions, même boucle : c'est ce qui autorise la comparaison appariée.
+
 Poser les deux stratégies face à la même question dans la même boucle, c'est ce
 qui autorise un test apparié — et un test apparié est beaucoup plus puissant à
 effectif égal.
@@ -891,6 +937,8 @@ contexte récupéré — les classe dans le même ordre : **0,697 contre 0,596.*
 La conclusion ne repose donc pas sur l'instrument seul.
 
 <!--
+▸ La deuxième ligne donne le mécanisme : défaut de rappel, pas de bruit. Et la mesure sans LLM confirme.
+
 Chiffre retiré de l'écran mais disponible : la cohérence du juge, c'est-à-dire la
 part des verdicts qui correspondent bien à ses propres contrôles, est de 100 %
 pour Lucene et 98,3 % pour Neo4j.
@@ -938,6 +986,8 @@ Le témoin n'a pas bougé. Neo4j, lui, gagne **1,7 point — une question sur 59
 **L'écart vient du moteur de récupération, pas de la traversée de graphe.**
 
 <!--
+▸ Le témoin n'a pas bougé d'une décimale. Sans ça, aucune attribution n'était possible.
+
 Le bras témoin n'a pas bougé d'une décimale entre les deux exécutions, et sur
 chacun des trois niveaux. C'est ça qui autorise l'attribution : si Lucene avait
 bougé, je n'aurais rien pu conclure du tout.
@@ -962,6 +1012,8 @@ Sur les deux autres niveaux : 5 piles sur 7, et 6 sur 9. **Banal.**
 d'avance, pas une surprise.
 
 <!--
+▸ Dire « non concluant » sur deux niveaux donne du poids au troisième.
+
 Les chiffres par niveau, si on les demande : LOCAL 31,6 % contre 20,0 %, 5 paires
 contre 2, p = 0,453. STRUCTURAL 63,2 % contre 42,1 %, 6 contre 3, p = 0,508.
 CROSS_MODULE 50,0 % contre 10,0 %, 8 contre 0, p = 0,0078.
@@ -999,6 +1051,8 @@ Et cinq fois, il a affiché **BUILD SUCCESS**.
 **Aucune erreur. Aucun avertissement. Des résultats plausibles.**
 
 <!--
+▸ Ce qui l'a révélé n'est pas une métrique, c'est un détail de style.
+
 La cinquième est la plus instructive : le rapport annonçait une dégradation de
 76 points avec intervalle de confiance et p-value à quatre zéros. Publiable tel
 quel. Entièrement faux.
@@ -1036,6 +1090,8 @@ ils tomberaient d'accord **68 fois sur 100.**
 κ, c'est **la part conquise de ce qu'il restait à conquérir.**
 
 <!--
+▸ Suivre le tableau du doigt. κ, c'est ce qu'on a gagné sur ce qu'il restait à gagner.
+
 Le résumé de la formule en une phrase : κ, c'est ce qu'on a gagné divisé par ce
 qu'il restait à gagner.
 
@@ -1068,6 +1124,8 @@ Donner le pourcentage seul le surestime.**
 Les deux vont ensemble. Avec les marges.
 
 <!--
+▸ Ici c'est le κ qui accable à tort. Regarder la répartition avant de juger le chiffre.
+
 C'est le contre-exemple de la diapositive précédente : là, le pourcentage
 flattait. Ici, c'est le κ qui accable à tort.
 
@@ -1098,6 +1156,8 @@ le verdict masque.** Le verdict est reproductible ; les **raisons** le sont
 beaucoup moins. Or c'est sur les raisons que le juge s'entraîne.
 
 <!--
+▸ L'écart entre 0,880 et 0,44 est l'information. Le plafond, c'est le corpus.
+
 Présenter le premier comme le second est l'erreur la plus fréquente, et la plus
 flatteuse : on annonce un alignement qu'on n'a jamais mesuré.
 
@@ -1127,6 +1187,8 @@ Il ne se trompe que sur les copies qu'il aurait dû recaler.
 Le même juge. Deux chiffres. **Ne publiez jamais le premier sans le second.**
 
 <!--
+▸ Ne jamais donner l'exactitude sans le taux d'erreurs attrapées.
+
 C'est le piège le plus courant, et il est flatteur. Un juge qui répondrait PASS à
 tout sur un corpus où 95 % des réponses sont bonnes afficherait 95 %
 d'exactitude — et attraperait zéro erreur.
@@ -1168,6 +1230,8 @@ ils sont aveugles.
 **Non concluant** — et cette issue était **écrite avant** de lancer la mesure.
 
 <!--
+▸ NE PAS dire « ça n'améliore pas ». Dire : mes 50 items ne voient pas la différence.
+
 Trois résultats, et aucun n'est celui que j'attendais.
 
 Premier : l'invite nue ne rend AUCUN JSON exploitable. Zéro sur 150. Le seul
@@ -1210,6 +1274,8 @@ C'est ça qui rend deux exécutions comparables.
 La baseline est stable parce qu'elle **décide avant de regarder.**
 
 <!--
+▸ Une leçon d'intégration, pas d'intelligence. Une chaîne a besoin d'un contrat.
+
 91 minutes de fine-tuning pour découvrir que le gain de justesse tenait dans
 quatre phrases d'invite, et que le fine-tuning servait à autre chose que ce que je
 croyais.
@@ -1257,6 +1323,8 @@ Et le signal fonctionne : **83 %** de verdicts justes sur les items stables,
 **67 %** sur les instables.
 
 <!--
+▸ Un humain n'intervient pas « parfois ». Il intervient quand le juge s'est contredit — c'est mesuré.
+
 « Parfois un humain » n'est pas une politique. Il faut un déclencheur mesurable,
 et il existe déjà dans le harnais : je fais trois passes pour mesurer la
 répétabilité, le même chiffre sert à trier.
@@ -1287,6 +1355,8 @@ On ne le force pas, on le déclare.
 **Même signal. Deux politiques.** Parce que se tromper ne coûte pas pareil.
 
 <!--
+▸ Le seul choix qui se retourne toujours contre vous : compter le douteux comme un succès.
+
 C'est la question qu'on m'a posée et à laquelle je n'avais pas répondu : on ne
 peut pas demander une relecture humaine à chaque fois. Personne ne fait vérifier
 ses tests unitaires par un collègue à chaque échec.
@@ -1313,6 +1383,8 @@ Quatre fois mon budget.
 **C'est pour ça qu'il n'est pas prêt pour la production.**
 
 <!--
+▸ Partir du budget humain, pas du seuil. Finir sur : mon juge n'est pas prêt pour la production.
+
 Ce seuil avait l'air arbitraire quand je l'ai écrit. Il ne l'est pas : il se
 déduit de la quantité de relecture humaine qu'on peut réellement fournir.
 
@@ -1356,6 +1428,8 @@ faire relire ce qui est évident, pour qu'il regarde ce qui ne l'est pas.
 Jamais parce qu'une métrique a protesté.**
 
 <!--
+▸ La conclusion. Ralentir. « Corrigé parce qu'on a regardé, jamais parce qu'une métrique a protesté. »
+
 C'est la conclusion, et c'est la phrase que je veux qu'on retienne : même le
 harnais d'évaluation ne doit pas être construit sans observation ni réflexion.
 
@@ -1384,6 +1458,8 @@ et il le fait silencieusement.
 <span class="ref">Tout le corpus, le protocole et les mesures sont dans le dépôt.</span>
 
 <!--
+▸ Les trois s'appliquent sans rien installer. Le dépôt permet de tout rejouer.
+
 Les trois sont applicables sans rien installer et sans budget.
 
 La troisième est celle que j'aurais voulu entendre il y a six mois : elle m'a
