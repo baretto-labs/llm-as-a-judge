@@ -794,9 +794,12 @@ section.dense li { margin-bottom: 0.55em; }
 <p><strong>2. Falsifiable</strong> — je sais dire ce qui le rendrait faux.</p>
 <p><strong>3. Reproductible</strong> — deux personnes répondent pareil.<br />
 <strong>Et celui-là, il se mesure.</strong></p>
-<p>Mon plus mauvais critère : <strong><code>respect_consignes</code>, κ = 0,386.</strong></p>
-<p>C'est aussi <strong>le seul qui n'a pas de définition propre</strong> — il hérite de la<br />
-requête. Ce n'est pas un hasard.</p>
+<p>Le test a désigné le plus faible des miens : <strong><code>respect_consignes</code>.</strong></p>
+<p><strong>Le diagnostic :</strong> c'est le seul <strong>sans définition propre</strong> — il hérite de la<br />
+requête, donc il change de sens à chaque question.</p>
+<p><strong>Le correctif :</strong> quand la contrainte est explicite, je la sors en critère<br />
+nommé. <em>« sans dépendance externe »</em>, <em>« sans changer la signature »</em>.<br />
+<strong>Neuf fois dans mon corpus.</strong></p>
 </section>
 </foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="15" data-paginate="true" data-background-color="#ffffff" data-theme="default" data-style="section {
   font-family: 'Segoe UI', system-ui, sans-serif;
@@ -2816,19 +2819,21 @@ Exemple OllamAssist : « refactorise cette méthode avec l'API Stream, sans chan
 la signature publique ». La contrainte est dans la phrase. Le critère aussi.
 
 Il y a neuf critères de ce type dans mon corpus, chacun apparaissant deux à six
-fois. Ce sont les cas où la requête était précise.</p></div><div class="bespoke-marp-note" data-index="13" tabindex="0"><p>Les deux premiers tests sont des règles d'écriture. Le troisième est une mesure —
-et c'est le seul qui tranche vraiment.
+fois. Ce sont les cas où la requête était précise.</p></div><div class="bespoke-marp-note" data-index="13" tabindex="0"><p>Les deux premiers tests sont des règles d'écriture. Le troisième est une mesure,
+et c'est le seul qui tranche.
 
-L'aveu, et il vaut mieux que n'importe quelle justification : mon critère le plus
-ambigu est celui qui n'en est pas vraiment un. « respect_consignes » est un
-fourre-tout, il change de sens à chaque requête, et il a le pire accord entre
-relecteurs de toute ma grille.
+Ce n'est pas un aveu, c'est une démonstration que le test fonctionne : il m'a
+désigné un critère, le critère avait une cause, et la cause avait un correctif.
 
-Le correctif est déjà dans le corpus : quand la contrainte est explicite, je la
-sors en critère nommé. Les neuf critères dictés par la requête sont exactement la
-décomposition de ce fourre-tout.
+Les chiffres si on demande : κ = 0,386 pour 78 % d'accord brut entre relecteurs.
+Et attention à ne pas s'auto-accabler — je montre deux diapositives plus loin
+qu'un κ bas sur des marges déséquilibrées SOUS-ESTIME l'accord. Les deux
+relecteurs se trompent rarement ; c'est simplement mon critère le moins net.
 
-Un critère qui échoue au troisième test doit être réécrit ou découpé. Pas défendu.</p></div><div class="bespoke-marp-note" data-index="14" tabindex="0"><p>C'est ce qui rend le juge réutilisable. Si j'avais entraîné le modèle sur « ce
+Ce qui reste, et qu'il faut dire si on insiste : les requêtes dont la consigne est
+elle-même vague. Là, aucune décomposition n'est possible sans réécrire la
+question. Je garde le critère plutôt que de ne rien évaluer sur cette dimension —
+c'est un choix, pas un oubli.</p></div><div class="bespoke-marp-note" data-index="14" tabindex="0"><p>C'est ce qui rend le juge réutilisable. Si j'avais entraîné le modèle sur « ce
 qu'est une bonne réponse pour OllamAssist », il ne servirait qu'à OllamAssist.
 Entraîné à coller à une grille, il change de domaine en changeant de grille.
 

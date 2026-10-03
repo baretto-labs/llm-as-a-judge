@@ -545,25 +545,31 @@ fois. Ce sont les cas où la requête était précise.
 **3. Reproductible** — deux personnes répondent pareil.
 **Et celui-là, il se mesure.**
 
-Mon plus mauvais critère : **`respect_consignes`, κ = 0,386.**
+Le test a désigné le plus faible des miens : **`respect_consignes`.**
 
-C'est aussi **le seul qui n'a pas de définition propre** — il hérite de la
-requête. Ce n'est pas un hasard.
+**Le diagnostic :** c'est le seul **sans définition propre** — il hérite de la
+requête, donc il change de sens à chaque question.
+
+**Le correctif :** quand la contrainte est explicite, je la sors en critère
+nommé. *« sans dépendance externe »*, *« sans changer la signature »*.
+**Neuf fois dans mon corpus.**
 
 <!--
-Les deux premiers tests sont des règles d'écriture. Le troisième est une mesure —
-et c'est le seul qui tranche vraiment.
+Les deux premiers tests sont des règles d'écriture. Le troisième est une mesure,
+et c'est le seul qui tranche.
 
-L'aveu, et il vaut mieux que n'importe quelle justification : mon critère le plus
-ambigu est celui qui n'en est pas vraiment un. « respect_consignes » est un
-fourre-tout, il change de sens à chaque requête, et il a le pire accord entre
-relecteurs de toute ma grille.
+Ce n'est pas un aveu, c'est une démonstration que le test fonctionne : il m'a
+désigné un critère, le critère avait une cause, et la cause avait un correctif.
 
-Le correctif est déjà dans le corpus : quand la contrainte est explicite, je la
-sors en critère nommé. Les neuf critères dictés par la requête sont exactement la
-décomposition de ce fourre-tout.
+Les chiffres si on demande : κ = 0,386 pour 78 % d'accord brut entre relecteurs.
+Et attention à ne pas s'auto-accabler — je montre deux diapositives plus loin
+qu'un κ bas sur des marges déséquilibrées SOUS-ESTIME l'accord. Les deux
+relecteurs se trompent rarement ; c'est simplement mon critère le moins net.
 
-Un critère qui échoue au troisième test doit être réécrit ou découpé. Pas défendu.
+Ce qui reste, et qu'il faut dire si on insiste : les requêtes dont la consigne est
+elle-même vague. Là, aucune décomposition n'est possible sans réécrire la
+question. Je garde le critère plutôt que de ne rien évaluer sur cette dimension —
+c'est un choix, pas un oubli.
 -->
 
 ---
