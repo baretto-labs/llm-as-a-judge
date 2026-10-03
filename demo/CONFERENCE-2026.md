@@ -431,14 +431,18 @@ salle la verra.
 ## L'ordre des champs décide du comportement
 
 ```
-  ✗  {                        ✓  <thinking> … </thinking>
-       "verdict": "PASS",          {
-       "checks": { … }               "checks":  { … },
-     }                               "verdict": "FAIL",
-                                     "reason":  "…"
-                                   }
+  ✗  {                      ✓  <thinking>  1. …  2. …  3. …  </thinking>
+       "verdict": "PASS",       {
+       "checks": { … }            "checks": {
+     }                              "exactitude_technique": true,
+                                    "absence_de_bugs":      false,
+                                    "respect_consignes":    true
+                                  },
+                                  "verdict": "FAIL",
+                                  "reason":  "…"
+                                }
 
-     décide, puis justifie       constate, puis conclut
+     décide, puis justifie     constate, puis conclut
 ```
 
 Un LLM génère **de gauche à droite**. Il ne revient pas en arrière.

@@ -663,14 +663,18 @@ section.dense li { margin-bottom: 0.55em; }
 .deux { display: grid; grid-template-columns: 1fr 1fr; gap: 2.2rem; }
 ;background-color:#ffffff;background-image:none;" data-marpit-pagination-total="46">
 <h2 id="lordre-des-champs-d%C3%A9cide-du-comportement">L'ordre des champs décide du comportement</h2>
-<pre is="marp-pre" data-auto-scaling="downscale-only"><code>  ✗  {                        ✓  &lt;thinking&gt; … &lt;/thinking&gt;
-       &quot;verdict&quot;: &quot;PASS&quot;,          {
-       &quot;checks&quot;: { … }               &quot;checks&quot;:  { … },
-     }                               &quot;verdict&quot;: &quot;FAIL&quot;,
-                                     &quot;reason&quot;:  &quot;…&quot;
-                                   }
+<pre is="marp-pre" data-auto-scaling="downscale-only"><code>  ✗  {                      ✓  &lt;thinking&gt;  1. …  2. …  3. …  &lt;/thinking&gt;
+       &quot;verdict&quot;: &quot;PASS&quot;,       {
+       &quot;checks&quot;: { … }            &quot;checks&quot;: {
+     }                              &quot;exactitude_technique&quot;: true,
+                                    &quot;absence_de_bugs&quot;:      false,
+                                    &quot;respect_consignes&quot;:    true
+                                  },
+                                  &quot;verdict&quot;: &quot;FAIL&quot;,
+                                  &quot;reason&quot;:  &quot;…&quot;
+                                }
 
-     décide, puis justifie       constate, puis conclut
+     décide, puis justifie     constate, puis conclut
 </code></pre>
 <p>Un LLM génère <strong>de gauche à droite</strong>. Il ne revient pas en arrière.<br />
 Verdict en premier : les contrôles sont écrits pour être <strong>cohérents avec une<br />
