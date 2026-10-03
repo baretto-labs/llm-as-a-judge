@@ -907,10 +907,21 @@ Sur les 60 questions, **24 les départagent.**
 
 Le hasard seul donnerait 12 – 12. → **p = 0,0066**
 
+Et une mesure **sans aucun LLM** — compter les identifiants attendus dans le
+contexte récupéré — les classe dans le même ordre : **0,697 contre 0,596.**
+La conclusion ne repose donc pas sur l'instrument seul.
+
 <!--
 Chiffre retiré de l'écran mais disponible : la cohérence du juge, c'est-à-dire la
 part des verdicts qui correspondent bien à ses propres contrôles, est de 100 %
 pour Lucene et 98,3 % pour Neo4j.
+Sur la mesure sans LLM : c'est la même idée que le filtre déterministe du début
+du talk. En amont elle économise des jetons, en aval elle sert de contre-expertise.
+Elle s'appelle hintCoverage, elle ne coûte qu'une liste d'identifiants attendus
+par question et un comptage. Si les deux méthodes s'étaient contredites, je
+n'aurais rien conclu du tout — c'est un garde-fou qu'on construit avant de
+connaître le résultat, pas après.
+
 Seules les paires discordantes portent de l'information : les questions où les
 deux stratégies font pareil ne départagent rien. Leur nombre est le vrai
 déterminant de la puissance à cet effectif, donc je le donne avec le p, jamais
@@ -958,29 +969,6 @@ La conséquence pratique, et c'est pour ça que je donne toujours le nombre de
 paires avec le p : doubler le nombre de questions ne sert à rien si elles sont
 faciles. Ce qui compte, c'est combien de questions font diverger les deux
 systèmes.
--->
-
----
-
-## Le contrôle qui ne passe pas par le juge
-
-`hintCoverage` — on compte les identifiants attendus
-présents dans le contexte récupéré. **Aucun LLM.**
-
-**Lucene 0,697. Neo4j 0,596.**
-
-Le même ordre que le juge — sans juge.
-
-**La conclusion ne repose donc pas sur l'instrument seul.**
-
-<!--
-C'est le filtre déterministe du début du talk, qui revient sous une autre forme.
-En amont il économise des jetons ; en aval il sert de validation croisée.
-
-Et ça ne coûte rien : une liste d'identifiants attendus par question, un
-comptage. Si les deux méthodes s'étaient contredites, je n'aurais rien conclu du
-tout — c'est le genre de garde-fou qu'on construit avant de connaître le
-résultat, pas après.
 -->
 
 ---
