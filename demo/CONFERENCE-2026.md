@@ -45,13 +45,18 @@ style: |
   h1 { font-size: 2.2rem; font-weight: 600; }
   h2 { font-size: 1.7rem; font-weight: 600; margin-bottom: 0.8em; }
   ul { line-height: 1.8; }
-  strong { font-weight: 600; }
+  strong { font-weight: 700; }
   table { font-size: 0.95rem; }
   .ref { font-size: 0.85rem; color: #666; }
   section.title { justify-content: center; }
   .carte { display: flex; gap: 2.5rem; align-items: flex-start; }
   .carte > .texte { flex: 1; min-width: 0; }
   .carte img { border: 1px solid #e5e5e5; border-radius: 6px; flex: none; }
+  section.dense { font-size: 1.2rem; }
+  section.dense h2 { font-size: 1.5rem; margin-bottom: 0.5em; }
+  section.dense ul { line-height: 1.45; }
+  section.dense li { margin-bottom: 0.55em; }
+  .deux { display: grid; grid-template-columns: 1fr 1fr; gap: 2.2rem; }
 ---
 
 <!-- _class: title -->
@@ -110,27 +115,30 @@ sur pièce, donc volontairement absents de l'écran.
 
 ---
 
+<!-- _class: dense -->
+
 ## Et ce n'est pas un cas isolé
 
-**DOCUMENTÉ** — décision de justice ou document public
+<div class="deux">
+<div>
 
-- **Mata v. Avianca, 2023** — un avocat dépose **six décisions de justice
-  inventées** par ChatGPT, citations d'apparence normale. Le juge constate
-  « conscious avoidance ». 5 000 $ de sanction.
-  <span class="ref">S.D.N.Y., 22-cv-1461 (PKC), juge P. Kevin Castel, 22 juin 2023</span>
+**DOCUMENTÉ** <span class="ref">— décision de justice ou document public</span>
 
-- **Deloitte Australie, 2025** — rapport à 440 000 AUD remis au *Department of
-  Employment and Workplace Relations*. Références fabriquées, dont une citation
-  attribuée à un juge fédéral. ~97 000 AUD remboursés. La version corrigée
-  mentionne l'usage d'Azure OpenAI.
+- **Mata v. Avianca, 2023** — un avocat dépose **six décisions de justice inventées** par ChatGPT, avec des citations d'apparence normale. Le juge constate « conscious avoidance ». **5 000 $** de sanction. <span class="ref">S.D.N.Y., 22-cv-1461, juge P. Kevin Castel, 22 juin 2023</span>
 
-**RAPPORTÉ PAR LA PRESSE** — non vérifié sur source primaire
+- **Deloitte Australie, 2025** — rapport à **440 000 AUD** remis à un ministère. Références fabriquées, dont une citation attribuée à un juge fédéral. **~97 000 AUD remboursés.** <span class="ref">la version corrigée mentionne l'usage d'Azure OpenAI</span>
 
-- **NYC MyCity, 2024** — le chatbot municipal conseille des pratiques contraires
-  au droit du travail.
+</div>
+<div>
 
-- **Chevrolet de Watsonville, 2023** — chatbot détourné par injection de prompt,
-  accepte de vendre un véhicule pour **1 $**.
+**RAPPORTÉ PAR LA PRESSE** <span class="ref">— non vérifié sur source primaire</span>
+
+- **NYC MyCity, 2024** — le chatbot de la ville conseille des pratiques contraires au droit du travail.
+
+- **Chevrolet de Watsonville, 2023** — chatbot détourné par injection de prompt, accepte de vendre un véhicule pour **1 $**.
+
+</div>
+</div>
 
 <!--
 Diapositive à survoler, deux secondes minimum à l'écran — en dessous, la salle
