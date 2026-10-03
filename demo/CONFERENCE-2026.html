@@ -617,7 +617,10 @@ Est-ce qu'on livre, ou pas ? La note ne répond pas.</p>
 la longueur impressionne, la main glisse vers le milieu,<br />
 et personne ne peut dire ce qui sépare 13 de 14.</p>
 <p><strong>Une question binaire force la décision.</strong> Elle se discute, donc elle se corrige.</p>
-<p><span class="ref">Mesuré ailleurs : décomposer en questions binaires fait gagner 0,45 d'accord entre 12 modèles évaluateurs — CheckEval, EMNLP 2025</span></p>
+<p>Mesuré ailleurs : douze modèles évaluateurs notent les mêmes textes.<br />
+Avec une échelle, leur accord vaut <strong>0,09</strong> — autant dire rien.<br />
+Avec des questions binaires, <strong>0,48</strong>.</p>
+<p><span class="ref">CheckEval, EMNLP 2025 — Lee et al.</span></p>
 </section>
 </foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="12" data-paginate="true" data-background-color="#ffffff" data-theme="default" data-style="section {
   font-family: 'Segoe UI', system-ui, sans-serif;
@@ -2743,7 +2746,19 @@ donc rien ne s'attribue à ma modification.
 C'est l'offline qui ferme le tunnel dont je parlais tout à l'heure. Rejouer les
 MÊMES questions est la seule façon de savoir si une modification améliore ou
 dégrade, et la seule façon de comparer deux stratégies : Lucene et Neo4j doivent
-répondre aux mêmes 60 questions pour être comparables.</p></div><div class="bespoke-marp-note" data-index="10" tabindex="0"><p>À dire clairement : ce point-là, je ne l'ai pas mesuré. Je m'appuie sur la
+répondre aux mêmes 60 questions pour être comparables.</p></div><div class="bespoke-marp-note" data-index="10" tabindex="0"><p>⚠ Les chiffres exacts, vérifiés dans le papier (arXiv 2403.18771, tables IEA) :
+Krippendorff α passe de 0,09 à 0,48 sur SummEval, et de 0,06 à 0,45 sur
+Topical-Chat, entre une notation en échelle (G-Eval) et les questions binaires.
+L'abstract annonce « +0,45 d'accord moyen » ; les écarts lisibles dans les tables
+font plutôt +0,39, la moyenne de l'abstract portant sur plus de groupes. D'où
+l'avant/après à l'écran plutôt que le gain — il est tiré de la table et
+inattaquable.
+
+Si la question « 0,48 c'est faible, non ? » vient : oui, c'est moyen. Mais le
+point n'est pas le niveau atteint, c'est le départ. 0,09, c'est l'accord de
+correcteurs qui cocheraient au hasard.
+
+À dire clairement : ce point-là, je ne l'ai pas mesuré. Je m'appuie sur la
 littérature. C'est la seule affirmation du talk dans ce cas, et autant le dire
 plutôt que le laisser croire.
 

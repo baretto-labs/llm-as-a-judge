@@ -397,9 +397,25 @@ et personne ne peut dire ce qui sépare 13 de 14.
 
 **Une question binaire force la décision.** Elle se discute, donc elle se corrige.
 
-<span class="ref">Mesuré ailleurs : décomposer en questions binaires fait gagner 0,45 d'accord entre 12 modèles évaluateurs — CheckEval, EMNLP 2025</span>
+Mesuré ailleurs : douze modèles évaluateurs notent les mêmes textes.
+Avec une échelle, leur accord vaut **0,09** — autant dire rien.
+Avec des questions binaires, **0,48**.
+
+<span class="ref">CheckEval, EMNLP 2025 — Lee et al.</span>
 
 <!--
+⚠ Les chiffres exacts, vérifiés dans le papier (arXiv 2403.18771, tables IEA) :
+Krippendorff α passe de 0,09 à 0,48 sur SummEval, et de 0,06 à 0,45 sur
+Topical-Chat, entre une notation en échelle (G-Eval) et les questions binaires.
+L'abstract annonce « +0,45 d'accord moyen » ; les écarts lisibles dans les tables
+font plutôt +0,39, la moyenne de l'abstract portant sur plus de groupes. D'où
+l'avant/après à l'écran plutôt que le gain — il est tiré de la table et
+inattaquable.
+
+Si la question « 0,48 c'est faible, non ? » vient : oui, c'est moyen. Mais le
+point n'est pas le niveau atteint, c'est le départ. 0,09, c'est l'accord de
+correcteurs qui cocheraient au hasard.
+
 À dire clairement : ce point-là, je ne l'ai pas mesuré. Je m'appuie sur la
 littérature. C'est la seule affirmation du talk dans ce cas, et autant le dire
 plutôt que le laisser croire.
