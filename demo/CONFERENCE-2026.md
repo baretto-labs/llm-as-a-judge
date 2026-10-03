@@ -646,9 +646,12 @@ améliore l'exactitude globale au lieu de la dégrader.
 | l'écriture reconnue | un **relecteur humain**, et un test de permutation | **mesuré** — 17 / 17 |
 | l'indulgence | publier le **taux d'erreurs attrapées**, pas l'exactitude | **mesuré** — 59 % |
 
-**Ne jamais présenter un biais cité comme un biais mesuré.**
+Quatre de ces cinq, je les ai **mesurés chez moi**. Le cinquième, non — je le **cite**.
 
 <!--
+La règle, à dire plutôt qu'à afficher : ne jamais présenter un biais cité comme
+un biais mesuré.
+
 Quatre des cinq parades sont des mesures, une seule est une précaution reprise de
 la littérature. C'est la seule chose qui sépare un retour d'expérience d'une revue
 de littérature mal digérée — et c'est aussi ce qui me permet de dire « je ne sais
