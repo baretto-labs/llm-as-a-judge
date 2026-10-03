@@ -428,58 +428,25 @@ salle la verra.
 
 ---
 
-## Le verdict n'est pas une opinion, c'est une conjonction
-
-```json
-<thinking>
-  1. …   2. …   3. …
-</thinking>
-{
-  "checks": {
-    "exactitude_technique": true,
-    "absence_de_bugs":      false,
-    "respect_consignes":    true
-  },
-  "verdict": "FAIL",
-  "reason":  "Diagnostic exact mais correctif faux : …"
-}
-```
-
-**PASS ⟺ tous les contrôles vrais.** Un seul `false` ⇒ FAIL.
-
-<!--
-Pas de demi-mesure, pas de « globalement acceptable ». Le verdict n'est pas
-jugé, il est CALCULÉ — donc vérifiable : je peux recalculer chaque verdict depuis
-les contrôles et détecter un juge qui se contredit. C'est comme ça que je mesure
-sa cohérence.
-
-Le vrai gain de la décomposition n'est pas la fiabilité. Une note globale dit
-QU'une réponse échoue ; les contrôles atomiques disent LEQUEL échoue. C'est ce
-qui me permettra, tout à l'heure, de conclure que Neo4j souffre d'un défaut de
-rappel et non d'un problème de bruit. Sans eux : un écart de 25 points sans
-explication.
-
-« reason » vient en dernier : le champ existe pour l'humain qui relira, pas pour
-la machine, et venant après le verdict il ne peut pas l'influencer.
--->
-
----
-
 ## L'ordre des champs décide du comportement
 
 ```
-  ✗  {                        ✓  {
-       "verdict": "PASS",          "checks": { … },
-       "checks": { … }             "verdict": "FAIL"
-     }                           }
+  ✗  {                        ✓  <thinking> … </thinking>
+       "verdict": "PASS",          {
+       "checks": { … }               "checks":  { … },
+     }                               "verdict": "FAIL",
+                                     "reason":  "…"
+                                   }
 
      décide, puis justifie       constate, puis conclut
 ```
 
 Un LLM génère **de gauche à droite**. Il ne revient pas en arrière.
-
 Verdict en premier : les contrôles sont écrits pour être **cohérents avec une
 décision déjà prise**.
+
+Et le verdict ne s'opine pas, il se calcule :
+**PASS si et seulement si tous les contrôles sont vrais.** Un seul `false` ⇒ FAIL.
 
 <!--
 C'est la chose la moins intuitive de tout le talk, et c'est deux caractères dans
@@ -491,6 +458,22 @@ Le bloc <thinking> obéit à la même logique. Raisonnement avant les contrôles
 contrôles avant le verdict : chaque étape conditionne la suivante dans le bon
 sens. Ce n'est pas trois décisions, c'en est une.
 
+Le verdict est calculé, donc vérifiable : on peut le recalculer depuis les
+contrôles et détecter un juge qui se contredit. C'est comme ça que sa cohérence
+est mesurée.
+
+Le vrai gain de la décomposition n'est pas la fiabilité. Une note globale dit
+QU'une réponse échoue ; les contrôles atomiques disent LEQUEL échoue. C'est ce
+qui permettra, en partie 3, de conclure que Neo4j souffre d'un défaut de rappel
+et non d'un problème de bruit.
+
+« reason » vient en dernier : il est écrit pour l'humain qui relira, et venant
+après le verdict il ne peut pas l'influencer.
+
+Contre-chiffre à ne pas taire, il revient en partie 4 : la conjonction ABSORBE
+les désaccords. Sur 50 items, 17 portent un désaccord sur au moins un contrôle,
+dont 15 que le verdict masque.
+
 ⚠ Je n'ai PAS mesuré l'écart entre les deux ordres : j'ai choisi le bon dès le
 départ. C'est un raisonnement sur le fonctionnement de la génération, pas un
 résultat expérimental. Le dire tel quel.
@@ -498,35 +481,10 @@ résultat expérimental. Le dire tel quel.
 
 ---
 
-## Une rubrique, pas une consigne
-
-**Raisonner d'abord, trancher ensuite** — le bloc `<thinking>` avant le JSON.
-
-**Décomposer en critères atomiques**, vrai ou faux, jamais « plutôt bien ».
-
-```
-  ✗  « La réponse est-elle de bonne qualité ? »
-
-  ✓  trois questions auxquelles on répond par oui ou non
-```
-
-Et un critère se formule comme **une question sur le texte**,
-jamais comme une propriété du monde.
-
-<!--
-Personne ne peut démontrer qu'un code n'a pas de bugs. On peut seulement dire si
-on en a repéré un. La nuance décide de tout : on détecte, on ne démontre pas.
-
-Le test d'un bon critère : deux personnes qui lisent la même réponse répondent
-pareil, sans se parler. Si elles hésitent, ce n'est pas la réponse qui est
-ambiguë, c'est le critère.
--->
-
----
-
 ## Mes critères, et d'où ils viennent
 
-Ils ne sont **pas une liste que j'ai choisie.**
+Un critère se formule comme **une question sur le texte**, jamais comme une
+propriété du monde. Et ils ne sont **pas une liste que j'ai choisie.**
 
 ```
   GÉNÉRIQUES — toute analyse de code            sur 150 / 150 exemples
@@ -1424,7 +1382,7 @@ réalisé.
                         ni juge, ni humain
 
   juge d'accord      →  automatique
-  avec lui-même ?       PASS ⟺ tous les contrôles vrais
+  avec lui-même ?       PASS si et seulement si tous les contrôles sont vrais
 
   juge instable ?    →  un humain
                         le seul cas légitime
