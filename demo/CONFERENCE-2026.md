@@ -46,7 +46,8 @@ style: |
   h2 { font-size: 1.7rem; font-weight: 600; margin-bottom: 0.8em; }
   ul { line-height: 1.8; }
   strong { font-weight: 700; }
-  table { font-size: 0.95rem; }
+  section table { display: table; width: 100%; font-size: 1rem; }
+  section th, section td { padding: 0.4em 0.7em; }
   .ref { font-size: 0.85rem; color: #666; }
   section.title { justify-content: center; }
   .carte { display: flex; gap: 2.5rem; align-items: flex-start; }
@@ -645,8 +646,7 @@ améliore l'exactitude globale au lieu de la dégrader.
 | l'écriture reconnue | un **relecteur humain**, et un test de permutation | **mesuré** — 17 / 17 |
 | l'indulgence | publier le **taux d'erreurs attrapées**, pas l'exactitude | **mesuré** — 59 % |
 
-**La dernière colonne est le sujet de cette diapositive.**
-Ne jamais présenter un biais **cité** comme un biais **mesuré**.
+**Ne jamais présenter un biais cité comme un biais mesuré.**
 
 <!--
 Quatre des cinq parades sont des mesures, une seule est une précaution reprise de
@@ -1267,8 +1267,6 @@ compte 46 %. Trois mesures indépendantes, un même diagnostic : il est indulgen
 | **+ conventions écrites** | **76,0 %** | 100 % |
 | **Fine-tuné** (91 min) | **76,0 %** | 100 % |
 
-La stabilité du verdict, elle, **baisse** — j'y viens juste après.
-
 **12 items les départagent. 6 d'un côté, 6 de l'autre.**
 Une pièce équilibrée. → **p = 1,0000**
 
@@ -1290,7 +1288,8 @@ avec sa formulation — c'est exactement ce à quoi sert un pré-enregistrement 
 pouvoir dire « je ne sais pas » sans que ce soit un échec, et sans céder à la
 tentation de redécouper les données jusqu'à trouver un p inférieur à 0,05.
 
-Troisième : ce qu'il a acheté est ailleurs, et c'est la diapositive suivante.
+Troisième : ce qu'il a acheté est ailleurs. Et la stabilité du verdict, elle,
+baisse — les deux diapositives suivantes.
 -->
 
 ---
