@@ -524,6 +524,11 @@ propriété du monde. Et ils ne sont **pas une liste que j'ai choisie.**
 ```
 
 <!--
+Le modèle n'apprend pas mon domaine, il apprend à suivre un barème — et c'est le
+barème qui porte le domaine. C'est pour ça que mes trois types de tâche partagent
+le même moteur : un seul correcteur, trois barèmes. Changer de domaine, c'est
+changer de barème, pas réentraîner.
+
 C'est la réponse à « comment savez-vous que ce sont les bons critères ». Je ne le
 décide pas pour la troisième catégorie : je la lis dans la requête. Si la demande
 impose une contrainte, elle devient un critère nommé. Sinon il n'existe pas.
@@ -571,33 +576,6 @@ Ce qui reste, et qu'il faut dire si on insiste : les requêtes dont la consigne 
 elle-même vague. Là, aucune décomposition n'est possible sans réécrire la
 question. Je garde le critère plutôt que de ne rien évaluer sur cette dimension —
 c'est un choix, pas un oubli.
--->
-
----
-
-## Séparer le moteur de la grille
-
-**Un seul correcteur. Deux barèmes.**
-
-```
-  BARÈME « CODE »                    BARÈME « DOCUMENTATION »
-
-  les API citées existent            les étapes sont dans l'ordre
-  un défaut visible fausse tout      aucune commande inventée
-  la consigne est respectée          les prérequis sont dits
-```
-
-Le modèle n'apprend pas **mon** domaine.
-Il apprend à **suivre un barème** — et c'est le barème qui porte le domaine.
-
-<!--
-C'est ce qui rend le juge réutilisable. Si j'avais entraîné le modèle sur « ce
-qu'est une bonne réponse pour OllamAssist », il ne servirait qu'à OllamAssist.
-Entraîné à coller à une grille, il change de domaine en changeant de grille.
-
-Conséquence directe sur le corpus : mes exemples d'entraînement portent trois
-marqueurs de tâche différents — analyse de code, pertinence du contexte
-récupéré, fidélité au contexte. Le même moteur, trois grilles.
 -->
 
 ---
@@ -1037,31 +1015,10 @@ preuve positive.
 
 ---
 
-## « On est d'accord 9 fois sur 10 »
-
-100 copies à corriger. **90 sont mauvaises.**
-
-Deux correcteurs **recalent tout le monde**, sans rien lire.
-
-→ ils sont **d'accord 9 fois sur 10.**
-
-L'accord brut ne mesure pas la compétence.
-Il mesure surtout **le déséquilibre du paquet de copies.**
-
-<!--
-C'est le piège le plus facile à tomber dedans, et le plus flatteur : on annonce
-un fort taux d'accord, et on croit avoir prouvé que son étalon est fiable.
-
-Or dès qu'une classe domine, l'accord est presque gratuit. Il faut donc enlever
-la part du hasard avant de parler de fiabilité.
-
-Le même raisonnement vaut pour une exactitude : 90 % de bonnes réponses sur un
-jeu où 90 % des cas sont de la même classe, c'est zéro information.
--->
-
----
-
 ## κ de Cohen, sur un cas réel
+
+Deux correcteurs qui **recaleraient tout le monde sans rien lire** seraient
+d'accord 9 fois sur 10. L'accord brut mesure surtout le **déséquilibre du paquet.**
 
 Deux correcteurs, 100 copies. Ils sont d'accord sur **90.**
 
@@ -1134,7 +1091,11 @@ Le premier dit *« mon étalon est-il fiable ? »*
 Le second dit *« mon juge est-il aligné ? »*
 
 **0,880 entre humains. 0,44 pour le juge.**
+
 Le plafond n'est pas le modèle — c'est ce que le corpus enseigne.
+Sur mes 50 items, **17 portent un désaccord sur au moins un contrôle, dont 15 que
+le verdict masque.** Le verdict est reproductible ; les **raisons** le sont
+beaucoup moins. Or c'est sur les raisons que le juge s'entraîne.
 
 <!--
 Présenter le premier comme le second est l'erreur la plus fréquente, et la plus
@@ -1147,33 +1108,6 @@ Et un κ bas ne veut pas toujours dire ce qu'on croit : mon contrôle le plus
 fréquent tombe à κ = 0,386 pour 78 % d'accord brut, simplement parce que les
 marges sont très déséquilibrées. Publier le κ seul sous-estime l'accord, publier
 les 78 % seuls le surestime. Les deux vont ensemble.
--->
-
----
-
-## Ce que le verdict cache
-
-**17 items sur 50** portent un désaccord sur au moins un contrôle.
-**15 d'entre eux : le verdict est identique quand même.**
-
-Le verdict est une conjonction — dès qu'un contrôle échoue des deux côtés,
-un désaccord sur un autre devient **invisible**.
-
-**Le verdict est reproductible. Les raisons le sont beaucoup moins.**
-
-Or c'est sur les raisons que le juge s'entraîne.
-
-<!--
-C'est le contre-chiffre de ma propre méthode, et je préfère le donner moi-même.
-
-Ce n'est pas un défaut de la conjonction — la conjonction fait exactement ce
-qu'on lui demande. C'est un plafond sur ce que le fine-tuning peut apprendre, et
-c'est une propriété de mon corpus.
-
-Une asymétrie qui n'est pas du bruit, et qui mérite d'être dite : 16 désaccords
-sur 22 vont dans le même sens, l'annotateur humain plus sévère que l'étiquette
-rédigée par le modèle. Une vérité de référence écrite par un LLM puis relue est
-plus indulgente que ce qu'un humain aurait produit seul.
 -->
 
 ---
