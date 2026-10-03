@@ -905,7 +905,8 @@ rejoue pas n'est pas une mesure.
 Sur les 60 questions, **24 les départagent.**
 **Lucene en gagne 19. Neo4j en gagne 5.**
 
-Le hasard seul donnerait 12 – 12. → **p = 0,0066**
+Le hasard seul donnerait 12 – 12. Obtenir 19 – 5, c'est tirer **19 fois pile
+sur 24 lancers.** → **p = 0,0066**
 
 Et une mesure **sans aucun LLM** — compter les identifiants attendus dans le
 contexte récupéré — les classe dans le même ordre : **0,697 contre 0,596.**
@@ -915,6 +916,15 @@ La conclusion ne repose donc pas sur l'instrument seul.
 Chiffre retiré de l'écran mais disponible : la cohérence du juge, c'est-à-dire la
 part des verdicts qui correspondent bien à ses propres contrôles, est de 100 %
 pour Lucene et 98,3 % pour Neo4j.
+Les 36 autres questions ne sont pas perdues : elles disent que les deux
+stratégies se valent là-dessus. Elles ne peuvent simplement pas servir à
+trancher. Le test apparié n'est rien d'autre qu'une pièce lancée autant de fois
+qu'il y a de questions qui départagent — ni boîte noire, ni magie.
+
+Conséquence pratique, et c'est pour ça que je donne toujours le nombre de
+questions qui départagent : doubler le nombre de questions ne sert à rien si
+elles sont faciles. Ce qui compte, c'est combien font diverger les deux systèmes.
+
 Sur la mesure sans LLM : c'est la même idée que le filtre déterministe du début
 du talk. En amont elle économise des jetons, en aval elle sert de contre-expertise.
 Elle s'appelle hintCoverage, elle ne coûte qu'une liste d'identifiants attendus
@@ -934,41 +944,6 @@ explication.
 
 C'est exactement ce que les critères atomiques apportent sur une note globale :
 ils disent lequel échoue.
--->
-
----
-
-## Pourquoi 36 questions sur 60 ne comptent pas
-
-Sur 60 questions, les deux stratégies font **pareil 36 fois** :
-soit les deux réussissent, soit les deux échouent.
-
-Ces 36 ne départagent rien. **Il reste 24 questions** où l'une gagne
-et l'autre perd.
-
-```
-      Lucene gagne     19
-      Neo4j  gagne      5
-```
-
-S'il n'y avait aucune différence, on attendrait **12 – 12.**
-Obtenir 19 – 5, c'est tirer **19 fois pile sur 24 lancers.**
-
-→ **p = 0,0066.** Le test, c'est exactement ce calcul. Rien de plus.
-
-<!--
-C'est la diapositive qui démystifie le test apparié. McNemar n'est pas une boîte
-noire : c'est une pièce lancée autant de fois qu'il y a de questions qui
-départagent.
-
-Insister sur le fait que les 36 questions identiques ne sont pas perdues — elles
-disent que les deux stratégies se valent là-dessus. Elles ne peuvent simplement
-pas servir à trancher.
-
-La conséquence pratique, et c'est pour ça que je donne toujours le nombre de
-paires avec le p : doubler le nombre de questions ne sert à rien si elles sont
-faciles. Ce qui compte, c'est combien de questions font diverger les deux
-systèmes.
 -->
 
 ---
