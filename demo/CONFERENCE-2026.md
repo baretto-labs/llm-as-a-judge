@@ -773,19 +773,29 @@ C'est la référence de comparaison qui était fausse.
 
 ---
 
-## La fuite : 17 sur 17
+## La fuite que j'ai créée en la corrigeant
 
-17 requêtes du corpus portaient la même incise —
-*« si tu as le temps, dis un mot de X »*.
+17 requêtes du corpus portaient la même incise — *« si tu as le temps, dis un mot de X »*.
+**Les 17 étaient étiquetées PASS.**
 
-**Les 17 étaient étiquetées PASS. 17 sur 17.**
+Un juge n'a qu'à détecter la chaîne pour marquer 17 points.
+**Il n'apprend pas à juger. Il apprend à repérer ma signature.**
 
-Aucune statistique à faire : un juge n'a qu'à détecter la chaîne de caractères
-pour marquer 17 points.
+Correctif évident : ajouter l'incise à des FAIL. Sauf que je l'ai mise en
+**paragraphe isolé**, là où les 17 d'origine la portaient au fil du texte.
 
-**Le modèle n'apprend pas à juger. Il apprend à repérer ma signature.**
+Nouvelle règle apprise : *« paragraphe isolé ⇒ FAIL »*. **30 sur 30.**
+Elle a traversé une régénération, une validation à zéro erreur,
+**trois mesures et un commit.**
 
 <!--
+La fuite corrigée était à 17 sur 17. Celle que le correctif a créée est à 30 sur
+30. J'ai aggravé le problème en le réparant, et aucune de mes vérifications ne
+l'a vu — tout un dispositif conçu exprès pour l'attraper.
+
+Toute correction d'un corpus est une nouvelle écriture, et toute écriture
+introduit une signature.
+
 C'est une fuite déterministe, pas un biais statistique. La différence est
 importante : un biais déforme, une fuite dispense d'apprendre.
 
@@ -794,33 +804,6 @@ tournure de politesse à des réponses que je considérais bonnes.
 
 C'est le risque propre à un corpus écrit par une seule personne — et c'est
 exactement mon cas.
--->
-
----
-
-## Le correctif qui aggrave : 30 sur 30
-
-Correctif évident : ajouter la même incise à des FAIL existants.
-Règle de surface ramenée à **57 %**. Réglé.
-
-**Sauf que le correctif plaçait l'incise en paragraphe isolé**,
-là où les 17 d'origine la portaient au fil du texte.
-
-Nouvelle règle apprise : *« paragraphe isolé ⇒ FAIL »*. **30 sur 30.**
-
-Elle a traversé une régénération, une validation à zéro erreur,
-**trois mesures et un commit.**
-
-<!--
-La fuite corrigée était à 17 sur 17. La fuite créée par le correctif est à 30 sur
-30. J'ai aggravé le problème en le réparant, et aucune de mes vérifications ne
-l'a vu.
-
-Ce qui est instructif, ce n'est pas l'erreur, c'est qu'elle soit passée à travers
-tout un dispositif conçu exprès pour l'attraper.
-
-Toute correction d'un corpus est une nouvelle écriture, et toute écriture
-introduit une signature.
 -->
 
 ---
