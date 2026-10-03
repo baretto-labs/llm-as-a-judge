@@ -1279,10 +1279,11 @@ compte 46 %. Trois mesures indépendantes, un même diagnostic : il est indulgen
 | **+ conventions écrites** | **76,0 %** | 100 % |
 | **Fine-tuné** (91 min) | **76,0 %** | 100 % |
 
-**12 items les départagent. 6 d'un côté, 6 de l'autre.**
-Une pièce équilibrée. → **p = 1,0000**
+**12 items les départagent. 6 d'un côté, 6 de l'autre** — une pièce équilibrée.
 
-Et les deux **ratent 4 erreurs sur 10.** L'exactitude ne le dit pas.
+Je ne peux pas dire que le fine-tuning n'apporte rien. Je peux dire que
+**mes 50 items ne voient pas la différence** : en dessous de 15 points d'écart,
+ils sont aveugles.
 
 **Non concluant** — et cette issue était **écrite avant** de lancer la mesure.
 
@@ -1300,39 +1301,12 @@ avec sa formulation — c'est exactement ce à quoi sert un pré-enregistrement 
 pouvoir dire « je ne sais pas » sans que ce soit un échec, et sans céder à la
 tentation de redécouper les données jusqu'à trouver un p inférieur à 0,05.
 
-Troisième : ce qu'il a acheté est ailleurs. Et la stabilité du verdict, elle,
-baisse — les deux diapositives suivantes.
--->
+Troisième : ce qu'il a acheté est ailleurs, c'est la diapositive d'après.
 
----
-
-## « Non concluant » ne veut pas dire « identique »
-
-12 questions départagent les deux juges. **6 – 6.**
-
-C'est 6 piles et 6 faces sur 12 lancers : **exactement ce que donne une pièce
-équilibrée.**
-
-Je ne peux pas dire que le fine-tuning n'apporte rien.
-Je peux seulement dire que **mes 50 items ne voient pas la différence.**
-
-Avec 50 items, tout écart de moins de ~15 points est invisible.
-→ intervalle de confiance : **de −14 à +14 points.**
-
-<!--
-C'est la distinction que tout le monde saute, et elle change tout. « Pas de
-différence détectée » et « pas de différence » sont deux affirmations
-différentes. La première parle de mon dispositif, la seconde parlerait du monde.
-
-Traduire l'intervalle à voix haute : la vérité peut être que le fine-tuning fait
-perdre 14 points, ou qu'il en fait gagner 14. Mes données ne savent pas
-départager. Pour le savoir, il faudrait plus d'items — pas un autre calcul.
-
-Et c'est précisément ce que le pré-enregistrement protège : la limite était
-écrite avant les résultats, donc « je ne sais pas » est une issue déclarée et non
-un échec. Sans ça, la tentation est de redécouper les données jusqu'à trouver un
-p inférieur à 0,05 — et avec 13 contrôles et 3 strates, on finit toujours par en
-trouver un.
+« Pas de différence détectée » et « pas de différence » sont deux affirmations
+différentes : la première parle de mon dispositif, la seconde parlerait du monde.
+Traduire l'intervalle à voix haute — la vérité peut être une perte de 14 points
+comme un gain de 14. Pour trancher il faudrait plus d'items, pas un autre calcul.
 -->
 
 ---
@@ -1352,6 +1326,9 @@ exact** — les bons noms, et les contrôles **avant** le verdict.
 
 C'est ça qui rend deux exécutions comparables.
 
+**Le contre-chiffre : la stabilité du verdict baisse, 76 % → 58 %.**
+La baseline est stable parce qu'elle **décide avant de regarder.**
+
 <!--
 91 minutes de fine-tuning pour découvrir que le gain de justesse tenait dans
 quatre phrases d'invite, et que le fine-tuning servait à autre chose que ce que je
@@ -1365,49 +1342,17 @@ fine-tuné : validation_entree 100 %, contexte_pertinent 89 %, absence_invention
 
 C'est une leçon d'intégration, pas d'intelligence : un juge sert dans une chaîne
 automatisée, et une chaîne a besoin d'un contrat, pas de bonne volonté.
--->
 
----
+Sur la stabilité qui baisse, si on demande : les deux chiffres ne mesurent pas le
+même objet. D'un côté la constance d'un seul jeton écrit tôt ; de l'autre celle
+d'une conjonction de trois contrôles, dont n'importe lequel qui bascule fait
+basculer le verdict. Mesuré : le verdict du fine-tuné ne bouge jamais sans qu'un
+contrôle bouge — 0 item sur 50 — et 8 fois la conjonction absorbe la variation.
+La stabilité de la baseline est donc moins chère, et elle n'achète aucune
+justesse : les deux sont à 76,0 %.
 
-## Le contre-chiffre : la stabilité baisse
-
-**76 % → 58 %** de verdicts identiques sur trois passes.
-
-Ce n'est pas le juge qui devient capricieux. C'est **le nombre de choses qui
-peuvent bouger** :
-
-```
-   baseline    1 engagement pris tôt : le verdict
-   fine-tuné   3 contrôles, puis leur ET
-```
-
-Mesuré : son verdict ne bouge **jamais** sans qu'un contrôle bouge — **0 item
-sur 50.** Et 8 fois, la conjonction **absorbe** la variation.
-
-La baseline est stable parce qu'elle **décide avant de regarder.**
-
-<!--
-Les deux chiffres ne mesurent pas le même objet. D'un côté la constance d'un seul
-jeton écrit tôt ; de l'autre la constance d'une conjonction de trois décisions.
-Un seul des trois contrôles qui bascule fait basculer le verdict.
-
-Le détail, si la question vient : sur les 29 items où les contrôles varient, 1,8
-contrôle bascule en moyenne. 21 fois le verdict suit, 8 fois la conjonction
-absorbe. Et jamais l'inverse.
-
-Donc la stabilité de la baseline est moins chère — et elle n'achète aucune
-justesse : les deux sont à 76,0 % exactement.
-
-⚠ Un piège à ne pas tendre soi-même : la cohérence entre verdict et contrôles est
-de 99,3 % DANS LES DEUX CAS. Elle ne départage donc pas les deux ordres, et ne
-peut pas servir de preuve ici.
-
-Et il faut le dire en entier : aucune des trois variantes ne passe le filtre de
-recevabilité fixé d'avance — au mieux 76 % de stabilité pour un seuil à 95 %. Le
-juge présenté ici n'est pas prêt pour la production.
-
-⚠ Ne pas dire « le 32B fait mieux » : il n'a jamais été entraîné. Le déclarer non
-réalisé.
+Et aucune des trois variantes ne passe le filtre de recevabilité fixé d'avance :
+au mieux 76 % de stabilité pour un seuil à 95 %.
 -->
 
 ---
