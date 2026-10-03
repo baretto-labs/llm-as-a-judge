@@ -670,7 +670,7 @@ pas des instruments de recherche.
 
 ---
 
-## Le chiffre spectaculaire
+## J'ai trouvé un signal
 
 **La question :** est-ce que la simple **longueur** d'une réponse suffit à
 deviner son verdict ?
