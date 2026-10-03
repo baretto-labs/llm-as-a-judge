@@ -670,6 +670,43 @@ pas des instruments de recherche.
 
 ---
 
+## Pourquoi entraîner un juge
+
+Les conventions écrites font déjà beaucoup.
+Mon pari : un modèle entraîné sur **mes propres jugements** collera mieux à la
+grille, et tiendra le format à chaque fois.
+
+Pour le savoir, il faut un corpus.
+
+**200 exemples** écrits à la main. **50** mis de côté comme étalon, relus en
+aveugle par deux personnes : **47 verdicts identiques sur 50.**
+
+**Le corpus a pris des semaines.**
+
+<span class="ref">corpus, protocole et mesures : judge-finetune/ dans le dépôt</span>
+
+<!--
+C'est l'accroche qui manquait : jusqu'ici personne n'a dit qu'on entraînait quoi
+que ce soit. Sans elle, les trois diapositives qui suivent parlent d'un corpus et
+d'un modèle qui apprend une signature, sans qu'on sache pourquoi il y a un
+modèle.
+
+Annoncer le pari comme un pari, pas comme une conclusion : la partie 4 dira s'il
+était bon, et la réponse n'est pas celle que j'attendais.
+
+Chaque exemple : une requête, un contexte, une réponse à évaluer, et le jugement
+attendu — contrôles, verdict, raison.
+
+L'accord entre relecteurs vaut κ = 0,880, IC 95 % [0,720 — 1,000]. Je ne mets pas
+le κ à l'écran ici : il n'est expliqué qu'en partie 4, et un chiffre qu'on ne sait
+pas lire ne sert à rien. « 47 sur 50 » se comprend tout de suite.
+
+Et c'est la phrase à faire porter : le modèle s'entraînera en 91 minutes, le
+corpus a pris des semaines. Le coût n'est pas le GPU, c'est l'étalon.
+-->
+
+---
+
 ## J'ai trouvé un signal
 
 **La question :** est-ce que la simple **longueur** d'une réponse suffit à
@@ -824,8 +861,9 @@ Un MacBook Pro M3 Pro, 36 Go. **Aucun service cloud, aucun jeton facturé.**
 **11,3 Go** de mémoire au pic, sur 36 disponibles.
 **43,8 Mo** d'adaptateur produit — 0,078 % des paramètres du modèle.
 
-**Le fine-tuning d'un juge n'est pas un projet d'infrastructure.
-C'est une soirée.**
+Le corpus a pris des semaines. **Le modèle, lui : une soirée.**
+
+**Entraîner un juge n'est pas un projet d'infrastructure.**
 
 <!--
 Les chiffres exacts, si la question vient : Qwen2.5-Coder-14B quantifié en 4 bits,
@@ -842,35 +880,6 @@ flatteur, et c'est précisément ce qui rend la correction crédible.
 Pire : le tout premier relevé annonçait 690 minutes — un facteur 9 — parce que la
 machine s'était mise en veille pendant l'entraînement. Rien ne l'a signalé.
 Troisième fois que ça arrivait.
--->
-
----
-
-## Le corpus : c'est là que part le travail
-
-**200 exemples** écrits à la main, **50** mis de côté comme étalon.
-
-Chaque exemple : une requête, un contexte, une réponse à évaluer,
-et le jugement attendu — contrôles, verdict, raison.
-
-**Accord entre annotateurs humains sur l'étalon : κ = 0,880**
-<span class="ref">IC 95 % [0,720 — 1,000] — accord de verdict 47 items sur 50</span>
-
-Le modèle s'entraîne en 91 minutes.
-**Le corpus a pris des semaines.**
-
-<!--
-Si vous ne retenez qu'une chose de cette partie : le coût n'est pas le GPU,
-c'est l'étalon.
-
-Le κ de Cohen mesure l'accord en retirant l'accord dû au hasard. 0,880, c'est un
-accord fort — mais c'est l'accord sur MON étalon, entre un humain et des
-étiquettes. Ce n'est pas encore l'accord du juge. J'y reviens à la fin, parce
-que ces deux κ se confondent tout le temps.
-
-Les contextes RAG des exemples ne sont pas inventés : ce sont de vraies
-extractions Lucene et Neo4j sur ma codebase, gardées telles quelles, avec leurs
-quasi-homonymes et leurs corps tronqués.
 -->
 
 ---
