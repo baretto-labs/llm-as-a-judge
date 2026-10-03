@@ -408,6 +408,12 @@ Exemple OllamAssist : « cette explication de ma classe RagService, elle vaut
 13 ou 14 sur 20 ? » La question n'a pas de réponse. « Est-ce qu'elle cite une
 méthode qui n'existe pas ? » en a une.
 
+Si on demande pourquoi j'y crois : j'ai moi-même présenté, il y a quelques mois,
+« +154 % en ajoutant BM25 » — calculé sur un passage de 1,8 à 4,5 sur 10. Un
+pourcentage d'augmentation sur une échelle sans ancrage ne mesure rien, et d'une
+exécution à l'autre le juge ne redonnait pas 4,5. La classe correspondante est
+marquée @deprecated depuis le 2026-09-13, la raison est écrite dans le code.
+
 Je n'ai pas fait combattre le gradué contre le binaire chez moi. J'ai abandonné
 le gradué, je ne l'ai pas battu en duel — la nuance compte, et quelqu'un dans la
 salle la verra.
@@ -488,37 +494,6 @@ sens. Ce n'est pas trois décisions, c'en est une.
 ⚠ Je n'ai PAS mesuré l'écart entre les deux ordres : j'ai choisi le bon dès le
 départ. C'est un raisonnement sur le fonctionnement de la génération, pas un
 résultat expérimental. Le dire tel quel.
--->
-
----
-
-## Ce que j'ai présenté il y a quelques mois
-
-```
-  Lucene knn-only      1,8 / 10
-  Lucene hybrid        4,5 / 10
-
-        « +154 % en ajoutant BM25 »
-```
-
-Que vaut 4,5 ? Et 4,6 ? **Je ne savais pas répondre. Le juge non plus** —
-d'une exécution à l'autre, il ne redonnait pas 4,5.
-
-Un pourcentage d'augmentation sur une échelle sans ancrage **ne mesure rien**.
-
-Aujourd'hui, même question, instrument remplacé :
-**Lucene 48,3 % contre Neo4j 23,7 %, p = 0,0066.**
-
-<!--
-Je ne vous montre pas une erreur de débutant, je vous montre une diapositive que
-j'ai projetée.
-
-L'argument décisif n'est pas la fiabilité, c'est la décidabilité : une échelle
-0-10 sans ancrage ne se TESTE pas. Deux stratégies se comparent sur des verdicts
-appariés, pas sur des moyennes de notes.
-
-La classe LLMJudge est marquée @deprecated depuis le 2026-09-13, avec la raison
-écrite dans le code. Elle reste compilable : c'est l'artefact du chemin parcouru.
 -->
 
 ---
