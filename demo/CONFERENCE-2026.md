@@ -509,17 +509,17 @@ salle la verra.
 ```
 
 Un LLM génère **de gauche à droite**. Il ne revient pas en arrière.
-Verdict en premier : les contrôles sont écrits pour être **cohérents avec une
-décision déjà prise**.
-
 Et le verdict ne s'opine pas, il se calcule :
-**PASS si et seulement si tous les contrôles sont vrais.** Un seul `false` ⇒ FAIL.
+**PASS si et seulement si tous les contrôles sont vrais.**
 
-**Vérifié :** le verdict suit ses propres contrôles **99,3 %** du temps.
-**Pas vérifié :** que les contrôles suivent le `<thinking>`.
+Et le raisonnement affiché, est-il suivi ? **Je l'ai remplacé par celui d'un
+autre item :** le verdict bascule **une fois sur deux** — et quand il bascule,
+il suit le raisonnement imposé **23 fois sur 24**.
+
+**Le `<thinking>` est une cause réelle de la décision. Pas sa cause unique.**
 
 <!--
-▸ La chose la moins intuitive du talk, et ça tient en deux caractères. Je n'ai pas mesuré l'inverse — le dire.
+▸ La chose la moins intuitive du talk, et ça tient en deux caractères. Puis : « et le raisonnement, est-il suivi ? » — je l'ai mesuré.
 
 C'est la chose la moins intuitive de tout le talk, et c'est deux caractères dans
 un schéma JSON. Aucun modèle, aucun fine-tuning, aucun prompt ne rattrape un
@@ -546,14 +546,23 @@ Contre-chiffre à ne pas taire, il revient en partie 4 : la conjonction ABSORBE
 les désaccords. Sur 50 items, 17 portent un désaccord sur au moins un contrôle,
 dont 15 que le verdict masque.
 
-⚠ Sur le <thinking> : un raisonnement affiché ne prouve pas que le modèle l'a
-suivi. C'est documenté — Turpin et al., NeurIPS 2023, montrent qu'une chaîne de
-raisonnement peut être plausible et systématiquement infidèle. Lanham et al.,
-2023, proposent de le tester en tronquant la chaîne ou en y injectant une erreur.
-Nuance utile : les petits modèles produisent souvent un raisonnement PLUS fidèle
-que les gros.
-La réserve est donc étroite : le conditionnement contrôles → verdict est mesuré
-chez moi (99,3 %), celui de thinking → contrôles ne l'est pas.
+Les deux conditionnements sont mesurés. Contrôles → verdict : 99,3 % de
+cohérence. Thinking → décision : l'expérience de fidélité, 46 paires, 92
+générations, température 0, pré-enregistrée avant la mesure.
+
+⚠ Ne PAS dire « le modèle suit son raisonnement ». La métrique principale — 53 %
+de bascule, IC [38 %, 68 %] — tombe dans la zone que j'avais déclarée indécise.
+Ce qui est net, c'est la direction : quand ça bascule, ça suit, 23 fois sur 24.
+Donc « cause réelle, pas cause unique », et rien de plus.
+
+Validité : réimposer au modèle son PROPRE raisonnement lui fait reprendre sa
+décision 45 fois sur 46. Le pré-remplissage ne perturbe donc rien par lui-même.
+
+Littérature, si la question vient : Turpin et al., NeurIPS 2023, montrent qu'une
+chaîne peut être plausible et infidèle ; Lanham et al., 2023, proposent de le
+tester par perturbation — c'est ce protocole. Et les petits modèles raisonnent
+souvent plus fidèlement que les gros, ce qui va dans le sens de ce 14B.
+Tout est dans judge-finetune/fidelite/.
 
 ⚠ Je n'ai PAS mesuré l'écart entre les deux ordres : j'ai choisi le bon dès le
 départ. C'est un raisonnement sur le fonctionnement de la génération, pas un

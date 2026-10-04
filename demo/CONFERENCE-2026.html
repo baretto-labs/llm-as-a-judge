@@ -709,12 +709,12 @@ section.dense li { margin-bottom: 0.55em; }
      décide, puis justifie     constate, puis conclut
 </code></pre>
 <p>Un LLM génère <strong>de gauche à droite</strong>. Il ne revient pas en arrière.<br />
-Verdict en premier : les contrôles sont écrits pour être <strong>cohérents avec une<br />
-décision déjà prise</strong>.</p>
-<p>Et le verdict ne s'opine pas, il se calcule :<br />
-<strong>PASS si et seulement si tous les contrôles sont vrais.</strong> Un seul <code>false</code> ⇒ FAIL.</p>
-<p><strong>Vérifié :</strong> le verdict suit ses propres contrôles <strong>99,3 %</strong> du temps.<br />
-<strong>Pas vérifié :</strong> que les contrôles suivent le <code>&lt;thinking&gt;</code>.</p>
+Et le verdict ne s'opine pas, il se calcule :<br />
+<strong>PASS si et seulement si tous les contrôles sont vrais.</strong></p>
+<p>Et le raisonnement affiché, est-il suivi ? <strong>Je l'ai remplacé par celui d'un<br />
+autre item :</strong> le verdict bascule <strong>une fois sur deux</strong> — et quand il bascule,<br />
+il suit le raisonnement imposé <strong>23 fois sur 24</strong>.</p>
+<p><strong>Le <code>&lt;thinking&gt;</code> est une cause réelle de la décision. Pas sa cause unique.</strong></p>
 </section>
 </foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="13" data-paginate="true" data-background-color="#ffffff" data-theme="default" data-style="section {
   font-family: 'Segoe UI', system-ui, sans-serif;
@@ -2502,7 +2502,7 @@ salle la verra.
   aclanthology.org/2025.emnlp-main.796/ — l'abstract attribue les incohérences
   aux « subjective evaluation criteria combined with Likert scale scoring » et
   mesure « improves the average agreement across evaluator models by 0.45 ».
-- Zheng et al., NeurIPS 2023, Datasets and Benchmarks. arxiv.org/abs/2306.05685</p></div><div class="bespoke-marp-note" data-index="11" tabindex="0"><p>▸ La chose la moins intuitive du talk, et ça tient en deux caractères. Je n'ai pas mesuré l'inverse — le dire.
+- Zheng et al., NeurIPS 2023, Datasets and Benchmarks. arxiv.org/abs/2306.05685</p></div><div class="bespoke-marp-note" data-index="11" tabindex="0"><p>▸ La chose la moins intuitive du talk, et ça tient en deux caractères. Puis : « et le raisonnement, est-il suivi ? » — je l'ai mesuré.
 
 C'est la chose la moins intuitive de tout le talk, et c'est deux caractères dans
 un schéma JSON. Aucun modèle, aucun fine-tuning, aucun prompt ne rattrape un
@@ -2529,14 +2529,23 @@ Contre-chiffre à ne pas taire, il revient en partie 4 : la conjonction ABSORBE
 les désaccords. Sur 50 items, 17 portent un désaccord sur au moins un contrôle,
 dont 15 que le verdict masque.
 
-⚠ Sur le &lt;thinking&gt; : un raisonnement affiché ne prouve pas que le modèle l'a
-suivi. C'est documenté — Turpin et al., NeurIPS 2023, montrent qu'une chaîne de
-raisonnement peut être plausible et systématiquement infidèle. Lanham et al.,
-2023, proposent de le tester en tronquant la chaîne ou en y injectant une erreur.
-Nuance utile : les petits modèles produisent souvent un raisonnement PLUS fidèle
-que les gros.
-La réserve est donc étroite : le conditionnement contrôles → verdict est mesuré
-chez moi (99,3 %), celui de thinking → contrôles ne l'est pas.
+Les deux conditionnements sont mesurés. Contrôles → verdict : 99,3 % de
+cohérence. Thinking → décision : l'expérience de fidélité, 46 paires, 92
+générations, température 0, pré-enregistrée avant la mesure.
+
+⚠ Ne PAS dire « le modèle suit son raisonnement ». La métrique principale — 53 %
+de bascule, IC [38 %, 68 %] — tombe dans la zone que j'avais déclarée indécise.
+Ce qui est net, c'est la direction : quand ça bascule, ça suit, 23 fois sur 24.
+Donc « cause réelle, pas cause unique », et rien de plus.
+
+Validité : réimposer au modèle son PROPRE raisonnement lui fait reprendre sa
+décision 45 fois sur 46. Le pré-remplissage ne perturbe donc rien par lui-même.
+
+Littérature, si la question vient : Turpin et al., NeurIPS 2023, montrent qu'une
+chaîne peut être plausible et infidèle ; Lanham et al., 2023, proposent de le
+tester par perturbation — c'est ce protocole. Et les petits modèles raisonnent
+souvent plus fidèlement que les gros, ce qui va dans le sens de ce 14B.
+Tout est dans judge-finetune/fidelite/.
 
 ⚠ Je n'ai PAS mesuré l'écart entre les deux ordres : j'ai choisi le bon dès le
 départ. C'est un raisonnement sur le fonctionnement de la génération, pas un
