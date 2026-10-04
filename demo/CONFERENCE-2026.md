@@ -1326,7 +1326,9 @@ Mais sous **son propre nom de clé**, et avec **le verdict avant.**
 Le fine-tuning ne lui a pas appris à décomposer. Il lui a appris **le contrat
 exact** — les bons noms, et les contrôles **avant** le verdict.
 
-C'est ça qui rend deux exécutions comparables.
+C'est ça qui rend deux exécutions comparables — et **vérifiables** :
+le `<thinking>` **aide le modèle à décider**, les `checks` me permettent de
+**vérifier** sa décision.
 
 **Le contre-chiffre : la stabilité du verdict baisse, 76 % → 58 %.**
 La baseline est stable parce qu'elle **décide avant de regarder.**
@@ -1346,6 +1348,14 @@ fine-tuné : validation_entree 100 %, contexte_pertinent 89 %, absence_invention
 
 C'est une leçon d'intégration, pas d'intelligence : un juge sert dans une chaîne
 automatisée, et une chaîne a besoin d'un contrat, pas de bonne volonté.
+
+Sur les deux fonctions, si on creuse : le <thinking> est de la prose. Il est
+causalement lié à la décision — mesuré — mais ce n'est pas une explication
+garantie : dans les 47 % où un raisonnement contraire ne fait PAS basculer le
+verdict, c'est le contenu de la réponse qui l'emporte, et de l'extérieur on ne
+sait pas dans quel cas on est. Les checks, eux, sont une structure DONT LE
+VERDICT DÉCOULE : on peut le recalculer, détecter une contradiction, mesurer
+l'accord critère par critère. L'auditabilité vient de là, pas du raisonnement.
 
 Sur la stabilité qui baisse, si on demande : les deux chiffres ne mesurent pas le
 même objet. D'un côté la constance d'un seul jeton écrit tôt ; de l'autre celle
