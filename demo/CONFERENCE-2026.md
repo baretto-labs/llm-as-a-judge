@@ -520,7 +520,7 @@ raisonnement fait tomber la justesse de 71 % à 36 %.
 **Un risque dont je n'ai pas mesuré le bénéfice.** <span class="ref">judge-finetune/fidelite/</span>
 
 <!--
-▸ La chose la moins intuitive du talk, et ça tient en deux caractères. Sur le thinking : rester sur la littérature, une phrase sur ma mesure, et renvoyer au dépôt.
+▸ Deux caractères changent le comportement. Sur le thinking : « les deux vont dans le même sens, sans que l'un prouve l'autre » — puis le lien, et on avance.
 
 C'est la chose la moins intuitive de tout le talk, et c'est deux caractères dans
 un schéma JSON. Aucun modèle, aucun fine-tuning, aucun prompt ne rattrape un
@@ -548,7 +548,19 @@ les désaccords. Sur 50 items, 17 portent un désaccord sur au moins un contrôl
 dont 15 que le verdict masque.
 
 Ne pas entrer dans le détail de l'expérience ici — une phrase, et le lien.
-Le détail est disponible si on pose la question.
+
+C'est le SEUL endroit du talk où la littérature et ma mesure convergent : partout
+ailleurs je dois les séparer. À dire comme tel, c'est l'argument le plus solide
+qui existe — ni l'un ni l'autre ne porte le poids seul. Formulation : « la
+méta-analyse prédit un bénéfice minime hors mathématique et symbolique, ma tâche
+n'est pas symbolique, ma mesure ne voit pas de bénéfice. Les deux vont dans le
+même sens, sans que l'un prouve l'autre. »
+
+⚠ Deux pièges à éviter en le disant. Ma tâche n'est pas PUREMENT non symbolique :
+décider si un correctif fonctionne est du raisonnement algorithmique, là où la
+méta-analyse dit que ça paie. Dire « mixte, à dominante non symbolique ».
+Et ne pas inverser l'inférence : la méta-analyse parle de familles de tâches, pas
+de mon juge. Elle rend mon résultat attendu, elle ne le démontre pas.
 
 Les trois bras, si on creuse : raisonnement propre 72 % de justesse, raisonnement
 emprunté 36 %, raisonnement VIDE 74 %. Le troisième ne diffère pas du premier —
