@@ -173,3 +173,36 @@ bénéfice détectable, pour un coût multiplié par quatre.
 Ce n'est pas une réfutation : 46 items ne permettent pas de voir un écart de
 moins de ~15 points, et « je ne vois pas » n'est pas « il n'y a rien ». C'est une
 mesure là où la pratique courante repose sur une supposition.
+
+---
+
+# Et par type de question ? — analyse exploratoire, négative
+
+La méta-analyse de Sprague et al. dit que le bénéfice du raisonnement **dépend du
+type de tâche**. Question légitime : paierait-il sur certaines de mes questions ?
+
+⚠ **Ce découpage est post-hoc.** Chercher un sous-groupe après avoir vu le
+résultat global est le même geste que choisir un seuil après coup — celui qui a
+transformé un « +8,8 σ » en bruit ailleurs dans ce projet. Ce qui suit est
+exploratoire et ne porte aucune conclusion.
+
+| sous-groupe | n | avec raisonnement | sans | p | paires |
+|---|---|---|---|---|---|
+| `CODE_ANALYSIS` | 38 | 71 % | 68 % | 1,000 | 6-5 |
+| `RAG_CONTEXT_RELEVANCE` | 4 | 75 % | 100 % | 1,000 | 0-1 |
+| `RAG_FAITHFULNESS` | 4 | 75 % | 100 % | 1,000 | 0-1 |
+| cas défaillant | 18 | 56 % | 50 % | 1,000 | 4-3 |
+| cas **limite** | 10 | 70 % | 70 % | 1,000 | 2-2 |
+| cas parfait | 18 | 89 % | 100 % | 0,500 | 0-2 |
+
+**Aucune cellule ne peut conclure.** Le plus gros groupe compte onze paires
+discordantes : il faudrait un partage de 10-1 pour atteindre p < 0,05, on est à
+6-5. Les types RAG font quatre items.
+
+Le sous-groupe où l'on attendrait le plus le raisonnement — les cas **limite** —
+donne 70 % contre 70 %, deux paires contre deux.
+
+**La conclusion est sur le corpus, pas sur le raisonnement : à cette taille, aucun
+sous-groupe n'est mesurable.** Découper ne crée pas de puissance, ça la divise.
+Répondre à cette question demanderait un étalon plusieurs fois plus grand, et
+le découpage devrait alors être **déclaré avant** la mesure, pas après.
