@@ -649,7 +649,7 @@ Avec une échelle, leur accord vaut <strong>0,09</strong> — autant dire rien.<
 Avec des questions binaires, <strong>0,48</strong>.</p>
 <p><span class="ref">CheckEval, EMNLP 2025 — Lee et al.</span></p>
 </section>
-</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="12" data-paginate="true" data-background-color="#ffffff" data-theme="default" data-style="section {
+</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="12" data-paginate="true" data-background-color="#ffffff" data-class="dense" data-theme="default" data-style="section {
   font-family: 'Segoe UI', system-ui, sans-serif;
   font-size: 1.35rem;
   color: #1a1a1a;
@@ -671,7 +671,7 @@ section.dense h2 { font-size: 1.5rem; margin-bottom: 0.5em; }
 section.dense ul { line-height: 1.45; }
 section.dense li { margin-bottom: 0.55em; }
 .deux { display: grid; grid-template-columns: 1fr 1fr; gap: 2.2rem; }
-" lang="POSIX" data-marpit-pagination="12" style="--paginate:true;--background-color:#ffffff;--theme:default;--style:section {
+" lang="POSIX" class="dense" data-marpit-pagination="12" style="--paginate:true;--background-color:#ffffff;--class:dense;--theme:default;--style:section {
   font-family: 'Segoe UI', system-ui, sans-serif;
   font-size: 1.35rem;
   color: #1a1a1a;
@@ -713,6 +713,8 @@ Verdict en premier : les contrôles sont écrits pour être <strong>cohérents a
 décision déjà prise</strong>.</p>
 <p>Et le verdict ne s'opine pas, il se calcule :<br />
 <strong>PASS si et seulement si tous les contrôles sont vrais.</strong> Un seul <code>false</code> ⇒ FAIL.</p>
+<p><strong>Vérifié :</strong> le verdict suit ses propres contrôles <strong>99,3 %</strong> du temps.<br />
+<strong>Pas vérifié :</strong> que les contrôles suivent le <code>&lt;thinking&gt;</code>.</p>
 </section>
 </foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="13" data-paginate="true" data-background-color="#ffffff" data-theme="default" data-style="section {
   font-family: 'Segoe UI', system-ui, sans-serif;
@@ -2526,6 +2528,15 @@ après le verdict il ne peut pas l'influencer.
 Contre-chiffre à ne pas taire, il revient en partie 4 : la conjonction ABSORBE
 les désaccords. Sur 50 items, 17 portent un désaccord sur au moins un contrôle,
 dont 15 que le verdict masque.
+
+⚠ Sur le &lt;thinking&gt; : un raisonnement affiché ne prouve pas que le modèle l'a
+suivi. C'est documenté — Turpin et al., NeurIPS 2023, montrent qu'une chaîne de
+raisonnement peut être plausible et systématiquement infidèle. Lanham et al.,
+2023, proposent de le tester en tronquant la chaîne ou en y injectant une erreur.
+Nuance utile : les petits modèles produisent souvent un raisonnement PLUS fidèle
+que les gros.
+La réserve est donc étroite : le conditionnement contrôles → verdict est mesuré
+chez moi (99,3 %), celui de thinking → contrôles ne l'est pas.
 
 ⚠ Je n'ai PAS mesuré l'écart entre les deux ordres : j'ai choisi le bon dès le
 départ. C'est un raisonnement sur le fonctionnement de la génération, pas un

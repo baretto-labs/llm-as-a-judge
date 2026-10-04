@@ -489,6 +489,8 @@ salle la verra.
 
 ---
 
+<!-- _class: dense -->
+
 ## L'ordre des champs décide du comportement
 
 ```
@@ -512,6 +514,9 @@ décision déjà prise**.
 
 Et le verdict ne s'opine pas, il se calcule :
 **PASS si et seulement si tous les contrôles sont vrais.** Un seul `false` ⇒ FAIL.
+
+**Vérifié :** le verdict suit ses propres contrôles **99,3 %** du temps.
+**Pas vérifié :** que les contrôles suivent le `<thinking>`.
 
 <!--
 ▸ La chose la moins intuitive du talk, et ça tient en deux caractères. Je n'ai pas mesuré l'inverse — le dire.
@@ -540,6 +545,15 @@ après le verdict il ne peut pas l'influencer.
 Contre-chiffre à ne pas taire, il revient en partie 4 : la conjonction ABSORBE
 les désaccords. Sur 50 items, 17 portent un désaccord sur au moins un contrôle,
 dont 15 que le verdict masque.
+
+⚠ Sur le <thinking> : un raisonnement affiché ne prouve pas que le modèle l'a
+suivi. C'est documenté — Turpin et al., NeurIPS 2023, montrent qu'une chaîne de
+raisonnement peut être plausible et systématiquement infidèle. Lanham et al.,
+2023, proposent de le tester en tronquant la chaîne ou en y injectant une erreur.
+Nuance utile : les petits modèles produisent souvent un raisonnement PLUS fidèle
+que les gros.
+La réserve est donc étroite : le conditionnement contrôles → verdict est mesuré
+chez moi (99,3 %), celui de thinking → contrôles ne l'est pas.
 
 ⚠ Je n'ai PAS mesuré l'écart entre les deux ordres : j'ai choisi le bon dès le
 départ. C'est un raisonnement sur le fonctionnement de la génération, pas un
