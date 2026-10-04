@@ -711,10 +711,11 @@ section.dense li { margin-bottom: 0.55em; }
 <p>Un LLM génère <strong>de gauche à droite</strong>. Il ne revient pas en arrière.<br />
 Et le verdict ne s'opine pas, il se calcule :<br />
 <strong>PASS si et seulement si tous les contrôles sont vrais.</strong></p>
-<p>Et le raisonnement affiché, est-il suivi ? <strong>Je l'ai remplacé par celui d'un<br />
-autre item :</strong> le verdict bascule <strong>une fois sur deux</strong> — et quand il bascule,<br />
-il suit le raisonnement imposé <strong>23 fois sur 24</strong>.</p>
-<p><strong>Le <code>&lt;thinking&gt;</code> est une cause réelle de la décision. Pas sa cause unique.</strong></p>
+<p>Et le <code>&lt;thinking&gt;</code> ? Il paie sur le <strong>mathématique et le symbolique</strong>, peu<br />
+ailleurs. <span class="ref">Sprague et al., ICLR 2025 — méta-analyse</span></p>
+<p>Chez moi, <strong>je n'arrive pas à prouver ce qu'il rapporte</strong> — mais un <strong>mauvais</strong><br />
+raisonnement fait tomber la justesse de 71 % à 36 %.<br />
+<strong>Un risque dont je n'ai pas mesuré le bénéfice.</strong> <span class="ref">judge-finetune/fidelite/</span></p>
 </section>
 </foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="13" data-paginate="true" data-background-color="#ffffff" data-theme="default" data-style="section {
   font-family: 'Segoe UI', system-ui, sans-serif;
@@ -2504,7 +2505,7 @@ salle la verra.
   aclanthology.org/2025.emnlp-main.796/ — l'abstract attribue les incohérences
   aux « subjective evaluation criteria combined with Likert scale scoring » et
   mesure « improves the average agreement across evaluator models by 0.45 ».
-- Zheng et al., NeurIPS 2023, Datasets and Benchmarks. arxiv.org/abs/2306.05685</p></div><div class="bespoke-marp-note" data-index="11" tabindex="0"><p>▸ La chose la moins intuitive du talk, et ça tient en deux caractères. Puis : « et le raisonnement, est-il suivi ? » — je l'ai mesuré.
+- Zheng et al., NeurIPS 2023, Datasets and Benchmarks. arxiv.org/abs/2306.05685</p></div><div class="bespoke-marp-note" data-index="11" tabindex="0"><p>▸ La chose la moins intuitive du talk, et ça tient en deux caractères. Sur le thinking : rester sur la littérature, une phrase sur ma mesure, et renvoyer au dépôt.
 
 C'est la chose la moins intuitive de tout le talk, et c'est deux caractères dans
 un schéma JSON. Aucun modèle, aucun fine-tuning, aucun prompt ne rattrape un
@@ -2531,9 +2532,25 @@ Contre-chiffre à ne pas taire, il revient en partie 4 : la conjonction ABSORBE
 les désaccords. Sur 50 items, 17 portent un désaccord sur au moins un contrôle,
 dont 15 que le verdict masque.
 
-Les deux conditionnements sont mesurés. Contrôles → verdict : 99,3 % de
-cohérence. Thinking → décision : l'expérience de fidélité, 46 paires, 92
-générations, température 0, pré-enregistrée avant la mesure.
+Ne pas entrer dans le détail de l'expérience ici — une phrase, et le lien.
+Le détail est disponible si on pose la question.
+
+Les trois bras, si on creuse : raisonnement propre 72 % de justesse, raisonnement
+emprunté 36 %, raisonnement VIDE 74 %. Le troisième ne diffère pas du premier —
+13 paires discordantes, 6 contre 7, p = 1,0000 — donc je ne vois pas ce que le
+raisonnement rapporte. Et il pèse 73 % des jetons générés : 27 s par jugement
+contre 7 s sans lui.
+
+Quand le verdict bascule sous un raisonnement emprunté, il suit ce raisonnement
+23 fois sur 24. C'est aussi une prise : qui contrôle le début de la réponse
+contrôle la fin.
+
+⚠ Réserve à garder : 46 items. « Je ne vois pas » n'est pas « il n'y a rien » —
+un écart réel de 10 points resterait invisible.
+
+⚠ Et G-Eval, la référence du raisonnement-avant-notation en évaluation, ne met en
+avant aucune ablation isolant le raisonnement. C'est un ingrédient supposé plutôt
+que démontré. (Seul le résumé a été lu.)
 
 ⚠ Ne PAS dire « le modèle suit son raisonnement ». La métrique principale — 53 %
 de bascule, IC [38 %, 68 %] — tombe dans la zone que j'avais déclarée indécise.

@@ -512,14 +512,15 @@ Un LLM génère **de gauche à droite**. Il ne revient pas en arrière.
 Et le verdict ne s'opine pas, il se calcule :
 **PASS si et seulement si tous les contrôles sont vrais.**
 
-Et le raisonnement affiché, est-il suivi ? **Je l'ai remplacé par celui d'un
-autre item :** le verdict bascule **une fois sur deux** — et quand il bascule,
-il suit le raisonnement imposé **23 fois sur 24**.
+Et le `<thinking>` ? Il paie sur le **mathématique et le symbolique**, peu
+ailleurs. <span class="ref">Sprague et al., ICLR 2025 — méta-analyse</span>
 
-**Le `<thinking>` est une cause réelle de la décision. Pas sa cause unique.**
+Chez moi, **je n'arrive pas à prouver ce qu'il rapporte** — mais un **mauvais**
+raisonnement fait tomber la justesse de 71 % à 36 %.
+**Un risque dont je n'ai pas mesuré le bénéfice.** <span class="ref">judge-finetune/fidelite/</span>
 
 <!--
-▸ La chose la moins intuitive du talk, et ça tient en deux caractères. Puis : « et le raisonnement, est-il suivi ? » — je l'ai mesuré.
+▸ La chose la moins intuitive du talk, et ça tient en deux caractères. Sur le thinking : rester sur la littérature, une phrase sur ma mesure, et renvoyer au dépôt.
 
 C'est la chose la moins intuitive de tout le talk, et c'est deux caractères dans
 un schéma JSON. Aucun modèle, aucun fine-tuning, aucun prompt ne rattrape un
@@ -546,9 +547,25 @@ Contre-chiffre à ne pas taire, il revient en partie 4 : la conjonction ABSORBE
 les désaccords. Sur 50 items, 17 portent un désaccord sur au moins un contrôle,
 dont 15 que le verdict masque.
 
-Les deux conditionnements sont mesurés. Contrôles → verdict : 99,3 % de
-cohérence. Thinking → décision : l'expérience de fidélité, 46 paires, 92
-générations, température 0, pré-enregistrée avant la mesure.
+Ne pas entrer dans le détail de l'expérience ici — une phrase, et le lien.
+Le détail est disponible si on pose la question.
+
+Les trois bras, si on creuse : raisonnement propre 72 % de justesse, raisonnement
+emprunté 36 %, raisonnement VIDE 74 %. Le troisième ne diffère pas du premier —
+13 paires discordantes, 6 contre 7, p = 1,0000 — donc je ne vois pas ce que le
+raisonnement rapporte. Et il pèse 73 % des jetons générés : 27 s par jugement
+contre 7 s sans lui.
+
+Quand le verdict bascule sous un raisonnement emprunté, il suit ce raisonnement
+23 fois sur 24. C'est aussi une prise : qui contrôle le début de la réponse
+contrôle la fin.
+
+⚠ Réserve à garder : 46 items. « Je ne vois pas » n'est pas « il n'y a rien » —
+un écart réel de 10 points resterait invisible.
+
+⚠ Et G-Eval, la référence du raisonnement-avant-notation en évaluation, ne met en
+avant aucune ablation isolant le raisonnement. C'est un ingrédient supposé plutôt
+que démontré. (Seul le résumé a été lu.)
 
 ⚠ Ne PAS dire « le modèle suit son raisonnement ». La métrique principale — 53 %
 de bascule, IC [38 %, 68 %] — tombe dans la zone que j'avais déclarée indécise.
