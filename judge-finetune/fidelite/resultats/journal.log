@@ -95,3 +95,55 @@
   90/92  bras B  b13-009  → PASS  11s
   91/92  bras A  b13-013  → PASS  11s
   92/92  bras B  b13-013  → FAIL  12s
+  50 items exploitables, 46 appariés, 4 écartés
+  chargement du modèle + adaptateur…
+Fetching 10 files:   0%|          | 0/10 [00:00<?, ?it/s]Fetching 10 files: 100%|██████████| 10/10 [00:00<00:00, 3250.89it/s]
+  92 générations déjà en cache
+  46 générations à produire
+
+  1/46  bras C  b01-005  → PASS  10s
+  2/46  bras C  b02-001  → PASS  9s
+  3/46  bras C  b02-002  → PASS  7s
+  4/46  bras C  b02-012  → PASS  9s
+  5/46  bras C  b03-001  → PASS  9s
+  6/46  bras C  b03-002  → PASS  9s
+  7/46  bras C  b03-003  → FAIL  8s
+  8/46  bras C  b03-004  → PASS  9s
+  9/46  bras C  b03-005  → PASS  10s
+  10/46  bras C  b03-012  → PASS  10s
+  11/46  bras C  b03-014  → PASS  10s
+  12/46  bras C  b04-002  → PASS  9s
+  13/46  bras C  b04-013  → PASS  8s
+  14/46  bras C  b04-014  → FAIL  7s
+  15/46  bras C  b04-015  → PASS  9s
+  16/46  bras C  b05-008  → PASS  13s
+  17/46  bras C  b05-009  → PASS  9s
+  18/46  bras C  b06-006  → PASS  7s
+  19/46  bras C  b06-008  → PASS  10s
+  20/46  bras C  b06-013  → PASS  8s
+  21/46  bras C  b06-014  → PASS  9s
+  22/46  bras C  b07-001  → PASS  9s
+  23/46  bras C  b07-002  → PASS  9s
+  24/46  bras C  b07-005  → PASS  8s
+  25/46  bras C  b07-008  → FAIL  9s
+  26/46  bras C  b07-011  → PASS  10s
+  27/46  bras C  b07-014  → PASS  8s
+  28/46  bras C  b07-015  → PASS  10s
+  29/46  bras C  b08-003  → PASS  10s
+  30/46  bras C  b08-004  → FAIL  9s
+  31/46  bras C  b08-007  → PASS  8s
+  32/46  bras C  b08-011  → FAIL  9s
+  33/46  bras C  b09-006  → FAIL  10s
+  34/46  bras C  b09-009  → FAIL  9s
+  35/46  bras C  b09-011  → PASS  8s
+  36/46  bras C  b09-014  → PASS  9s
+  37/46  bras C  b10-003  → PASS  8s
+  38/46  bras C  b10-015  → PASS  10s
+  39/46  bras C  b12-005  → FAIL  7s
+  40/46  bras C  b12-007  → PASS  8s
+  41/46  bras C  b12-008  → FAIL  9s
+  42/46  bras C  b12-011  → FAIL  12s
+  43/46  bras C  b12-012  → PASS  10s
+  44/46  bras C  b13-001  → FAIL  9s
+  45/46  bras C  b13-009  → PASS  10s
+  46/46  bras C  b13-013  → PASS  11s

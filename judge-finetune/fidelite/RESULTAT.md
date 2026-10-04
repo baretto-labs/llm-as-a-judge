@@ -76,3 +76,61 @@ cd judge-finetune
 
 L'appariement est déterministe — tri par identifiant, chaque PASS reçoit le
 raisonnement du FAIL de même rang. Aucune graine, aucun tirage.
+
+---
+
+# Bras C — et si on supprimait le raisonnement ?
+
+Ajouté le 2026-10-04, après l'amendement déclarant ce bras et sa métrique.
+
+Les deux premiers bras opposaient un **bon** raisonnement à un **mauvais**. Ils ne
+disaient rien sur l'**absence** de raisonnement. Le bras C impose
+`<thinking></thinking>` — la structure apprise, sans contenu.
+
+## Résultat
+
+| bras | justesse | erreurs attrapées |
+|---|---|---|
+| **A — raisonnement propre** | 33/46 = **72 %** | 52 % |
+| **C — raisonnement vide** | 34/46 = **74 %** | 48 % |
+
+**13 paires discordantes, 6 contre 7. McNemar exact bilatéral : p = 1,0000.**
+
+Selon la lecture déclarée avant la mesure : **on ne tranche pas.** À 46 items,
+un écart inférieur à ~15 points est invisible. Le signe est même légèrement en
+faveur du bras vide, ce qui à ce niveau ne veut rien dire.
+
+## Le coût, lui, est sans ambiguïté
+
+| | jetons générés | temps par jugement |
+|---|---|---|
+| avec raisonnement | 301 <span>(mesuré au banc)</span> | 27 s |
+| JSON seul | 80 <span>(mesuré ici)</span> | 7 s |
+
+**Le `<thinking>` représente 73 % des jetons générés et multiplie le temps par
+quatre.**
+
+## Ce que les trois bras disent ensemble
+
+- Un raisonnement **faux** fait beaucoup de mal : 71 % → 36 %.
+- Un raisonnement **absent** ne fait rien de mesurable : 72 % contre 74 %.
+- Un raisonnement **coûte** quatre fois le temps.
+
+Sur ce corpus, le `<thinking>` est donc **un coût de ×4, une prise pour qui
+contrôle le début de la réponse, et un bénéfice que je n'ai pas pu mesurer.**
+
+La formulation défendable n'est **pas** « supprimez le raisonnement ». C'est :
+*il coûte quatre fois plus cher, et je n'ai pas réussi à mesurer ce qu'il
+rapporte.*
+
+## Ce qui limite cette conclusion
+
+- **46 items.** Un écart réel de 10 points resterait invisible.
+- Le raisonnement est **imposé**, pas généré. Un modèle qui écrit lui-même son
+  analyse n'est pas exactement dans la condition du bras A.
+- Le modèle a été **entraîné à toujours produire un `<thinking>`**. Le bras C lui
+  donne la structure attendue mais vide, ce qui limite l'écart de distribution
+  sans l'annuler.
+- Le coût en jetons compare une mesure du banc (301, raisonnement généré) à une
+  mesure d'ici (80, JSON seul). Les deux sont relevées, pas estimées, mais elles
+  ne viennent pas de la même exécution.

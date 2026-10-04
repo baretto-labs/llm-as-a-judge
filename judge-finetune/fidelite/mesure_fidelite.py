@@ -102,15 +102,20 @@ def main():
             deja.add((d["bras"], d["id"]))
         print(f"  {len(deja)} générations déjà en cache")
 
-    taches = [(bras, i) for i in sorted(paires) for bras in ("A", "B")
+    bras_demandes = sys.argv[1:] or ["A", "B"]
+    taches = [(bras, i) for i in sorted(paires) for bras in bras_demandes
               if (bras, i) not in deja]
     print(f"  {len(taches)} générations à produire\n")
 
     with SORTIE.open("a", encoding="utf-8") as sortie:
         for n, (bras, ident) in enumerate(taches, 1):
             it = items[ident]
-            source = ident if bras == "A" else paires[ident]
-            impose = items[source]["thinking"]
+            if bras == "A":
+                source, impose = ident, items[ident]["thinking"]
+            elif bras == "B":
+                source, impose = paires[ident], items[paires[ident]]["thinking"]
+            else:   # C : la structure apprise, sans contenu
+                source, impose = None, "<thinking>\n</thinking>"
             invite = tok.apply_chat_template(it["invite"], add_generation_prompt=True,
                                              tokenize=False)
             t0 = time.perf_counter()
@@ -120,6 +125,7 @@ def main():
             o = verdict(suite)
             sortie.write(json.dumps({
                 "bras": bras, "id": ident, "thinking_de": source,
+                "tokens_suite": len(tok.encode(suite)),
                 "reference": it["reference"],
                 "verdict_origine": it.get("verdict_origine"),
                 "verdict": (o or {}).get("verdict"),

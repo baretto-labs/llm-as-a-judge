@@ -64,3 +64,40 @@ directeur.
 Elle teste **mon** juge, **mon** corpus, **un** modèle. Elle ne dira rien de la
 fidélité des chaînes de raisonnement en général, et elle ne dira pas si le
 raisonnement est *correct* — seulement s'il est *suivi*.
+
+---
+
+## Amendement daté — 2026-10-04, un troisième bras : le raisonnement vide
+
+Les deux premiers bras montrent que le raisonnement **oriente** la décision, et
+qu'un raisonnement emprunté fait tomber la justesse de 71 % à 36 %. Mais le bras B
+n'est pas « sans raisonnement », c'est « avec un raisonnement **faux** », et une
+analyse trompeuse est pire que pas d'analyse.
+
+La question restée ouverte : **peut-on sauter le `<thinking>` et aller droit aux
+critères ?** Elle demande un bras de plus.
+
+### Bras C — raisonnement vide
+
+On impose `<thinking>\n</thinking>` : **la structure que le modèle a apprise, sans
+contenu**. Cela évite de le sortir de sa distribution d'entraînement, ce qu'une
+suppression pure et simple du bloc aurait fait.
+
+### Métrique principale, déclarée avant
+
+**L'écart de justesse entre le bras A et le bras C, apparié**, sur les mêmes
+items, avec un **McNemar exact** sur les paires discordantes. Génération gloutonne,
+comme les deux autres bras.
+
+Lecture fixée à l'avance :
+
+| résultat | conclusion |
+|---|---|
+| **p < 0,05** et A meilleur | le raisonnement **paie sa place** en jetons |
+| **p < 0,05** et C meilleur | le raisonnement **nuit** — résultat à publier tel quel |
+| **p ≥ 0,05** | on ne tranche pas : à cet effectif, l'écart n'est pas visible |
+
+### Secondaire
+
+Le coût : jetons générés et durée par jugement, bras A contre bras C. C'est ce qui
+rend la question économique et pas seulement méthodologique.
