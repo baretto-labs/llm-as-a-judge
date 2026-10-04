@@ -133,14 +133,14 @@ sur pièce, donc volontairement absents de l'écran.
 
 - **Mata v. Avianca, 2023** — un avocat dépose **six décisions de justice inventées** par ChatGPT, avec des citations d'apparence normale. Le juge constate « conscious avoidance ». **5 000 $** de sanction. <span class="ref">S.D.N.Y., 22-cv-1461, juge P. Kevin Castel, 22 juin 2023</span>
 
-- **Deloitte Australie, 2025** — rapport à **440 000 AUD** remis à un ministère. Références fabriquées, dont une citation attribuée à un juge fédéral. **~97 000 AUD remboursés.** <span class="ref">la version corrigée mentionne l'usage d'Azure OpenAI</span>
+- **NYC MyCity, audit public 2025** — le chatbot de la ville rend des réponses différentes à une question identique. L'administration annonçait **95 à 99 % d'exactitude** ; l'audit établit que ce calcul **excluait les réponses jugées perfectibles**. <span class="ref">Bureau du Contrôleur de New York, audit IT25PAR20028, 30 décembre 2025</span>
 
 </div>
 <div>
 
 **RAPPORTÉ PAR LA PRESSE** <span class="ref">— non vérifié sur source primaire</span>
 
-- **NYC MyCity, 2024** — le chatbot de la ville conseille des pratiques contraires au droit du travail.
+- **Deloitte Australie, 2025** — rapport à **440 000 AUD** remis à un ministère, références fabriquées, **~97 000 AUD remboursés**.
 
 - **Chevrolet de Watsonville, 2023** — chatbot détourné par injection de prompt, accepte de vendre un véhicule pour **1 $**.
 
@@ -163,9 +163,18 @@ Martinez, Estate of Durden, Miller). Des résumés en annoncent neuf — les tro
 autres noms qui circulent (Zicherman, Ehrlich, In re Air Crash Disaster) sont de
 VRAIES décisions citées à l'intérieur des fausses. Ne pas se tromper en public.
 
-⚠ Deloitte : concordant sur AP, Fortune et CFO Dive, mais la source primaire
-(rapport révisé du DEWR) n'a pas pu être ouverte le 2026-09-24. La confirmer
-avant l'oral, sinon basculer la ligne dans RAPPORTÉ.
+⚠ NYC MyCity : l'audit du Contrôleur est une source primaire, VÉRIFIÉE. Mais il
+ne documente PAS le conseil d'enfreindre la loi — ça, c'est The Markup, mars
+2024, donc de la presse. Ne citer de l'audit que ce qu'il contient : les réponses
+incohérentes, et le taux d'exactitude annoncé qui excluait les mauvais cas.
+
+Et c'est le meilleur exemple du talk : une administration publie 95 % avec une
+métrique qui écarte les cas gênants, et c'est un auditeur public qui le relève.
+C'est exactement le sujet.
+
+⚠ Deloitte descend chez les cas rapportés : concordant sur AP, Fortune et CFO
+Dive, mais la source primaire du DEWR n'a jamais pu être ouverte. Si tu la
+vérifies, la ligne peut remonter.
 -->
 
 ---
@@ -261,6 +270,9 @@ RAG et pas seulement le modèle.
 - Ma crainte : **avancer à l'aveugle.**
   Modifier, livrer, et ne jamais savoir si j'ai amélioré ou dégradé.
 
+Je vais donc construire un juge. Et la question devient :
+**comment savoir que mon RAG s'améliore, sans croire mon juge sur parole ?**
+
 <!--
 ▸ Trois rôles en conflit : auteur, sélectionneur, juge. Le mot à dire, c'est TUNNEL.
 
@@ -269,6 +281,10 @@ juge.
 
 Le mot exact, c'est TUNNEL. Pas de boucle de retour, donc chaque modification
 est un pari, et les paris s'accumulent sans qu'on sache lequel a coûté quoi.
+
+La dernière ligne est la promesse du talk, et c'est elle qu'il faut tenir : les
+deux moitiés comptent. Mesurer le RAG, et ne pas faire confiance à l'instrument
+sans l'avoir mesuré lui aussi.
 
 Cette crainte se vérifie à la fin du talk : 91 minutes de fine-tuning pour une
 justesse de 76,0 % contre 76,0 %. Exactement « j'ai modifié sans savoir si
@@ -418,6 +434,10 @@ et personne ne peut dire ce qui sépare 13 de 14.
 
 **Une question binaire force la décision.** Elle se discute, donc elle se corrige.
 
+Et elle convient **à mon cas** : des critères qu'on tranche un par un, une
+décision de livraison, et des erreurs dont le coût n'est pas le même des deux
+côtés.
+
 Mesuré ailleurs : douze modèles évaluateurs notent les mêmes textes.
 Avec une échelle, leur accord vaut **0,09** — autant dire rien.
 Avec des questions binaires, **0,48**.
@@ -439,8 +459,10 @@ Si la question « 0,48 c'est faible, non ? » vient : oui, c'est moyen. Mais le
 point n'est pas le niveau atteint, c'est le départ. 0,09, c'est l'accord de
 correcteurs qui cocheraient au hasard.
 
-À dire clairement : ce point-là, je ne l'ai pas mesuré. Je m'appuie sur la
-littérature. C'est la seule affirmation du talk dans ce cas, et autant le dire
+À dire clairement : ce point-là, je ne l'ai pas mesuré, je m'appuie sur la
+littérature. Et CheckEval montre que les listes binaires tiennent mieux SUR LES
+TÂCHES ÉTUDIÉES — ça ne prouve pas qu'un verdict binaire soit meilleur partout.
+D'où la justification par mon cas plutôt que par une règle générale. C'est la seule affirmation du talk dans ce cas, et autant le dire
 plutôt que le laisser croire.
 
 Exemple OllamAssist : « cette explication de ma classe RagService, elle vaut
@@ -932,9 +954,13 @@ Sur les 60 questions, **24 les départagent.**
 Le hasard seul donnerait 12 – 12. Obtenir 19 – 5, c'est tirer **19 fois pile
 sur 24 lancers.** → **p = 0,0066**
 
-Et une mesure **sans aucun LLM** — compter les identifiants attendus dans le
-contexte récupéré — les classe dans le même ordre : **0,697 contre 0,596.**
-La conclusion ne repose donc pas sur l'instrument seul.
+Une mesure **sans aucun LLM** — compter les identifiants attendus dans le
+contexte récupéré — **les classe dans le même ordre** : 0,697 contre 0,596.
+
+Elle ne valide pas les verdicts, **elle mesure autre chose.** Mais deux
+instruments indépendants qui classent pareil, c'est mieux qu'un seul.
+
+<span class="ref">Sur ce corpus, selon ce juge.</span>
 
 <!--
 ▸ La deuxième ligne donne le mécanisme : défaut de rappel, pas de bruit. Et la mesure sans LLM confirme.
@@ -950,6 +976,15 @@ qu'il y a de questions qui départagent — ni boîte noire, ni magie.
 Conséquence pratique, et c'est pour ça que je donne toujours le nombre de
 questions qui départagent : doubler le nombre de questions ne sert à rien si
 elles sont faciles. Ce qui compte, c'est combien font diverger les deux systèmes.
+
+⚠ Ne pas dire que hintCoverage « valide » le juge. Il compte des identifiants
+présents dans le contexte ; le juge évalue une réponse. Ce sont deux propriétés
+différentes. Ce qu'on peut dire : deux instruments indépendants classent les deux
+stratégies dans le même ordre, donc la conclusion ne tient pas au seul juge.
+
+⚠ Et la réserve, à énoncer : ces chiffres valent pour CE corpus, jugé par CE
+juge, dont l'alignement est de 0,44 et la stabilité de 58 %. Un écart de 25
+points est large, mais c'est une comparaison, pas une vérité sur GraphRAG.
 
 Sur la mesure sans LLM : c'est la même idée que le filtre déterministe du début
 du talk. En amont elle économise des jetons, en aval elle sert de contre-expertise.
@@ -1313,19 +1348,21 @@ au mieux 76 % de stabilité pour un seuil à 95 %.
   avec lui-même ?       PASS si et seulement si tous les contrôles sont vrais
 
   juge instable ?    →  un humain
-                        le seul cas légitime
+                        déclencheur mesurable, pas une impression
 ```
-
-Un humain n'intervient pas « parfois ». Il intervient quand **le juge s'est
-contredit d'une passe à l'autre** — ce qui est mesuré, pas ressenti.
 
 Et le signal fonctionne : **83 %** de verdicts justes sur les items stables,
 **67 %** sur les instables.
 
+**Mais la stabilité mesure la répétabilité, pas la justesse.**
+Un verdict stable reste faux une fois sur six.
+Les enjeux, le hors-domaine, les critères qui se contredisent sont **d'autres
+motifs** de relecture — l'instabilité est le seul que je sache mesurer.
+
 <!--
 ▸ Un humain n'intervient pas « parfois ». Il intervient quand le juge s'est contredit — c'est mesuré.
 
-« Parfois un humain » n'est pas une politique. Il faut un déclencheur mesurable,
+« Parfois un humain » n'est pas une politique : il faut un déclencheur mesurable,
 et il existe déjà dans le harnais : je fais trois passes pour mesurer la
 répétabilité, le même chiffre sert à trier.
 

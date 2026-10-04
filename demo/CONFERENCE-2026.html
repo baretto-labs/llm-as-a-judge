@@ -169,7 +169,7 @@ section.dense li { margin-bottom: 0.55em; }
 <p><strong>Mata v. Avianca, 2023</strong> — un avocat dépose <strong>six décisions de justice inventées</strong> par ChatGPT, avec des citations d'apparence normale. Le juge constate « conscious avoidance ». <strong>5 000 $</strong> de sanction. <span class="ref">S.D.N.Y., 22-cv-1461, juge P. Kevin Castel, 22 juin 2023</span></p>
 </li>
 <li>
-<p><strong>Deloitte Australie, 2025</strong> — rapport à <strong>440 000 AUD</strong> remis à un ministère. Références fabriquées, dont une citation attribuée à un juge fédéral. <strong>~97 000 AUD remboursés.</strong> <span class="ref">la version corrigée mentionne l'usage d'Azure OpenAI</span></p>
+<p><strong>NYC MyCity, audit public 2025</strong> — le chatbot de la ville rend des réponses différentes à une question identique. L'administration annonçait <strong>95 à 99 % d'exactitude</strong> ; l'audit établit que ce calcul <strong>excluait les réponses jugées perfectibles</strong>. <span class="ref">Bureau du Contrôleur de New York, audit IT25PAR20028, 30 décembre 2025</span></p>
 </li>
 </ul>
 </div>
@@ -177,7 +177,7 @@ section.dense li { margin-bottom: 0.55em; }
 <p><strong>RAPPORTÉ PAR LA PRESSE</strong> <span class="ref">— non vérifié sur source primaire</span></p>
 <ul>
 <li>
-<p><strong>NYC MyCity, 2024</strong> — le chatbot de la ville conseille des pratiques contraires au droit du travail.</p>
+<p><strong>Deloitte Australie, 2025</strong> — rapport à <strong>440 000 AUD</strong> remis à un ministère, références fabriquées, <strong>~97 000 AUD remboursés</strong>.</p>
 </li>
 <li>
 <p><strong>Chevrolet de Watsonville, 2023</strong> — chatbot détourné par injection de prompt, accepte de vendre un véhicule pour <strong>1 $</strong>.</p>
@@ -370,6 +370,8 @@ sur quelques exemples <strong>choisis par moi</strong></p>
 Modifier, livrer, et ne jamais savoir si j'ai amélioré ou dégradé.</p>
 </li>
 </ul>
+<p>Je vais donc construire un juge. Et la question devient :<br />
+<strong>comment savoir que mon RAG s'améliore, sans croire mon juge sur parole ?</strong></p>
 </section>
 </foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="7" data-paginate="true" data-background-color="#ffffff" data-theme="default" data-style="section {
   font-family: 'Segoe UI', system-ui, sans-serif;
@@ -639,6 +641,9 @@ Est-ce qu'on livre, ou pas ? La note ne répond pas.</p>
 la longueur impressionne, la main glisse vers le milieu,<br />
 et personne ne peut dire ce qui sépare 13 de 14.</p>
 <p><strong>Une question binaire force la décision.</strong> Elle se discute, donc elle se corrige.</p>
+<p>Et elle convient <strong>à mon cas</strong> : des critères qu'on tranche un par un, une<br />
+décision de livraison, et des erreurs dont le coût n'est pas le même des deux<br />
+côtés.</p>
 <p>Mesuré ailleurs : douze modèles évaluateurs notent les mêmes textes.<br />
 Avec une échelle, leur accord vaut <strong>0,09</strong> — autant dire rien.<br />
 Avec des questions binaires, <strong>0,48</strong>.</p>
@@ -1437,9 +1442,11 @@ section.dense li { margin-bottom: 0.55em; }
 <strong>Lucene en gagne 19. Neo4j en gagne 5.</strong></p>
 <p>Le hasard seul donnerait 12 – 12. Obtenir 19 – 5, c'est tirer <strong>19 fois pile<br />
 sur 24 lancers.</strong> → <strong>p = 0,0066</strong></p>
-<p>Et une mesure <strong>sans aucun LLM</strong> — compter les identifiants attendus dans le<br />
-contexte récupéré — les classe dans le même ordre : <strong>0,697 contre 0,596.</strong><br />
-La conclusion ne repose donc pas sur l'instrument seul.</p>
+<p>Une mesure <strong>sans aucun LLM</strong> — compter les identifiants attendus dans le<br />
+contexte récupéré — <strong>les classe dans le même ordre</strong> : 0,697 contre 0,596.</p>
+<p>Elle ne valide pas les verdicts, <strong>elle mesure autre chose.</strong> Mais deux<br />
+instruments indépendants qui classent pareil, c'est mieux qu'un seul.</p>
+<p><span class="ref">Sur ce corpus, selon ce juge.</span></p>
 </section>
 </foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="25" data-paginate="true" data-background-color="#ffffff" data-theme="default" data-style="section {
   font-family: 'Segoe UI', system-ui, sans-serif;
@@ -2054,12 +2061,14 @@ section.dense li { margin-bottom: 0.55em; }
   avec lui-même ?       PASS si et seulement si tous les contrôles sont vrais
 
   juge instable ?    →  un humain
-                        le seul cas légitime
+                        déclencheur mesurable, pas une impression
 </code></pre>
-<p>Un humain n'intervient pas « parfois ». Il intervient quand <strong>le juge s'est<br />
-contredit d'une passe à l'autre</strong> — ce qui est mesuré, pas ressenti.</p>
 <p>Et le signal fonctionne : <strong>83 %</strong> de verdicts justes sur les items stables,<br />
 <strong>67 %</strong> sur les instables.</p>
+<p><strong>Mais la stabilité mesure la répétabilité, pas la justesse.</strong><br />
+Un verdict stable reste faux une fois sur six.<br />
+Les enjeux, le hors-domaine, les critères qui se contredisent sont <strong>d'autres<br />
+motifs</strong> de relecture — l'instabilité est le seul que je sache mesurer.</p>
 </section>
 </foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="35" data-paginate="true" data-background-color="#ffffff" data-theme="default" data-style="section {
   font-family: 'Segoe UI', system-ui, sans-serif;
@@ -2342,9 +2351,18 @@ Martinez, Estate of Durden, Miller). Des résumés en annoncent neuf — les tro
 autres noms qui circulent (Zicherman, Ehrlich, In re Air Crash Disaster) sont de
 VRAIES décisions citées à l'intérieur des fausses. Ne pas se tromper en public.
 
-⚠ Deloitte : concordant sur AP, Fortune et CFO Dive, mais la source primaire
-(rapport révisé du DEWR) n'a pas pu être ouverte le 2026-09-24. La confirmer
-avant l'oral, sinon basculer la ligne dans RAPPORTÉ.</p></div><div class="bespoke-marp-note" data-index="3" tabindex="0"><p>▸ Le faux avait la forme du vrai. Un avocat ne relit pas une citation bien formatée.
+⚠ NYC MyCity : l'audit du Contrôleur est une source primaire, VÉRIFIÉE. Mais il
+ne documente PAS le conseil d'enfreindre la loi — ça, c'est The Markup, mars
+2024, donc de la presse. Ne citer de l'audit que ce qu'il contient : les réponses
+incohérentes, et le taux d'exactitude annoncé qui excluait les mauvais cas.
+
+Et c'est le meilleur exemple du talk : une administration publie 95 % avec une
+métrique qui écarte les cas gênants, et c'est un auditeur public qui le relève.
+C'est exactement le sujet.
+
+⚠ Deloitte descend chez les cas rapportés : concordant sur AP, Fortune et CFO
+Dive, mais la source primaire du DEWR n'a jamais pu être ouverte. Si tu la
+vérifies, la ligne peut remonter.</p></div><div class="bespoke-marp-note" data-index="3" tabindex="0"><p>▸ Le faux avait la forme du vrai. Un avocat ne relit pas une citation bien formatée.
 
 Un avocat ne relit pas une citation bien formatée. « 925 F.3d 1339 (11th Cir.
 2019) » a la forme d'une vraie référence, et c'est tout ce que notre œil
@@ -2382,6 +2400,10 @@ juge.
 
 Le mot exact, c'est TUNNEL. Pas de boucle de retour, donc chaque modification
 est un pari, et les paris s'accumulent sans qu'on sache lequel a coûté quoi.
+
+La dernière ligne est la promesse du talk, et c'est elle qu'il faut tenir : les
+deux moitiés comptent. Mesurer le RAG, et ne pas faire confiance à l'instrument
+sans l'avoir mesuré lui aussi.
 
 Cette crainte se vérifie à la fin du talk : 91 minutes de fine-tuning pour une
 justesse de 76,0 % contre 76,0 %. Exactement « j'ai modifié sans savoir si
@@ -2453,8 +2475,10 @@ Si la question « 0,48 c'est faible, non ? » vient : oui, c'est moyen. Mais le
 point n'est pas le niveau atteint, c'est le départ. 0,09, c'est l'accord de
 correcteurs qui cocheraient au hasard.
 
-À dire clairement : ce point-là, je ne l'ai pas mesuré. Je m'appuie sur la
-littérature. C'est la seule affirmation du talk dans ce cas, et autant le dire
+À dire clairement : ce point-là, je ne l'ai pas mesuré, je m'appuie sur la
+littérature. Et CheckEval montre que les listes binaires tiennent mieux SUR LES
+TÂCHES ÉTUDIÉES — ça ne prouve pas qu'un verdict binaire soit meilleur partout.
+D'où la justification par mon cas plutôt que par une règle générale. C'est la seule affirmation du talk dans ce cas, et autant le dire
 plutôt que le laisser croire.
 
 Exemple OllamAssist : « cette explication de ma classe RagService, elle vaut
@@ -2685,6 +2709,15 @@ Conséquence pratique, et c'est pour ça que je donne toujours le nombre de
 questions qui départagent : doubler le nombre de questions ne sert à rien si
 elles sont faciles. Ce qui compte, c'est combien font diverger les deux systèmes.
 
+⚠ Ne pas dire que hintCoverage « valide » le juge. Il compte des identifiants
+présents dans le contexte ; le juge évalue une réponse. Ce sont deux propriétés
+différentes. Ce qu'on peut dire : deux instruments indépendants classent les deux
+stratégies dans le même ordre, donc la conclusion ne tient pas au seul juge.
+
+⚠ Et la réserve, à énoncer : ces chiffres valent pour CE corpus, jugé par CE
+juge, dont l'alignement est de 0,44 et la stabilité de 58 %. Un écart de 25
+points est large, mais c'est une comparaison, pas une vérité sur GraphRAG.
+
 Sur la mesure sans LLM : c'est la même idée que le filtre déterministe du début
 du talk. En amont elle économise des jetons, en aval elle sert de contre-expertise.
 Elle s'appelle hintCoverage, elle ne coûte qu'une liste d'identifiants attendus
@@ -2844,7 +2877,7 @@ justesse : les deux sont à 76,0 %.
 Et aucune des trois variantes ne passe le filtre de recevabilité fixé d'avance :
 au mieux 76 % de stabilité pour un seuil à 95 %.</p></div><div class="bespoke-marp-note" data-index="33" tabindex="0"><p>▸ Un humain n'intervient pas « parfois ». Il intervient quand le juge s'est contredit — c'est mesuré.
 
-« Parfois un humain » n'est pas une politique. Il faut un déclencheur mesurable,
+« Parfois un humain » n'est pas une politique : il faut un déclencheur mesurable,
 et il existe déjà dans le harnais : je fais trois passes pour mesurer la
 répétabilité, le même chiffre sert à trier.
 
