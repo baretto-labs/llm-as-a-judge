@@ -134,3 +134,42 @@ rapporte.*
 - Le coût en jetons compare une mesure du banc (301, raisonnement généré) à une
   mesure d'ici (80, JSON seul). Les deux sont relevées, pas estimées, mais elles
   ne viennent pas de la même exécution.
+
+---
+
+# Où ce résultat se situe dans la littérature
+
+Vérifié le 2026-10-04.
+
+## La méta-analyse générale va dans le même sens
+
+**Sprague et al., *To CoT or not to CoT?*, ICLR 2025** — méta-analyse sur plus de
+100 articles, 20 jeux de données, 14 modèles. Le raisonnement en chaîne apporte
+**+12,3 % en mathématiques et +14,2 % en symbolique, et un bénéfice minime sur
+les tâches non symboliques**. Les auteurs recommandent une application
+**sélective** : presque tout le gain, pour un coût d'inférence nettement réduit.
+
+Juger une explication de code au regard d'une grille est une tâche largement non
+symbolique. La méta-analyse prédit donc un bénéfice faible — ce qui est
+exactement ce qu'on mesure ici.
+
+## La littérature des juges l'utilise sans l'avoir isolé
+
+**G-Eval (Liu et al., 2023, arXiv 2303.16634)** est la référence du
+*reasoning-then-scoring* en évaluation. Le raisonnement en chaîne y est présenté
+comme une composante du cadre. **Son résumé ne rapporte aucune ablation** qui
+montrerait que le retirer dégrade la corrélation avec le jugement humain.
+
+Réserve sur cette affirmation : **seul le résumé a été lu.** Il peut exister une
+ablation dans le corps de l'article. Ce qui est vérifié, c'est qu'elle ne figure
+pas parmi les résultats mis en avant.
+
+## Ce que ça change pour la portée
+
+Le `<thinking>` est, dans les cadres d'évaluation, un **ingrédient supposé plutôt
+que démontré**. Cette mesure l'isole sur une tâche précise et n'y trouve pas de
+bénéfice détectable, pour un coût multiplié par quatre.
+
+Ce n'est pas une réfutation : 46 items ne permettent pas de voir un écart de
+moins de ~15 points, et « je ne vois pas » n'est pas « il n'y a rien ». C'est une
+mesure là où la pratique courante repose sur une supposition.
