@@ -1194,15 +1194,14 @@ mesure soutient.
 
 Et cinq fois, il a affiché **BUILD SUCCESS**.
 
-| Ce qui était cassé | Ce que ça a produit |
-|---|---|
-| Les `-D` non transmis par surefire | un corpus synthétique indexé à la place du vrai |
-| Une propriété vide au lieu de l'adaptateur | le modèle de base, jugé comme s'il était fine-tuné |
-| Un `pgrep` qui matchait son propre script | ~5 heures perdues |
-| Un mélange non graîné | 21 questions sur 60 divergentes à récupération identique |
-| `--adapter-path` accepté puis ignoré | *« le fine-tuning dégrade de 76 % »* — un résultat qui ne mesurait rien |
+La pire : une option d'adaptateur **acceptée, puis ignorée**.
+Deux heures de calcul. 150 réponses plausibles. Et un rapport qui annonçait
+**« le fine-tuning dégrade la justesse de 76 % »**, intervalle de confiance
+compris.
 
-**Aucune erreur. Aucun avertissement. Des résultats plausibles.**
+**Publiable tel quel. Entièrement faux.**
+
+Aucune erreur. Aucun avertissement.
 
 <!--
 Et maintenant le retour d'expérience qui m'a le plus coûté.
@@ -1210,25 +1209,37 @@ Et maintenant le retour d'expérience qui m'a le plus coûté.
 Cinq fois, mon banc d'essai a mesuré le vide. Et cinq fois, il a affiché « build
 success ».
 
-Les options non transmises par le lanceur de tests : il a indexé un corpus
-synthétique à la place de ma vraie codebase. Une propriété vide au lieu de
-l'adaptateur : j'ai noté le modèle de base en croyant juger le modèle entraîné.
-Un pgrep qui matchait son propre script : cinq heures perdues. Un mélange non
-graîné : vingt-et-une questions sur soixante divergentes à récupération
-identique. Et une option d'adaptateur acceptée puis ignorée — celle-là m'a rendu
-« le fine-tuning dégrade la justesse de 76 % », un résultat publiable et
-entièrement faux.
+Je vous raconte la pire. J'avais passé une option pour charger mon modèle
+entraîné. Le serveur l'a acceptée — et il a répondu avec le modèle de base. Deux
+heures de calcul, cent cinquante réponses parfaitement plausibles, aucune erreur,
+aucun avertissement.
 
-Aucune erreur. Aucun avertissement. Des résultats plausibles à chaque fois.
+Et au bout, un rapport qui m'annonçait : « le fine-tuning dégrade la justesse de
+soixante-seize pour cent », avec son intervalle de confiance. Publiable tel quel.
+Entièrement faux.
 
-Et ce qui a fini par le révéler, ce n'est pas une métrique. C'est un détail de
+Ce qui a fini par le révéler, ce n'est pas une métrique. C'est un détail de
 style : des clés plates dans un bloc markdown, là où mes exemples d'entraînement
-portent tous un JSON nu.
+portent tous un JSON nu. Le modèle ne parlait pas la langue que je lui avais
+apprise.
 
 La leçon, et c'est le correctif que j'ai mis en place : avant de dépenser une
-heure de calcul, faire un appel et vérifier une propriété qui ne peut pas
+heure de calcul, faites un appel, et vérifiez une propriété qui ne peut pas
 apparaître par hasard si la plomberie est cassée. Pas l'absence d'erreur. Une
 preuve positive.
+
+==============================================================
+
+⚠ Les quatre autres, si on demande : les options `-D` non transmises par
+surefire — un corpus synthétique indexé à la place de la vraie codebase ; une
+propriété vide au lieu de l'adaptateur — le modèle de base jugé comme s'il était
+fine-tuné ; un `pgrep` qui matchait son propre script — environ cinq heures
+perdues ; un mélange non graîné — 21 questions sur 60 divergentes à récupération
+identique.
+
+⚠ Ne pas les énumérer à l'écran : cinq bugs cryptiques enterrent le signal, qui
+est le NOMBRE et le fait qu'ils soient tous passés au vert. Une histoire racontée
+vaut mieux que cinq résumés.
 -->
 ---
 

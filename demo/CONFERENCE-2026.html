@@ -1603,37 +1603,12 @@ section.dense li { margin-bottom: 0.55em; }
 ;background-color:#ffffff;background-image:none;" data-marpit-pagination-total="38">
 <h2 id="cinq-fois-mon-banc-a-mesur%C3%A9-le-vide">Cinq fois, mon banc a mesuré le vide</h2>
 <p>Et cinq fois, il a affiché <strong>BUILD SUCCESS</strong>.</p>
-<table>
-<thead>
-<tr>
-<th>Ce qui était cassé</th>
-<th>Ce que ça a produit</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Les <code>-D</code> non transmis par surefire</td>
-<td>un corpus synthétique indexé à la place du vrai</td>
-</tr>
-<tr>
-<td>Une propriété vide au lieu de l'adaptateur</td>
-<td>le modèle de base, jugé comme s'il était fine-tuné</td>
-</tr>
-<tr>
-<td>Un <code>pgrep</code> qui matchait son propre script</td>
-<td>~5 heures perdues</td>
-</tr>
-<tr>
-<td>Un mélange non graîné</td>
-<td>21 questions sur 60 divergentes à récupération identique</td>
-</tr>
-<tr>
-<td><code>--adapter-path</code> accepté puis ignoré</td>
-<td><em>« le fine-tuning dégrade de 76 % »</em> — un résultat qui ne mesurait rien</td>
-</tr>
-</tbody>
-</table>
-<p><strong>Aucune erreur. Aucun avertissement. Des résultats plausibles.</strong></p>
+<p>La pire : une option d'adaptateur <strong>acceptée, puis ignorée</strong>.<br />
+Deux heures de calcul. 150 réponses plausibles. Et un rapport qui annonçait<br />
+<strong>« le fine-tuning dégrade la justesse de 76 % »</strong>, intervalle de confiance<br />
+compris.</p>
+<p><strong>Publiable tel quel. Entièrement faux.</strong></p>
+<p>Aucune erreur. Aucun avertissement.</p>
 </section>
 </foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="28" data-paginate="true" data-background-color="#ffffff" data-theme="default" data-style="section {
   font-family: 'Segoe UI', system-ui, sans-serif;
@@ -2913,25 +2888,37 @@ mesure soutient.</p></div><div class="bespoke-marp-note" data-index="26" tabinde
 Cinq fois, mon banc d'essai a mesuré le vide. Et cinq fois, il a affiché « build
 success ».
 
-Les options non transmises par le lanceur de tests : il a indexé un corpus
-synthétique à la place de ma vraie codebase. Une propriété vide au lieu de
-l'adaptateur : j'ai noté le modèle de base en croyant juger le modèle entraîné.
-Un pgrep qui matchait son propre script : cinq heures perdues. Un mélange non
-graîné : vingt-et-une questions sur soixante divergentes à récupération
-identique. Et une option d'adaptateur acceptée puis ignorée — celle-là m'a rendu
-« le fine-tuning dégrade la justesse de 76 % », un résultat publiable et
-entièrement faux.
+Je vous raconte la pire. J'avais passé une option pour charger mon modèle
+entraîné. Le serveur l'a acceptée — et il a répondu avec le modèle de base. Deux
+heures de calcul, cent cinquante réponses parfaitement plausibles, aucune erreur,
+aucun avertissement.
 
-Aucune erreur. Aucun avertissement. Des résultats plausibles à chaque fois.
+Et au bout, un rapport qui m'annonçait : « le fine-tuning dégrade la justesse de
+soixante-seize pour cent », avec son intervalle de confiance. Publiable tel quel.
+Entièrement faux.
 
-Et ce qui a fini par le révéler, ce n'est pas une métrique. C'est un détail de
+Ce qui a fini par le révéler, ce n'est pas une métrique. C'est un détail de
 style : des clés plates dans un bloc markdown, là où mes exemples d'entraînement
-portent tous un JSON nu.
+portent tous un JSON nu. Le modèle ne parlait pas la langue que je lui avais
+apprise.
 
 La leçon, et c'est le correctif que j'ai mis en place : avant de dépenser une
-heure de calcul, faire un appel et vérifier une propriété qui ne peut pas
+heure de calcul, faites un appel, et vérifiez une propriété qui ne peut pas
 apparaître par hasard si la plomberie est cassée. Pas l'absence d'erreur. Une
-preuve positive.</p></div><div class="bespoke-marp-note" data-index="27" tabindex="0"><p>Parlons maintenant de la fiabilité du juge lui-même. Et pour ça, il faut un
+preuve positive.
+
+==============================================================
+
+⚠ Les quatre autres, si on demande : les options `-D` non transmises par
+surefire — un corpus synthétique indexé à la place de la vraie codebase ; une
+propriété vide au lieu de l'adaptateur — le modèle de base jugé comme s'il était
+fine-tuné ; un `pgrep` qui matchait son propre script — environ cinq heures
+perdues ; un mélange non graîné — 21 questions sur 60 divergentes à récupération
+identique.
+
+⚠ Ne pas les énumérer à l'écran : cinq bugs cryptiques enterrent le signal, qui
+est le NOMBRE et le fait qu'ils soient tous passés au vert. Une histoire racontée
+vaut mieux que cinq résumés.</p></div><div class="bespoke-marp-note" data-index="27" tabindex="0"><p>Parlons maintenant de la fiabilité du juge lui-même. Et pour ça, il faut un
 outil : le kappa de Cohen.
 
 D'abord le problème. Deux correcteurs qui recaleraient tout le monde sans rien
