@@ -462,3 +462,37 @@ lire », pas « comparer à une référence ».
 déterministe sans LLM. En amont il économise des jetons, en aval il sert de
 contre-expertise.
 -->
+
+---
+## Deuxième question : quand évaluer ?
+
+**Dans la CI, à chaque modification — la non-régression.**
+Les **mêmes** questions, rejouées. Le corrigé type ou le barème : les deux
+marchent, puisque les questions ne changent pas.
+
+**En production, par échantillonnage.**
+Là, plus de questions figées : **le barème seul.**
+Combien, à quelle fréquence ? Ça dépend de trop de choses.
+**Un échantillon suffit.**
+
+Moi : **100 % dans la CI.** Aucun échantillonnage de production.
+
+<!--
+[À REFORMULER AVEC TES MOTS]
+
+Deuxième question : quand ?
+
+Dans la CI, à chaque modification : c'est de la non-régression. On rejoue les
+mêmes questions. Et comme elles ne changent pas, le corrigé type ou le barème
+fonctionnent tous les deux.
+
+En production, par échantillonnage. Là, plus de questions figées, donc le barème
+seul. Combien, à quelle fréquence ? Ça dépend de trop de choses pour que j'en
+parle ici. Un échantillon suffit.
+
+Moi, je suis à cent pour cent dans la CI. Aucun échantillonnage de production.
+
+Et c'est la CI qui ferme le tunnel : rejouer les mêmes questions, c'est la seule
+façon de savoir si ma modification améliore ou dégrade — et la seule façon de
+comparer deux stratégies.
+-->
