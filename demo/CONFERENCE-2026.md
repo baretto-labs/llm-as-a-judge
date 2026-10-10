@@ -117,6 +117,8 @@ Six cent cinquante dollars. Le montant est dérisoire, et c'est ce qui rend la
 décision intéressante : ce n'est pas le préjudice qui compte, c'est le principe.
 Vous répondez de ce que votre chatbot affirme.
 
+==============================================================
+
 ⚠ Vérifié sur la décision : membre Christopher C. Rivers, 14 février 2024,
 650,88 $ CA. Ne pas citer de mémoire le délai annoncé par le chatbot ni le total
 avec frais — non vérifiés, volontairement absents de l'écran.
@@ -164,6 +166,8 @@ En dessous, deux cas que je n'ai pas pu vérifier sur source primaire, et qui
 restent donc étiquetés comme tels.
 
 J'aurais pu en remplir beaucoup plus. Je ne garde que ceux que je peux prouver.
+
+==============================================================
 
 ⚠ Deux secondes minimum à l'écran, sinon l'effet de volume tombe. Mata v.
 Avianca : SIX décisions inventées, pas neuf — trois des noms qui circulent sont
@@ -269,6 +273,8 @@ ce qu'il a trouvé.
 
 C'est ce déplacement qui justifie de mesurer la récupération, et pas seulement le
 modèle.
+
+==============================================================
 
 ⚠ La carte de droite est un gabarit à remplacer la veille :
 demo/img/ollamassist-marketplace.png, 768 x 638, même nom, puis relancer le
@@ -389,6 +395,8 @@ Pourquoi pas le corrigé ? Parce que sur du code, le corrigé est exactement ce 
 je n'ai pas. Si je savais écrire la bonne réponse à mes soixante questions, je
 n'aurais pas besoin de RAG.
 
+==============================================================
+
 ⚠ Le « A contre B, puis B contre A » neutralise le biais de position ENTRE DEUX
 RÉPONSES. Ce que j'ai mesuré est un biais de position sur L'ORDRE DES CONTEXTES
 RÉCUPÉRÉS (12 verdicts sur 60). Même phénomène, dispositif différent : dire
@@ -501,6 +509,8 @@ Mesuré ailleurs, pas par moi : douze modèles évaluateurs notent les mêmes te
 Avec une échelle, leur accord vaut zéro virgule zéro neuf — autant dire rien. Avec
 des questions binaires, zéro virgule quarante-huit.
 
+==============================================================
+
 ⚠ Dire clairement que ce point vient de la littérature. Et CheckEval vaut pour
 les tâches étudiées — ça ne prouve pas qu'un verdict binaire soit meilleur
 partout, d'où la justification par mon cas.
@@ -596,88 +606,53 @@ moi : je n'arrive pas à prouver ce qu'il rapporte. En revanche, un mauvais
 raisonnement fait tomber la justesse de 71 à 36 %. C'est donc un risque dont je
 n'ai pas mesuré le bénéfice. Le protocole est dans le dépôt.
 
-⚠ C'est le seul endroit où la littérature et ma mesure convergent : le dire.
-« Les deux vont dans le même sens, sans que l'un prouve l'autre. » Et ne pas
-inverser l'inférence : la méta-analyse parle de familles de tâches, pas de mon
-juge. Ma tâche est mixte, à dominante non symbolique — décider si un correctif
-fonctionne, c'est du raisonnement algorithmique.
+==============================================================
 
-⚠ Deux pièges à éviter en le disant. Ma tâche n'est pas PUREMENT non symbolique :
-décider si un correctif fonctionne est du raisonnement algorithmique, là où la
-méta-analyse dit que ça paie. Dire « mixte, à dominante non symbolique ».
-Et ne pas inverser l'inférence : la méta-analyse parle de familles de tâches, pas
-de mon juge. Elle rend mon résultat attendu, elle ne le démontre pas.
+⚠ Formulation exacte : « la méta-analyse prédit un bénéfice minime hors
+mathématique et symbolique, ma tâche n'est pas symbolique, ma mesure ne voit pas
+de bénéfice. Les deux vont dans le même sens, sans que l'un prouve l'autre. »
+C'est le SEUL endroit du talk où la littérature et ma mesure convergent.
 
-Les trois bras, si on creuse : raisonnement propre 72 % de justesse, raisonnement
-emprunté 36 %, raisonnement VIDE 74 %. Le troisième ne diffère pas du premier —
-13 paires discordantes, 6 contre 7, p = 1,0000 — donc je ne vois pas ce que le
-raisonnement rapporte. Et il pèse 73 % des jetons générés : 27 s par jugement
-contre 7 s sans lui.
-
-Quand le verdict bascule sous un raisonnement emprunté, il suit ce raisonnement
-23 fois sur 24. C'est aussi une prise : qui contrôle le début de la réponse
-contrôle la fin.
-
-⚠ Réserve à garder : 46 items. « Je ne vois pas » n'est pas « il n'y a rien » —
-un écart réel de 10 points resterait invisible.
-
-⚠ Et G-Eval, la référence du raisonnement-avant-notation en évaluation, ne met en
-avant aucune ablation isolant le raisonnement. C'est un ingrédient supposé plutôt
-que démontré. (Seul le résumé a été lu.)
+⚠ Deux pièges en le disant. Ma tâche n'est pas PUREMENT non symbolique — décider
+si un correctif fonctionne est du raisonnement algorithmique, là où la
+méta-analyse dit que ça paie : dire « mixte, à dominante non symbolique ». Et ne
+pas inverser l'inférence : la méta-analyse parle de familles de tâches, pas de
+mon juge ; elle rend mon résultat attendu, elle ne le démontre pas.
 
 ⚠ Ne PAS dire « le modèle suit son raisonnement ». La métrique principale — 53 %
 de bascule, IC [38 %, 68 %] — tombe dans la zone que j'avais déclarée indécise.
-Ce qui est net, c'est la direction : quand ça bascule, ça suit, 23 fois sur 24.
-Donc « cause réelle, pas cause unique », et rien de plus.
+Net en revanche : quand ça bascule, ça suit le raisonnement imposé 23 fois sur
+24. Donc « cause réelle, pas cause unique », et rien de plus.
 
-Validité : réimposer au modèle son PROPRE raisonnement lui fait reprendre sa
-décision 45 fois sur 46. Le pré-remplissage ne perturbe donc rien par lui-même.
+⚠ Les trois bras si on creuse : raisonnement propre 72 % de justesse, emprunté
+36 %, VIDE 74 %. Le troisième ne diffère pas du premier — 13 paires
+discordantes, 6 contre 7, p = 1,0000. Et il pèse 73 % des jetons : 27 s par
+jugement contre 7 s sans lui. Validité : réimposer son PROPRE raisonnement lui
+fait reprendre sa décision 45 fois sur 46.
 
-Littérature, si la question vient : Turpin et al., NeurIPS 2023, montrent qu'une
-chaîne peut être plausible et infidèle ; Lanham et al., 2023, proposent de le
-tester par perturbation — c'est ce protocole. Et les petits modèles raisonnent
-souvent plus fidèlement que les gros, ce qui va dans le sens de ce 14B.
-Tout est dans judge-finetune/fidelite/.
+⚠ Réserve : 46 items. « Je ne vois pas » n'est pas « il n'y a rien » — un écart
+réel de 10 points resterait invisible.
 
-⚠ Je n'ai PAS mesuré l'écart entre les deux ordres : j'ai choisi le bon dès le
+⚠ Littérature : Turpin et al., NeurIPS 2023, montrent qu'une chaîne peut être
+plausible et infidèle ; Lanham et al., 2023, proposent de la tester par
+perturbation — c'est ce protocole. Les petits modèles raisonnent souvent plus
+fidèlement que les gros. Et G-Eval, la référence du raisonnement-avant-notation,
+ne met en avant aucune ablation isolant le raisonnement : ingrédient supposé
+plutôt que démontré (seul le résumé a été lu). Tout est dans
+judge-finetune/fidelite/.
+
+⚠ L'ordre des champs lui-même, je ne l'ai PAS mesuré : j'ai choisi le bon dès le
 départ. C'est un raisonnement sur le fonctionnement de la génération, pas un
 résultat expérimental. Le dire tel quel.
- 
-▸ Deux caractères changent le comportement. Sur le thinking : « les deux vont dans le même sens, sans que l'un prouve l'autre » — puis le lien, et on avance.
 
-C'est la chose la moins intuitive de tout le talk, et c'est deux caractères dans
-un schéma JSON. Aucun modèle, aucun fine-tuning, aucun prompt ne rattrape un
-mauvais ordre de champs : le texte déjà écrit conditionne le texte suivant, et
-jamais l'inverse.
-
-Le bloc <thinking> obéit à la même logique. Raisonnement avant les contrôles,
-contrôles avant le verdict : chaque étape conditionne la suivante dans le bon
-sens. Ce n'est pas trois décisions, c'en est une.
-
-Le verdict est calculé, donc vérifiable : on peut le recalculer depuis les
-contrôles et détecter un juge qui se contredit. C'est comme ça que sa cohérence
-est mesurée.
-
-Le vrai gain de la décomposition n'est pas la fiabilité. Une note globale dit
-QU'une réponse échoue ; les contrôles atomiques disent LEQUEL échoue. C'est ce
-qui permettra, en partie 3, de conclure que Neo4j souffre d'un défaut de rappel
-et non d'un problème de bruit.
-
-« reason » vient en dernier : il est écrit pour l'humain qui relira, et venant
-après le verdict il ne peut pas l'influencer.
-
-Contre-chiffre à ne pas taire, il revient en partie 4 : la conjonction ABSORBE
-les désaccords. Sur 50 items, 17 portent un désaccord sur au moins un contrôle,
-dont 15 que le verdict masque.
-
-Ne pas entrer dans le détail de l'expérience ici — une phrase, et le lien.
-
-C'est le SEUL endroit du talk où la littérature et ma mesure convergent : partout
-ailleurs je dois les séparer. À dire comme tel, c'est l'argument le plus solide
-qui existe — ni l'un ni l'autre ne porte le poids seul. Formulation : « la
-méta-analyse prédit un bénéfice minime hors mathématique et symbolique, ma tâche
-n'est pas symbolique, ma mesure ne voit pas de bénéfice. Les deux vont dans le
-même sens, sans que l'un prouve l'autre. »
+⚠ Fond, si on creuse. Le verdict est calculé, donc vérifiable : on peut le
+recalculer depuis les contrôles et détecter un juge qui se contredit. Le vrai
+gain de la décomposition n'est pas la fiabilité mais le diagnostic — une note
+globale dit QU'une réponse échoue, les contrôles disent LEQUEL, et c'est ce qui
+permettra en partie 3 de conclure à un défaut de rappel. « reason » vient en
+dernier : écrit pour l'humain, et venant après le verdict il ne peut pas
+l'influencer. Contre-chiffre qui revient en partie 4 : la conjonction ABSORBE les
+désaccords — 17 items sur 50 en portent un, dont 15 que le verdict masque.
 -->
 ---
 
@@ -757,6 +732,8 @@ propre — il hérite de la requête, donc il change de sens à chaque question.
 
 Le correctif est déjà dans mon corpus : quand la contrainte est explicite, je la
 sors en critère nommé. Neuf fois.
+
+==============================================================
 
 ⚠ Les chiffres si on demande : kappa 0,386 pour 78 % d'accord brut. Ne pas
 s'auto-accabler — je montre plus tard qu'un kappa bas sur des marges
@@ -867,6 +844,8 @@ Et c'est là que tout le travail est parti. Le corpus a pris des semaines.
 
 Tout est dans le dépôt : le corpus, le protocole, les mesures.
 
+==============================================================
+
 ⚠ Annoncer le pari comme un pari. La partie 4 dira s'il était bon, et la réponse
 n'est pas celle que j'attendais.
 -->
@@ -897,6 +876,8 @@ quatre-vingt-dix essais. Le meilleur devinait le verdict trois fois sur quatre,
 là où le hasard en fait une sur deux.
 
 J'ai annoncé un effet quasi impossible à devoir au hasard.
+
+==============================================================
 
 ⚠ Chiffres exacts si la question vient : 75 % de bonne prédiction contre un taux
 de base de 53 %, annoncé à +8,8 σ. Le « quasi impossible » est la traduction de
@@ -935,6 +916,8 @@ hasard produit couramment. Du bruit.
 
 La règle que j'en ai tirée : tout seuil choisi après coup se compare à un tirage
 de permutation du même maximum. Jamais à un taux de base.
+
+==============================================================
 
 ⚠ Le test de permutation ramène l'effet à +1,3 σ, p = 0,132.
 -->
@@ -1027,6 +1010,8 @@ Le corpus a pris des semaines. Le modèle, lui : une soirée.
 
 Entraîner un juge n'est pas un projet d'infrastructure.
 
+==============================================================
+
 ⚠ Raconter la correction si le temps le permet : j'ai d'abord publié 76 minutes,
 ma méthode excluant les neuf passes de validation. Corriger rendait le chiffre
 moins flatteur.
@@ -1103,6 +1088,8 @@ Et une mesure qui ne passe pas du tout par le juge — on compte les identifiant
 attendus dans le contexte récupéré — les classe dans le même ordre. Elle ne
 valide pas les verdicts, elle mesure autre chose. Mais deux instruments
 indépendants qui classent pareil, c'est mieux qu'un seul.
+
+==============================================================
 
 ⚠ Dire la réserve : sur ce corpus, selon ce juge.
 
@@ -1193,6 +1180,8 @@ c'est une limite de puissance que j'avais annoncée avant de lancer.
 
 Dire « non concluant » sur deux niveaux, c'est ce qui donne du poids au
 troisième.
+
+==============================================================
 
 ⚠ Réserve de portée à énoncer : ces chiffres valent pour CETTE implémentation
 Neo4j, à ces réglages, sur CETTE codebase. « GraphRAG fait moins bien » serait un
@@ -1392,6 +1381,8 @@ Et pour OllamAssist, les deux erreurs n'ont pas le même prix : un défaut qui
 passe, c'est une explication fausse sur ma codebase livrée à l'utilisateur. Un
 bon code recalé, c'est juste une relecture inutile.
 
+==============================================================
+
 ⚠ Chiffres, si la question vient : 16 erreurs détectées sur 27 (59 %) et 22
 bonnes réponses validées sur 23 (96 %) pour le fine-tuné ; 17 sur 27 (63 %) et 21
 sur 23 (91 %) pour la baseline. L'écart entre les deux variantes est d'UN item :
@@ -1439,6 +1430,8 @@ Non concluant. Et cette issue était écrite dans mon protocole avant que je lan
 la mesure. C'est tout l'intérêt d'un pré-enregistrement : pouvoir dire « je ne
 sais pas » sans que ce soit un échec, et sans redécouper les données jusqu'à
 trouver un p flatteur.
+
+==============================================================
 
 ⚠ NE PAS dire « ça n'améliore pas ». Dire : mes 50 items ne voient pas la
 différence.
@@ -1530,6 +1523,8 @@ stable reste faux une fois sur six. Les enjeux, les questions hors-domaine, les
 critères qui se contredisent sont d'autres motifs de relecture — l'instabilité
 est simplement le seul que je sache mesurer.
 
+==============================================================
+
 ⚠ Réserve sur le 83 / 67 : 29 items stables contre 21 instables. C'est une
 tendance, pas un effet établi — mais elle va dans le même sens sur les deux
 variantes mesurées, baseline comprise (79 % contre 67 %).
@@ -1602,6 +1597,8 @@ Quatre fois mon budget.
 C'est pour ça qu'il n'est pas prêt pour la production. Et le raisonnement
 s'inverse pour vous : partez de ce qu'un humain peut relire par semaine, ça vous
 donne le taux de stabilité à atteindre, et donc si votre juge est utilisable.
+
+==============================================================
 
 ⚠ Réserve à énoncer : 29 items stables contre 21 instables. C'est une tendance,
 pas un effet établi — mais elle va dans le même sens sur les deux variantes
