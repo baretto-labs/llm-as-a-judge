@@ -1190,3 +1190,92 @@ Merci.
 ⚠ Les trois sont applicables sans budget et sans installation. C'est ce qui en
 fait des actions et pas des conseils.
 -->
+
+---
+
+## Les sources
+
+**Les incidents** — tous vérifiés sur la source primaire
+<span class="ref">Moffatt v. Air Canada, 2024 BCCRT 149 · Mata v. Avianca, S.D.N.Y. 22-cv-1461 · NYC Comptroller, audit IT25PAR20028</span>
+
+**Les biais du juge** — position, verbosité, auto-préférence
+<span class="ref">Zheng et al., NeurIPS 2023 — MT-Bench & Chatbot Arena, arXiv 2306.05685</span>
+
+**Questions binaires plutôt que notes graduées**
+<span class="ref">CheckEval, Lee et al., EMNLP 2025 — aclanthology.org/2025.emnlp-main.796</span>
+
+**Pour aller plus loin** — le raisonnement en chaîne, et sa fidélité
+<span class="ref">Sprague et al., ICLR 2025, arXiv 2409.12183 · Turpin et al., NeurIPS 2023 · Lanham et al., arXiv 2307.13702</span>
+
+**OllamAssist** — le plugin, et tout le protocole
+<span class="ref">plugins.jetbrains.com/plugin/26388 · github.com/baretto-labs/llm-as-a-judge</span>
+
+<!--
+[À REFORMULER AVEC TES MOTS]
+
+Je ne lis pas cette diapositive. Je la laisse deux secondes, je dis qu'elle est
+dans le support partagé, et j'enchaîne.
+
+Deux choses à dire quand même, parce qu'elles disent ce que vaut le reste. Les
+trois incidents du début, je les ai vérifiés sur la source primaire : la décision
+de justice, l'opinion du juge, le rapport d'audit. Et les affirmations que je
+n'ai pas mesurées moi-même sont là, avec leur référence — vous pouvez aller voir.
+
+==============================================================
+
+⚠ UNE SEULE source académique pour « binaire plutôt que gradué » : CheckEval. Ne
+pas dire « les études montrent », dire « une étude montre ». Et elle vaut pour
+les tâches qu'elle a étudiées.
+
+⚠ « Pour aller plus loin » est étiqueté comme tel parce que ces trois références
+ne soutiennent rien de ce qui est affirmé dans le talk — elles ouvrent une suite.
+Ne pas les présenter comme des appuis.
+
+⚠ Deloitte n'est PAS sur cette diapositive : sa source primaire n'a jamais été
+ouverte. Si on la vérifie un jour, elle peut y entrer.
+-->
+
+---
+
+## Dites-moi ce qui n'a pas marché
+
+<div class="carte">
+<div class="texte">
+
+Ce talk raconte **cinq mesures qui m'ont menti** parce que personne ne les avait
+regardées.
+
+Alors regardez celle-ci.
+
+Ce qui n'était pas clair, ce qui vous a semblé faux, ce que vous auriez fait
+autrement : **c'est ce qui me sert.**
+
+</div>
+<img src="img/qr-feedback.png" width="300" height="300" alt="QR code de retour">
+</div>
+
+<!--
+[À REFORMULER AVEC TES MOTS]
+
+Une dernière chose, et c'est une demande.
+
+Ce talk raconte cinq mesures qui m'ont menti, simplement parce que personne ne
+les avait regardées. Alors regardez celle-ci.
+
+Ce qui n'était pas clair, ce qui vous a paru faux, ce que vous auriez fait
+autrement — c'est exactement ce qui me sert. Le QR code est là, il y restera
+pendant les questions.
+
+Merci.
+
+==============================================================
+
+⚠ À FAIRE AVANT : générer le QR vers ton formulaire et écraser
+demo/img/qr-feedback.png — même nom, 620 x 620, puis relancer le rendu.
+
+⚠ Laisser cette diapositive affichée pendant les questions : c'est le moment où
+les gens dégainent leur téléphone.
+
+⚠ L'angle « vous avez vu un talk sur la vérification, vérifiez-moi » est
+cohérent avec le propos. Éviter le « n'hésitez pas à me faire un retour » neutre.
+-->
