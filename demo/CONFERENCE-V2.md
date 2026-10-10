@@ -496,3 +496,253 @@ Et c'est la CI qui ferme le tunnel : rejouer les mêmes questions, c'est la seul
 façon de savoir si ma modification améliore ou dégrade — et la seule façon de
 comparer deux stratégies.
 -->
+
+---
+
+## Le correcteur se laisse impressionner par l'épaisseur
+
+Quatre pages, c'est sérieux. Une réponse courte, ça fait négligé.
+
+**Le même défaut, écrit deux fois** — une version bavarde, une version sèche.
+Si le juge valide plus souvent la bavarde, il note la forme, pas le fond.
+
+**Chez moi : 46 % de faux PASS sur les défauts bavards.**
+
+<!--
+[À REFORMULER AVEC TES MOTS]
+
+Premier biais, et c'est le plus humain : le correcteur se laisse impressionner
+par l'épaisseur de la copie. Quatre pages, ça fait sérieux. Une réponse en trois
+lignes, ça fait bâclé.
+
+Comment je le détecte ? J'écris le même défaut deux fois. Une version bavarde,
+une version sèche. Même erreur, deux habillages. Si mon juge valide plus souvent
+la bavarde, il note la forme et pas le fond.
+
+Chez moi, 46 % de faux PASS sur les défauts bavards.
+
+==============================================================
+
+[AJOUT AU SCHÉMA : le jeu de questions doit être APPARIÉ — chaque défaut existe
+en version longue et en version courte. C'est une contrainte sur le corpus, pas
+sur le pipeline.]
+
+⚠ Le chiffre exact : 46 % de faux PASS sur défauts verbeux contre 42 % sur
+défauts concis — l'écart lui-même est petit, c'est le NIVEAU qui est mauvais.
+Ne pas vendre l'écart, vendre le niveau.
+-->
+
+---
+
+## Le même devoir, selon sa place dans la pile
+
+La première copie et la vingtième ne sont pas notées pareil.
+
+Pour un juge, c'est **l'ordre des extraits** qu'on lui donne.
+
+**Je mélange le contexte — avec une graine tirée de la question**, pour que la
+mesure se rejoue à l'identique.
+
+Ça atténue. Ça ne supprime pas :
+**12 verdicts sur 60 basculent au seul réordonnancement.**
+
+<!--
+[À REFORMULER AVEC TES MOTS]
+
+Deuxième biais : la place dans la pile. Un correcteur ne note pas la première
+copie comme la vingtième. Pour un juge LLM, ce n'est pas la pile, c'est l'ordre
+des extraits qu'on lui donne dans le contexte.
+
+Ma parade : je mélange les extraits. Mais attention — avec une graine tirée de la
+question, sinon la mesure n'est plus rejouable, et j'en ai fait les frais.
+
+Et je veux être honnête : ça atténue, ça ne supprime pas. Douze verdicts sur
+soixante basculent au seul réordonnancement, à récupération strictement
+identique.
+
+==============================================================
+
+[AJOUT AU SCHÉMA : une boîte « mélange graîné » entre la récupération et le juge.]
+
+⚠ Sans graine, les exécutions de la veille faisaient bouger le même bras de
+55,9 % à 43,3 %. Une mesure qui ne se rejoue pas n'est pas une mesure.
+
+⚠ Ne pas confondre avec le « A contre B puis B contre A » de la comparaison par
+paires : là c'est l'ordre de DEUX RÉPONSES, ici c'est l'ordre des EXTRAITS.
+-->
+
+---
+
+## Un correcteur indulgent a l'air fiable
+
+Il valide presque tout. Donc il se trompe rarement.
+Il ne se trompe que sur les copies qu'il aurait dû recaler.
+
+```
+   27 mauvaises copies   →  il en recale 16.  Il en laisse passer 11.
+   23 bonnes copies      →  il en valide 22.
+```
+
+**76 % de décisions justes. Et 4 défauts sur 10 qui passent.**
+
+Le même juge, deux chiffres. **Ne publiez jamais le premier sans le second.**
+
+<!--
+[À REFORMULER AVEC TES MOTS]
+
+Troisième biais, et c'est celui qu'aucun tableau ne montre : l'indulgence.
+
+Un correcteur qui valide presque tout se trompe rarement. Forcément : il ne se
+trompe que sur les copies qu'il aurait dû recaler.
+
+Mon juge, sur vingt-sept mauvaises réponses, en recale seize. Il en laisse passer
+onze. Sur vingt-trois bonnes, il en valide vingt-deux.
+
+Ça fait soixante-seize pour cent de décisions justes — et quatre défauts sur dix
+qui passent. Le même juge, deux chiffres.
+
+Et pour moi les deux erreurs n'ont pas le même prix : un défaut qui passe, c'est
+une explication fausse sur ma codebase livrée à l'utilisateur. Un bon code
+recalé, c'est juste une relecture inutile.
+
+==============================================================
+
+[AJOUT AU SCHÉMA : le juge ne sort pas UN chiffre mais DEUX — les décisions
+justes, et les erreurs attrapées.]
+
+⚠ Un juge qui répondrait PASS à tout sur un corpus où 95 % des réponses sont
+bonnes afficherait 95 % d'exactitude et attraperait zéro erreur. C'est l'exemple
+à donner si quelqu'un doute.
+
+⚠ Ce biais recoupe les deux autres : 46 % de faux PASS sur les défauts verbeux,
+et un juge qui rend PASS 64 % du temps là où l'étalon en compte 46 %. Trois
+mesures indépendantes, un même diagnostic.
+-->
+
+---
+
+## Et il y a le quatrième, que je n'ai pas mesuré
+
+**L'auto-préférence** : un modèle préfère ce qui ressemble à ce qu'il aurait
+écrit.
+
+Je ne l'ai **pas mesuré chez moi**. Je le cite.
+
+La parade connue : **ne pas faire juger un modèle par sa propre famille.**
+
+<!--
+[À REFORMULER AVEC TES MOTS]
+
+Il y en a un quatrième, et je vais être clair sur son statut : l'auto-préférence.
+Un modèle préfère ce qui ressemble à ce qu'il aurait écrit lui-même.
+
+Celui-là, je ne l'ai pas mesuré. Je le cite. La parade connue, c'est de ne pas
+faire juger un modèle par un modèle de sa propre famille.
+
+Je le dis parce que mélanger ce qu'on a mesuré et ce qu'on a lu, c'est la
+meilleure façon de perdre la confiance de la salle sur tout le reste.
+
+==============================================================
+
+⚠ C'est la diapositive qui protège les trois précédentes. Si on ne distingue pas
+mesuré et cité, la salle a raison de douter de tout. Référence pour les biais de
+position, verbosité et auto-préférence : Zheng et al., NeurIPS 2023, MT-Bench.
+
+⚠ Possible de la fusionner avec la précédente si le temps manque — mais ne pas la
+supprimer : c'est elle qui rend les trois autres crédibles.
+-->
+
+---
+
+## Et le RAG a ses propres pièges
+
+Trois cas, tirés de **vraies extractions** sur ma codebase. Rien d'inventé.
+
+**Le quasi-homonyme** — je demande `OllamaService`, le moteur rend
+`OllamaSettings`. Même forme, classe voisine, interface sans rapport.
+Le contexte **ressemble** à une réponse.
+
+**Les corps tronqués** — dix extraits, pas un seul corps de méthode, pour une
+question en « comment ». Les noms annoncent une intention, ils ne livrent pas la
+mécanique.
+
+**Le vrai mais non étayé** — une réponse exacte dans ma codebase, mais absente du
+contexte fourni. **Elle doit tomber.**
+
+<!--
+[À REFORMULER AVEC TES MOTS]
+
+Jusqu'ici j'ai parlé des biais du juge. Mais le RAG a les siens, et ils arrivent
+avant — ils sont dans le contexte qu'on donne au juge.
+
+Trois cas, et ce sont de vraies extractions sur ma codebase, gardées telles
+quelles.
+
+Le quasi-homonyme. Je demande OllamaService, le moteur me rend OllamaSettings.
+Même forme, classe voisine, interface sans aucun rapport. Le contexte ressemble à
+une réponse — et il invite à répondre faux.
+
+Les corps tronqués. Dix extraits, pas un seul corps de méthode, pour une question
+qui commence par « comment ». Les noms annoncent une intention, ils ne livrent
+pas la mécanique.
+
+Et le plus subtil : le vrai mais non étayé. Une réponse exacte — elle est juste,
+je peux le vérifier dans ma codebase — mais rien dans le contexte fourni ne
+l'appuie. Celle-là doit tomber. Parce que si je l'accepte au motif qu'elle est
+vraie, je valide le même comportement sur un dossier où il aura inventé.
+
+==============================================================
+
+⚠ C'est la promesse de l'abstract : « comprendre quelques biais des systèmes
+RAG », pas seulement des biais de juge. Ne pas sauter cette diapositive.
+
+⚠ Le troisième cas est le test décisif de la posture en monde fermé. Si la salle
+ne retient qu'un des trois, c'est celui-là.
+-->
+
+---
+
+## Ce que ça change pour le juge
+
+Si le contexte peut tromper, alors **juger la réponse ne suffit pas.**
+
+Le juge reçoit **trois choses**, pas deux : la question, **le contexte**, et la
+réponse.
+
+Et il répond séparément :
+
+```
+   le contexte est-il pertinent ?
+   permet-il de répondre sans rien supposer ?
+   la réponse s'appuie-t-elle sur lui ?
+```
+
+C'est ce qui distingue **un défaut de récupération** d'un **défaut de
+génération**.
+
+<!--
+[À REFORMULER AVEC TES MOTS]
+
+Alors qu'est-ce que ça change pour mon juge ?
+
+Si le contexte peut tromper, juger la réponse ne suffit plus. Le juge doit
+recevoir trois choses, pas deux : la question, le contexte, et la réponse.
+
+Et il doit répondre séparément : est-ce que le contexte est pertinent ? Est-ce
+qu'il permet de répondre sans rien supposer ? Est-ce que la réponse s'appuie
+dessus ?
+
+Parce que c'est ce qui me permet de distinguer deux pannes très différentes : le
+moteur n'a rien trouvé d'utile, ou le modèle a mal utilisé ce qu'il avait.
+
+Sans ça, j'ai un taux d'échec et aucune idée de quoi corriger.
+
+==============================================================
+
+[AJOUT AU SCHÉMA : le contexte récupéré entre DANS le juge, pas seulement dans
+l'assistant. Et la sortie du juge se décompose.]
+
+⚠ C'est ce qui permettra, plus tard, de dire que Neo4j souffre d'un défaut de
+rappel — 66 % de contextes jugés insuffisants contre 40 % — et pas d'un problème
+de bruit. Sans cette décomposition : 25 points d'écart sans explication.
+-->
