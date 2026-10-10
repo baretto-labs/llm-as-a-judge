@@ -499,6 +499,72 @@ comparer deux stratégies.
 
 ---
 
+<!-- _class: dense -->
+
+## Ce que le juge rend
+
+Pas une note sur 10 — **« 13/20 » ne dit pas si on livre.**
+Des **contrôles, un par critère**, vrai ou faux.
+
+```
+  ✗  {                        ✓  {
+       "verdict": "PASS",          "checks": { … },
+       "checks": { … }             "verdict": "FAIL"
+     }                           }
+
+     décide, puis justifie       constate, puis conclut
+```
+
+Un modèle génère **de gauche à droite**, il ne revient pas en arrière.
+Verdict en premier : les contrôles sont écrits pour **lui donner raison**.
+
+**PASS si et seulement si tous les contrôles sont vrais.**
+
+<!--
+[À REFORMULER AVEC TES MOTS]
+
+Maintenant, sous quelle forme il rend son verdict. Et là il y a deux décisions
+qui ne coûtent rien et qui changent tout.
+
+La première : pas de note sur dix. « Treize sur vingt », ça ne me dit pas si je
+livre. Des contrôles, un par critère, vrai ou faux. Et le verdict est vrai
+seulement si tous les contrôles le sont — pas de demi-mesure.
+
+La seconde, et c'est la moins intuitive du talk : l'ordre des champs.
+
+Un modèle génère de gauche à droite. Il ne revient jamais en arrière. Donc si le
+verdict est écrit en premier, tout ce qui suit est écrit pour lui donner raison.
+Il décide, puis il justifie. Dans l'autre sens, il constate, puis il conclut.
+
+Deux caractères dans un schéma JSON. Aucun modèle, aucun prompt ne rattrape un
+mauvais ordre de champs.
+
+==============================================================
+
+[AJOUT AU SCHÉMA : la sortie du juge n'est plus une note, c'est une liste de
+contrôles puis un verdict.]
+
+⚠ D'où viennent mes critères, si on demande : trois sont génériques pour toute
+analyse de code, trois dépendent du type de tâche, et neuf sont LUS DANS LA
+REQUÊTE — « sans dépendance externe » devient un critère nommé, sinon il
+n'existe pas. Je ne les choisis pas pour la troisième catégorie.
+
+⚠ Je n'ai PAS mesuré l'écart entre les deux ordres : j'ai choisi le bon dès le
+départ. C'est un raisonnement sur le fonctionnement de la génération, pas un
+résultat expérimental. Le dire tel quel.
+
+⚠ Ce que j'ai mesuré en revanche : le verdict correspond bien à ses propres
+contrôles 99,3 % du temps. Donc je peux le recalculer et détecter un juge qui se
+contredit.
+
+⚠ Un bon critère tient trois tests : décidable — la réponse se lit dans ce qui
+est fourni ; falsifiable — je sais dire ce qui le rendrait faux ; reproductible —
+deux personnes répondent pareil. Le troisième se mesure, et c'est le seul qui
+tranche.
+-->
+
+---
+
 ## Le correcteur se laisse impressionner par l'épaisseur
 
 Quatre pages, c'est sérieux. Une réponse courte, ça fait négligé.
@@ -745,6 +811,101 @@ l'assistant. Et la sortie du juge se décompose.]
 ⚠ C'est ce qui permettra, plus tard, de dire que Neo4j souffre d'un défaut de
 rappel — 66 % de contextes jugés insuffisants contre 40 % — et pas d'un problème
 de bruit. Sans cette décomposition : 25 points d'écart sans explication.
+-->
+
+---
+
+## L'étalon, et le biais que j'y ai mis moi-même
+
+Pour vérifier un juge, il faut des réponses **dont je connais déjà le verdict**.
+200 exemples écrits à la main, 50 mis de côté, **relus en aveugle par deux
+personnes** : 47 verdicts identiques sur 50.
+
+Et dans ces exemples, **17 requêtes portaient la même incise** —
+*« si tu as le temps, dis un mot de X »*. **Les 17 étaient étiquetées PASS.**
+
+Le juge n'apprend pas à juger. Il apprend à **repérer ma signature**.
+
+Correctif évident : ajouter l'incise à des réponses en échec. Sauf que je l'ai
+mise **en paragraphe isolé**. Nouvelle règle apprise : *paragraphe isolé ⇒
+échec*. **30 sur 30.**
+
+<!--
+[À REFORMULER AVEC TES MOTS]
+
+Pour vérifier un juge, il me faut des réponses dont je connais déjà le verdict.
+Donc un étalon : deux cents exemples écrits à la main, cinquante mis de côté, et
+relus en aveugle par deux personnes avant qu'elles se parlent. Quarante-sept
+verdicts identiques sur cinquante.
+
+Et c'est là que je me suis fait avoir.
+
+Dix-sept requêtes de mon corpus portaient la même incise : « si tu as le temps,
+dis un mot de X ». Les dix-sept étaient étiquetées PASS. Sans que je m'en rende
+compte, j'avais associé une tournure de politesse à des réponses que je trouvais
+bonnes.
+
+Un juge n'a plus qu'à détecter cette chaîne de caractères pour marquer dix-sept
+points. Il n'apprend pas à juger, il apprend à repérer ma signature.
+
+Le correctif était évident : ajouter la même incise à des réponses en échec. Sauf
+que je l'ai mise en paragraphe isolé, là où les dix-sept d'origine la portaient
+au fil du texte. Nouvelle règle apprise : paragraphe isolé, donc échec. Trente
+sur trente.
+
+J'avais aggravé le problème en le réparant. Et ça a traversé une régénération,
+une validation à zéro erreur, trois mesures et un commit.
+
+==============================================================
+
+⚠ C'est aussi la diapositive qui introduit le corpus : sans elle, le « κ du
+corpus » deux diapos plus loin tombe du ciel.
+
+⚠ Toute correction d'un corpus est une nouvelle écriture, et toute écriture
+laisse une signature. C'est la leçon, pas l'anecdote.
+
+⚠ Ne pas appeler ces 50 items « golden set » ni les confondre avec les 60
+questions du banc. Deux jeux, deux rôles.
+-->
+
+---
+
+## Ce qui l'a trouvée : un humain
+
+Les métriques ont trouvé **ce que je leur avais demandé de chercher.**
+
+L'humain a trouvé **ce que je ne savais pas chercher.**
+
+Un relecteur a répondu **différemment** sur un item, après avoir appliqué la
+règle correctement quatre fois de suite.
+
+Ce n'était pas un relâchement. **Le stimulus était réellement différent.**
+
+<!--
+[À REFORMULER AVEC TES MOTS]
+
+Alors qu'est-ce qui l'a trouvée ?
+
+Les métriques ont trouvé ce que je leur avais demandé de chercher. L'humain a
+trouvé ce que je ne savais pas chercher.
+
+Concrètement : un relecteur a répondu différemment sur un item, après avoir
+appliqué la règle correctement quatre fois de suite. Ce n'était pas un
+relâchement — le stimulus était réellement différent, et c'est en creusant ce
+désaccord que la règle est apparue.
+
+Un balayage automatique cherche les régularités qu'on a listées. Il ne peut pas
+signaler celle à laquelle on n'a pas pensé. Et une fuite, par définition, c'est
+celle à laquelle on n'a pas pensé.
+
+==============================================================
+
+⚠ Ralentir. C'est la diapositive qui porte la conclusion du talk, et c'est aussi
+la première ligne de son tableau final.
+
+⚠ Si le temps manque vraiment, c'est celle-ci qui se fusionne avec la précédente
+— mais on y perd la phrase, et c'est une des deux ou trois que la salle peut
+retenir.
 -->
 
 ---
