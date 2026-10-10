@@ -2968,7 +2968,45 @@ modèle — c'est ce que le corpus enseigne.
 Pourquoi ? Sur mes cinquante items, dix-sept portent un désaccord sur au moins un
 contrôle, et quinze d'entre eux sont masqués par le verdict. Le verdict est
 reproductible ; les raisons le sont beaucoup moins. Or c'est sur les raisons que
-le juge s'entraîne.</p></div><div class="bespoke-marp-note" data-index="30" tabindex="0"><p>Avant de vous donner le résultat du fine-tuning, une mise en garde sur la façon
+le juge s'entraîne.
+
+==============================================================
+
+⚠ SI ON DEMANDE « COMMENT VÉRIFIEZ-VOUS QUE VOTRE JUGE EST CORRECT ? »
+Répondre d'abord sans aucun chiffre, sinon on perd ceux qui découvrent le sujet.
+
+  « Je ne vérifie pas qu'il est correct. Je mesure à quel point il ne l'est pas,
+  de quatre façons indépendantes.
+
+  Un. Je lui donne des copies dont je connais déjà la note, et je compare. Mais
+  avant ça j'ai vérifié que ces notes sont fiables : deux personnes ont corrigé
+  les mêmes copies, séparément, sans se parler. Si elles ne s'accordent pas, ma
+  règle est fausse et tout le reste ne vaut rien.
+
+  Deux. Je lui fais corriger deux fois la même copie. S'il change d'avis, je le
+  sais, et je sais de combien.
+
+  Trois. Je compte quelque chose sans lui — une mesure mécanique, sans aucune IA.
+  Si elle classe les deux systèmes dans le même ordre que lui, ce n'est plus
+  seulement sa parole.
+
+  Quatre. Je regarde surtout les copies qu'il aurait dû recaler, parce qu'un
+  correcteur qui valide tout a l'air excellent tant qu'on ne compte que ses
+  bonnes décisions.
+
+  Et le point qui tient tout : au moins une de ces vérifications ne doit pas
+  passer par une IA. Sinon on fait vérifier un juge par un autre juge, et on
+  tourne en rond.
+
+  Résultat : mon juge n'est pas assez fiable pour ce que je voulais en faire.
+  Je ne vous présente pas un juge qui marche, je vous présente comment savoir
+  qu'il ne marche pas. »
+
+⚠ Les chiffres, seulement si on les réclame : accord avec l'étalon κ = 0,44
+contre 0,880 entre humains · stabilité du verdict 58 % sur trois passes ·
+hintCoverage classe les deux stratégies dans le même ordre, sans LLM · 16 vraies
+erreurs attrapées sur 27, donc quatre défauts sur dix passent. Et le juge échoue
+le filtre de recevabilité que j'avais fixé d'avance.</p></div><div class="bespoke-marp-note" data-index="30" tabindex="0"><p>Avant de vous donner le résultat du fine-tuning, une mise en garde sur la façon
 de lire un chiffre de justesse.
 
 Un correcteur qui valide presque tout se trompe rarement. Il ne se trompe que sur
