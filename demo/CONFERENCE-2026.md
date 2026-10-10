@@ -60,6 +60,16 @@ style: |
   .deux { display: grid; grid-template-columns: 1fr 1fr; gap: 2.2rem; }
 ---
 
+
+<!-- _class: title -->
+
+# RAGots et Hallucinations
+
+## votre chatbot passe devant le juge
+
+Mehdi Elketroussi
+Novembre 2026
+
 <!--
 RAGots et Hallucinations : votre chatbot passe devant le juge.
 
@@ -70,22 +80,6 @@ sens : le tribunal, et le juge automatique qu'on va construire ensemble.
 Vingt minutes. Une question : comment savoir si mon RAG s'améliore, sans croire
 mon juge sur parole.
 -->
-
-# RAGots et Hallucinations
-
-## votre chatbot passe devant le juge
-
-Mehdi Elketroussi
-Novembre 2026
-
-<!--
-Lire le titre à voix haute dès la première seconde : « RAGots » est un jeu de
-mots qui se perd à l'écrit, la moitié de la salle ne le verra pas.
-
-« Passe devant le juge » porte les deux sens du talk : le juge automatique qu'on
-construit, et le tribunal.
--->
-
 ---
 
 ## Air Canada, 2024
@@ -127,31 +121,9 @@ Vous répondez de ce que votre chatbot affirme.
 650,88 $ CA. Ne pas citer de mémoire le délai annoncé par le chatbot ni le total
 avec frais — non vérifiés, volontairement absents de l'écran.
 -->
-
 ---
 
-<!--
-Et ce n'est pas un cas isolé. Je passe vite, vous les retrouverez dans le
-support.
-
-Mata contre Avianca : un avocat dépose au tribunal six décisions de justice
-inventées par ChatGPT. Le juge parle d'évitement conscient. Cinq mille dollars de
-sanction.
-
-New York, audit public : le chatbot de la ville rend des réponses différentes à
-une question identique. Et l'administration annonçait 95 à 99 % d'exactitude —
-l'audit établit que ce calcul excluait les réponses jugées perfectibles.
-
-En dessous, deux cas que je n'ai pas pu vérifier sur source primaire, et qui
-restent donc étiquetés comme tels.
-
-J'aurais pu en remplir beaucoup plus. Je ne garde que ceux que je peux prouver.
-
-⚠ Deux secondes minimum à l'écran, sinon l'effet de volume tombe. Mata v.
-Avianca : SIX décisions inventées, pas neuf — trois des noms qui circulent sont
-de vraies décisions citées dans les fausses. Et l'audit de New York ne documente
-PAS le conseil illégal : ça, c'est la presse.
--->
+<!-- _class: dense -->
 
 ## Et ce n'est pas un cas isolé
 
@@ -177,15 +149,26 @@ PAS le conseil illégal : ça, c'est la presse.
 </div>
 
 <!--
-Diapositive à survoler, deux secondes minimum à l'écran — en dessous, la salle
-ne perçoit pas qu'elle est dense et l'effet de volume tombe.
+Et ce n'est pas un cas isolé. Je passe vite, vous les retrouverez dans le
+support.
 
-« J'aurais pu en remplir beaucoup plus — mais je ne garde que ceux que je peux
-prouver. » Survol assumé : « je ne m'arrête pas, vous les retrouverez », jamais
-« je n'ai pas le temps ».
+Mata contre Avianca : un avocat dépose au tribunal six décisions de justice
+inventées par ChatGPT. Le juge parle d'évitement conscient. Cinq mille dollars de
+sanction.
 
-Dire pourquoi la diapositive est coupée en deux : un talk sur la mesure
-rigoureuse range ses propres anecdotes par niveau de preuve.
+New York, audit public : le chatbot de la ville rend des réponses différentes à
+une question identique. Et l'administration annonçait 95 à 99 % d'exactitude —
+l'audit établit que ce calcul excluait les réponses jugées perfectibles.
+
+En dessous, deux cas que je n'ai pas pu vérifier sur source primaire, et qui
+restent donc étiquetés comme tels.
+
+J'aurais pu en remplir beaucoup plus. Je ne garde que ceux que je peux prouver.
+
+⚠ Deux secondes minimum à l'écran, sinon l'effet de volume tombe. Mata v.
+Avianca : SIX décisions inventées, pas neuf — trois des noms qui circulent sont
+de vraies décisions citées dans les fausses. Et l'audit de New York ne documente
+PAS le conseil illégal : ça, c'est la presse.
 
 ⚠ Mata v. Avianca : SIX décisions inventées (Varghese, Shaboon, Petersen,
 Martinez, Estate of Durden, Miller). Des résumés en annoncent neuf — les trois
@@ -204,8 +187,17 @@ C'est exactement le sujet.
 ⚠ Deloitte descend chez les cas rapportés : concordant sur AP, Fortune et CFO
 Dive, mais la source primaire du DEWR n'a jamais pu être ouverte. Si tu la
 vérifies, la ligne peut remonter.
--->
+ 
+Diapositive à survoler, deux secondes minimum à l'écran — en dessous, la salle
+ne perçoit pas qu'elle est dense et l'effet de volume tombe.
 
+« J'aurais pu en remplir beaucoup plus — mais je ne garde que ceux que je peux
+prouver. » Survol assumé : « je ne m'arrête pas, vous les retrouverez », jamais
+« je n'ai pas le temps ».
+
+Dire pourquoi la diapositive est coupée en deux : un talk sur la mesure
+rigoureuse range ses propres anecdotes par niveau de preuve.
+-->
 ---
 
 ## Pourquoi personne n'a rien vu
@@ -236,7 +228,6 @@ question admet dix bonnes réponses.
 Donc on livre en se fiant à l'impression qu'on a en relisant trois sorties à la
 main.
 -->
-
 ---
 
 ## OllamAssist
@@ -284,8 +275,27 @@ demo/img/ollamassist-marketplace.png, 768 x 638, même nom, puis relancer le
 rendu. Les faits si on demande : plugin JetBrains sur la Marketplace, Ollama,
 mode hors-ligne, 162 fichiers Java indexés — c'est ma codebase, donc je vois
 quand il se trompe.
--->
 
+⚠ À FAIRE LA VEILLE : l'image de droite est un gabarit. Prendre une capture de
+la carte sur plugins.jetbrains.com/plugin/26388, et ÉCRASER le fichier
+demo/img/ollamassist-marketplace.png — même nom, idéalement 768 x 638. Puis
+relancer le rendu. Aucune modification du markdown.
+Un iframe a été écarté : il exigeait du réseau pendant la présentation et ne
+s'exportait pas en PDF.
+
+Les faits, si on demande : c'est un plugin JetBrains, publié sur la Marketplace,
+propulsé par Ollama, avec un mode entièrement hors-ligne. Chat dans l'IDE,
+autocomplétion expérimentale, messages de commit générés depuis le diff.
+
+La codebase qu'il indexe fait 162 fichiers Java. C'est la mienne — donc je vois
+quand il se trompe. C'est ce qui rend l'exercice possible : sur du code que je ne
+connais pas, je n'aurais aucun moyen de juger le juge.
+
+La dernière ligne est la charnière de tout l'exposé. Tant que c'est un chatbot,
+la qualité vient du modèle. Dès qu'il lit le workspace, elle vient d'abord de ce
+que la récupération a rapporté. C'est ce déplacement qui justifie de mesurer le
+RAG et pas seulement le modèle.
+-->
 ---
 
 ## Comment mesurer la qualité des réponses de mon assistant ?
@@ -319,7 +329,6 @@ chaque modification est un pari, et les paris s'accumulent.
 Je vais donc construire un juge. Et la question devient : comment savoir que mon
 RAG s'améliore, sans croire mon juge sur parole.
 -->
-
 ---
 
 ## LLM-as-a-Judge, en une image
@@ -351,7 +360,6 @@ Et notez les trois entrées : il voit aussi le contexte. C'est ce qui lui permet
 dire « cette réponse est peut-être vraie, mais rien dans le contexte ne
 l'étaye ».
 -->
-
 ---
 
 ## Trois façons de juger
@@ -380,8 +388,12 @@ C'est mon choix — et tout repose alors sur le barème.
 Pourquoi pas le corrigé ? Parce que sur du code, le corrigé est exactement ce que
 je n'ai pas. Si je savais écrire la bonne réponse à mes soixante questions, je
 n'aurais pas besoin de RAG.
--->
 
+⚠ Le « A contre B, puis B contre A » neutralise le biais de position ENTRE DEUX
+RÉPONSES. Ce que j'ai mesuré est un biais de position sur L'ORDRE DES CONTEXTES
+RÉCUPÉRÉS (12 verdicts sur 60). Même phénomène, dispositif différent : dire
+lequel a été mesuré.
+-->
 ---
 
 ## Première question : que ne PAS lui donner à juger
@@ -413,7 +425,6 @@ en prose qui contiennent du code, donc « est-ce que ça compile » ne s'appliqu
 pas directement. Il faudrait extraire les blocs et les compiler à part. Je ne
 l'ai pas fait. C'est une raison, pas une excuse.
 -->
-
 ---
 
 ## Deuxième question : quand évaluer ?
@@ -446,7 +457,6 @@ Et c'est la CI qui ferme le tunnel : rejouer les mêmes questions, c'est la seul
 façon de savoir si ma modification améliore ou dégrade — et la seule façon de
 comparer deux stratégies.
 -->
-
 ---
 
 ## Troisième question : quel format de verdict ?
@@ -494,36 +504,49 @@ des questions binaires, zéro virgule quarante-huit.
 ⚠ Dire clairement que ce point vient de la littérature. Et CheckEval vaut pour
 les tâches étudiées — ça ne prouve pas qu'un verdict binaire soit meilleur
 partout, d'où la justification par mon cas.
--->
 
+⚠ Les chiffres exacts, vérifiés dans le papier (arXiv 2403.18771, tables IEA) :
+Krippendorff α passe de 0,09 à 0,48 sur SummEval, et de 0,06 à 0,45 sur
+Topical-Chat, entre une notation en échelle (G-Eval) et les questions binaires.
+L'abstract annonce « +0,45 d'accord moyen » ; les écarts lisibles dans les tables
+font plutôt +0,39, la moyenne de l'abstract portant sur plus de groupes. D'où
+l'avant/après à l'écran plutôt que le gain — il est tiré de la table et
+inattaquable.
+
+Si la question « 0,48 c'est faible, non ? » vient : oui, c'est moyen. Mais le
+point n'est pas le niveau atteint, c'est le départ. 0,09, c'est l'accord de
+correcteurs qui cocheraient au hasard.
+
+À dire clairement : ce point-là, je ne l'ai pas mesuré, je m'appuie sur la
+littérature. Et CheckEval montre que les listes binaires tiennent mieux SUR LES
+TÂCHES ÉTUDIÉES — ça ne prouve pas qu'un verdict binaire soit meilleur partout.
+D'où la justification par mon cas plutôt que par une règle générale. C'est la seule affirmation du talk dans ce cas, et autant le dire
+plutôt que le laisser croire.
+
+Exemple OllamAssist : « cette explication de ma classe RagService, elle vaut
+13 ou 14 sur 20 ? » La question n'a pas de réponse. « Est-ce qu'elle cite une
+méthode qui n'existe pas ? » en a une.
+
+Si on demande pourquoi j'y crois : j'ai moi-même présenté, il y a quelques mois,
+« +154 % en ajoutant BM25 » — calculé sur un passage de 1,8 à 4,5 sur 10. Un
+pourcentage d'augmentation sur une échelle sans ancrage ne mesure rien, et d'une
+exécution à l'autre le juge ne redonnait pas 4,5. La classe correspondante est
+marquée @deprecated depuis le 2026-09-13, la raison est écrite dans le code.
+
+Je n'ai pas fait combattre le gradué contre le binaire chez moi. J'ai abandonné
+le gradué, je ne l'ai pas battu en duel — la nuance compte, et quelqu'un dans la
+salle la verra.
+
+⚠ Références exactes :
+- CheckEval, EMNLP 2025, Lee, Kim, Kim, Cho, Kang, Kang, Kim.
+  aclanthology.org/2025.emnlp-main.796/ — l'abstract attribue les incohérences
+  aux « subjective evaluation criteria combined with Likert scale scoring » et
+  mesure « improves the average agreement across evaluator models by 0.45 ».
+- Zheng et al., NeurIPS 2023, Datasets and Benchmarks. arxiv.org/abs/2306.05685
+-->
 ---
 
-<!--
-Et maintenant le détail le moins intuitif de tout ce talk. Il tient en deux
-caractères.
-
-À gauche, le verdict d'abord, les contrôles ensuite. À droite, l'inverse.
-
-Un modèle génère de gauche à droite. Il ne revient jamais en arrière. Donc si le
-verdict est écrit en premier, tout ce qui suit est écrit pour être cohérent avec
-une décision déjà prise. Il décide, puis il justifie. Dans l'autre sens, il
-constate, puis il conclut.
-
-Et le verdict ne s'opine pas, il se calcule : pass si et seulement si tous les
-contrôles sont vrais. Un seul faux, et c'est fail.
-
-Dernier point, sur le bloc de raisonnement. La littérature dit qu'il paie sur le
-mathématique et le symbolique, et peu ailleurs. J'ai essayé de le mesurer chez
-moi : je n'arrive pas à prouver ce qu'il rapporte. En revanche, un mauvais
-raisonnement fait tomber la justesse de 71 à 36 %. C'est donc un risque dont je
-n'ai pas mesuré le bénéfice. Le protocole est dans le dépôt.
-
-⚠ C'est le seul endroit où la littérature et ma mesure convergent : le dire.
-« Les deux vont dans le même sens, sans que l'un prouve l'autre. » Et ne pas
-inverser l'inférence : la méta-analyse parle de familles de tâches, pas de mon
-juge. Ma tâche est mixte, à dominante non symbolique — décider si un correctif
-fonctionne, c'est du raisonnement algorithmique.
--->
+<!-- _class: dense -->
 
 ## L'ordre des champs décide du comportement
 
@@ -554,41 +577,30 @@ raisonnement fait tomber la justesse de 71 % à 36 %.
 **Un risque dont je n'ai pas mesuré le bénéfice.** <span class="ref">judge-finetune/fidelite/</span>
 
 <!--
-▸ Deux caractères changent le comportement. Sur le thinking : « les deux vont dans le même sens, sans que l'un prouve l'autre » — puis le lien, et on avance.
+Et maintenant le détail le moins intuitif de tout ce talk. Il tient en deux
+caractères.
 
-C'est la chose la moins intuitive de tout le talk, et c'est deux caractères dans
-un schéma JSON. Aucun modèle, aucun fine-tuning, aucun prompt ne rattrape un
-mauvais ordre de champs : le texte déjà écrit conditionne le texte suivant, et
-jamais l'inverse.
+À gauche, le verdict d'abord, les contrôles ensuite. À droite, l'inverse.
 
-Le bloc <thinking> obéit à la même logique. Raisonnement avant les contrôles,
-contrôles avant le verdict : chaque étape conditionne la suivante dans le bon
-sens. Ce n'est pas trois décisions, c'en est une.
+Un modèle génère de gauche à droite. Il ne revient jamais en arrière. Donc si le
+verdict est écrit en premier, tout ce qui suit est écrit pour être cohérent avec
+une décision déjà prise. Il décide, puis il justifie. Dans l'autre sens, il
+constate, puis il conclut.
 
-Le verdict est calculé, donc vérifiable : on peut le recalculer depuis les
-contrôles et détecter un juge qui se contredit. C'est comme ça que sa cohérence
-est mesurée.
+Et le verdict ne s'opine pas, il se calcule : pass si et seulement si tous les
+contrôles sont vrais. Un seul faux, et c'est fail.
 
-Le vrai gain de la décomposition n'est pas la fiabilité. Une note globale dit
-QU'une réponse échoue ; les contrôles atomiques disent LEQUEL échoue. C'est ce
-qui permettra, en partie 3, de conclure que Neo4j souffre d'un défaut de rappel
-et non d'un problème de bruit.
+Dernier point, sur le bloc de raisonnement. La littérature dit qu'il paie sur le
+mathématique et le symbolique, et peu ailleurs. J'ai essayé de le mesurer chez
+moi : je n'arrive pas à prouver ce qu'il rapporte. En revanche, un mauvais
+raisonnement fait tomber la justesse de 71 à 36 %. C'est donc un risque dont je
+n'ai pas mesuré le bénéfice. Le protocole est dans le dépôt.
 
-« reason » vient en dernier : il est écrit pour l'humain qui relira, et venant
-après le verdict il ne peut pas l'influencer.
-
-Contre-chiffre à ne pas taire, il revient en partie 4 : la conjonction ABSORBE
-les désaccords. Sur 50 items, 17 portent un désaccord sur au moins un contrôle,
-dont 15 que le verdict masque.
-
-Ne pas entrer dans le détail de l'expérience ici — une phrase, et le lien.
-
-C'est le SEUL endroit du talk où la littérature et ma mesure convergent : partout
-ailleurs je dois les séparer. À dire comme tel, c'est l'argument le plus solide
-qui existe — ni l'un ni l'autre ne porte le poids seul. Formulation : « la
-méta-analyse prédit un bénéfice minime hors mathématique et symbolique, ma tâche
-n'est pas symbolique, ma mesure ne voit pas de bénéfice. Les deux vont dans le
-même sens, sans que l'un prouve l'autre. »
+⚠ C'est le seul endroit où la littérature et ma mesure convergent : le dire.
+« Les deux vont dans le même sens, sans que l'un prouve l'autre. » Et ne pas
+inverser l'inférence : la méta-analyse parle de familles de tâches, pas de mon
+juge. Ma tâche est mixte, à dominante non symbolique — décider si un correctif
+fonctionne, c'est du raisonnement algorithmique.
 
 ⚠ Deux pièges à éviter en le disant. Ma tâche n'est pas PUREMENT non symbolique :
 décider si un correctif fonctionne est du raisonnement algorithmique, là où la
@@ -630,8 +642,43 @@ Tout est dans judge-finetune/fidelite/.
 ⚠ Je n'ai PAS mesuré l'écart entre les deux ordres : j'ai choisi le bon dès le
 départ. C'est un raisonnement sur le fonctionnement de la génération, pas un
 résultat expérimental. Le dire tel quel.
--->
+ 
+▸ Deux caractères changent le comportement. Sur le thinking : « les deux vont dans le même sens, sans que l'un prouve l'autre » — puis le lien, et on avance.
 
+C'est la chose la moins intuitive de tout le talk, et c'est deux caractères dans
+un schéma JSON. Aucun modèle, aucun fine-tuning, aucun prompt ne rattrape un
+mauvais ordre de champs : le texte déjà écrit conditionne le texte suivant, et
+jamais l'inverse.
+
+Le bloc <thinking> obéit à la même logique. Raisonnement avant les contrôles,
+contrôles avant le verdict : chaque étape conditionne la suivante dans le bon
+sens. Ce n'est pas trois décisions, c'en est une.
+
+Le verdict est calculé, donc vérifiable : on peut le recalculer depuis les
+contrôles et détecter un juge qui se contredit. C'est comme ça que sa cohérence
+est mesurée.
+
+Le vrai gain de la décomposition n'est pas la fiabilité. Une note globale dit
+QU'une réponse échoue ; les contrôles atomiques disent LEQUEL échoue. C'est ce
+qui permettra, en partie 3, de conclure que Neo4j souffre d'un défaut de rappel
+et non d'un problème de bruit.
+
+« reason » vient en dernier : il est écrit pour l'humain qui relira, et venant
+après le verdict il ne peut pas l'influencer.
+
+Contre-chiffre à ne pas taire, il revient en partie 4 : la conjonction ABSORBE
+les désaccords. Sur 50 items, 17 portent un désaccord sur au moins un contrôle,
+dont 15 que le verdict masque.
+
+Ne pas entrer dans le détail de l'expérience ici — une phrase, et le lien.
+
+C'est le SEUL endroit du talk où la littérature et ma mesure convergent : partout
+ailleurs je dois les séparer. À dire comme tel, c'est l'argument le plus solide
+qui existe — ni l'un ni l'autre ne porte le poids seul. Formulation : « la
+méta-analyse prédit un bénéfice minime hors mathématique et symbolique, ma tâche
+n'est pas symbolique, ma mesure ne voit pas de bénéfice. Les deux vont dans le
+même sens, sans que l'un prouve l'autre. »
+-->
 ---
 
 ## Mes critères, et d'où ils viennent
@@ -675,7 +722,6 @@ signature », il apparaît. Sinon, il n'existe pas.
 C'est la réponse à « comment savez-vous que ce sont les bons critères ». Pour la
 troisième catégorie, je ne les choisis pas : je les lis dans la demande.
 -->
-
 ---
 
 ## Les trois tests d'un bon critère
@@ -716,7 +762,6 @@ sors en critère nommé. Neuf fois.
 s'auto-accabler — je montre plus tard qu'un kappa bas sur des marges
 déséquilibrées sous-estime l'accord.
 -->
-
 ---
 
 ## Cinq façons de se tromper sans être incompétent
@@ -755,7 +800,6 @@ note. Un juge automatique fait exactement les mêmes, et pour les mêmes raisons
 
 La quatrième est la plus vicieuse, et c'est celle qui m'est arrivée. J'y viens.
 -->
-
 ---
 
 ## Comment je m'en protège
@@ -791,7 +835,6 @@ L'indulgence : je publie le taux d'erreurs attrapées, pas l'exactitude. Mesuré
 Quatre de ces cinq, je les ai mesurés chez moi. Le cinquième, non — je le cite.
 Et je ne présenterai jamais l'un pour l'autre.
 -->
-
 ---
 
 ## Pourquoi entraîner un juge
@@ -827,7 +870,6 @@ Tout est dans le dépôt : le corpus, le protocole, les mesures.
 ⚠ Annoncer le pari comme un pari. La partie 4 dira s'il était bon, et la réponse
 n'est pas celle que j'attendais.
 -->
-
 ---
 
 ## J'ai trouvé un signal
@@ -855,8 +897,11 @@ quatre-vingt-dix essais. Le meilleur devinait le verdict trois fois sur quatre,
 là où le hasard en fait une sur deux.
 
 J'ai annoncé un effet quasi impossible à devoir au hasard.
--->
 
+⚠ Chiffres exacts si la question vient : 75 % de bonne prédiction contre un taux
+de base de 53 %, annoncé à +8,8 σ. Le « quasi impossible » est la traduction de
+ce 8,8 σ.
+-->
 ---
 
 ## …et pourquoi il ne valait rien
@@ -890,8 +935,9 @@ hasard produit couramment. Du bruit.
 
 La règle que j'en ai tirée : tout seuil choisi après coup se compare à un tirage
 de permutation du même maximum. Jamais à un taux de base.
--->
 
+⚠ Le test de permutation ramène l'effet à +1,3 σ, p = 0,132.
+-->
 ---
 
 ## La fuite que j'ai créée en la corrigeant
@@ -928,7 +974,6 @@ trente. J'avais aggravé le problème en le réparant.
 Et elle a traversé une régénération, une validation à zéro erreur, trois mesures
 et un commit.
 -->
-
 ---
 
 ## Ce qui l'a trouvée : un humain
@@ -956,7 +1001,6 @@ Un balayage automatique cherche les régularités qu'on a listées. Il ne peut p
 signaler celle à laquelle on n'a pas pensé — et une fuite, par définition, c'est
 celle à laquelle on n'a pas pensé.
 -->
-
 ---
 
 ## Tout en local, et pourquoi
@@ -987,7 +1031,6 @@ Entraîner un juge n'est pas un projet d'infrastructure.
 ma méthode excluant les neuf passes de validation. Corriger rendait le chiffre
 moins flatteur.
 -->
-
 ---
 
 ## Le banc d'essai : 60 questions, 3 niveaux
@@ -1018,7 +1061,6 @@ Et le mélange du contexte est tiré de la question, donc la mesure se rejoue à
 l'identique. Ce n'est pas un détail : sans graine, les exécutions de la veille
 faisaient bouger le même bras de 56 à 43 %.
 -->
-
 ---
 
 ## Le résultat
@@ -1063,8 +1105,36 @@ valide pas les verdicts, elle mesure autre chose. Mais deux instruments
 indépendants qui classent pareil, c'est mieux qu'un seul.
 
 ⚠ Dire la réserve : sur ce corpus, selon ce juge.
--->
 
+⚠ Ne pas dire que hintCoverage « valide » le juge. Il compte des identifiants
+présents dans le contexte ; le juge évalue une réponse. Ce sont deux propriétés
+différentes. Ce qu'on peut dire : deux instruments indépendants classent les deux
+stratégies dans le même ordre, donc la conclusion ne tient pas au seul juge.
+
+⚠ Et la réserve, à énoncer : ces chiffres valent pour CE corpus, jugé par CE
+juge, dont l'alignement est de 0,44 et la stabilité de 58 %. Un écart de 25
+points est large, mais c'est une comparaison, pas une vérité sur GraphRAG.
+
+Sur la mesure sans LLM : c'est la même idée que le filtre déterministe du début
+du talk. En amont elle économise des jetons, en aval elle sert de contre-expertise.
+Elle s'appelle hintCoverage, elle ne coûte qu'une liste d'identifiants attendus
+par question et un comptage. Si les deux méthodes s'étaient contredites, je
+n'aurais rien conclu du tout — c'est un garde-fou qu'on construit avant de
+connaître le résultat, pas après.
+
+Seules les paires discordantes portent de l'information : les questions où les
+deux stratégies font pareil ne départagent rien. Leur nombre est le vrai
+déterminant de la puissance à cet effectif, donc je le donne avec le p, jamais
+sans.
+
+Et la deuxième ligne du tableau dit le mécanisme : ce n'est pas un problème de
+bruit mal maîtrisé, c'est un DÉFAUT DE RAPPEL. Le moteur ne rapporte pas assez
+de matière. Sans critères atomiques, j'aurais un écart de 25 points sans
+explication.
+
+C'est exactement ce que les critères atomiques apportent sur une note globale :
+ils disent lequel échoue.
+-->
 ---
 
 ## Moteur ou graphe ? Le contrôle d'équité
@@ -1096,7 +1166,6 @@ Donc l'écart vient du moteur de récupération, pas de la traversée de graphe.
 Ce n'est pas « le graphe est mal implémenté » : c'est ce pipeline-là qui rappelle
 moins de matière.
 -->
-
 ---
 
 ## Par niveau : ce qui conclut, et ce qui ne conclut pas
@@ -1124,8 +1193,12 @@ c'est une limite de puissance que j'avais annoncée avant de lancer.
 
 Dire « non concluant » sur deux niveaux, c'est ce qui donne du poids au
 troisième.
--->
 
+⚠ Réserve de portée à énoncer : ces chiffres valent pour CETTE implémentation
+Neo4j, à ces réglages, sur CETTE codebase. « GraphRAG fait moins bien » serait un
+abus ; « ce pipeline-ci rappelle moins que Lucene sur ce corpus » est ce que la
+mesure soutient.
+-->
 ---
 
 ## Cinq fois, mon banc a mesuré le vide
@@ -1168,7 +1241,6 @@ heure de calcul, faire un appel et vérifier une propriété qui ne peut pas
 apparaître par hasard si la plomberie est cassée. Pas l'absence d'erreur. Une
 preuve positive.
 -->
-
 ---
 
 ## κ de Cohen, sur un cas réel
@@ -1214,7 +1286,6 @@ que l'accord brut affichait quatre-vingt-dix pour cent.
 
 Kappa, c'est la part conquise de ce qu'il restait à conquérir.
 -->
-
 ---
 
 ## Et le piège marche dans les deux sens
@@ -1246,7 +1317,6 @@ surestime. Les deux vont ensemble, avec la répartition.
 Un kappa bas ne veut donc pas toujours dire ce qu'on croit. Il faut regarder le
 paquet avant de juger le chiffre.
 -->
-
 ---
 
 ## Deux κ qu'on confond tout le temps
@@ -1287,7 +1357,6 @@ contrôle, et quinze d'entre eux sont masqués par le verdict. Le verdict est
 reproductible ; les raisons le sont beaucoup moins. Or c'est sur les raisons que
 le juge s'entraîne.
 -->
-
 ---
 
 ## Un correcteur indulgent a l'air fiable
@@ -1322,8 +1391,16 @@ Le même juge, deux chiffres. Ne publiez jamais le premier sans le second.
 Et pour OllamAssist, les deux erreurs n'ont pas le même prix : un défaut qui
 passe, c'est une explication fausse sur ma codebase livrée à l'utilisateur. Un
 bon code recalé, c'est juste une relecture inutile.
--->
 
+⚠ Chiffres, si la question vient : 16 erreurs détectées sur 27 (59 %) et 22
+bonnes réponses validées sur 23 (96 %) pour le fine-tuné ; 17 sur 27 (63 %) et 21
+sur 23 (91 %) pour la baseline. L'écart entre les deux variantes est d'UN item :
+c'est du bruit, ne pas l'interpréter.
+
+Et ça recoupe deux autres mesures qui disent la même chose : 46 % de faux PASS
+sur les défauts verbeux, et un juge qui rend PASS 64 % du temps là où l'étalon en
+compte 46 %. Trois mesures indépendantes, un même diagnostic : il est indulgent.
+-->
 ---
 
 ## Le fine-tuning a-t-il amélioré mon juge ?
@@ -1366,7 +1443,6 @@ trouver un p flatteur.
 ⚠ NE PAS dire « ça n'améliore pas ». Dire : mes 50 items ne voient pas la
 différence.
 -->
-
 ---
 
 ## Ce qu'il a acheté : le contrat, pas le jugement
@@ -1410,7 +1486,6 @@ Et le contre-chiffre, dans la même phrase : la stabilité du verdict baisse, de
 soixante-seize à cinquante-huit pour cent. La baseline est stable parce qu'elle
 décide avant de regarder.
 -->
-
 ---
 
 ## Qui décide quoi
@@ -1454,8 +1529,15 @@ Mais attention : la stabilité mesure la répétabilité, pas la justesse. Un ve
 stable reste faux une fois sur six. Les enjeux, les questions hors-domaine, les
 critères qui se contredisent sont d'autres motifs de relecture — l'instabilité
 est simplement le seul que je sache mesurer.
--->
 
+⚠ Réserve sur le 83 / 67 : 29 items stables contre 21 instables. C'est une
+tendance, pas un effet établi — mais elle va dans le même sens sur les deux
+variantes mesurées, baseline comprise (79 % contre 67 %).
+
+Ça referme aussi la partie sur la fuite : c'est un humain qui a trouvé ce que
+douze mesures avaient manqué, parce qu'il a changé d'avis sur un item.
+L'instabilité est un signal, chez le juge comme chez le relecteur.
+-->
 ---
 
 ## Et quand il n'y a pas d'humain ?
@@ -1490,7 +1572,6 @@ Même signal, deux politiques, parce que se tromper ne coûte pas pareil.
 Et le piège, dans les deux cas : compter l'item douteux comme un succès. C'est le
 seul choix qui se retourne toujours contre vous.
 -->
-
 ---
 
 ## Le seuil n'est pas statistique. C'est votre budget.
@@ -1521,11 +1602,6 @@ Quatre fois mon budget.
 C'est pour ça qu'il n'est pas prêt pour la production. Et le raisonnement
 s'inverse pour vous : partez de ce qu'un humain peut relire par semaine, ça vous
 donne le taux de stabilité à atteindre, et donc si votre juge est utilisable.
--->
-
-<!--
-Ça ne s'invente pas, ça se lit dans le harnais : je fais déjà trois passes pour
-mesurer la répétabilité. Le même chiffre sert à trier.
 
 ⚠ Réserve à énoncer : 29 items stables contre 21 instables. C'est une tendance,
 pas un effet établi — mais elle va dans le même sens sur les deux variantes
@@ -1537,8 +1613,10 @@ est un signal, chez le juge comme chez le relecteur.
 
 L'objectif n'est pas de retirer l'humain de la boucle. C'est d'arrêter de lui
 faire relire ce qui est évident, pour qu'il regarde ce qui ne l'est pas.
+ 
+Ça ne s'invente pas, ça se lit dans le harnais : je fais déjà trois passes pour
+mesurer la répétabilité. Le même chiffre sert à trier.
 -->
-
 ---
 
 ## Aucun instrument n'a été juste du premier coup
@@ -1573,7 +1651,6 @@ C'est la phrase que je veux que vous reteniez : on construit un juge pour arrêt
 d'avancer à l'aveugle, mais le juge est lui-même un instrument. Et un instrument,
 ça se vérifie. Sinon on a simplement déplacé l'aveuglement d'un cran.
 -->
-
 ---
 
 ## Trois choses à faire lundi
