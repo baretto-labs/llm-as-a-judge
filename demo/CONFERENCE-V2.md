@@ -71,22 +71,23 @@ Mehdi Elketroussi
 Novembre 2026
 
 <!--
-RAGots et Hallucinations : votre chatbot passe devant le juge.
+Bonjour à tous, merci de prendre un peu de votre temps pour discuter des chatbots,
+mais aussi des agents.
 
-Le titre se lit à voix haute, sinon le jeu de mots se perd. Les RAGots, ce que
-votre système raconte dans votre dos. Et « passer devant le juge », dans les deux
-sens : le tribunal, et le juge automatique qu'on va construire ensemble.
-
-Vingt minutes. Une question : comment savoir si mon RAG s'améliore, sans croire
-mon juge sur parole.
+Je m'appelle Mehdi Elketroussi, je suis marié et père de 2 petites princesses,
+et quand tout le monde est à l'école ou au travail, je suis software engineer.
+J'aime beaucoup les sujets liés à la perf et à la qualité, et depuis la popularisation des LLM
+une question m'est venue : comment savoir si mon RAG s'améliore ? Et surtout :
+comment faire confiance à une mesure, quand la même question peut donner deux
+réponses différentes ?
 -->
 ---
 
 ## Air Canada, 2024
 
-Le chatbot du site invente une politique de tarif deuil.
+Le chatbot invente une politique de tarif deuil.
 
-Air Canada plaide que le chatbot est
+Air Canada plaide : le chatbot est
 **« une entité juridique distincte, responsable de ses propres actes »**.
 
 Le tribunal :
@@ -94,34 +95,47 @@ Le tribunal :
 > « This is a remarkable submission. While a chatbot has an interactive
 > component, it is still just a part of Air Canada's website. »
 
-**650,88 $ CA** — négligence dans la présentation d'informations
+**650,88 $ CA**
 
 <span class="ref">Moffatt v. Air Canada, 2024 BCCRT 149</span>
 
 <!--
-Novembre 2022. Jake Moffatt réserve un vol pour les funérailles de sa
-grand-mère. Il demande au chatbot du site s'il peut obtenir le tarif deuil. Le
-chatbot lui répond qu'il peut faire la demande après le voyage.
+Mais avant de commencer, j'aimerais vous raconter une histoire, celle de Jake
+Moffatt, qui en novembre 2022 a dû réserver un vol pour les funérailles de sa
+grand-mère. Il se renseigne et après un court échange avec l'assistant du site,
+il voit qu'il peut effectuer les demandes après le voyage.
 
-Cette politique n'existe pas. La vraie règle exige de la demander avant. Il paie
-le plein tarif, et il attaque.
+Sauf que non, le chatbot avait « halluciné » cette réponse, la vraie règle
+présente sur le site exige que la demande se fasse avant le voyage.
 
-Devant le tribunal, Air Canada plaide que le chatbot est une entité juridique
-distincte, responsable de ses propres actes.
+Cette affaire passe devant le tribunal, pour Air Canada le
+chatbot est une entité juridique distincte, responsable de ses propres actes, et
+l'utilisateur doit vérifier les informations sur le site.
 
-Le tribunal répond — je vous le lis en anglais, c'est l'original : « This is a
-remarkable submission. While a chatbot has an interactive component, it is still
-just a part of Air Canada's website. »
+Et c'est la réponse du tribunal qui est importante, je vous l'affiche (laisse 3 ou 4 secondes pour que le public lise)
 
-Six cent cinquante dollars. Le montant est dérisoire, et c'est ce qui rend la
-décision intéressante : ce n'est pas le préjudice qui compte, c'est le principe.
-Vous répondez de ce que votre chatbot affirme.
+Le chatbot fait partie du site, et l'entité responsable du site
+est donc légalement responsable des réponses du chat. Ce n'est pas juste un POC,
+c'est un engagement.
 
+Ici, six cent cinquante dollars.
+
+Petite question pour le public : qui a déployé un LLM, ou un RAG, en production ?
+Autre question : et qui a mis en place un système d'évaluation des réponses de
+son système ?
 ==============================================================
 
 ⚠ Vérifié sur la décision : membre Christopher C. Rivers, 14 février 2024,
-650,88 $ CA. Ne pas citer de mémoire le délai annoncé par le chatbot ni le total
-avec frais — non vérifiés, volontairement absents de l'écran.
+650,88 $ CA, au titre de la NÉGLIGENCE DANS LA PRÉSENTATION D'INFORMATIONS
+(negligent misrepresentation) — le motif a quitté l'écran le 2026-10-13 pour
+alléger, le dire si on demande sur quel fondement Air Canada a été condamnée.
+Ne pas citer de mémoire le délai annoncé par le chatbot ni le total avec frais —
+non vérifiés, volontairement absents de l'écran.
+
+⚠ Si on demande la défense exacte : Air Canada a aussi plaidé que Moffatt
+n'avait pas suivi la procédure. Détail vérifié et utile pour une salle de devs —
+la réponse du chatbot contenait elle-même un lien vers la page « Bereavement
+travel », qui disait le contraire. Sources : McCarthy Tétrault, CTV News.
 -->
 ---
 
@@ -153,54 +167,33 @@ avec frais — non vérifiés, volontairement absents de l'écran.
 <!--
 Et ce n'est pas un cas isolé. Je passe vite, vous les retrouverez dans le
 support.
-
-Mata contre Avianca : un avocat dépose au tribunal six décisions de justice
-inventées par ChatGPT. Le juge parle d'évitement conscient. Cinq mille dollars de
-sanction.
-
-New York, audit public : le chatbot de la ville rend des réponses différentes à
-une question identique. Et l'administration annonçait 95 à 99 % d'exactitude —
-l'audit établit que ce calcul excluait les réponses jugées perfectibles.
-
-En dessous, deux cas que je n'ai pas pu vérifier sur source primaire, et qui
-restent donc étiquetés comme tels.
-
-J'aurais pu en remplir beaucoup plus. Je ne garde que ceux que je peux prouver.
+Mais derrière chacune de ces lignes, il y a aussi une histoire, un Jake Moffatt blessé,
+des citoyens dans le doute, des ventes irrégulières ...
+Et en réalité, j'aurais pu en remplir beaucoup plus ...
+Mais je ne garde que ce que je peux prouver — à droite, ceux que je n'ai pas
+pu vérifier sur source primaire.
+Vous voyez où je veux en venir ?
 
 ==============================================================
 
-⚠ Deux secondes minimum à l'écran, sinon l'effet de volume tombe. Mata v.
-Avianca : SIX décisions inventées, pas neuf — trois des noms qui circulent sont
-de vraies décisions citées dans les fausses. Et l'audit de New York ne documente
-PAS le conseil illégal : ça, c'est la presse.
-
 ⚠ Mata v. Avianca : SIX décisions inventées (Varghese, Shaboon, Petersen,
-Martinez, Estate of Durden, Miller). Des résumés en annoncent neuf — les trois
-autres noms qui circulent (Zicherman, Ehrlich, In re Air Crash Disaster) sont de
-VRAIES décisions citées à l'intérieur des fausses. Ne pas se tromper en public.
+Martinez, Estate of Durden, Miller), pas neuf. Les trois autres noms qui
+circulent (Zicherman, Ehrlich, In re Air Crash Disaster) sont de VRAIES
+décisions citées à l'intérieur des fausses. Ne pas se tromper en public.
 
 ⚠ NYC MyCity : l'audit du Contrôleur est une source primaire, VÉRIFIÉE. Mais il
 ne documente PAS le conseil d'enfreindre la loi — ça, c'est The Markup, mars
 2024, donc de la presse. Ne citer de l'audit que ce qu'il contient : les réponses
 incohérentes, et le taux d'exactitude annoncé qui excluait les mauvais cas.
-
-Et c'est le meilleur exemple du talk : une administration publie 95 % avec une
+C'est le meilleur exemple du talk : une administration publie 95 % avec une
 métrique qui écarte les cas gênants, et c'est un auditeur public qui le relève.
-C'est exactement le sujet.
 
 ⚠ Deloitte descend chez les cas rapportés : concordant sur AP, Fortune et CFO
 Dive, mais la source primaire du DEWR n'a jamais pu être ouverte. Si tu la
 vérifies, la ligne peut remonter.
- 
-Diapositive à survoler, deux secondes minimum à l'écran — en dessous, la salle
-ne perçoit pas qu'elle est dense et l'effet de volume tombe.
 
-« J'aurais pu en remplir beaucoup plus — mais je ne garde que ceux que je peux
-prouver. » Survol assumé : « je ne m'arrête pas, vous les retrouverez », jamais
-« je n'ai pas le temps ».
-
-Dire pourquoi la diapositive est coupée en deux : un talk sur la mesure
-rigoureuse range ses propres anecdotes par niveau de preuve.
+⚠ Deux secondes minimum à l'écran : en dessous, la salle ne perçoit pas que la
+diapositive est dense et l'effet de volume tombe.
 -->
 ---
 
@@ -208,29 +201,51 @@ rigoureuse range ses propres anecdotes par niveau de preuve.
 
 **Le faux avait exactement la forme du vrai.**
 
-- Un test unitaire vérifie une valeur de retour, **pas un raisonnement**
+> *Varghese v. China Southern Airlines Co., 925 F.3d 1339 (11th Cir. 2019)*
 
-- Comparer mot à mot la réponse attendue et la réponse obtenue :
-  une réponse **juste** formulée autrement est pénalisée,
-  une réponse **fausse** bien formulée passe
+**Cet arrêt n'existe pas.**
 
-- Il n'y a pas d'oracle : la même question admet dix bonnes réponses
+- Un test unitaire vérifie une valeur, **pas un raisonnement**
+
+- Comparer mot à mot : une réponse **juste** formulée
+  autrement est pénalisée, une **fausse** bien écrite passe
 
 <!--
 Alors pourquoi personne n'a rien vu ?
 
-Parce que le faux avait exactement la forme du vrai. Un avocat ne relit pas une
-citation bien formatée. « 925 F.3d 1339, onzième circuit, 2019 » — ça a la forme
-d'une vraie référence, et c'est tout ce que notre œil vérifie.
+Parce que le faux avait exactement la forme du vrai. Regardez la référence à
+l'écran : les parties, le numéro de recueil, la cour, l'année. Elle a tout. Un
+avocat ne relit pas une citation bien formatée — et c'est tout ce que notre œil
+vérifie.
 
-Et nos outils ne nous aident pas. Un test unitaire vérifie une valeur de retour,
-pas un raisonnement. Comparer mot à mot la réponse attendue et la réponse
-obtenue, ça pénalise une bonne réponse formulée autrement et ça laisse passer une
-mauvaise réponse bien écrite. Et de toute façon il n'y a pas d'oracle : la même
-question admet dix bonnes réponses.
+Cet arrêt n'existe pas.
+
+Et nos outils ne nous aident pas davantage. Un test unitaire vérifie une valeur
+de retour, pas un raisonnement. Et comparer mot à mot la réponse attendue et la
+réponse obtenue, ça pénalise une bonne réponse formulée autrement, et ça laisse
+passer une mauvaise réponse bien écrite.
 
 Donc on livre en se fiant à l'impression qu'on a en relisant trois sorties à la
 main.
+
+==============================================================
+
+⚠ Varghese v. China Southern Airlines, 925 F.3d 1339 (11th Cir. 2019) : c'est la
+référence réellement déposée dans Mata v. Avianca, pour un arrêt qui n'existe
+pas. Concordant sur Volokh et Simon Willison, qui citent le dépôt — pas vérifié
+sur l'ordonnance elle-même.
+
+⚠ Si on demande : à cette page du recueil, le vrai arrêt voisin est A.D. v.
+Azar, 925 F.3d 1291. Le modèle n'a pas tiré un numéro au hasard, il en a produit
+un plausible juste à côté d'un vrai. C'est exactement le propos de la diapo.
+
+⚠ « La même question admet dix bonnes réponses » a été retiré d'ici : c'est un
+argument tourné vers l'avant, pas une explication de ce qui s'est passé. VÉRIFIÉ
+le 2026-10-13 : l'idée n'est désormais écrite NULLE PART ailleurs dans le
+support. Elle reste portée implicitement par le deuxième point (« une réponse
+juste formulée autrement est pénalisée »). À remettre explicitement sur la diapo
+« Comment mesurer… » si la question « pourquoi ne pas juste comparer à la réponse
+attendue ? » revient.
 -->
 ---
 
@@ -239,21 +254,16 @@ main.
 <div class="carte">
 <div class="texte">
 
-**Un assistant de code dans mon IDE.
-Il tourne entièrement sur ma machine.**
+**Un assistant de code dans IntelliJ,
+entièrement local. Mon labo.**
 
-Pourquoi je l'ai écrit : pour comprendre ce que
-l'IA fait vraiment, plutôt que de le lire. **Un labo.**
-
-D'abord un **chatbot** — je pose une question,
-il répond avec ce qu'il sait.
+D'abord un **chatbot** — il répond avec ce qu'il sait.
 
 Puis un **agent** — il lit mon workspace,
 et répond sur **mon** code.
 
-Et là, tout change : sa réponse ne dépend plus
-surtout du modèle.
-**Elle dépend de ce qu'il a trouvé.**
+**Sa réponse ne dépend plus surtout du modèle.
+Elle dépend de ce qu'il a trouvé.**
 
 </div>
 <img src="img/ollamassist-marketplace.png" width="384" height="319" alt="Carte OllamAssist sur la JetBrains Marketplace">
@@ -262,10 +272,11 @@ surtout du modèle.
 <!--
 Moi, mon terrain, c'est OllamAssist. C'est un assistant de code dans mon IDE,
 qui tourne entièrement sur ma machine. Je l'ai écrit pour comprendre ce que l'IA
-fait vraiment, plutôt que de le lire. Un labo.
+fait vraiment, plutôt que de le lire. C'est mon labo, que j'ai partagé.
+La codebase qu'il indexe fait 162 fichiers Java, et c'est la mienne — donc je
+vois quand il se trompe.
 
 Au début, c'est un chatbot : je pose une question, il répond avec ce qu'il sait.
-
 Puis c'est devenu un agent : il lit mon workspace, et il répond sur mon code.
 
 Et là, tout change. Sa réponse ne dépend plus surtout du modèle. Elle dépend de
@@ -276,47 +287,49 @@ modèle.
 
 ==============================================================
 
-⚠ La carte de droite est un gabarit à remplacer la veille :
-demo/img/ollamassist-marketplace.png, 768 x 638, même nom, puis relancer le
-rendu. Les faits si on demande : plugin JetBrains sur la Marketplace, Ollama,
-mode hors-ligne, 162 fichiers Java indexés — c'est ma codebase, donc je vois
-quand il se trompe.
-
 ⚠ À FAIRE LA VEILLE : l'image de droite est un gabarit. Prendre une capture de
-la carte sur plugins.jetbrains.com/plugin/26388, et ÉCRASER le fichier
+la carte sur plugins.jetbrains.com/plugin/26388 et ÉCRASER le fichier
 demo/img/ollamassist-marketplace.png — même nom, idéalement 768 x 638. Puis
 relancer le rendu. Aucune modification du markdown.
 Un iframe a été écarté : il exigeait du réseau pendant la présentation et ne
 s'exportait pas en PDF.
 
-Les faits, si on demande : c'est un plugin JetBrains, publié sur la Marketplace,
-propulsé par Ollama, avec un mode entièrement hors-ligne. Chat dans l'IDE,
-autocomplétion expérimentale, messages de commit générés depuis le diff.
+⚠ Les faits, si on demande : plugin JetBrains publié sur la Marketplace, propulsé
+par Ollama, avec un mode entièrement hors-ligne. Chat dans l'IDE, autocomplétion
+expérimentale, messages de commit générés depuis le diff.
 
-La codebase qu'il indexe fait 162 fichiers Java. C'est la mienne — donc je vois
-quand il se trompe. C'est ce qui rend l'exercice possible : sur du code que je ne
-connais pas, je n'aurais aucun moyen de juger le juge.
+⚠ Les 162 fichiers Java sont désormais dits à voix haute. Le prolongement, si on
+demande : sur du code que je ne connais pas, je n'aurais aucun moyen de juger le
+juge.
 
-La dernière ligne est la charnière de tout l'exposé. Tant que c'est un chatbot,
-la qualité vient du modèle. Dès qu'il lit le workspace, elle vient d'abord de ce
-que la récupération a rapporté. C'est ce déplacement qui justifie de mesurer le
-RAG et pas seulement le modèle.
+⚠ « Elle dépend de ce qu'il a trouvé » est la charnière de tout l'exposé. Tant
+que c'est un chatbot, la qualité vient du modèle ; dès qu'il lit le workspace,
+elle vient d'abord de ce que la récupération a rapporté. Ralentir sur cette
+phrase.
+
+⚠ À TRANCHER : la recherche sur internet. Si OllamAssist peut interroger le web,
+alors « mode entièrement hors-ligne » doit devenir « peut tourner entièrement
+hors-ligne », ici et dans les faits ci-dessus. Retiré du script parlé le
+2026-10-13 parce que, dit vingt secondes après « il tourne entièrement en
+local », ça se lit comme une contradiction.
+
+⚠ Le tunnel et la peur d'avancer à l'aveugle appartiennent à la diapo suivante
+(« Comment mesurer… »), qui est construite dessus. Ne pas les dire ici.
 -->
 ---
 
 ## Comment mesurer la qualité des réponses de mon assistant ?
 
-- J'avais deux stratégies de RAG — Lucene et un graphe Neo4j —
-  et **aucun moyen de les départager**
+- Deux stratégies de RAG, Lucene et Neo4j —
+  **aucun moyen de les départager**
 
-- Le seul juge disponible, c'était moi,
-  sur quelques exemples **choisis par moi**
+- Le seul juge disponible, c'était **moi**,
+  sur des exemples **choisis par moi**
 
 - Ma crainte : **avancer à l'aveugle.**
-  Modifier, livrer, et ne jamais savoir si j'ai amélioré ou dégradé.
 
-Je vais donc construire un juge. Et la question devient :
-**comment savoir que mon RAG s'améliore, sans croire mon juge sur parole ?**
+**Comment savoir que mon RAG s'améliore,
+sans croire mon juge sur parole ?**
 
 <!--
 Comment mesurer la qualité des réponses de mon assistant ?
@@ -347,9 +360,9 @@ RAG s'améliore, sans croire mon juge sur parole.
 
 **Il ne génère pas la réponse. Il la juge.**
 
-Écrire un livre est difficile. Le lire et dire s'il est bon, beaucoup moins.
+Écrire un livre est difficile. 
+Le lire et dire s'il est bon, beaucoup moins.
 
-→ un modèle plus petit suffit, et ça change le prix
 
 <!--
 Le principe tient en une image.
@@ -370,13 +383,13 @@ l'étaye ».
 
 ## Trois façons de juger
 
-**1. Deux copies côte à côte** — « laquelle est la meilleure ? »
-Je sais les classer. **Je ne sais pas si l'une mérite la moyenne.**
+**1. Deux copies côte à côte** — laquelle est la meilleure ?
+Je sais les classer. **Pas si l'une mérite la moyenne.**
 
-**2. Le corrigé type** — je compare la copie au corrigé.
-Fiable. Mais il faut **écrire le corrigé de chaque question.**
+**2. Le corrigé type** — fiable, mais il faut
+**écrire le corrigé de chaque question.**
 
-**3. Le barème seul** — pas de corrigé, une liste de points à vérifier.
+**3. Le barème seul** — une liste de points à vérifier.
 ← *mon choix* · **Tout repose alors sur le barème.**
 
 <!--
@@ -407,9 +420,8 @@ lequel a été mesuré.
 
 ## Première question : que ne PAS lui donner à juger
 
-Avant de lire une copie, le correcteur vérifie trois choses :
-elle est **signée**, elle est dans la **bonne matière**, elle n'est pas
-**hors-sujet**.
+Avant de lire, le correcteur vérifie qu'elle est **signée**,
+dans la **bonne matière**, pas **hors-sujet**.
 
 Il ne lit pas pour ça. **Il écarte.**
 
@@ -419,11 +431,10 @@ Il ne lit pas pour ça. **Il écarte.**
   Le style tient ?         →  le linter
 ```
 
-**Tout ce qui est déterministe ne passe pas par le juge.**
-Pas pour l'économiser — **parce qu'il est moins bon que le compilateur à ça.**
+**Tout ce qui est déterministe ne passe pas par le juge** —
+pas pour l'économiser, **parce qu'il est moins bon que le compilateur à ça.**
 
-Mon filtre à moi : l'équilibrage des parenthèses.
-C'est tout. **Ce n'est pas un filtre, c'est un début.**
+Chez moi : l'équilibrage des parenthèses. **Pas un filtre, un début.**
 
 <!--
 [À REFORMULER AVEC TES MOTS]
@@ -467,13 +478,10 @@ contre-expertise.
 ## Deuxième question : quand évaluer ?
 
 **Dans la CI, à chaque modification — la non-régression.**
-Les **mêmes** questions, rejouées. Le corrigé type ou le barème : les deux
-marchent, puisque les questions ne changent pas.
+Les **mêmes** questions rejouées : corrigé type ou barème, les deux marchent.
 
 **En production, par échantillonnage.**
-Là, plus de questions figées : **le barème seul.**
-Combien, à quelle fréquence ? Ça dépend de trop de choses.
-**Un échantillon suffit.**
+Plus de questions figées : **le barème seul.**
 
 Moi : **100 % dans la CI.** Aucun échantillonnage de production.
 
@@ -641,8 +649,8 @@ paires : là c'est l'ordre de DEUX RÉPONSES, ici c'est l'ordre des EXTRAITS.
 
 ## Un correcteur indulgent a l'air fiable
 
-Il valide presque tout. Donc il se trompe rarement.
-Il ne se trompe que sur les copies qu'il aurait dû recaler.
+Il valide presque tout, donc il se trompe rarement —
+seulement sur les copies qu'il aurait dû recaler.
 
 ```
    27 mauvaises copies   →  il en recale 16.  Il en laisse passer 11.
@@ -722,18 +730,16 @@ supprimer : c'est elle qui rend les trois autres crédibles.
 
 ## Et le RAG a ses propres pièges
 
-Trois cas, tirés de **vraies extractions** sur ma codebase. Rien d'inventé.
+Trois cas, tirés de **vraies extractions** sur ma codebase.
 
 **Le quasi-homonyme** — je demande `OllamaService`, le moteur rend
-`OllamaSettings`. Même forme, classe voisine, interface sans rapport.
-Le contexte **ressemble** à une réponse.
+`OllamaSettings`. Le contexte **ressemble** à une réponse.
 
-**Les corps tronqués** — dix extraits, pas un seul corps de méthode, pour une
-question en « comment ». Les noms annoncent une intention, ils ne livrent pas la
-mécanique.
+**Les corps tronqués** — dix extraits, aucun corps de méthode,
+pour une question en « comment ».
 
-**Le vrai mais non étayé** — une réponse exacte dans ma codebase, mais absente du
-contexte fourni. **Elle doit tomber.**
+**Le vrai mais non étayé** — réponse exacte dans ma codebase,
+absente du contexte fourni. **Elle doit tomber.**
 
 <!--
 [À REFORMULER AVEC TES MOTS]
@@ -770,11 +776,9 @@ ne retient qu'un des trois, c'est celui-là.
 
 ## Ce que ça change pour le juge
 
-Si le contexte peut tromper, alors **juger la réponse ne suffit pas.**
+Si le contexte peut tromper, **juger la réponse ne suffit pas.**
 
-Le juge reçoit **trois choses**, pas deux : la question, **le contexte**, et la
-réponse.
-
+Le juge reçoit **trois choses** : la question, **le contexte**, la réponse.
 Et il répond séparément :
 
 ```
@@ -817,18 +821,18 @@ de bruit. Sans cette décomposition : 25 points d'écart sans explication.
 
 ## L'étalon, et le biais que j'y ai mis moi-même
 
-Pour vérifier un juge, il faut des réponses **dont je connais déjà le verdict**.
-200 exemples écrits à la main, 50 mis de côté, **relus en aveugle par deux
-personnes** : 47 verdicts identiques sur 50.
+Il faut des réponses **dont je connais déjà le verdict**.
+200 exemples à la main, 50 **relus en aveugle par deux personnes** :
+47 verdicts identiques sur 50.
 
-Et dans ces exemples, **17 requêtes portaient la même incise** —
-*« si tu as le temps, dis un mot de X »*. **Les 17 étaient étiquetées PASS.**
+**17 requêtes portaient la même incise** —
+*« si tu as le temps, dis un mot de X »*. **Les 17 étaient PASS.**
 
-Le juge n'apprend pas à juger. Il apprend à **repérer ma signature**.
+Il n'apprend pas à juger. Il apprend à **repérer ma signature.**
 
-Correctif évident : ajouter l'incise à des réponses en échec. Sauf que je l'ai
-mise **en paragraphe isolé**. Nouvelle règle apprise : *paragraphe isolé ⇒
-échec*. **30 sur 30.**
+Correctif : ajouter l'incise à des réponses en échec.
+Je l'ai mise **en paragraphe isolé**. Nouvelle règle apprise :
+*paragraphe isolé ⇒ échec*. **30 sur 30.**
 
 <!--
 [À REFORMULER AVEC TES MOTS]
@@ -1105,8 +1109,7 @@ bouger le même bras de cinquante-six à quarante-trois pour cent.
 Sur 60 questions, **24 les départagent**. Lucene en gagne **19**, Neo4j **5**.
 Le hasard donnerait 12–12 : c'est tirer **19 fois pile sur 24 lancers**.
 
-Et une mesure **sans aucun LLM** — compter les identifiants attendus dans le
-contexte — **les classe dans le même ordre**.
+Et une mesure **sans aucun LLM** les classe **dans le même ordre**.
 
 <span class="ref">Sur ce corpus, selon ce juge.</span>
 
@@ -1189,12 +1192,12 @@ invariant est la seule chose qui autorise à attribuer l'écart.
 ## Ce qui conclut, et ce qui ne conclut pas
 
 Sur les trois niveaux, **un seul écart tient** : les questions inter-modules.
-Là, sur les 8 questions où les deux ont divergé, **Lucene a gagné les 8.**
+Sur les 8 où ils divergent, **Lucene gagne les 8.**
 
 Sur les deux autres : **5 piles sur 7, et 6 sur 9. Banal.**
 
-**Deux écarts sur trois ne concluent pas** — et c'était une limite
-**annoncée avant** de lancer la mesure, pas une surprise.
+**Deux écarts sur trois ne concluent pas** — limite
+**annoncée avant** la mesure, pas une surprise.
 
 <!--
 [À REFORMULER AVEC TES MOTS]
@@ -1315,12 +1318,11 @@ d'avancer à l'aveugle. Mais le juge est lui-même un instrument. Et un instrume
 **1. Écrivez vos conventions avant tout le reste.**
 Chez moi : d'aucun JSON exploitable à 76 % de réponses justes. Quatre phrases.
 
-**2. Décomposez en critères, et mettez les contrôles avant le verdict.**
-Un modèle génère de gauche à droite. L'ordre des champs change le comportement.
+**2. Décomposez en critères, les contrôles avant le verdict.**
+Un modèle génère de gauche à droite. L'ordre des champs change tout.
 
 **3. Exigez une preuve positive avant de dépenser du calcul.**
-Un banc qui ne sait pas prouver qu'il a mesuré la bonne chose ne mesure rien —
-et il le fait silencieusement.
+Un banc qui ne prouve pas ce qu'il mesure ne mesure rien — silencieusement.
 
 <span class="ref">Corpus, protocole et mesures : le dépôt est partagé.</span>
 
