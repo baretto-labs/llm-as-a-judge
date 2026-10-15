@@ -307,11 +307,11 @@ que c'est un chatbot, la qualité vient du modèle ; dès qu'il lit le workspace
 elle vient d'abord de ce que la récupération a rapporté. Ralentir sur cette
 phrase.
 
-⚠ À TRANCHER : la recherche sur internet. Si OllamAssist peut interroger le web,
-alors « mode entièrement hors-ligne » doit devenir « peut tourner entièrement
-hors-ligne », ici et dans les faits ci-dessus. Retiré du script parlé le
-2026-10-13 parce que, dit vingt secondes après « il tourne entièrement en
-local », ça se lit comme une contradiction.
+⚠ TRANCHÉ le 2026-10-14 : OllamAssist PEUT faire une recherche internet, mais
+c'est OPTIONNEL et désactivé par défaut. Formulation exacte à employer partout :
+« peut tourner entièrement hors-ligne », jamais « tourne entièrement hors-ligne
+et ne sort jamais ». Retiré du script parlé parce que, dit vingt secondes après
+« il tourne entièrement en local », ça se lisait comme une contradiction.
 
 ⚠ Le tunnel et la peur d'avancer à l'aveugle appartiennent à la diapo suivante
 (« Comment mesurer… »), qui est construite dessus. Ne pas les dire ici.
@@ -436,6 +436,11 @@ pas pour l'économiser, **parce qu'il est moins bon que le compilateur à ça.**
 
 Chez moi : l'équilibrage des parenthèses. **Pas un filtre, un début.**
 
+```
+   [ FILTRE L0 ] ───►  ( LE JUGE )
+    écarte sans lire
+```
+
 <!--
 [À REFORMULER AVEC TES MOTS]
 
@@ -461,6 +466,12 @@ l'ai pas fait. C'est une raison, pas une excuse.
 
 ==============================================================
 
+[AJOUT AU SCHÉMA : la naissance du schéma, et DEUX boîtes d'un coup. À gauche,
+ce qui entre : la CI, qui rejoue les MÊMES questions à chaque modification.
+Puis, avant le juge, un filtre déterministe qui écarte sans lire — rien de ce
+qu'il recale n'atteint le LLM. La brique CI venait de la diapositive « quand
+évaluer ? », supprimée le 2026-10-14.]
+
 ⚠ Garder les DEUX moitiés de l'argument : le coût ET la fiabilité. Le coût seul
 est la moitié faible. « Le prof à la deux-centième copie se trompe, le scanner
 non. »
@@ -475,37 +486,6 @@ contre-expertise.
 -->
 
 ---
-## Deuxième question : quand évaluer ?
-
-**Dans la CI, à chaque modification — la non-régression.**
-Les **mêmes** questions rejouées : corrigé type ou barème, les deux marchent.
-
-**En production, par échantillonnage.**
-Plus de questions figées : **le barème seul.**
-
-Moi : **100 % dans la CI.** Aucun échantillonnage de production.
-
-<!--
-[À REFORMULER AVEC TES MOTS]
-
-Deuxième question : quand ?
-
-Dans la CI, à chaque modification : c'est de la non-régression. On rejoue les
-mêmes questions. Et comme elles ne changent pas, le corrigé type ou le barème
-fonctionnent tous les deux.
-
-En production, par échantillonnage. Là, plus de questions figées, donc le barème
-seul. Combien, à quelle fréquence ? Ça dépend de trop de choses pour que j'en
-parle ici. Un échantillon suffit.
-
-Moi, je suis à cent pour cent dans la CI. Aucun échantillonnage de production.
-
-Et c'est la CI qui ferme le tunnel : rejouer les mêmes questions, c'est la seule
-façon de savoir si ma modification améliore ou dégrade — et la seule façon de
-comparer deux stratégies.
--->
-
----
 
 <!-- _class: dense -->
 
@@ -515,18 +495,23 @@ Pas une note sur 10 — **« 13/20 » ne dit pas si on livre.**
 Des **contrôles, un par critère**, vrai ou faux.
 
 ```
-  ✗  {                        ✓  {
-       "verdict": "PASS",          "checks": { … },
-       "checks": { … }             "verdict": "FAIL"
-     }                           }
+  ✗  {                        ✓  <thinking> … </thinking>
+       "verdict": "PASS",         {
+       "checks": { … }              "checks": { … },
+     }                              "verdict": "FAIL"
+                                  }
 
-     décide, puis justifie       constate, puis conclut
+     décide, puis justifie       raisonne, constate, conclut
 ```
 
 Un modèle génère **de gauche à droite**, il ne revient pas en arrière.
 Verdict en premier : les contrôles sont écrits pour **lui donner raison**.
 
 **PASS si et seulement si tous les contrôles sont vrais.**
+
+```
+   CI ─► [ L0 ] ─►  ( LE JUGE ) ─►  thinking · checks · verdict
+```
 
 <!--
 [À REFORMULER AVEC TES MOTS]
@@ -582,6 +567,12 @@ Si le juge valide plus souvent la bavarde, il note la forme, pas le fond.
 
 **Chez moi : 46 % de faux PASS sur les défauts bavards.**
 
+```
+   CI ─► [ L0 ] ─►  ( LE JUGE ) ─►  thinking · checks · verdict
+                         ▲
+                 le même défaut, bavard ET sec
+```
+
 <!--
 [À REFORMULER AVEC TES MOTS]
 
@@ -620,6 +611,12 @@ mesure se rejoue à l'identique.
 Ça atténue. Ça ne supprime pas :
 **12 verdicts sur 60 basculent au seul réordonnancement.**
 
+```
+   RÉCUPÉRATION ─► [ mélange grainé ] ─┐
+                                       ▼
+   CI ─► [ L0 ] ───────────────► ( LE JUGE ) ─► thinking · checks · verdict
+```
+
 <!--
 [À REFORMULER AVEC TES MOTS]
 
@@ -636,7 +633,8 @@ identique.
 
 ==============================================================
 
-[AJOUT AU SCHÉMA : une boîte « mélange graîné » entre la récupération et le juge.]
+[AJOUT AU SCHÉMA : c'est ici que la RÉCUPÉRATION apparaît sur le schéma — elle
+est le préalable. Puis une boîte « mélange grainé » entre elle et le juge.]
 
 ⚠ Sans graine, les exécutions de la veille faisaient bouger le même bras de
 55,9 % à 43,3 %. Une mesure qui ne se rejoue pas n'est pas une mesure.
@@ -661,6 +659,13 @@ seulement sur les copies qu'il aurait dû recaler.
 
 Le même juge, deux chiffres. **Ne publiez jamais le premier sans le second.**
 
+```
+   RÉCUPÉRATION ─► [ mélange grainé ] ─┐
+                                       ▼
+   CI ─► [ L0 ] ───────────────► ( LE JUGE ) ─► [ LE BANC ]
+                                                 justes · attrapées
+```
+
 <!--
 [À REFORMULER AVEC TES MOTS]
 
@@ -681,8 +686,22 @@ recalé, c'est juste une relecture inutile.
 
 ==============================================================
 
-[AJOUT AU SCHÉMA : le juge ne sort pas UN chiffre mais DEUX — les décisions
-justes, et les erreurs attrapées.]
+[AJOUT AU SCHÉMA : ce n'est pas le juge qui sort deux chiffres, c'est le BANC
+qui le mesure — une boîte en aval, avec deux cadrans : les décisions justes, et
+les erreurs attrapées.]
+
+⚠ TRANCHÉ le 2026-10-14 : tout le talk parle du juge FINE-TUNÉ, parce que c'est
+LUI qui a tourné sur le banc RAG (REX_TRAME l.110, « juge 14B fine-tuné au
+checkpoint 200 »). Cette matrice (16 recalés, 11 passés, 22 validés) est donc la
+bonne, ainsi que les 46 % / 42 % de verbosité et les 64 % de PASS ci-dessous.
+Ne pas réintroduire les chiffres de la variante à conventions (κ 0,48,
+stabilité 76 %, 40 % de faux PASS concis) : ils appartiennent à un juge qui n'a
+pas produit le résultat.
+
+⚠ Le n, si on demande — et c'est LA question qui viendra sur cette diapositive :
+les 46 % portent sur **8 items verbeux à défaut caché**, contre 19 concis
+(results/report.md §2). Un pourcentage à deux chiffres sur 8 cas. Le dire avant
+qu'on le demande vaut mieux que de le défendre après.
 
 ⚠ Un juge qui répondrait PASS à tout sur un corpus où 95 % des réponses sont
 bonnes afficherait 95 % d'exactitude et attraperait zéro erreur. C'est l'exemple
@@ -695,7 +714,7 @@ mesures indépendantes, un même diagnostic.
 
 ---
 
-## Et il y a le quatrième, que je n'ai pas mesuré
+## Le quatrième, je ne l'ai pas mesuré — et je vous le dis
 
 **L'auto-préférence** : un modèle préfère ce qui ressemble à ce qu'il aurait
 écrit.
@@ -703,6 +722,8 @@ mesures indépendantes, un même diagnostic.
 Je ne l'ai **pas mesuré chez moi**. Je le cite.
 
 La parade connue : **ne pas faire juger un modèle par sa propre famille.**
+
+*Et je vous dis ça alors que mon juge, lui, est tout seul. J'y reviens à la fin.*
 
 <!--
 [À REFORMULER AVEC TES MOTS]
@@ -716,7 +737,34 @@ faire juger un modèle par un modèle de sa propre famille.
 Je le dis parce que mélanger ce qu'on a mesuré et ce qu'on a lu, c'est la
 meilleure façon de perdre la confiance de la salle sur tout le reste.
 
+Et puisque j'y suis : je vous donne cette parade alors que mon juge, lui, est
+tout seul. Gardez-le en tête, j'y reviens à la fin.
+
 ==============================================================
+
+⚠ LA DETTE OUVERTE ICI SE PAIE EN CONCLUSION (« un jury, pas un juge »). Dix mots
+posés tôt pour que la fin soit un remboursement et pas une idée qui tombe du
+ciel. Si la conclusion change, retirer cette phrase.
+
+⚠ RÉSOLU le 2026-10-14 — la question « votre juge est-il de la même famille que
+ce qu'il juge ? » a une réponse nette : NON, pas dans les résultats publiés.
+Le juge est Qwen2.5-Coder-14B. Le seul autre Qwen du pipeline est
+`rag.hyde.model = qwen2.5:7b` (Neo4jGraphRagStrategy.java:87), et il N'A PAS
+TOURNÉ : ligne 246, le modèle HyDE n'est branché que si le reranking est actif,
+or les deux scénarios du banc (`hybrid|hybrid-graph` et `hybrid|hybrid`)
+n'activent ni le reranking ni HyDE (FeatureFlags). Aucun recouvrement de
+familles dans la mesure.
+
+⚠ Trouvé au passage, à NE PAS mettre dans le talk mais à savoir : le preset
+`hybrid-graph-hyde` pose hydeEnabled=true ET rerankingEnabled=false, donc
+ligne 246 lui passe un modèle null et ligne 1718 rend la requête d'origine sans
+rien dire. Ce preset tournerait SANS HyDE en annonçant son nom. Jamais publié,
+donc rien d'invalidé — mais ce serait un sixième « BUILD SUCCESS » sur du vide.
+
+⚠ Ne PAS dire « la littérature montre qu'un jury est plus stable » : Verga et al.
+ont mesuré l'accord avec l'humain, le biais intra-modèle et le coût, PAS la
+stabilité. Formulation sûre : « un jury corrige une autre classe d'erreur —
+l'angle mort partagé — et mécaniquement il lisse le bruit. »
 
 ⚠ C'est la diapositive qui protège les trois précédentes. Si on ne distingue pas
 mesuré et cité, la salle a raison de douter de tout. Référence pour les biais de
@@ -776,10 +824,7 @@ ne retient qu'un des trois, c'est celui-là.
 
 ## Ce que ça change pour le juge
 
-Si le contexte peut tromper, **juger la réponse ne suffit pas.**
-
-Le juge reçoit **trois choses** : la question, **le contexte**, la réponse.
-Et il répond séparément :
+Donc mon juge ne rend pas **un** verdict. Il répond séparément :
 
 ```
    le contexte est-il pertinent ?
@@ -787,30 +832,38 @@ Et il répond séparément :
    la réponse s'appuie-t-elle sur lui ?
 ```
 
-C'est ce qui distingue **un défaut de récupération** d'un **défaut de
-génération**.
+**Le moteur n'a rien trouvé d'utile, ou le modèle a mal utilisé ce qu'il avait.
+Sans cette distinction : un taux d'échec, et aucune idée de quoi corriger.**
+
+```
+   RÉCUPÉRATION ─► [ mélange ] ─┐ le contexte entre AUSSI
+                                ▼
+   CI ─► [ L0 ] ──────► ( LE JUGE ) ─► pertinent ? suffisant ? étayé ?
+                        question + contexte + réponse  └─► [ LE BANC ]
+```
 
 <!--
 [À REFORMULER AVEC TES MOTS]
 
-Alors qu'est-ce que ça change pour mon juge ?
+Vous vous souvenez, je vous ai dit que mon juge reçoit le contexte en plus de la
+réponse. Voilà pourquoi.
 
-Si le contexte peut tromper, juger la réponse ne suffit plus. Le juge doit
-recevoir trois choses, pas deux : la question, le contexte, et la réponse.
+Il ne rend pas un verdict, il répond séparément à trois questions. Est-ce que le
+contexte est pertinent ? Est-ce qu'il permet de répondre sans rien supposer ?
+Est-ce que la réponse s'appuie dessus ?
 
-Et il doit répondre séparément : est-ce que le contexte est pertinent ? Est-ce
-qu'il permet de répondre sans rien supposer ? Est-ce que la réponse s'appuie
-dessus ?
-
-Parce que c'est ce qui me permet de distinguer deux pannes très différentes : le
-moteur n'a rien trouvé d'utile, ou le modèle a mal utilisé ce qu'il avait.
-
-Sans ça, j'ai un taux d'échec et aucune idée de quoi corriger.
+Parce que ça distingue deux pannes très différentes : le moteur n'a rien trouvé
+d'utile, ou le modèle a mal utilisé ce qu'il avait. Sans ça, j'ai un taux
+d'échec et aucune idée de quoi corriger.
 
 ==============================================================
 
 [AJOUT AU SCHÉMA : le contexte récupéré entre DANS le juge, pas seulement dans
 l'assistant. Et la sortie du juge se décompose.]
+
+⚠ RÉDUITE le 2026-10-15 à ses trois questions : les trois entrées du juge
+étaient déjà montrées ET dites à la diapositive 7, neuf diapositives plus tôt.
+Ne pas les réintroduire ici.
 
 ⚠ C'est ce qui permettra, plus tard, de dire que Neo4j souffre d'un défaut de
 rappel — 66 % de contextes jugés insuffisants contre 40 % — et pas d'un problème
@@ -819,11 +872,71 @@ de bruit. Sans cette décomposition : 25 points d'écart sans explication.
 
 ---
 
+## Tout ça, écrit, fait quatre paragraphes
+
+**1. Verdict** — PASS si et seulement si tous les contrôles sont vrais.
+
+**2. Préférence ou obligation** — « si tu as le temps » non suivi :
+contrôle vrai, écart noté dans le `<thinking>`.
+Verbeux mais correct : **jamais pénalisé.**
+
+**3. Un contrôle, un critère.** Pas de double sanction.
+
+**4. Citations** — on ne sanctionne que ce qui **déforme** le contexte.
+
+**Avant : 0 % de JSON exploitable. Après : 100 %, et 76 % de justes.**
+
+```
+  ╔═ LES 4 CONVENTIONS ═════════════════════════════════════╗
+  ║  RÉCUP ─► [mélange] ─┐                                  ║
+  ║  CI ─► [L0] ─────────► ( LE JUGE ) ─► checks ─► [ BANC ]║
+  ╚═════════════════════════════════════════════════════════╝
+```
+
+<!--
+[À REFORMULER AVEC TES MOTS]
+
+Vous venez de me voir construire ce juge pendant neuf diapositives. Le filtre
+avant le juge, le format de sortie, les contrôles avant le verdict, les parades
+contre les biais, le contexte qui entre dedans.
+
+Tout ça, une fois écrit, ça fait quatre paragraphes.
+
+Le premier, vous le connaissez déjà : PASS seulement si tous les contrôles sont
+vrais. Le deuxième règle le cas de la consigne polie — « si tu as le temps » —
+et il interdit de pénaliser une réponse juste parce qu'elle est longue. C'est là
+qu'on dit au juge où consigner ce qu'il a laissé passer : dans son bloc de
+raisonnement. Le troisième évite qu'un même défaut soit puni deux fois. Le
+quatrième dit qu'on ne sanctionne la citation que si elle déforme.
+
+Et voilà le chiffre. Avant ces quatre paragraphes, mon juge ne rendait aucun
+JSON exploitable. Zéro sur cent cinquante. Après, cent pour cent de JSON
+exploitable, et soixante-seize pour cent de réponses justes.
+
+Avant d'envisager quoi que ce soit de plus sophistiqué — écrivez vos conventions.
+
+==============================================================
+
+[AJOUT AU SCHÉMA : les conventions ne sont pas une boîte de plus, c'est le cadre
+qui entoure tout le schéma — elles s'appliquent à chaque contrôle.]
+
+⚠ Les chiffres : 0 % → 100 % de JSON exploitable, 0 % → 76 % de réponses justes.
+Le texte intégral est dans judge-finetune/configs/conventions.md.
+
+⚠ Cette diapositive ferme la section construction. C'est le paiement des neuf
+diapositives précédentes : ne pas l'expédier, c'est elle qui leur donne un sens.
+
+⚠ Elle rend l'action n°1 de la conclusion redondante : là-bas, une ligne de
+rappel suffit désormais, pas une explication.
+-->
+
+---
+
 ## L'étalon, et le biais que j'y ai mis moi-même
 
 Il faut des réponses **dont je connais déjà le verdict**.
-200 exemples à la main, 50 **relus en aveugle par deux personnes** :
-47 verdicts identiques sur 50.
+200 exemples, 50 **relus en aveugle** : 47 verdicts identiques sur 50.
+**Un relecteur contre mes étiquettes** — pas deux humains entre eux.
 
 **17 requêtes portaient la même incise** —
 *« si tu as le temps, dis un mot de X »*. **Les 17 étaient PASS.**
@@ -838,9 +951,17 @@ Je l'ai mise **en paragraphe isolé**. Nouvelle règle apprise :
 [À REFORMULER AVEC TES MOTS]
 
 Pour vérifier un juge, il me faut des réponses dont je connais déjà le verdict.
-Donc un étalon : deux cents exemples écrits à la main, cinquante mis de côté, et
-relus en aveugle par deux personnes avant qu'elles se parlent. Quarante-sept
+Donc un étalon : deux cents exemples, cinquante relus en aveugle, quarante-sept
 verdicts identiques sur cinquante.
+
+Et je vous préviens tout de suite : à partir d'ici il y a DEUX jeux, et je ne
+veux pas que vous les confondiez. Cinquante copies déjà corrigées, qui servent à
+vérifier le juge. Et soixante questions sur ma codebase, qui serviront à comparer
+les deux moteurs. Deux jeux, deux rôles.
+
+Sa limite, je vous la dois tout de suite : UN relecteur, contre des étiquettes
+écrites par un modèle. C'est la faiblesse la plus sérieuse de tout ce que je vous
+montre.
 
 Et c'est là que je me suis fait avoir.
 
@@ -849,13 +970,13 @@ dis un mot de X ». Les dix-sept étaient étiquetées PASS. Sans que je m'en re
 compte, j'avais associé une tournure de politesse à des réponses que je trouvais
 bonnes.
 
-Un juge n'a plus qu'à détecter cette chaîne de caractères pour marquer dix-sept
-points. Il n'apprend pas à juger, il apprend à repérer ma signature.
+Un juge n'a plus qu'à détecter cette chaîne pour marquer dix-sept points. Il
+n'apprend pas à juger, il apprend à repérer ma signature.
 
-Le correctif était évident : ajouter la même incise à des réponses en échec. Sauf
-que je l'ai mise en paragraphe isolé, là où les dix-sept d'origine la portaient
-au fil du texte. Nouvelle règle apprise : paragraphe isolé, donc échec. Trente
-sur trente.
+Le correctif était évident : la même incise sur des réponses en échec. Sauf que
+je l'ai mise en paragraphe isolé, là où les dix-sept d'origine la portaient au
+fil du texte. Nouvelle règle apprise : paragraphe isolé, donc échec. Trente sur
+trente.
 
 J'avais aggravé le problème en le réparant. Et ça a traversé une régénération,
 une validation à zéro erreur, trois mesures et un commit.
@@ -929,6 +1050,15 @@ Deux questions, et il faut les deux :
 Un juge qui change d'avis d'une lecture à l'autre n'est pas un juge.
 Un juge constant mais faux non plus.
 
+```
+  ╔═ LES 4 CONVENTIONS ═════════════════════════════════════╗
+  ║  RÉCUP ─► [mélange] ─┐                                  ║
+  ║  CI ─► [L0] ─────────► ( LE JUGE ) ─► checks ─► [ BANC ]║
+  ║                           ▲                        │    ║
+  ║                           └── aligné ? stable ? ───┘    ║
+  ╚═════════════════════════════════════════════════════════╝
+```
+
 <!--
 [À REFORMULER AVEC TES MOTS]
 
@@ -946,6 +1076,10 @@ juge. Mais un juge parfaitement constant et parfaitement faux non plus.
 
 ==============================================================
 
+[AJOUT AU SCHÉMA : une BOUCLE DE RETOUR sur le juge lui-même. Jusqu'ici le
+schéma était une chaîne qui va dans un sens ; à partir d'ici il se vérifie.
+Cet ajout change sa nature. Le corpus viendra encore s'ajouter deux diapos plus loin.]
+
 ⚠ C'est la bascule du talk. Ralentir, marquer un temps.
 
 ⚠ Ne pas annoncer la réponse ici. Le fait que mon juge échoue son propre seuil
@@ -955,106 +1089,164 @@ d'abord.
 
 ---
 
-## Mesurer un accord, c'est enlever le hasard
-
-Deux correcteurs qui **recaleraient tout le monde sans rien lire** seraient
-d'accord 9 fois sur 10, si 9 copies sur 10 sont mauvaises.
-
-Deux correcteurs, 100 copies, d'accord sur **90**.
-Chacun valide une copie sur cinq — donc **même au hasard**, ils tomberaient
-d'accord **68 fois**.
+## Est-ce qu'il marche, oui ou non ?
 
 ```
-  0                                        68          90        100
-  ├──────── donné par le hasard ────────────┼─ conquis ─┼─ raté ──┤
-                                               22           10
+  d'accord avec une référence ?          κ = 0,44
+  d'accord avec lui-même ?               même verdict 3 fois sur 5
+  une mesure SANS LLM dit-elle pareil ?  oui, même classement
 ```
 
-**κ = 22 conquis sur les 32 qui restaient = 0,69**
+**κ, c'est l'accord une fois retiré ce que le hasard donne.** 0,44, c'est moyen —
+et c'est mesuré contre l'étalon dont je viens de vous dire la limite.
+
+**Je ne lui fais pas confiance sur une copie.
+Je lui fais confiance sur soixante.**
+
+<span class="ref">Ce juge est entraîné sur mon corpus : ça lui donne le format, pas la justesse.</span>
+
+**Assez net pour départager deux moteurs de 25 points** — et une mesure
+qui ne contient aucun LLM les classe pareil.
+
+*Et vous, vous la connaissez, la précision de votre évaluateur ?*
+
+```
+  [ LE CORPUS ] ─────────── étalon ──────┐
+  ╔════════════════════════════════════╗ │
+  ║  RÉCUP ─► [mélange] ─┐             ║ ▼
+  ║  CI ─► [L0] ─────────► ( LE JUGE ) ─► checks ─► [ BANC ]
+  ║                           ▲                        │
+  ║  LES 4 CONVENTIONS        └── aligné ? stable ? ───┘
+  ╚════════════════════════════════════╝
+```
 
 <!--
 [À REFORMULER AVEC TES MOTS]
 
-Avant de vous donner mes chiffres, il faut un outil, parce que l'accord brut ne
-veut rien dire.
+Alors est-ce qu'il marche ? Trois réponses.
 
-Imaginez deux correcteurs qui recaleraient tout le monde, sans rien lire. Si neuf
-copies sur dix sont mauvaises, ils sont d'accord neuf fois sur dix. Leur accord
-ne mesure pas leur compétence, il mesure le déséquilibre du paquet.
+Une précision d'abord, parce qu'elle compte pour la suite : ce juge-là, je l'ai
+aussi entraîné sur mon corpus. Ça lui a donné le format — du JSON exploitable à
+tous les coups — pas la justesse. Et c'est lui qui a tourné sur le banc que je
+vais vous montrer.
 
-Alors prenons un vrai cas. Deux correcteurs, cent copies, d'accord sur
-quatre-vingt-dix. Chacun valide une copie sur cinq. Donc même en cochant au
-hasard, ils tomberaient d'accord soixante-huit fois sur cent.
+Est-il d'accord avec une référence ? Kappa zéro virgule quarante-quatre —
+l'accord une fois retiré ce que le hasard donne tout seul. C'est moyen.
 
-Partant de soixante-huit, il ne restait que trente-deux points à conquérir. Ils
-en ont pris vingt-deux. Kappa, c'est ça : la part conquise de ce qu'il restait à
-conquérir. Zéro virgule soixante-neuf — alors que l'accord brut affichait
-quatre-vingt-dix pour cent.
+Est-il d'accord avec lui-même ? Je lui donne la même copie trois fois. Il ne rend
+le même verdict que trois fois sur cinq.
+
+Ce qui veut dire une chose très concrète : je ne lui fais pas confiance sur une
+copie. Si je lui en soumets une seule et qu'il répond PASS, je ne sais pas si
+c'est son jugement ou son tirage. Mais sur soixante questions, le bruit se
+moyenne — et c'est comme ça que je l'utilise.
+
+Mais la troisième compte plus que les deux autres. J'ai vérifié mon juge avec une
+mesure qui ne contient aucun LLM — compter les identifiants attendus dans le
+contexte. Elle classe les deux moteurs dans le même ordre que lui.
+
+Les deux ne partagent aucun mode de défaillance. C'est ça qui tient l'écart de
+vingt-cinq points.
+
+Et vous, vous la connaissez, la précision de votre évaluateur ?
 
 ==============================================================
 
-⚠ Échelle usuelle, si on demande : au-dessus de 0,8 fort, 0,6 à 0,8 correct,
-0,4 à 0,6 moyen. Ce sont des conventions, pas des lois.
+[AJOUT AU SCHÉMA : le corpus sort de l'ombre et devient une boîte à part, avec
+son propre cadran. Et DEUX cadrans sur le juge, pas un : l'alignement et la
+stabilité.]
 
-⚠ Et le piège marche dans les deux sens : sur mon critère le plus fréquent,
-78 % d'accord brut pour un κ de 0,386. Le paquet est très déséquilibré, donc le κ
-paraît médiocre alors que les relecteurs se trompent rarement. Donner le κ seul
-sous-estime, donner le pourcentage seul surestime.
+⚠ DÉMOTION DU κ, 2026-10-14. La diapositive de pédagogie du κ (« mesurer un
+accord, c'est enlever le hasard ») a été SUPPRIMÉE, et celle-ci ne l'enseigne
+plus : elle le donne en une phrase, comme réponse à une question posée juste
+avant. Motif : le κ portait deux diapositives, il est faible, et il est mesuré
+contre un étalon fragile — il donnait à tout l'exposé une couleur d'excuse. Ne
+pas le réintroduire comme sujet.
+
+⚠ C'est hintCoverage qui porte la réponse, pas le κ. Pour une salle de devs,
+« j'ai vérifié mon juge LLM avec une mesure sans aucun LLM » est plus fort qu'un
+coefficient. Mais ne PAS dire qu'il valide le juge : il corrobore un CLASSEMENT.
+
+⚠ Les chiffres, si on demande : κ du juge 0,44 IC [0,27 — 0,60] pour le juge
+fine-tuné, CELUI QUI A TOURNÉ SUR LE BANC. La variante à conventions est à 0,48
+[0,29 — 0,66] mais elle n'a pas produit le résultat — ne pas les mélanger. κ du
+corpus 0,880 IC [0,720 — 1,000], et c'est UN relecteur contre des étiquettes
+écrites par un modèle, jamais deux humains. Stabilité 76 % (conventions) contre
+58 % (fine-tuné). hintCoverage 0,697 contre 0,596.
+
+⚠ Si on demande comment faire mieux sur l'étalon : une seconde relecture est
+PRÉ-ENREGISTRÉE et le paquet aveugle est prêt (judge-finetune/data/relecture2/),
+il manque seulement un relecteur disponible. Le dire comme un fait, pas comme une
+excuse.
 -->
 
 ---
 
-## Deux κ qu'on confond tout le temps
+## Et son hésitation, elle, me sert
 
-| | ce qu'il mesure | |
-|---|---|---|
-| **κ du corpus** | l'humain contre mes étiquettes | **0,880** |
-| **κ du juge** | le juge contre l'étalon | **0,44** |
+Les copies où il **change d'avis** entre trois lectures, je les relis.
 
-Le premier dit *« ma règle est-elle fiable ? »*.
-Le second dit *« mon juge est-il aligné ? »*.
+```
+   50 copies
+   ├─ 29 stables     →  je n'y touche pas
+   └─ 21 instables   →  je relis
+```
 
-**0,880 entre humains. 0,44 pour le juge.**
-Le plafond n'est pas le modèle — **c'est ce que mon corpus enseigne.**
+**21 relectures au lieu de 50.** Et ça rattrape **7 de ses 12 erreurs.**
+
+**Les 5 autres, il les a rendues trois fois de suite, identiques et fausses.**
+Il n'a pas hésité. **L'hésitation ne les signale pas.**
 
 <!--
 [À REFORMULER AVEC TES MOTS]
 
-Et là il y a deux kappas qu'on confond tout le temps.
+Bon. Mon juge hésite une fois sur quatre. Mais cette hésitation, je peux m'en
+servir.
 
-Le premier mesure l'accord entre un humain et mes étiquettes de référence. Il
-répond à : est-ce que ma règle est fiable ? Parce que mesurer contre une règle
-fausse ne vaut rien. Il vaut zéro virgule quatre-vingt-huit — deux personnes ont
-relu les mêmes copies, séparément, sans se parler.
+L'idée est simple : les copies où il rend trois fois le même verdict, je lui fais
+confiance. Celles où il change d'avis, je les relis moi-même.
 
-Le second mesure l'accord entre mon juge et cette règle. Il répond à : est-ce que
-mon juge est aligné ? Il vaut zéro virgule quarante-quatre.
+Résultat : je relis vingt et une copies au lieu de cinquante. La moitié du
+travail, c'est lui qui l'a trié — et il a trié ce qu'il y avait de plus ambigu.
 
-Présenter le premier à la place du second, c'est l'erreur la plus fréquente, et
-la plus flatteuse : on annonce un alignement qu'on n'a jamais mesuré.
+Et sur les douze fois où il n'est pas d'accord avec mon étalon, l'hésitation m'en
+signale sept. Plus de la moitié. Les cinq
+autres, il les a rendues trois fois de suite, identiques, et fausses. Il ne
+doutait pas. Il se trompait.
 
-Et l'écart entre les deux est la vraie information. Mon plafond n'est pas le
-modèle. C'est ce que mon corpus lui enseigne.
-
-Une dernière chose, découverte en mesurant, et c'est peut-être le conseil le plus
-utile de tout le talk : l'invite nue de mon juge ne rendait aucun JSON
-exploitable. Zéro sur cent cinquante. Quatre phrases de conventions écrites l'ont
-fait passer à soixante-seize pour cent de réponses justes. Avant d'envisager quoi
-que ce soit de plus sophistiqué — écrivez vos conventions.
+Et c'est exactement ce que je vous disais tout à l'heure : un juge qui change
+d'avis n'est pas un juge, mais un juge constant et faux non plus.
 
 ==============================================================
 
-⚠ Le κ du corpus vient d'une relecture en aveugle AVANT discussion : 47 verdicts
-identiques sur 50. IC 95 % [0,720 — 1,000].
+⚠ MESURE A POSTERIORI, pas pré-enregistrée. Le dire si on insiste. Tout est
+consigné dans judge-finetune/TRIAGE_POSTHOC.md, méthode et limites comprises.
+« Erreur » veut dire « désaccord avec l'étalon », pas faute objective.
 
-⚠ Le κ du juge : 0,44, IC [0,27 — 0,60].
+⚠ LA QUESTION QUI VIENT : « comment en attraper plus ? » Trois réponses, dans
+cet ordre.
+  1. Pas en routant sur les contrôles plutôt que sur le verdict : MESURÉ, ça
+     fait relire 16 copies au lieu de 12 et rattrape exactement les mêmes 4.
+     Perte sèche.
+  2. Un contrôle déterministe, sans LLM — hintCoverage existe déjà et ne partage
+     aucune erreur systématique avec le juge. Ne PAS dire qu'il valide le juge :
+     il corrobore un classement.
+  3. Un JURY plutôt qu'un juge : des modèles de familles disjointes, et on route
+     sur leur désaccord. C'est le seul levier qui attaque la part systématique.
+     Verga et al., « Replacing Judges with Juries », arXiv:2404.18796, Cohere
+     2024 : un panel de petits modèles bat un seul gros juge, moins de biais
+     intra-modèle, plus de sept fois moins cher. Et c'est cohérent avec ma
+     parade contre l'auto-préférence.
 
-⚠ Pourquoi le corpus plafonne : sur 50 items, 17 portent un désaccord sur au
-moins un contrôle, dont 15 que le verdict masque. Le verdict est reproductible,
-les raisons beaucoup moins — et c'est sur les raisons qu'un juge apprend.
+⚠ POURQUOI les 8 échappent : rejouer le même modèle ne fait varier que
+l'échantillonnage, pas la compréhension. Une convention mal lue est mal lue
+pareil aux trois passes. Ces erreurs sont systématiques — c'est structurel,
+aucun rejeu du même modèle ne les exposera.
 
-⚠ Les conventions : 0 % → 76 % de réponses justes, et 0 % → 100 % de JSON
-exploitable. C'est l'item à ne pas perdre si on coupe cette diapositive.
+⚠ Le curseur, si on demande : la variante fine-tunée est plus instable, elle
+envoie 21 copies à l'humain au lieu de 12, et rattrape 7 désaccords sur 12 au
+lieu de 4. Plus on relit, plus on attrape. Ce n'est pas une qualité du triage,
+c'est sa couverture.
 -->
 
 ---
@@ -1069,13 +1261,17 @@ exploitable. C'est l'item à ne pas perdre si on coupe cette diapositive.
 
 Les **mêmes** 60 questions pour les deux stratégies, dans la **même** exécution.
 
-Mélange du contexte **graîné par la question** → la mesure se rejoue à
+Mélange du contexte **grainé par la question** → la mesure se rejoue à
 l'identique.
 
 <!--
 [À REFORMULER AVEC TES MOTS]
 
 Maintenant le banc. Soixante questions sur ma codebase, en trois niveaux.
+
+Et c'est lui qui tourne dans ma CI, à chaque modification. Toujours les mêmes
+questions — c'est la seule façon de savoir si ce que je viens de changer améliore
+ou dégrade. C'est ça qui ferme le tunnel dont je vous parlais au début.
 
 Local : une méthode précise, dans un seul fichier. Structural : héritage,
 interfaces, ce qui implémente quoi. Et inter-modules : une chaîne qui traverse
@@ -1151,14 +1347,17 @@ vérité sur GraphRAG.
 
 ## Moteur, ou traversée de graphe ?
 
-J'ai rejoué les 60 questions **sans** l'expansion de graphe.
-Et j'ai laissé **Lucene strictement identique** : son taux **doit** être le même.
+Les chiffres d'avant mettent les deux moteurs sur le **même réglage**.
+Mais Neo4j, lui, sait traverser le graphe.
 
-**Il l'est. 48,3 %, à la décimale, et sur les trois niveaux.**
+Je l'ai donc rejoué **avec** l'expansion K-hop :
+**22,0 % au lieu de 23,7. Il perd 1,7 point — une question sur 59.**
 
-Le témoin n'a pas bougé. Neo4j, lui, gagne **1,7 point — une question sur 59.**
+Et **Lucene ne bouge pas d'une décimale** : 48,3 %, sur les trois niveaux.
+C'est ce témoin qui valide la comparaison.
 
-**L'écart vient du moteur de récupération, pas du parcours de graphe.**
+**L'écart de 25 points vient du moteur de récupération,
+pas du parcours de graphe.**
 
 <!--
 [À REFORMULER AVEC TES MOTS]
@@ -1166,15 +1365,17 @@ Le témoin n'a pas bougé. Neo4j, lui, gagne **1,7 point — une question sur 59
 Mais attention. Mon pipeline Neo4j fait deux choses : il cherche, puis il étend
 la recherche en suivant les liens du graphe. Lequel des deux pose problème ?
 
-Alors j'ai rejoué les soixante questions sans l'expansion de graphe. Et surtout,
-j'ai laissé Lucene strictement identique dans les deux exécutions. Son taux doit
-donc être le même.
+Les chiffres que je viens de vous montrer comparent les deux moteurs sur le même
+réglage, sans expansion des deux côtés. Je les ai donc rejoués une seconde fois,
+en rendant à Neo4j son expansion de graphe. Et surtout, j'ai laissé Lucene
+strictement identique dans les deux exécutions. Son taux doit donc être le même.
 
 Il l'est. Quarante-huit virgule trois pour cent, à la décimale, et sur chacun des
 trois niveaux. Le témoin n'a pas bougé — et c'est ça qui rend l'attribution
 possible. S'il avait bougé, je n'aurais rien pu conclure du tout.
 
-Neo4j, lui, gagne un virgule sept point. Une question sur cinquante-neuf.
+Neo4j, lui, passe de vingt-trois virgule sept à vingt-deux pour cent. Il perd un
+virgule sept point. Une question sur cinquante-neuf. Du bruit.
 
 Donc l'écart vient du moteur de récupération, pas de la traversée. Et la nuance
 compte : je ne dis pas « le graphe est mal implémenté ». Je dis que ce
@@ -1182,6 +1383,15 @@ pipeline-là rapporte moins de matière. Ce n'est pas la même critique, et ce n
 pas le même correctif.
 
 ==============================================================
+
+⚠ CORRIGÉ le 2026-10-14 après audit : le sens de l'ablation était inversé. La
+diapositive « Le résultat » affiche 23,7 % — c'est `hybrid|hybrid`, le contrôle
+d'équité, SANS expansion des deux côtés. Donc ici on AJOUTE l'expansion, on ne
+la retire pas, et Neo4j PERD 1,7 point. Les deux lignes de REX_TRAME :
+  hybrid|hybrid-graph  (avec K-hop)  22,0 %  +26,3 pts  p 0,0041  25 discordantes
+  hybrid|hybrid        (sans K-hop)  23,7 %  +24,6 pts  p 0,0066  24 discordantes
+Avant correction, la salle ne pouvait pas calculer le 1,7 : les 22,0 % n'étaient
+affichés nulle part.
 
 ⚠ C'est la diapositive qui rend tout le reste défendable. Le bras témoin
 invariant est la seule chose qui autorise à attribuer l'écart.
@@ -1232,10 +1442,10 @@ la perdre : c'est ce qui distingue ce talk d'une démonstration arrangée.
 
 Et cinq fois, il a affiché **BUILD SUCCESS**.
 
-La pire : une option d'adaptateur **acceptée, puis ignorée**.
+La pire : une option **acceptée, puis ignorée** — le serveur a répondu
+avec un autre modèle que celui demandé.
 Deux heures de calcul. 150 réponses plausibles. Et un rapport annonçant
-**« le fine-tuning dégrade la justesse de 76 % »**, intervalle de confiance
-compris.
+**une dégradation de 76 %**, intervalle de confiance compris.
 
 **Publiable tel quel. Entièrement faux.**
 
@@ -1269,7 +1479,7 @@ preuve positive.
 
 ⚠ Les quatre autres, si on demande : options non transmises par le lanceur de
 tests, propriété vide au lieu de l'adaptateur, un pgrep qui matchait son propre
-script, un mélange non graîné. Ne pas les énumérer à l'écran — cinq bugs
+script, un mélange non grainé. Ne pas les énumérer à l'écran — cinq bugs
 cryptiques enterrent le signal, qui est le NOMBRE.
 -->
 
@@ -1302,6 +1512,17 @@ avec le journal. Une sonde avant de lire les chiffres.
 Chacun a été corrigé parce qu'on a regardé. Jamais parce qu'une métrique a
 protesté.
 
+Et je vous dois une réponse. Tout à l'heure je vous ai dit de ne pas faire juger
+un modèle par sa propre famille, alors que mon juge, lui, est tout seul. Voilà
+où ça m'a mené : quand il hésite, je le vois. Quand il se trompe avec aplomb,
+non — et c'est huit fois sur douze. Rejouer le même modèle ne fait varier que
+l'échantillonnage, jamais la compréhension.
+
+Donc ce que je ferais ensuite, ce n'est pas un plus gros modèle. J'ai aussi
+essayé d'entraîner le mien sur mon corpus : ça lui a donné le format, pas la
+justesse. C'est un jury plutôt qu'un juge — des modèles de familles différentes,
+et on relit là où ils se contredisent.
+
 C'est la phrase que je veux que vous reteniez : on construit un juge pour arrêter
 d'avancer à l'aveugle. Mais le juge est lui-même un instrument. Et un instrument,
 ça se vérifie. Sinon on a simplement déplacé l'aveuglement d'un cran.
@@ -1316,7 +1537,7 @@ d'avancer à l'aveugle. Mais le juge est lui-même un instrument. Et un instrume
 ## Trois choses à faire lundi
 
 **1. Écrivez vos conventions avant tout le reste.**
-Chez moi : d'aucun JSON exploitable à 76 % de réponses justes. Quatre phrases.
+Vous l'avez vu : quatre paragraphes, 0 % → 76 %.
 
 **2. Décomposez en critères, les contrôles avant le verdict.**
 Un modèle génère de gauche à droite. L'ordre des champs change tout.
@@ -1331,9 +1552,9 @@ Un banc qui ne prouve pas ce qu'il mesure ne mesure rien — silencieusement.
 
 Trois choses, applicables lundi, sans rien installer.
 
-Un. Écrivez vos conventions avant tout le reste. Chez moi, mon juge passait
-d'aucun JSON exploitable à soixante-seize pour cent de réponses justes. Pour
-quatre phrases.
+Un. Écrivez vos conventions avant tout le reste. Vous les avez vues tout à
+l'heure : quatre paragraphes, et mon juge passait de zéro à soixante-seize pour
+cent.
 
 Deux. Décomposez en critères, et mettez les contrôles avant le verdict. Un modèle
 génère de gauche à droite — l'ordre des champs change son comportement, et ça ne
@@ -1345,8 +1566,6 @@ silencieusement.
 
 Tout est dans le dépôt : le corpus, le protocole avec ses amendements datés, et
 les générations écartées avec la raison de leur mise à l'écart.
-
-Merci.
 
 ==============================================================
 
@@ -1436,9 +1655,71 @@ Merci.
 ⚠ À FAIRE AVANT : générer le QR vers ton formulaire et écraser
 demo/img/qr-feedback.png — même nom, 620 x 620, puis relancer le rendu.
 
-⚠ Laisser cette diapositive affichée pendant les questions : c'est le moment où
-les gens dégainent leur téléphone.
+⚠ C'est bien la DERNIÈRE diapositive : la laisser affichée pendant les
+questions, c'est le moment où les gens dégainent leur téléphone. Les questions
+qui peuvent tomber sont en pistes de réponse plus bas, hors écran.
 
 ⚠ L'angle « vous avez vu un talk sur la vérification, vérifiez-moi » est
 cohérent avec le propos. Éviter le « n'hésitez pas à me faire un retour » neutre.
+
+==============================================================
+LES QUESTIONS QUI PEUVENT TOMBER — pistes de réponse, pas de script.
+Toutes les valeurs sont vérifiées ; les sources sont nommées.
+
+❓ COMMENT L'EMPÊCHER DE SE TROMPER TROIS FOIS DE SUITE, AVEC APLOMB ?
+   1. D'abord soupçonner l'étalon, pas le juge. REX_TRAME l.205 : 16 désaccords
+      sur 22 vont dans le MÊME sens, l'humain plus sévère que l'étiquette écrite
+      par le LLM. Une partie des 8 sont peut-être des erreurs d'étiquette.
+   2. Corriger les RAISONS, pas le volume : 17 items sur 50 portent un désaccord
+      sur au moins un contrôle, dont 15 que le verdict masque. Ajouter 200
+      exemples de plus reproduit l'ambiguïté au lieu de la lever.
+   3. Puis un JURY : des familles disjointes, on relit là où elles divergent.
+      Seul levier contre l'angle mort partagé. Verga et al., arXiv:2404.18796.
+   4. PAS un plus gros modèle : mesuré, 76,0 % contre 76,0 %, p = 1,0000.
+   ⚠ Levier mesuré et NÉGATIF, à sortir si on le propose : router sur « un
+     contrôle a bougé » au lieu du verdict fait relire 16 copies au lieu de 12
+     et rattrape exactement les mêmes 4. Détail dans TRIAGE_POSTHOC.md.
+
+❓ κ = 0,44, C'EST FAIBLE. COMMENT CONCLUEZ-VOUS QUOI QUE CE SOIT ?
+   Je ne conclus pas sur une réponse isolée. Je compare deux moteurs sur les
+   mêmes 60 questions, dans la même exécution : le bruit tombe des deux côtés.
+   Témoin invariant : Lucene identique à la décimale sur les trois strates.
+   hintCoverage, SANS aucun LLM, les classe pareil (0,697 contre 0,596).
+   McNemar p = 0,0066 sur 24 paires discordantes, 19-5.
+   La réserve à énoncer : sur ce corpus, selon ce juge.
+
+❓ VOTRE ÉTALON EST ÉCRIT PAR UN MODÈLE ET RELU PAR UNE SEULE PERSONNE.
+   Oui. C'est la limite la plus sérieuse du travail — la reconnaître, ne pas la
+   défendre. C'est écrit en en-tête de data/REVUE_GOLDEN.md.
+   Ce que je n'en tire PAS : un plafond humain. 47/50 et κ 0,880, c'est un
+   contrôle de cohérence de MA règle, pas un accord entre deux humains.
+   Et le biais est documenté ET orienté : 16/22 désaccords dans le même sens,
+   ma référence est plus indulgente qu'un humain. Je le dis avant qu'on le
+   trouve.
+
+❓ POURQUOI PAS UN PLUS GROS MODÈLE, OU PLUS DE FINE-TUNING ?
+   Mesuré : 76,0 % contre 76,0 %, p = 1,0000. Le fine-tuning a acheté le
+   CONTRAT DE SORTIE — 100 % de format strict — pas la justesse.
+   Et il a DÉGRADÉ la stabilité : 76 % à 58 %.
+   Le plafond n'est pas la taille du modèle, c'est ce que le corpus enseigne.
+
+❓ DONC LUCENE BAT GRAPHRAG ? EN GÉNÉRAL ?
+   Non. Sur ma codebase, 162 fichiers Java, avec CE pipeline Neo4j.
+   Et ce n'est pas la traversée de graphe : l'expansion K-hop ne pèse que
+   1,7 point. C'est le moteur de récupération lui-même.
+   Le mécanisme est lisible : contexte jugé insuffisant 66 % contre 40 % — un
+   défaut de rappel, pas un problème de bruit.
+   Un seul niveau conclut : CROSS_MODULE, 8-0, p = 0,0078. Les deux autres non,
+   et c'était annoncé avant la mesure.
+
+❓ LE BLOC DE RAISONNEMENT, IL SERT VRAIMENT À QUELQUE CHOSE ?
+   Mesuré chez moi, fidelite/RESULTAT.md, pré-enregistré.
+   Le verdict bascule 53 % du temps si on lui impose un raisonnement étranger,
+   IC [38 %, 68 %] — NON CONCLUANT selon mes propres bandes déclarées.
+   Mais 23 bascules sur 24 suivent le raisonnement imposé : c'est une cause
+   réelle, pas une cause unique.
+   Et thinking vide : 74 % contre 72 %, p = 1,0000, alors qu'il coûte 73 % des
+   jetons. Donc : auditabilité démontrée, gain en justesse NON démontré.
+   Ne pas prétendre l'inverse — c'est exactement le genre de glissement que le
+   talk dénonce.
 -->
