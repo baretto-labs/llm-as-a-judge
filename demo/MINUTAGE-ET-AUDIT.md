@@ -96,22 +96,34 @@ justesse du juge, **le parseur du harnais est importé** (`extract_judgment`,
 `majority_verdicts`, `strict_accuracy`) : aucune seconde logique d'extraction ne
 peut diverger en silence.
 
-### Un chiffre faux, corrigé
+### Un chiffre que cet audit avait cassé, et qui est remis d'aplomb
 
-**Diapositive 24, ligne « contexte jugé insuffisant » : affichait 40 % / 66 %.**
+**Diapositive 24, ligne « contexte jugé insuffisant » : 40 % / 66 %, et c'est juste.**
 
-Mesuré dans `benchmarks/rag-quality-detail.jsonl`, scénario `hybrid|hybrid`,
-contrôle `contexte_suffisant` à faux :
+Cet audit avait conclu le 2026-10-17 qu'il fallait afficher **43 % / 67 %**. C'était
+faux, et c'est annulé. Le calcul comptait les **60** lignes de
+`benchmarks/rag-quality-detail.jsonl`, invalides comprises, alors que le code
+exclut les invalides : `RagQualityEvaluation.ligneSynthese` divise par `valides`,
+jamais par `js`.
+
+La source publiée est l'agrégat, `benchmarks/rag-quality.jsonl`, scénario
+`hybrid|hybrid`, ligne `difficulty ALL` :
 
 ```
-  lucene  26/60 = 43,3 %        neo4j  40/60 = 66,7 %
+  lucene  n=58  invalid=2   contexteInsuffisantRate 0,397   →  40 %
+  neo4j   n=59  invalid=1   contexteInsuffisantRate 0,661   →  66 %
 ```
 
-Affiché désormais **43 % / 67 %**. Le 40 % était faux de 3 points, **dans le sens
-qui flatte la conclusion** : il donnait 26 points d'écart au lieu de 24.
+C'est la MÊME ligne et le MÊME dénominateur que les 48 % / 24 % de réponses
+justes affichés juste au-dessus. La « correction » laissait donc deux
+dénominateurs sur une seule diapositive, et elle contredisait les notes des
+diapositives 13 et 31, restées à 66 % contre 40 %.
 
-Vérifié qu'il ne s'agissait pas d'un autre contrôle mal étiqueté — aucun ne
-produit 40 % : `contexte_pertinent` 38,3/45,0 · `bruit_maitrise` 26,7/26,7.
+Elle se trompait aussi de sens : 40/66 fait 26 points d'écart, 43/67 en fait 24 —
+elle **réduisait** l'écart, elle ne le flattait pas.
+
+**Leçon, et c'est la seule chose à retenir de cette section : recouper contre le
+fichier de synthèse publié avant de recalculer depuis le détail.**
 
 ### Exact au chiffre près
 
