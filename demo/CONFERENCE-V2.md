@@ -1150,16 +1150,6 @@ Je lui fais confiance sur soixante.**
 
 *Et vous, vous la connaissez, la précision de votre évaluateur ?*
 
-```
-  [ LE CORPUS ] ─────────── étalon ──────┐
-  ╔════════════════════════════════════╗ │
-  ║  RÉCUP ─► [mélange] ─┐             ║ ▼
-  ║  CI ─► [L0] ─────────► ( LE JUGE ) ─► checks ─► [ BANC ]
-  ║                           ▲                        │
-  ║  LES 4 CONVENTIONS        └── aligné ? stable ? ───┘
-  ╚════════════════════════════════════╝
-```
-
 <!--
 [À REFORMULER AVEC TES MOTS]
 
@@ -1214,9 +1204,12 @@ Et vous, vous la connaissez, la précision de votre évaluateur ?
 
 ==============================================================
 
-[AJOUT AU SCHÉMA : le corpus sort de l'ombre et devient une boîte à part, avec
-son propre cadran. Et DEUX cadrans sur le juge, pas un : l'alignement et la
-stabilité.]
+⚠ PAS DE SCHÉMA SUR CETTE DIAPOSITIVE. Le tableau occupe la hauteur utile :
+l'échafaudage ASCII y était coupé en pleine ligne à la projection (mesuré sur le
+rendu, 1 diapo sur 31). Le corpus en boîte à part et les deux cadrans du juge
+sont déjà dans l'état 11 de `SCHEMA-ETATS.md`, qui est un sur-ensemble — ne pas
+dessiner deux fois. Si un visuel revient ici un jour, c'est une image
+dimensionnée, jamais du texte préformaté.
 
 ⚠ NE PAS RÉINTRODUIRE LE κ COMME SUJET. Il se donne en une phrase, en réponse à
 la question posée juste avant — jamais enseigné. Il est faible et mesuré contre
@@ -1522,7 +1515,7 @@ bouger le même bras de cinquante-six à quarante-trois pour cent.
 
 | | Lucene | Neo4j |
 |---|---|---|
-| **Réponses justes** | **48 %** | **24 %** |
+| **Contexte exploitable** | **48 %** | **24 %** |
 | Contexte jugé insuffisant | 40 % | **66 %** |
 
 Sur 60 questions, **24 les départagent**. Lucene en gagne **19**, Neo4j **5**.
@@ -1535,8 +1528,9 @@ Et une mesure **sans aucun LLM** les classe **dans le même ordre**.
 <!--
 [À REFORMULER AVEC TES MOTS]
 
-Le résultat. Lucene, quarante-huit pour cent de réponses justes. Mon graphe
-Neo4j, vingt-quatre.
+Le résultat. Lucene, quarante-huit pour cent de contextes exploitables. Mon
+graphe Neo4j, vingt-quatre. Mon banc ne note pas des réponses : il note ce que
+chaque moteur rapporte.
 
 Mais le chiffre qui m'intéresse est le deuxième : le contexte de Neo4j est jugé
 insuffisant deux fois sur trois, contre quatre fois sur dix pour Lucene. Ce n'est
@@ -1544,8 +1538,8 @@ pas un problème de bruit, c'est un défaut de rappel — le moteur ne rapporte 
 assez de matière. Sans mes critères décomposés, j'aurais vingt-cinq points
 d'écart et aucune idée de quoi corriger.
 
-Sur les soixante questions, vingt-quatre les départagent — les trente-six autres,
-les deux font pareil, elles ne tranchent rien. Lucene en gagne dix-neuf, Neo4j
+Sur les soixante questions, vingt-quatre les départagent. Lucene en gagne
+dix-neuf, Neo4j
 cinq. Le hasard donnerait douze-douze. Obtenir dix-neuf contre cinq, c'est tirer
 dix-neuf fois pile sur vingt-quatre lancers.
 
@@ -1559,6 +1553,11 @@ viens de décrire. Les deux rendent soixante-seize pour cent sur l'étalon. Je
 vous ai décrit la plus simple.
 
 ==============================================================
+
+⚠ `passRate` = PASS ⟺ les TROIS contrôles de contexte vrais
+(`RagContextJudge.java:93-95`) : pertinent, suffisant, bruit maîtrisé. Le banc ne
+génère aucune réponse — aucun appel de chat dans `RetrievalBenchmark.java`. Ne
+jamais réécrire « réponses justes ».
 
 ⚠ LES QUATRE CHIFFRES VIENNENT D'UNE SEULE LIGNE : `benchmarks/rag-quality.jsonl`,
 scénario `hybrid|hybrid`, `difficulty ALL`, invalides EXCLUS.

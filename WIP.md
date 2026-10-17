@@ -263,6 +263,27 @@ pas celui qui échoue — « mon banc a mesuré le vide » devient « je l'ai at
 
 ## Fait le 2026-10-17
 
+- **La diapositive 24 ne mesurait pas des réponses : la ligne portait un faux nom.**
+  Elle affichait « Réponses justes 48 % / 24 % ». Ce chiffre est `passRate`, et `passRate` vaut PASS
+  ⟺ les **trois** contrôles de contexte sont vrais — pertinent, suffisant, bruit maîtrisé
+  (`RagContextJudge.java:93-95`, `RagQualityEvaluation.tauxPass:166`). Le banc ne génère aucune
+  réponse : aucun appel de chat dans `RetrievalBenchmark.java`. Le seul chemin de génération qui
+  existe, `RagService.askQuestion`, n'y est pas branché. Renommée **« Contexte exploitable »** à
+  l'écran et à l'oral, avec la phrase « mon banc ne note pas des réponses : il note ce que chaque
+  moteur rapporte ». Payée en coupant « les trente-six autres, les deux font pareil » — l'écran dit
+  déjà que 24 questions départagent. 31,2 min inchangés. Les chiffres, eux, ne bougent pas : seul le
+  nom était faux.
+
+- **La diapositive 21 était coupée à la projection ; l'échafaudage ASCII est retiré.**
+  Mesuré sur le rendu réel, pas sur le markdown : les 31 diapositives exportées en PNG, puis balayage
+  des 12 dernières lignes de pixels de chacune. **Une seule touchait le bord bas**, la 21, avec 1819
+  pixels de contenu dans la zone coupée — le schéma s'arrêtait en pleine ligne. Le bloc
+  `CONFERENCE-V2.md:1153-1161` est supprimé, et **l'état 10 de `SCHEMA-ETATS.md` est fusionné dans
+  l'état 11**, qui montre déjà le corpus en boîte à part et les deux cadrans. Conséquence sur le
+  chemin critique : **dix dessins Excalidraw à faire deviennent neuf**. Re-mesure après coup : zéro
+  diapositive sur 31 ne touche le bord. Le dépassement n'était pas un problème de contenu mais
+  d'échafaudage — une image se dimensionne, pas du texte préformaté.
+
 - **La « correction » du taux de contexte insuffisant était la régression, elle est annulée.**
   La diapositive 24 affichait 40 % / 66 % ; une correction écrite plus tôt le 2026-10-17 l'avait
   passée à 43 % / 67 % en recomptant sur `benchmarks/rag-quality-detail.jsonl` les **60** lignes,

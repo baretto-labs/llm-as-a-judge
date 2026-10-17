@@ -27,9 +27,9 @@ périmés : les états 3 à 10 pointaient tous **une diapositive trop loin**, et
 états 1 et 2 ont fusionné en **un seul marqueur** (diapo 9) depuis la suppression
 de la diapositive « quand évaluer ? » le 2026-10-14. La correspondance a été
 rétablie par le CONTENU des marqueurs, pas par leur numéro. Vérification : le
-support porte **9 marqueurs** `[AJOUT AU SCHÉMA]` (diapos 9, 10, 11, 12, 13, 16,
-17, 20, 21) et l'état 11 est un récapitulatif sans marqueur — soit les **dix
-états à dessiner**.
+support porte **8 marqueurs** `[AJOUT AU SCHÉMA]` (diapos 9, 10, 11, 12, 13, 16,
+17, 20) et l'état 11 est un récapitulatif sans marqueur — soit les **neuf états à
+dessiner**. L'état 10 a été fusionné dans l'état 11 : voir son en-tête.
 
 ⚠ « C'EST LUI QUI PLAFONNE TOUT » A ÉTÉ RETIRÉ DE L'ÉTAT 10 le 2026-10-17, et
 ne doit pas revenir dans le dessin. Le banc `32B-baseline-conventions` rend
@@ -210,7 +210,11 @@ Le schéma cesse d'être une chaîne. **Il se vérifie.**
 
 ---
 
-## État 10 — diapo 21 · le corpus, et les deux cadrans
+## État 10 — FUSIONNÉ DANS L'ÉTAT 11 · ne pas dessiner
+
+⚠ Retiré de la diapositive 21 : le tableau y prend toute la hauteur utile et ce
+bloc était coupé en pleine ligne à la projection. L'état 11 montre déjà le corpus
+en boîte à part et les deux cadrans. Conservé ici pour mémoire uniquement.
 
 ```
   ┌──────────────┐  tout est mesuré contre lui
