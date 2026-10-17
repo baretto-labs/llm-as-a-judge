@@ -20,7 +20,7 @@ Benchmark RAG (Lucene vs GraphRAG-Neo4j) jugé par un LLM entraîné et servi en
 
 ### Chemin critique — ces trois tâches seules décident si l'exposé existe
 
-1. **Reformuler** les 25 diapositives sur 33 encore écrites dans les mots de l'assistant.
+1. **Reformuler** les 23 diapositives sur 31 encore écrites dans les mots de l'assistant.
 2. **Couper** ~12 minutes : le support fait ~32 min de script pour un créneau de 20.
 3. **Dessiner** les dix états du schéma de construction du juge (échafaudage ASCII en place dans
    `demo/CONFERENCE-V2.md`, versions longues dans `demo/SCHEMA-ETATS.md`).

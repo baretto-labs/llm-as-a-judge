@@ -323,8 +323,8 @@ et ne sort jamais ». Retiré du script parlé parce que, dit vingt secondes apr
 - Deux stratégies de RAG, Lucene et Neo4j —
   **aucun moyen de les départager**
 
-- Le seul juge disponible, c'était **moi**,
-  sur des exemples **choisis par moi**
+- Trois rôles, une seule personne : **j'écris, je choisis, je juge** —
+  **un dispositif qui ne peut pas me contredire ne mesure rien**
 
 - Ma crainte : **avancer à l'aveugle.**
 
@@ -565,7 +565,7 @@ Quatre pages, c'est sérieux. Une réponse courte, ça fait négligé.
 **Le même défaut, écrit deux fois** — une version bavarde, une version sèche.
 Si le juge valide plus souvent la bavarde, il note la forme, pas le fond.
 
-**Chez moi : 46 % de faux PASS sur les défauts bavards.**
+**Le test répond : 46 % de faux PASS sur les défauts bavards.**
 
 ```
    CI ─► [ L0 ] ─►  ( LE JUGE ) ─►  thinking · checks · verdict
@@ -608,7 +608,7 @@ Pour un juge, c'est **l'ordre des extraits** qu'on lui donne.
 **Je mélange le contexte — avec une graine tirée de la question**, pour que la
 mesure se rejoue à l'identique.
 
-Ça atténue. Ça ne supprime pas :
+La parade atténue. **Et je sais de combien il reste :**
 **12 verdicts sur 60 basculent au seul réordonnancement.**
 
 ```
@@ -625,9 +625,9 @@ copie comme la vingtième. Pour un juge LLM, ce n'est pas la pile, c'est l'ordre
 des extraits qu'on lui donne dans le contexte.
 
 Ma parade : je mélange les extraits. Mais attention — avec une graine tirée de la
-question, sinon la mesure n'est plus rejouable, et j'en ai fait les frais.
+question, sinon la mesure n'est plus rejouable.
 
-Et je veux être honnête : ça atténue, ça ne supprime pas. Douze verdicts sur
+Et je peux chiffrer ce qui reste. Douze verdicts sur
 soixante basculent au seul réordonnancement, à récupération strictement
 identique.
 
@@ -714,7 +714,7 @@ mesures indépendantes, un même diagnostic.
 
 ---
 
-## Le quatrième, je ne l'ai pas mesuré — et je vous le dis
+## Le quatrième, je le cite — je ne le mesure pas
 
 **L'auto-préférence** : un modèle préfère ce qui ressemble à ce qu'il aurait
 écrit.
@@ -932,7 +932,7 @@ rappel suffit désormais, pas une explication.
 
 ---
 
-## L'étalon, et le biais que j'y ai mis moi-même
+## L'étalon, et la signature que j'y ai trouvée
 
 Il faut des réponses **dont je connais déjà le verdict**.
 200 exemples, 50 **relus en aveugle** : 47 verdicts identiques sur 50.
@@ -943,9 +943,10 @@ Il faut des réponses **dont je connais déjà le verdict**.
 
 Il n'apprend pas à juger. Il apprend à **repérer ma signature.**
 
-Correctif : ajouter l'incise à des réponses en échec.
-Je l'ai mise **en paragraphe isolé**. Nouvelle règle apprise :
-*paragraphe isolé ⇒ échec*. **30 sur 30.**
+Correctif : ajouter l'incise à des réponses en échec, **en paragraphe isolé**.
+Nouvelle règle apprise : *paragraphe isolé ⇒ échec*. **30 sur 30.**
+
+**Corriger un corpus, c'est l'écrire encore — et toute écriture signe.**
 
 <!--
 [À REFORMULER AVEC TES MOTS]
@@ -954,7 +955,7 @@ Pour vérifier un juge, il me faut des réponses dont je connais déjà le verdi
 Donc un étalon : deux cents exemples, cinquante relus en aveugle, quarante-sept
 verdicts identiques sur cinquante.
 
-Et je vous préviens tout de suite : à partir d'ici il y a DEUX jeux, et je ne
+Un point d'attention tout de suite : à partir d'ici il y a DEUX jeux, et je ne
 veux pas que vous les confondiez. Cinquante copies déjà corrigées, qui servent à
 vérifier le juge. Et soixante questions sur ma codebase, qui serviront à comparer
 les deux moteurs. Deux jeux, deux rôles.
@@ -963,7 +964,7 @@ Sa limite, je vous la dois tout de suite : UN relecteur, contre des étiquettes
 écrites par un modèle. C'est la faiblesse la plus sérieuse de tout ce que je vous
 montre.
 
-Et c'est là que je me suis fait avoir.
+Et c'est là que le corpus m'a piégé.
 
 Dix-sept requêtes de mon corpus portaient la même incise : « si tu as le temps,
 dis un mot de X ». Les dix-sept étaient étiquetées PASS. Sans que je m'en rende
@@ -1094,19 +1095,19 @@ d'abord.
 ```
   d'accord avec une référence ?          κ = 0,44
   d'accord avec lui-même ?               même verdict 3 fois sur 5
-  une mesure SANS LLM dit-elle pareil ?  oui, même classement
+  un comptage sans LLM dit-il pareil ?   oui, même classement
 ```
 
-**κ, c'est l'accord une fois retiré ce que le hasard donne.** 0,44, c'est moyen —
-et c'est mesuré contre l'étalon dont je viens de vous dire la limite.
+**κ, c'est l'accord une fois retiré ce que le hasard donne.** 0,44, c'est moyen.
+**Et je le sais, parce que je l'ai mesuré.**
 
 **Je ne lui fais pas confiance sur une copie.
 Je lui fais confiance sur soixante.**
 
-<span class="ref">Ce juge est entraîné sur mon corpus : ça lui donne le format, pas la justesse.</span>
+<span class="ref">Mesuré : l'entraînement achète le format, pas la justesse.</span>
 
-**Assez net pour départager deux moteurs de 25 points** — et une mesure
-qui ne contient aucun LLM les classe pareil.
+**Assez net pour départager deux moteurs de 25 points** — et compter les
+identifiants attendus dans le contexte, sans aucun LLM, les classe pareil.
 
 *Et vous, vous la connaissez, la précision de votre évaluateur ?*
 
@@ -1194,13 +1195,14 @@ Les copies où il **change d'avis** entre trois lectures, je les relis.
 
 **21 relectures au lieu de 50.** Et ça rattrape **7 de ses 12 erreurs.**
 
-**Les 5 autres, il les a rendues trois fois de suite, identiques et fausses.**
-Il n'a pas hésité. **L'hésitation ne les signale pas.**
+**L'hésitation en attrape 7 sur 12.** Les 5 autres, il les rend trois fois
+identiques et fausses — **rejouer le même modèle fait varier l'échantillonnage,
+jamais la compréhension.**
 
 <!--
 [À REFORMULER AVEC TES MOTS]
 
-Bon. Mon juge hésite une fois sur quatre. Mais cette hésitation, je peux m'en
+Bon. Mon juge hésite deux fois sur cinq. Mais cette hésitation, je peux m'en
 servir.
 
 L'idée est simple : les copies où il rend trois fois le même verdict, je lui fais
@@ -1284,7 +1286,7 @@ ce qui autorise une comparaison appariée, et une comparaison appariée est
 beaucoup plus puissante à effectif égal.
 
 Et le mélange du contexte est tiré de la question. Sans ça, la mesure ne se
-rejoue pas — et j'en ai fait les frais : les exécutions de la veille faisaient
+rejoue pas : les exécutions de la veille faisaient
 bouger le même bras de cinquante-six à quarante-trois pour cent.
 
 ==============================================================
@@ -1412,7 +1414,7 @@ Sur les deux autres : **5 piles sur 7, et 6 sur 9. Banal.**
 <!--
 [À REFORMULER AVEC TES MOTS]
 
-Et je veux être honnête sur ce qui conclut.
+Et voilà ce qui conclut.
 
 Par niveau, un seul écart tient : les questions inter-modules. Là, sur les huit
 questions où les deux stratégies ont divergé, Lucene a gagné les huit. Huit piles
@@ -1438,7 +1440,7 @@ la perdre : c'est ce qui distingue ce talk d'une démonstration arrangée.
 
 ---
 
-## Cinq fois, mon banc a mesuré le vide
+## Cinq fois, j'ai pris mon banc à mesurer le vide
 
 Et cinq fois, il a affiché **BUILD SUCCESS**.
 
@@ -1449,7 +1451,8 @@ Deux heures de calcul. 150 réponses plausibles. Et un rapport annonçant
 
 **Publiable tel quel. Entièrement faux.**
 
-Aucune erreur. Aucun avertissement.
+Aucune erreur, aucun avertissement.
+**Ce qui l'a trahi : un détail de style.**
 
 <!--
 [À REFORMULER AVEC TES MOTS]
@@ -1485,14 +1488,14 @@ cryptiques enterrent le signal, qui est le NOMBRE.
 
 ---
 
-## Aucun instrument n'a été juste du premier coup
+## Ce qui a rattrapé chaque instrument
 
-| ce qui devait mesurer | ce qui l'a révélé |
+| ce qui l'a rattrapé | ce qui était faux |
 |---|---|
-| le corpus | un test de permutation, puis **un humain** |
-| le relevé de coût — faux **trois fois** | une comparaison avec le journal |
-| le correctif d'une fuite | le désaccord d'un relecteur |
-| le banc d'essai — **cinq fois** | une sonde avant de lire les chiffres |
+| un test de permutation, puis **un humain** | le corpus |
+| une comparaison avec le journal | le relevé de coût — faux **trois fois** |
+| le désaccord d'un relecteur | le correctif d'une fuite |
+| une sonde avant de lire les chiffres | le banc d'essai — **cinq fois** |
 
 **Chacun a été corrigé parce qu'on a regardé.
 Jamais parce qu'une métrique a protesté.**
@@ -1518,11 +1521,6 @@ où ça m'a mené : quand il hésite, je le vois. Quand il se trompe avec aplomb
 non — et c'est huit fois sur douze. Rejouer le même modèle ne fait varier que
 l'échantillonnage, jamais la compréhension.
 
-Donc ce que je ferais ensuite, ce n'est pas un plus gros modèle. J'ai aussi
-essayé d'entraîner le mien sur mon corpus : ça lui a donné le format, pas la
-justesse. C'est un jury plutôt qu'un juge — des modèles de familles différentes,
-et on relit là où ils se contredisent.
-
 C'est la phrase que je veux que vous reteniez : on construit un juge pour arrêter
 d'avancer à l'aveugle. Mais le juge est lui-même un instrument. Et un instrument,
 ça se vérifie. Sinon on a simplement déplacé l'aveuglement d'un cran.
@@ -1534,7 +1532,7 @@ d'avancer à l'aveugle. Mais le juge est lui-même un instrument. Et un instrume
 
 ---
 
-## Trois choses à faire lundi
+## Trois choses pour vous, une pour moi
 
 **1. Écrivez vos conventions avant tout le reste.**
 Vous l'avez vu : quatre paragraphes, 0 % → 76 %.
@@ -1545,12 +1543,14 @@ Un modèle génère de gauche à droite. L'ordre des champs change tout.
 **3. Exigez une preuve positive avant de dépenser du calcul.**
 Un banc qui ne prouve pas ce qu'il mesure ne mesure rien — silencieusement.
 
-<span class="ref">Corpus, protocole et mesures : le dépôt est partagé.</span>
+**Et moi, ensuite ?** Pas un plus gros modèle — mesuré, **76,0 % contre 76,0 %**.
+Pas un entraînement — il achète le format. **Un jury de familles disjointes :**
+8 erreurs sur 12 sont systématiques, et aucun rejeu ne les verra.
 
 <!--
 [À REFORMULER AVEC TES MOTS]
 
-Trois choses, applicables lundi, sans rien installer.
+Trois choses applicables lundi, sans rien installer. Et une que je garde pour moi.
 
 Un. Écrivez vos conventions avant tout le reste. Vous les avez vues tout à
 l'heure : quatre paragraphes, et mon juge passait de zéro à soixante-seize pour
@@ -1564,6 +1564,16 @@ Trois. Exigez une preuve positive avant de dépenser du calcul. Un banc qui ne
 sait pas prouver qu'il a mesuré la bonne chose ne mesure rien, et il le fait
 silencieusement.
 
+Et moi, ensuite ? Je vous dois une réponse, parce que je vous ai dit de ne pas
+faire juger un modèle par sa propre famille, et mon juge est tout seul.
+
+Ce ne sera pas un plus gros modèle : je l'ai mesuré, soixante-seize contre
+soixante-seize, p égal à un. Ce ne sera pas un entraînement non plus : j'ai
+essayé, ça lui a donné le format, pas la justesse. Ce sera un jury plutôt qu'un
+juge — des modèles de familles différentes, et on relit là où ils se
+contredisent. Parce que huit de ses douze erreurs sont systématiques, et
+qu'aucune répétition du même modèle ne les montrera jamais.
+
 Tout est dans le dépôt : le corpus, le protocole avec ses amendements datés, et
 les générations écartées avec la raison de leur mise à l'écart.
 
@@ -1571,6 +1581,11 @@ les générations écartées avec la raison de leur mise à l'écart.
 
 ⚠ Les trois sont applicables sans budget et sans installation. C'est ce qui en
 fait des actions et pas des conseils.
+
+⚠ Le quatrième bloc n'est pas une action pour la salle, c'est MON plan. Deux
+leviers écartés PAR LA MESURE, un seul retenu — et c'est ce qui l'empêche de
+sonner comme une liste de ce qui manque. Ne jamais le dire comme « il reste
+du travail ».
 -->
 
 ---
@@ -1624,8 +1639,8 @@ ouverte. Si on la vérifie un jour, elle peut y entrer.
 <div class="carte">
 <div class="texte">
 
-Ce talk raconte **cinq mesures qui m'ont menti** parce que personne ne les avait
-regardées.
+Ce talk raconte **cinq mesures prises en flagrant délit** — parce que quelqu'un
+a fini par les regarder.
 
 Alors regardez celle-ci.
 
@@ -1641,8 +1656,8 @@ autrement : **c'est ce qui me sert.**
 
 Une dernière chose, et c'est une demande.
 
-Ce talk raconte cinq mesures qui m'ont menti, simplement parce que personne ne
-les avait regardées. Alors regardez celle-ci.
+Ce talk raconte cinq mesures prises en flagrant délit, parce que quelqu'un a
+fini par les regarder. Alors regardez celle-ci.
 
 Ce qui n'était pas clair, ce qui vous a paru faux, ce que vous auriez fait
 autrement — c'est exactement ce qui me sert. Le QR code est là, il y restera
