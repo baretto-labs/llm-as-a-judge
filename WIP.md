@@ -263,6 +263,21 @@ pas celui qui échoue — « mon banc a mesuré le vide » devient « je l'ai at
 
 ## Fait le 2026-10-17
 
+- **Le juge est validé sur une tâche, et il a tourné sur une autre : la question est désormais armée.**
+  Recompté sur `judge-finetune/data/golden/test.jsonl` (champ `meta.task`, pas `meta.marker`) :
+  **38 CODE_ANALYSIS, 6 RAG_CONTEXT_RELEVANCE, 6 RAG_FAITHFULNESS**. Or le banc RAG tourne à 100 %
+  sur `RAG_CONTEXT_RELEVANCE` — `RagContextJudge.java:35-38` l'écrit noir sur blanc, « les 6 items du
+  golden set ». Donc les 76 %, le κ et la stabilité de la diapositive 21 portent majoritairement sur
+  une tâche que le banc n'exécute pas, et **la justesse sur la tâche réellement exécutée repose sur
+  n = 6**. Ce découpage n'apparaissait nulle part dans le support. Réponse ajoutée en Q&A, placée
+  avant celle du κ dont elle est la version plus tranchante : on ne déclare pas le n = 6, on conclut
+  sur la **comparaison appariée** (même juge, mêmes 60 questions, même exécution), le témoin Lucene
+  invariant et McNemar p = 0,0066. La note sort aussi, si on insiste, le `bruit_maitrise` **50 %**
+  d'accord du fine-tuné — l'un des trois contrôles dont la conjonction fait le 48 % / 24 %. Ce que ça
+  coûte : la valeur absolue des deux taux. Ce que ça ne coûte pas : leur écart. Hors écran, phase de
+  coupe : 31,2 min inchangés. ⚠ Le renommage de la diapositive 24 **augmente** la probabilité de
+  cette question au lieu de la réduire — c'est pourquoi elle est armée dans le même mouvement.
+
 - **La diapositive 24 ne mesurait pas des réponses : la ligne portait un faux nom.**
   Elle affichait « Réponses justes 48 % / 24 % ». Ce chiffre est `passRate`, et `passRate` vaut PASS
   ⟺ les **trois** contrôles de contexte sont vrais — pertinent, suffisant, bruit maîtrisé

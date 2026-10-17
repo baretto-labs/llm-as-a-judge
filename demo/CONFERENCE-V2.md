@@ -1554,6 +1554,10 @@ vous ai décrit la plus simple.
 
 ==============================================================
 
+⚠ SI ON DEMANDE LA JUSTESSE DU JUGE SUR LE CONTEXTE : réponse armée en Q&A,
+« votre juge est validé à 76 % — sur quelle tâche ? ». Le chiffre honnête est
+n = 6 ; ce qui conclut, c'est la comparaison appariée, pas la valeur absolue.
+
 ⚠ `passRate` = PASS ⟺ les TROIS contrôles de contexte vrais
 (`RagContextJudge.java:93-95`) : pertinent, suffisant, bruit maîtrisé. Le banc ne
 génère aucune réponse — aucun appel de chat dans `RetrievalBenchmark.java`. Ne
@@ -2045,6 +2049,27 @@ Toutes les valeurs sont vérifiées ; les sources sont nommées.
    ⚠ Levier mesuré et NÉGATIF, à sortir si on le propose : router sur « un
      contrôle a bougé » au lieu du verdict fait relire 16 copies au lieu de 12
      et rattrape exactement les mêmes 4. Détail dans TRIAGE_POSTHOC.md.
+
+❓ VOTRE JUGE EST VALIDÉ À 76 % — SUR QUELLE TÂCHE, EXACTEMENT ?
+   La question est juste, la prendre de face. Mon étalon de 50 items se répartit
+   en 38 CODE_ANALYSIS, 6 RAG_CONTEXT_RELEVANCE, 6 RAG_FAITHFULNESS
+   (data/golden/test.jsonl, champ meta.task). Le banc RAG, lui, tourne à 100 %
+   sur RAG_CONTEXT_RELEVANCE — RagContextJudge.java:35-38 le dit en clair, « les
+   6 items du golden set ». Donc mes 76 %, mon κ et ma stabilité portent
+   majoritairement sur une tâche que le banc n'exécute pas, et la justesse sur la
+   tâche réellement exécutée repose sur n = 6. Je ne la déclare pas.
+   Ce qui tient quand même, et c'est là-dessus que je conclus : la comparaison
+   est APPARIÉE — même juge, mêmes 60 questions, même exécution. Une
+   complaisance partagée se retranche dans la différence. Témoin invariant :
+   Lucene identique à la décimale sur les trois strates. hintCoverage, sans
+   aucun LLM, classe dans le même sens. McNemar p = 0,0066 sur 24 paires, 19-5.
+   ⚠ À SORTIR SI ON INSISTE, ne pas le laisser trouver : l'accord par contrôle du
+     FINE-TUNÉ — celui qui a tourné le banc — donne bruit_maitrise 50 %, et
+     bruit_maitrise est l'un des trois contrôles dont la conjonction fait le
+     48 % / 24 %. Ce que ça coûte : la valeur absolue des deux taux. Ce que ça ne
+     coûte pas : leur ÉCART, qui est apparié.
+   ⚠ NE PAS promettre la mesure « pour bientôt ». Étiqueter plus d'items RAG est
+     du travail de corpus, pas une case à cocher.
 
 ❓ κ = 0,44, C'EST FAIBLE. COMMENT CONCLUEZ-VOUS QUOI QUE CE SOIT ?
    Je ne conclus pas sur une réponse isolée. Je compare deux moteurs sur les
