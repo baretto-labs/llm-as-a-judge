@@ -1145,8 +1145,8 @@ d'abord.
 κ, c'est l'accord une fois retiré ce que le hasard donne.
 **Ni les conventions ni l'entraînement n'ont amélioré cette colonne.**
 
-**Je ne lui fais pas confiance sur une copie.
-Je lui fais confiance sur soixante.**
+**Sur une copie, je ne distingue pas son jugement de son tirage.
+Ce qui conclut, c'est l'écart entre deux moteurs jugés par le même juge.**
 
 *Et vous, vous la connaissez, la précision de votre évaluateur ?*
 
@@ -1193,12 +1193,11 @@ mon juge, pas de mon corpus.
 Et la dernière colonne : zéro. La taille n'achète pas le schéma. L'entraînement,
 lui, l'achète en entier.
 
-Et ça compte pour la suite : c'est la troisième ligne qui a tourné sur le banc
-que je vais vous montrer.
-
-Donc je ne lui fais pas confiance sur une copie. Si je lui en soumets une seule
-et qu'il répond PASS, je ne sais pas si c'est son jugement ou son tirage. Sur
-soixante questions, le bruit se moyenne — et c'est comme ça que je l'utilise.
+Donc, sur une copie, je ne sais pas si c'est son jugement ou son tirage. Et
+répéter ne suffit pas : vous verrez tout à l'heure que deux tiers de ses erreurs
+reviennent identiques. Ce que j'exploite, ce n'est pas une moyenne, c'est un
+écart : deux moteurs, le même juge, les mêmes questions. Ce qu'il a de
+complaisant, il l'est des deux côtés.
 
 Et vous, vous la connaissez, la précision de votre évaluateur ?
 
@@ -1210,6 +1209,14 @@ rendu, 1 diapo sur 31). Le corpus en boîte à part et les deux cadrans du juge
 sont déjà dans l'état 11 de `SCHEMA-ETATS.md`, qui est un sur-ensemble — ne pas
 dessiner deux fois. Si un visuel revient ici un jour, c'est une image
 dimensionnée, jamais du texte préformaté.
+
+⚠ NE JAMAIS REVENIR À « SUR SOIXANTE, LE BRUIT SE MOYENNE ». La diapositive 22
+démontre l'inverse : 8 erreurs sur 12 sont rendues trois fois identiques, parce
+que rejouer le même modèle fait varier l'échantillonnage, jamais la
+compréhension. Un biais systématique ne se moyenne pas. Ce qui conclut est la
+comparaison APPARIÉE, où une complaisance partagée se retranche. Accessoirement
+« soixante » désignait le banc alors que la ligne mesure l'étalon de 50 — deux
+diapositives après « deux jeux, deux rôles ».
 
 ⚠ NE PAS RÉINTRODUIRE LE κ COMME SUJET. Il se donne en une phrase, en réponse à
 la question posée juste avant — jamais enseigné. Il est faible et mesuré contre

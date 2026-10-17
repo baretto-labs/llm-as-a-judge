@@ -263,6 +263,18 @@ pas celui qui échoue — « mon banc a mesuré le vide » devient « je l'ai at
 
 ## Fait le 2026-10-17
 
+- **« Sur soixante, le bruit se moyenne » était contredit par la diapositive 22 ; remplacé par l'argument apparié.**
+  La diapositive 21 justifiait la confiance par une moyenne ; quatre diapositives plus loin le support
+  démontre que **8 erreurs sur 12 sont rendues trois fois identiques**, parce que rejouer le même
+  modèle fait varier l'échantillonnage et jamais la compréhension. Un biais systématique ne se
+  moyenne pas : il traverse intégralement le 48 % et le 24 %. L'écran dit désormais « sur une copie,
+  je ne distingue pas son jugement de son tirage ; ce qui conclut, c'est l'écart entre deux moteurs
+  jugés par le même juge ». Deux défauts accessoires réglés au passage : « soixante » désignait le
+  banc alors que la ligne mesure l'étalon de 50, et le mot fautif était *bruit*, pas l'usage. Payé en
+  supprimant « c'est la troisième ligne qui a tourné sur le banc », redite trois diapositives plus
+  loin au meilleur endroit, juste à côté des chiffres : **4374 → 4369 mots**, cinq de gagnés. Re-mesure
+  du rendu après coup : 0 diapositive sur 31 ne touche le bord bas.
+
 - **Le juge est validé sur une tâche, et il a tourné sur une autre : la question est désormais armée.**
   Recompté sur `judge-finetune/data/golden/test.jsonl` (champ `meta.task`, pas `meta.marker`) :
   **38 CODE_ANALYSIS, 6 RAG_CONTEXT_RELEVANCE, 6 RAG_FAITHFULNESS**. Or le banc RAG tourne à 100 %
