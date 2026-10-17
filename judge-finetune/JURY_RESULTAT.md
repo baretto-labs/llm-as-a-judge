@@ -137,7 +137,7 @@ autour du faux*. Elle ne peut donc pas attraper ces trois-là, et la mesure de
 ⚠ Ce qui reste limité : n = 3 et post hoc. La lecture ferme la question
 « corpus ou modèle ? » — c'est le modèle — mais elle ne mesure pas la fréquence
 du motif, et aucun test n'a été construit pour lui. C'est une **piste outillable**
-(un jeu apparié *faux dense* / *faux nu*), pas un résultat chiffré.
+(un jeu apparié *erreur bien entourée* / *erreur nue*), pas un résultat chiffré.
 
 ## Ce que cela change dans l'exposé
 

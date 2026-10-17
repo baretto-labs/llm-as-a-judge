@@ -1495,7 +1495,7 @@ judge-finetune/JURY_RESULTAT.md.
   ⚠ Limites, si on insiste : n = 3, post hoc. La lecture tranche « corpus ou
   modèle » — c'est le modèle — mais elle ne mesure pas la fréquence du motif.
   Aucun test ne le couvre aujourd'hui. Piste outillable : un jeu apparié
-  faux dense / faux nu. C'est une piste, pas un chiffre.
+  erreur bien entourée / erreur nue. C'est une piste, pas un chiffre.
 
 ⚠ Le curseur, si on demande : la variante fine-tunée est plus instable, elle
 envoie 21 copies à l'humain au lieu de 12, et rattrape 7 désaccords sur 12 au
@@ -1809,7 +1809,7 @@ Un banc qui ne prouve pas ce qu'il mesure ne mesure rien — silencieusement.
 **Et moi, ensuite ?** Je vous ai dit de ne pas faire juger un modèle par sa
 famille. Je l'ai fait : **2 erreurs sur 8**, et la même complaisance.
 
-**Ce n'est pas la famille** — c'est le faux dense.
+**Ce n'est pas la famille** — c'est l'erreur bien entourée.
 
 <!--
 [À REFORMULER AVEC TES MOTS]
@@ -1871,8 +1871,27 @@ Appliquée sans renégociation. Détail complet dans judge-finetune/JURY_RESULTA
   6 des 12 désaccords pour 18 relectures, contre 4 pour 12 au triage seul.
   Descriptif, et ce n'était pas la question posée.
 
-⚠ « LE FAUX DENSE » est un terme maison, il n'existe dans aucune littérature.
-Ne pas le présenter comme un concept établi. Ce qu'il désigne est mesuré et lu :
+⚠ « L'ERREUR BIEN ENTOURÉE » est un terme maison. Le mot est choisi pour être
+défini par la phrase qui le suit sur scène — « une phrase fausse, entourée de
+paragraphes justes » — donc raconter d'abord, nommer ensuite. Ne PAS le
+présenter comme un concept établi.
+  OÙ ÇA SE SITUE DANS LA LITTÉRATURE, vérifié le 2026-10-17. Le phénomène
+  appartient à une famille déjà nommée et mesurée :
+    · « style over substance » — un juge préfère une réponse bien écrite et
+      fausse à une réponse moins soignée et juste. Feuer et al. 2024 (SOS-Bench),
+      Doddapaneni et al. 2024.
+    · « authority bias » — un juge récompense les références et les tournures
+      formelles.
+    · le plus proche : un juge favorise les DÉTAILS CONCRETS (chiffres, termes
+      techniques, identifiants) SANS vérifier qu'ils sont corrects. C'est
+      exactement ce que les trois items exploitent : toArray(new String[0]),
+      lockInterruptibly, getMonth() indexé à zéro — tout exact, et c'est ça qui
+      fait passer le faux.
+  CE QUI RESTE PROPRE À CE TRAVAIL, et c'est la position à tenir : aucune de ces
+  études ne fait varier la JUSTESSE DE L'ENTOURAGE. Elles font varier le style,
+  le ton, la longueur. Donc : « je n'invente pas un phénomène, j'ajoute un
+  mécanisme à une famille connue. » Ne jamais revendiquer la découverte du biais
+  lui-même — quelqu'un dans la salle connaît SOS-Bench. Ce qu'il désigne est mesuré et lu :
 les trois items que les QUATRE configurations ratent portent une affirmation
 centrale fausse entourée de développements annexes exacts. Lus le 2026-10-17,
 l'étalon a raison dans les trois cas — ce n'est pas un défaut de corpus. Détail,
@@ -1881,9 +1900,9 @@ parlée dans les notes de la diapositive 22.
   La distinction qui tient le terme : le biais de la diapositive 11 joue sur la
   LONGUEUR, celui-ci sur la DENSITÉ DE VRAI AUTOUR DU FAUX. Le test apparié
   actuel fait varier la longueur à défaut égal, il ne peut donc pas couvrir ces
-  trois-là. Piste outillable annoncée sur scène : un jeu apparié faux dense /
-  faux nu. ⚠ C'est une piste, pas un chiffre. n = 3, post hoc, fréquence non
-  mesurée.
+  trois-là. Piste outillable annoncée sur scène : un jeu apparié erreur bien
+  entourée / erreur nue. ⚠ C'est une piste, pas un chiffre. n = 3, post hoc,
+  fréquence non mesurée.
 
 ⚠ « VOS MODÈLES SONT TROP PETITS POUR LA TÂCHE » — l'objection la plus forte du
 talk, et ce sont tes propres chiffres qui l'alimentent : dans la table post hoc,

@@ -278,14 +278,14 @@ pas celui qui échoue — « mon banc a mesuré le vide » devient « je l'ai at
   forme adulte : la parade appariée de la diapositive 11 fait varier la **longueur** à défaut égal,
   pas la **densité de vrai autour du faux**. Elle ne peut pas couvrir ces trois-là, et les 46 % de
   faux PASS sur défauts bavards ne parlent pas d'eux. Piste outillable, **non mesurée** : un jeu
-  apparié *faux dense* / *faux nu*. n = 3, post hoc, fréquence inconnue.
+  apparié *erreur bien entourée* / *erreur nue*. n = 3, post hoc, fréquence inconnue.
 
 - **Les diapositives 14 et 29 sont recalées — la dette est passée d'un plan à un résultat.** La 14
   ouvre une dette en une ligne (« mon juge est tout seul, j'y reviens à la fin ») que la 29
   remboursait par « un jury de familles disjointes ». Le jury ayant rendu 2/8, c'était faux à
   l'écran. **La 14 ne bouge pas d'un mot** — elle parle de famille, et la nouvelle conclusion aussi.
   La 29 dit désormais « je vous l'ai dit, alors je l'ai fait : 2 erreurs sur 8, et la même
-  complaisance. Ce n'est pas la famille — c'est le faux dense », et se ferme sur « pas un modèle de
+  complaisance. Ce n'est pas la famille — c'est l'erreur bien entourée », et se ferme sur « pas un modèle de
   plus, un test de plus ».
 
 - **L'objection « vos modèles sont trop petits » est armée hors écran**, avec cinq réponses dans
