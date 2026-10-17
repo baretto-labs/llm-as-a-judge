@@ -1137,13 +1137,15 @@ d'abord.
 | **invite nue** | 0 % | 0,00 | 0 % | 0 % |
 | **+ 4 conventions** | **76 %** | 0,48 | **76 %** | 0 % |
 | **+ entraînement** | **76 %** | 0,44 | 58 % | **100 %** |
-| **+ un modèle 32B** | **90 %** | **0,80** | **92 %** | 0 % |
+| **+ un modèle 32B** | 90 % | **0,80** | 92 % | 0 % |
 
 **Quatre paragraphes achètent l'essentiel de la justesse.
 91 minutes d'entraînement n'achètent qu'une colonne — la dernière.**
 
 κ, c'est l'accord une fois retiré ce que le hasard donne.
-**Ni les conventions ni l'entraînement n'ont amélioré cette colonne.**
+**Entraîner n'a pas amélioré cette colonne.**
+
+<span class="ref">4ᵉ ligne : contrôle de plafond, pas comparaison de justesse — 38 copies justes sur 50 contre 45.</span>
 
 **Sur une copie, je ne distingue pas son jugement de son tirage.
 Ce qui conclut, c'est l'écart entre deux moteurs jugés par le même juge.**
@@ -1209,6 +1211,13 @@ rendu, 1 diapo sur 31). Le corpus en boîte à part et les deux cadrans du juge
 sont déjà dans l'état 11 de `SCHEMA-ETATS.md`, qui est un sur-ensemble — ne pas
 dessiner deux fois. Si un visuel revient ici un jour, c'est une image
 dimensionnée, jamais du texte préformaté.
+
+⚠ LA 4ᵉ LIGNE N'EST PAS EN GRAS, et ne doit pas le redevenir : sous une légende
+« ce que chaque version achète », trois cellules grasses se lisent comme un
+classement — précisément ce que la note ci-dessous interdit de dire. Le κ 0,80
+reste gras, c'est la seule cellule qui désamorce le piège κ.
+⚠ La colonne accord a bien été améliorée par les CONVENTIONS (0,00 → 0,48) : ne
+pas réécrire « ni les conventions ni l'entraînement », c'était faux à l'écran.
 
 ⚠ NE JAMAIS REVENIR À « SUR SOIXANTE, LE BRUIT SE MOYENNE ». La diapositive 22
 démontre l'inverse : 8 erreurs sur 12 sont rendues trois fois identiques, parce

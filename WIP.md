@@ -263,6 +263,21 @@ pas celui qui échoue — « mon banc a mesuré le vide » devient « je l'ai at
 
 ## Fait le 2026-10-17
 
+- **La 4ᵉ ligne du tableau de la diapositive 21 n'est plus en gras, et une phrase fausse est corrigée.**
+  Sous une légende « ce que chaque version achète », les trois cellules grasses de `+ un modèle 32B`
+  (90 %, 0,80, 92 %) se lisaient comme un classement — exactement ce que la note de la diapositive
+  interdit de dire (« NE PAS DIRE : la taille améliore la justesse »). Dégraissées, sauf **κ 0,80**
+  qui reste la seule cellule désamorçant le piège κ. Ajouté en `.ref` ce que la note dit déjà :
+  « contrôle de plafond, pas comparaison de justesse — 38 copies justes sur 50 contre 45 ».
+  ⚠ **La proposition de l'audit d'afficher « non concluant » a été écartée**, et c'est volontaire : la
+  note tranche depuis le 2026-10-17 que la 4ᵉ ligne est un **contre-exemple d'existence** contre
+  « le corpus plafonne à 76 % », qu'on ne teste pas l'existence et que le script ne prononce donc ni
+  valeur-p ni « non concluant ». Décision antérieure, mieux argumentée, conservée.
+  Trouvé au passage et corrigé : l'écran affirmait « **Ni les conventions ni l'entraînement** n'ont
+  amélioré cette colonne » alors que le tableau juste au-dessus montre l'accord passer de **0,00 à
+  0,48** avec les conventions. Devenu « Entraîner n'a pas amélioré cette colonne », qui est vrai
+  (0,48 → 0,44). 31,2 min inchangés, 0 diapositive sur 31 ne touche le bord bas.
+
 - **« Sur soixante, le bruit se moyenne » était contredit par la diapositive 22 ; remplacé par l'argument apparié.**
   La diapositive 21 justifiait la confiance par une moyenne ; quatre diapositives plus loin le support
   démontre que **8 erreurs sur 12 sont rendues trois fois identiques**, parce que rejouer le même
