@@ -239,13 +239,10 @@ sur l'ordonnance elle-même.
 Azar, 925 F.3d 1291. Le modèle n'a pas tiré un numéro au hasard, il en a produit
 un plausible juste à côté d'un vrai. C'est exactement le propos de la diapo.
 
-⚠ « La même question admet dix bonnes réponses » a été retiré d'ici : c'est un
-argument tourné vers l'avant, pas une explication de ce qui s'est passé. VÉRIFIÉ
-le 2026-10-13 : l'idée n'est désormais écrite NULLE PART ailleurs dans le
-support. Elle reste portée implicitement par le deuxième point (« une réponse
-juste formulée autrement est pénalisée »). À remettre explicitement sur la diapo
-« Comment mesurer… » si la question « pourquoi ne pas juste comparer à la réponse
-attendue ? » revient.
+⚠ « La même question admet dix bonnes réponses » n'est écrite nulle part dans le
+support ; le deuxième point la porte implicitement. À dire explicitement sur
+« Comment mesurer… » si on demande « pourquoi ne pas comparer à la réponse
+attendue ? ».
 -->
 ---
 
@@ -307,11 +304,9 @@ que c'est un chatbot, la qualité vient du modèle ; dès qu'il lit le workspace
 elle vient d'abord de ce que la récupération a rapporté. Ralentir sur cette
 phrase.
 
-⚠ TRANCHÉ le 2026-10-14 : OllamAssist PEUT faire une recherche internet, mais
-c'est OPTIONNEL et désactivé par défaut. Formulation exacte à employer partout :
-« peut tourner entièrement hors-ligne », jamais « tourne entièrement hors-ligne
-et ne sort jamais ». Retiré du script parlé parce que, dit vingt secondes après
-« il tourne entièrement en local », ça se lisait comme une contradiction.
+⚠ OllamAssist PEUT faire une recherche internet : optionnelle, désactivée par
+défaut. Dire « peut tourner entièrement hors-ligne », jamais « tourne entièrement
+hors-ligne et ne sort jamais ».
 
 ⚠ Le tunnel et la peur d'avancer à l'aveugle appartiennent à la diapo suivante
 (« Comment mesurer… »), qui est construite dessus. Ne pas les dire ici.
@@ -707,12 +702,8 @@ recalé, c'est juste une relecture inutile.
 qui le mesure — une boîte en aval, avec deux cadrans : les décisions justes, et
 les erreurs attrapées.]
 
-⚠ RE-TRANCHÉ le 2026-10-17, dans l'AUTRE SENS : tout le support parle désormais
-du juge À CONVENTIONS, de bout en bout. L'arbitrage du 2026-10-14 disait
-l'inverse ; il est annulé parce qu'il laissait les diapositives 22 et 29 se
-contredire sur la même quantité, et parce que la mesure montre que son motif ne
-coûtait presque rien ici. Mesuré le 2026-10-17 sur results/runs/, la matrice
-publiée (16/11/22) étant reproduite à l'identique comme contrôle de lecture :
+⚠ TOUT LE SUPPORT PARLE DU JUGE À CONVENTIONS, de bout en bout. Ne pas mélanger
+les deux variantes d'une diapositive à l'autre. Mesuré sur results/runs/ :
 
   |                        | fine-tuné | À CONVENTIONS |
   | matrice                | 16/11/22  | 17/10/21      |
@@ -721,18 +712,13 @@ publiée (16/11/22) étant reproduite à l'identique comme contrôle de lecture 
   | taux de PASS (150 passes)| 64 %    | 65 %          |
   | justesse               | 76 %      | 76 %          |
 
-Aucun chiffre ne bouge de plus de 4 points et le message est intact. La crainte
-du 2026-10-14 portait sur κ 0,48 et stabilité 76 %, qui diffèrent VRAIMENT entre
-les deux juges — l'indulgence, non.
+Aucun chiffre ne bouge de plus de 4 points : l'indulgence est la même. Ce qui
+diffère VRAIMENT entre les deux juges, c'est κ 0,48 contre 0,44 et la stabilité.
 
-⚠ CE QUI RESTE À FAIRE, ET C'EST ÉDITORIAL : le banc RAG a tourné avec le juge
-FINE-TUNÉ (REX_TRAME l.110, « 14B fine-tuné au checkpoint 200 »). Le support ne
-le dit nulle part à l'écran. Il faut donc une phrase à « Le résultat », et elle
-est déjà gagée par le tableau de la 21 : les deux juges rendent 76 % contre 76 %,
-p = 1,0000 — indiscernables en justesse. Formulation proposée, à valider :
-« le banc a tourné avec la variante entraînée ; sur l'étalon les deux sont
-indiscernables, 76 % contre 76 % — je vous décris la plus simple. »
-⚠ L'alternative — rejouer le banc RAG avec le juge à conventions — est
+⚠ LE BANC RAG A TOURNÉ AVEC LE JUGE FINE-TUNÉ, et la diapositive « Le résultat »
+le dit à l'écran. Les deux juges rendent 76 % contre 76 %, p = 1,0000 :
+indiscernables EN JUSTESSE, pas en alignement (κ 0,48 contre 0,44).
+⚠ Rejouer le banc avec le juge à conventions — rejouer le banc RAG avec le juge à conventions — est
 IMPOSSIBLE hors-ligne, mesuré le 2026-10-17. `RetrievalBenchmark.java:447-449`
 stocke `generated` **non mélangé et tronqué à 3000** caractères, là où le juge
 recevait l'ordre mélangé par `question.hashCode()` tronqué à **6000**. Le prompt
@@ -740,8 +726,7 @@ réellement jugé n'est donc pas reconstituable. Et la perte est asymétrique :
 **118/120 contextes Lucene amputés (98 %)** contre 4/120 côté Neo4j — rejuger ne
 comparerait plus que 2 items Lucene à 116 Neo4j. Il faudrait rejouer la
 RÉCUPÉRATION entière (Java + Lucene + Neo4j), hors chemin critique.
-→ Donc la phrase éditoriale ci-dessus n'est pas une commodité : c'est la seule
-  option. Elle est gagée par 76 % contre 76 %, p = 1,0000.
+→ La phrase à l'écran n'est donc pas une commodité : c'est la seule option.
 
 ⚠ QUEL ESTIMATEUR, si on ouvre le dépôt — vérifié le 2026-10-17. L'écran dit
 76 % ; `results/report.md` affiche DEUX chiffres pour la même variante :
@@ -796,17 +781,14 @@ tout seul. Gardez-le en tête, j'y reviens à la fin.
 
 ==============================================================
 
-⚠ LA DETTE OUVERTE ICI SE PAIE EN CONCLUSION — PAR UNE MESURE, PAS PAR UN PLAN
-(recalé le 2026-10-17). Dix mots posés tôt pour que la fin soit un remboursement
-et pas une idée qui tombe du ciel. La version précédente la remboursait par
-« un jury, pas un juge ». Le jury a tourné le 2026-10-17 : 2 sur 8, bande ≤ 3/8,
-il ne peut donc plus être annoncé comme la suite. Ce qui le remplace parle
-TOUJOURS DE FAMILLE — « je vous l'ai dit, alors je l'ai fait, et ce n'est pas la
-famille » — donc **cette phrase reste valable telle quelle**. Ne la retirer que
-si la conclusion cesse de parler de famille.
+⚠ LA DETTE OUVERTE ICI SE PAIE EN CONCLUSION — PAR UNE MESURE, PAS PAR UN PLAN.
+Dix mots posés tôt pour que la fin soit un remboursement et pas une idée qui
+tombe du ciel. La conclusion la rembourse en parlant TOUJOURS DE FAMILLE — « je
+vous l'ai dit, alors je l'ai fait, et ce n'est pas la famille ». Ne retirer cette
+phrase que si la conclusion cesse de parler de famille.
 
-⚠ RÉSOLU le 2026-10-14 — la question « votre juge est-il de la même famille que
-ce qu'il juge ? » a une réponse nette : NON, pas dans les résultats publiés.
+⚠ « VOTRE JUGE EST-IL DE LA MÊME FAMILLE QUE CE QU'IL JUGE ? » — NON, pas dans
+les résultats publiés.
 Le juge est Qwen2.5-Coder-14B. Le seul autre Qwen du pipeline est
 `rag.hyde.model = qwen2.5:7b` (Neo4jGraphRagStrategy.java:87), et il N'A PAS
 TOURNÉ : ligne 246, le modèle HyDE n'est branché que si le reranking est actif,
@@ -920,9 +902,8 @@ d'échec et aucune idée de quoi corriger.
 [AJOUT AU SCHÉMA : le contexte récupéré entre DANS le juge, pas seulement dans
 l'assistant. Et la sortie du juge se décompose.]
 
-⚠ RÉDUITE le 2026-10-15 à ses trois questions : les trois entrées du juge
-étaient déjà montrées ET dites à la diapositive 7, neuf diapositives plus tôt.
-Ne pas les réintroduire ici.
+⚠ Ne pas réintroduire ici les trois ENTRÉES du juge : déjà montrées et dites
+diapositive 7. Cette diapositive ne porte que ses trois QUESTIONS.
 
 ⚠ C'est ce qui permettra, plus tard, de dire que Neo4j souffre d'un défaut de
 rappel — 66 % de contextes jugés insuffisants contre 40 % — et pas d'un problème
@@ -1237,12 +1218,9 @@ Et vous, vous la connaissez, la précision de votre évaluateur ?
 son propre cadran. Et DEUX cadrans sur le juge, pas un : l'alignement et la
 stabilité.]
 
-⚠ DÉMOTION DU κ, 2026-10-14. La diapositive de pédagogie du κ (« mesurer un
-accord, c'est enlever le hasard ») a été SUPPRIMÉE, et celle-ci ne l'enseigne
-plus : elle le donne en une phrase, comme réponse à une question posée juste
-avant. Motif : le κ portait deux diapositives, il est faible, et il est mesuré
-contre un étalon fragile — il donnait à tout l'exposé une couleur d'excuse. Ne
-pas le réintroduire comme sujet.
+⚠ NE PAS RÉINTRODUIRE LE κ COMME SUJET. Il se donne en une phrase, en réponse à
+la question posée juste avant — jamais enseigné. Il est faible et mesuré contre
+un étalon fragile : en faire un sujet donne à tout l'exposé une couleur d'excuse.
 
 ⚠ LE TABLEAU, posé le 2026-10-17. Source : REX_TRAME.md:257 — banc du juge du
 2026-09-24, 450 générations, 50 items, 3 passes, T = 0,2, bootstrap 10 000.
@@ -1261,9 +1239,9 @@ pré-enregistrement de la seconde relecture a tranché : « il ne peut pas servi
 plafond » (PREENREGISTREMENT_RELECTURE2.md). L'y mettre réintroduirait à l'écran
 l'erreur corrigée le 2026-10-13.
 
-⚠ hintCoverage a QUITTÉ cette diapositive le 2026-10-17. Il vit sur « Le
-résultat », à sa place, avec la comparaison des deux moteurs. Il y corrobore un
-CLASSEMENT — ne jamais dire qu'il valide le juge.
+⚠ hintCoverage n'est pas ici : il vit sur « Le résultat », avec la comparaison
+des deux moteurs. Il y corrobore un CLASSEMENT — ne jamais dire qu'il valide
+le juge.
 
 ⚠ Les chiffres hors écran, si on demande : κ 0,48 IC [0,29 — 0,66] pour la
 variante À CONVENTIONS, celle que raconte le support depuis l'arbitrage du
@@ -1279,10 +1257,10 @@ validation_entree 100 %,
 contexte_pertinent 89 %, absence_invention 83 %, format_impose 33 %,
 bruit_maitrise 50 %.
 
-⚠ QUATRIÈME LIGNE TOMBÉE le 2026-10-17, et la lecture pré-déclarée est appliquée
-telle quelle. `32B-baseline-conventions` : même invite, mêmes conventions, mêmes
-50 items, 3 passes — seule la TAILLE change. Paire pré-déclarée dans
-configs/variants.json, « effet de la taille, à conventions identiques ».
+⚠ LA QUATRIÈME LIGNE. `32B-baseline-conventions` : même invite, mêmes
+conventions, mêmes 50 items, 3 passes — seule la TAILLE change. Paire
+pré-déclarée dans configs/variants.json, « effet de la taille, à conventions
+identiques », et la lecture pré-déclarée est appliquée telle quelle.
 
   justesse stricte (vote majoritaire)   90 %   contre 76 %
   accord κ moyen                        0,80   contre 0,48   IC95 [0,64 ; 0,93]
@@ -1292,7 +1270,7 @@ configs/variants.json, « effet de la taille, à conventions identiques ».
   Écart apparié produit par le harnais : Δ justesse = +14,0 points,
   IC95 bootstrap [+2,0 ; +26,0], McNemar p = 0,0654, 11 paires discordantes.
 
-CE QUI EST DIT SUR SCÈNE, ARBITRÉ LE 2026-10-17 AU SOIR : **le contrôle de
+CE QUI EST DIT SUR SCÈNE : **le contrôle de
 plafond, pas la comparaison de justesse.** « Le corpus plafonne à 76 % » est une
 affirmation UNIVERSELLE ; un seul contre-exemple la détruit, et 90 % sur le même
 corpus avec la même invite en est un. **Cela ne demande aucun test** — on ne
@@ -1358,15 +1336,9 @@ Réponse courte si on insiste : « les deux s'appellent kappa et ne mesurent pas
 même chose ; l'accord entre deux humains sur cette grille, je ne l'ai pas encore —
 la seconde relecture est pré-enregistrée. »
 
-⚠ CE QUE CETTE LIGNE A COÛTÉ À L'ÉCRAN, à relire quand tu reformuleras. Trois
-affirmations devenaient fausses et ont été corrigées le 2026-10-17 :
-  — « Quatre paragraphes achètent TOUTE la justesse » → « l'essentiel de » (76 sur 90) ;
-  — « Aucun des DEUX leviers n'a amélioré cette colonne » → « ni les conventions
-    ni l'entraînement », parce qu'un troisième levier l'a améliorée : κ 0,80 ;
-  — le script disait « les TROIS versions » et « la justesse ne bouge plus après la
-    deuxième ligne ». Corrigé en quatre versions, et « entre la deuxième et la
-    troisième ».
-L'hypothèse de plafond est donc ABANDONNÉE : le corpus ne plafonne pas à 76 %,
+⚠ À RELIRE QUAND TU REFORMULERAS : il y a QUATRE versions, pas trois, et les
+conventions achètent « l'essentiel de » la justesse, pas « toute » (76 sur 90).
+L'hypothèse de plafond est ABANDONNÉE : le corpus ne plafonne pas à 76 %,
 puisqu'un modèle plus gros atteint 90 % sur le même corpus. Mais l'écart n'est pas
 déclarable à n = 50. Les deux phrases tiennent ensemble, et c'est tout le propos.
 
@@ -1417,12 +1389,9 @@ le reste de la copie est impeccable. Mon juge a noté l'entourage.
 
 ==============================================================
 
-⚠ ARBITRÉ LE 2026-10-17 — cette diapositive montrait le juge FINE-TUNÉ (29/21,
-7 sur 12) alors que les quatre preuves du REX, la 29 et les notes ci-dessous
-parlaient toutes du juge À CONVENTIONS. Le support raconte désormais le juge à
-conventions de bout en bout. Ce qui change : 12 relectures au lieu de 21, et 4
-désaccords rattrapés au lieu de 7. Les deux chiffres étaient vrais, d'un juge
-différent. Si on demande pourquoi moins : voir le curseur, plus bas.
+⚠ LES CHIFFRES SONT CEUX DU JUGE À CONVENTIONS : 12 relectures, 4 désaccords
+rattrapés. Ne pas confondre avec le fine-tuné, qui donne 21 et 7 — vrais aussi,
+mais d'un autre juge. Si on demande pourquoi moins : voir le curseur, plus bas.
 
 ⚠ MESURE A POSTERIORI, pas pré-enregistrée. Le dire si on insiste. Tout est
 consigné dans judge-finetune/TRIAGE_POSTHOC.md, méthode et limites comprises.
@@ -1591,27 +1560,18 @@ vous ai décrit la plus simple.
 
 ==============================================================
 
-⚠ « CONTEXTE JUGÉ INSUFFISANT » : 40 % / 66 %, ET C'EST LA SOURCE PUBLIÉE.
-Une « correction » du 2026-10-17 l'avait passée à 43 % / 67 % — elle est ANNULÉE,
-elle était fausse. Elle recomptait sur `rag-quality-detail.jsonl` les **60**
-lignes, invalides comprises, alors que le code exclut les invalides :
-`RagQualityEvaluation.ligneSynthese` divise par `valides`, jamais par `js`.
-La source de TOUS les autres chiffres de cette diapositive est
-`benchmarks/rag-quality.jsonl`, scénario `hybrid|hybrid`, ligne `difficulty ALL` :
+⚠ LES QUATRE CHIFFRES VIENNENT D'UNE SEULE LIGNE : `benchmarks/rag-quality.jsonl`,
+scénario `hybrid|hybrid`, `difficulty ALL`, invalides EXCLUS.
     lucene  n=58  invalid=2  justes 0,483  ctx insuffisant 0,397  hint 0,697
     neo4j   n=59  invalid=1  justes 0,237  ctx insuffisant 0,661  hint 0,596
-→ 48/24 et 40/66 viennent de la MÊME ligne, au MÊME dénominateur. La
-  « correction » en laissait deux sur une seule diapositive, et elle contredisait
-  les notes des diapos 13 et 31, restées à 66 % contre 40 %.
-→ Elle se trompait aussi de sens : 40/66 fait 26 points d'écart, 43/67 en fait 24.
-  Elle RÉDUISAIT l'écart, elle ne le flattait pas.
+Ne jamais recalculer depuis `rag-quality-detail.jsonl` sans exclure les
+invalides : `ligneSynthese` divise par `valides`, jamais par `js`, et compter les
+60 lignes donne 43/67 au lieu de 40/66.
 
-⚠ UN ITEM NON RÉCONCILIÉ — à dire si on insiste, pas à afficher. En recomptant à
-la main sur le détail en excluant correctement les invalides, Neo4j tombe pile
-(39/59 = 0,661) mais Lucene donne 24/58 = 0,414, soit UN item de plus que les
-23/58 = 0,397 du fichier de synthèse. Un item sur 58 : ne change ni le classement
-ni « quatre fois sur dix ». Ne pas réafficher 41 % tant que l'item n'est pas
-trouvé — l'écrit publié reste 40 %.
+⚠ UN ITEM NON RÉCONCILIÉ, à dire si on insiste. Recompté à la main sur le détail,
+Neo4j tombe pile (39/59 = 0,661) mais Lucene donne 24/58 = 0,414 contre 23/58 =
+0,397 à la synthèse. Un item sur 58 : ne change ni le classement ni « quatre fois
+sur dix ». Ne pas afficher 41 % tant que l'item n'est pas trouvé.
 
 ⚠ « VINGT-CINQ POINTS » DANS LE SCRIPT EST JUSTE, ne pas le « corriger » en 24.
 Sur les taux bruts : 0,483 − 0,237 = 24,6 points. Le 24 vient des arrondis
@@ -1684,14 +1644,13 @@ pas le même correctif.
 
 ==============================================================
 
-⚠ CORRIGÉ le 2026-10-14 après audit : le sens de l'ablation était inversé. La
-diapositive « Le résultat » affiche 23,7 % — c'est `hybrid|hybrid`, le contrôle
-d'équité, SANS expansion des deux côtés. Donc ici on AJOUTE l'expansion, on ne
-la retire pas, et Neo4j PERD 1,7 point. Les deux lignes de REX_TRAME :
+⚠ LE SENS DE L'ABLATION, facile à inverser. « Le résultat » affiche 23,7 % —
+c'est `hybrid|hybrid`, le contrôle d'équité, SANS expansion des deux côtés. Ici
+on AJOUTE l'expansion, on ne la retire pas, et Neo4j PERD 1,7 point. Les deux
+lignes de REX_TRAME :
   hybrid|hybrid-graph  (avec K-hop)  22,0 %  +26,3 pts  p 0,0041  25 discordantes
   hybrid|hybrid        (sans K-hop)  23,7 %  +24,6 pts  p 0,0066  24 discordantes
-Avant correction, la salle ne pouvait pas calculer le 1,7 : les 22,0 % n'étaient
-affichés nulle part.
+Les 22,0 % sont à l'écran : sans eux, la salle ne peut pas calculer le 1,7.
 
 ⚠ C'est la diapositive qui rend tout le reste défendable. Le bras témoin
 invariant est la seule chose qui autorise à attribuer l'écart.
@@ -1885,11 +1844,11 @@ les générations écartées avec la raison de leur mise à l'écart.
 ⚠ Les trois sont applicables sans budget et sans installation. C'est ce qui en
 fait des actions et pas des conseils.
 
-⚠ Le quatrième bloc n'est pas une action pour la salle. Et depuis le 2026-10-17
-ce n'est plus un PLAN, c'est un RÉSULTAT : deux leviers écartés par la mesure
-(jury, entraînement), un troisième non déclarable (taille), et une seule piste
-retenue — celle que la mesure désigne. Ne jamais le dire comme « il reste du
-travail » : le sujet de la phrase est celui qui a mesuré, pas celui qui a raté.
+⚠ Le quatrième bloc n'est pas une action pour la salle, et ce n'est pas un PLAN
+mais un RÉSULTAT : deux leviers écartés par la mesure (jury, entraînement), un
+troisième non déclarable (taille), une seule piste retenue. Ne jamais le dire
+comme « il reste du travail » : le sujet de la phrase est celui qui a mesuré,
+pas celui qui a raté.
 
 ⚠ LE JURY A TOURNÉ, et il est la raison de cette réécriture.
 `Mistral-Small-3.2-24B-Instruct-2506-4bit`, banc terminé le 2026-10-17 à 15 h 44,
@@ -1965,19 +1924,13 @@ levier dominant. Cinq réponses, dans cet ordre.
   ⚠ La dernière ligne dite sur scène — « pas un modèle de plus, un test de
   plus » — pose cette réponse AVANT la question. Ne pas la couper.
 
-⚠ CE QUI A QUITTÉ L'ÉCRAN le 2026-10-17 : « 8 erreurs sur 12 sont systématiques,
-et aucun rejeu du même modèle ne les verra ». Ce n'est pas une coupe, c'est du
-dédoublonnage — la diapositive 22 le dit déjà presque mot pour mot.
-
-⚠ CORRIGÉ le 2026-10-17. La version précédente disait « pas un plus gros modèle —
-mesuré, 76,0 % contre 76,0 % ». FAUX : le 32B n'a jamais été entraîné
-(REX_TRAME.md:431, lignes 32B-* gelées sans données), et ce 76,0 contre 76,0 est
-`14B-baseline-conventions` contre `14B-finetuned` — deux variantes de MÊME taille.
-TRANCHÉ LE 2026-10-17 : le banc 32B a rendu son chiffre, et la règle
-pré-déclarée s'applique — la ligne « plus gros modèle » NE REVIENT PAS. Elle ne
-devait revenir que sur un résultat détectable ; 90 % contre 76 % donne
-Δ +14 points, IC95 [+2 ; +26], McNemar p = 0,0654, soit NON CONCLUANT à n = 50.
-Détail complet dans les notes de la diapositive 21.
+⚠ LA LIGNE « PAS UN PLUS GROS MODÈLE » NE REVIENT PAS, et c'est la règle
+pré-déclarée qui le dit : elle ne devait revenir que sur un résultat détectable,
+or 90 % contre 76 % donne Δ +14 points, IC95 [+2 ; +26], McNemar p = 0,0654 —
+NON CONCLUANT à n = 50. Détail dans les notes de la diapositive 21.
+Et ne jamais gager cette ligne sur 76,0 contre 76,0 : ce sont deux variantes de
+MÊME taille (`14B-baseline-conventions` contre `14B-finetuned`). Le 32B n'a
+jamais été entraîné (REX_TRAME.md:431, lignes 32B-* gelées sans données).
 ⚠ Ce qui change quand même, et qui n'est pas sur cette diapositive : l'hypothèse
 « c'est le corpus qui plafonne » est abandonnée. Un modèle plus gros atteint 90 %
 sur le MÊME corpus. L'écart n'est pas déclarable, le plafond n'est plus défendable.
