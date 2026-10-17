@@ -263,6 +263,36 @@ pas celui qui échoue — « mon banc a mesuré le vide » devient « je l'ai at
 
 ## Fait le 2026-10-17
 
+- **La « correction » du taux de contexte insuffisant était la régression, elle est annulée.**
+  La diapositive 24 affichait 40 % / 66 % ; une correction écrite plus tôt le 2026-10-17 l'avait
+  passée à 43 % / 67 % en recomptant sur `benchmarks/rag-quality-detail.jsonl` les **60** lignes,
+  invalides comprises. Or le code exclut les invalides : `RagQualityEvaluation.ligneSynthese` divise
+  par `valides`, pas par `js`. La source publiée, `benchmarks/rag-quality.jsonl` scénario
+  `hybrid|hybrid` ligne `ALL`, donne `0,397` et `0,661` — soit **40 % / 66 %**, les valeurs
+  d'origine, au même dénominateur (n = 58 et 59) que les 48 % / 24 % de la même ligne. La correction
+  laissait donc deux dénominateurs sur une seule diapositive et contredisait les notes des
+  diapositives 13 et 31, restées à 66 % contre 40 %. Elle se trompait aussi de sens : 40/66 fait
+  26 points d'écart et 43/67 en fait 24 — elle **réduisait** l'écart au lieu de le flatter.
+  **Leçon : recouper contre le fichier de synthèse publié avant de recalculer depuis le détail.**
+
+- **Un item Lucene reste non réconcilié, et c'est écrit dans les notes.** En recomptant à la main sur
+  le détail en excluant correctement les invalides, Neo4j tombe pile (39/59 = 0,661) mais Lucene
+  donne 24/58 = 0,414 contre 23/58 = 0,397 au fichier de synthèse. Un item sur 58 : ne change ni le
+  classement, ni « quatre fois sur dix ». **Ne pas afficher 41 % tant que l'item n'est pas trouvé.**
+
+- **« Vingt-cinq points d'écart » dans le script est juste, et la note le protège désormais.**
+  Sur les taux bruts 0,483 − 0,237 = 24,6 points ; le 24 vient des arrondis affichés. Vérifié avant
+  d'éditer, donc rien touché.
+
+- **La phrase éditoriale en attente est posée : le support dit maintenant à l'écran quel juge a
+  tourné le banc.** La réserve de la diapositive 24 devient « Sur ce corpus, selon ma variante
+  entraînée — 76 % de justesse, comme celle décrite », et le script l'énonce en trois phrases.
+  Preuve directe et non plus déduite : les 120 lignes du scénario portent `judgeModel` =
+  `…Qwen2.5-Coder-14B-Instruct-4bit+adapters/14b-judge-ckpt200`. Le piège κ est armé dans les notes :
+  les deux variantes sont indiscernables **en justesse** (76 % contre 76 %), pas en alignement —
+  κ 0,48 pour celle décrite diapositive 21, κ 0,44 pour celle qui a tourné le banc.
+  Coût : +0,2 min (31,0 → 31,2).
+
 - **Les trois items incorrigibles ont été lus, et l'étalon tient.** `JURY_RESULTAT.md` disait
   explicitement que distinguer « étiquette discutable » de « cas difficile » demandait de les lire,
   et que ça n'avait pas été fait. C'est fait. Dans les trois cas l'affirmation centrale de la copie

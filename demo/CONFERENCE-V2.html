@@ -1455,15 +1455,15 @@ section.dense li { margin-bottom: 0.55em; }
 </tr>
 <tr>
 <td>Contexte jugé insuffisant</td>
-<td>43 %</td>
-<td><strong>67 %</strong></td>
+<td>40 %</td>
+<td><strong>66 %</strong></td>
 </tr>
 </tbody>
 </table>
 <p>Sur 60 questions, <strong>24 les départagent</strong>. Lucene en gagne <strong>19</strong>, Neo4j <strong>5</strong>.<br />
 Le hasard donnerait 12–12 : c'est tirer <strong>19 fois pile sur 24 lancers</strong>.</p>
 <p>Et une mesure <strong>sans aucun LLM</strong> les classe <strong>dans le même ordre</strong>.</p>
-<p><span class="ref">Sur ce corpus, selon ce juge.</span></p>
+<p><span class="ref">Sur ce corpus, selon ma variante entraînée — 76 % de justesse, comme celle décrite.</span></p>
 </section>
 </foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="25" data-paginate="true" data-background-color="#ffffff" data-theme="default" data-style="section {
   font-family: 'Segoe UI', system-ui, sans-serif;
@@ -2852,27 +2852,62 @@ je compte les identifiants attendus dans le contexte récupéré — classe les 
 dans le même ordre. Elle ne valide pas les verdicts, elle mesure autre chose.
 Mais deux instruments indépendants qui classent pareil, c'est mieux qu'un seul.
 
+Une précision : le banc a tourné avec ma variante entraînée, pas celle que je
+viens de décrire. Les deux rendent soixante-seize pour cent sur l'étalon. Je
+vous ai décrit la plus simple.
+
 ==============================================================
 
-⚠ CORRIGÉ le 2026-10-17 — la ligne « contexte jugé insuffisant » affichait
-40 % / 66 %. Mesuré depuis `benchmarks/rag-quality-detail.jsonl`, scénario
-`hybrid|hybrid`, contrôle `contexte_suffisant` à faux :
-    lucene 26/60 = 43,3 %      neo4j 40/60 = 66,7 %
-Affiché désormais 43 % / 67 %. Le 40 % était faux de 3 points, et dans le sens
-qui FLATTE la conclusion : il donnait 26 points d'écart au lieu de 24.
-Aucun autre contrôle ne produit 40 % (`contexte_pertinent` 38,3/45,0 ·
-`bruit_maitrise` 26,7/26,7), donc ce n'était pas une autre mesure mal étiquetée.
-→ En reformulant le script, « quatre fois sur dix » reste juste pour 43,3 %,
-   mais « deux fois sur trois » contre « plus de quatre sur dix » est plus exact.
+⚠ « CONTEXTE JUGÉ INSUFFISANT » : 40 % / 66 %, ET C'EST LA SOURCE PUBLIÉE.
+Une « correction » du 2026-10-17 l'avait passée à 43 % / 67 % — elle est ANNULÉE,
+elle était fausse. Elle recomptait sur `rag-quality-detail.jsonl` les **60**
+lignes, invalides comprises, alors que le code exclut les invalides :
+`RagQualityEvaluation.ligneSynthese` divise par `valides`, jamais par `js`.
+La source de TOUS les autres chiffres de cette diapositive est
+`benchmarks/rag-quality.jsonl`, scénario `hybrid|hybrid`, ligne `difficulty ALL` :
+    lucene  n=58  invalid=2  justes 0,483  ctx insuffisant 0,397  hint 0,697
+    neo4j   n=59  invalid=1  justes 0,237  ctx insuffisant 0,661  hint 0,596
+→ 48/24 et 40/66 viennent de la MÊME ligne, au MÊME dénominateur. La
+  « correction » en laissait deux sur une seule diapositive, et elle contredisait
+  les notes des diapos 13 et 31, restées à 66 % contre 40 %.
+→ Elle se trompait aussi de sens : 40/66 fait 26 points d'écart, 43/67 en fait 24.
+  Elle RÉDUISAIT l'écart, elle ne le flattait pas.
+
+⚠ UN ITEM NON RÉCONCILIÉ — à dire si on insiste, pas à afficher. En recomptant à
+la main sur le détail en excluant correctement les invalides, Neo4j tombe pile
+(39/59 = 0,661) mais Lucene donne 24/58 = 0,414, soit UN item de plus que les
+23/58 = 0,397 du fichier de synthèse. Un item sur 58 : ne change ni le classement
+ni « quatre fois sur dix ». Ne pas réafficher 41 % tant que l'item n'est pas
+trouvé — l'écrit publié reste 40 %.
+
+⚠ « VINGT-CINQ POINTS » DANS LE SCRIPT EST JUSTE, ne pas le « corriger » en 24.
+Sur les taux bruts : 0,483 − 0,237 = 24,6 points. Le 24 vient des arrondis
+affichés. Idem pour « L'écart de 25 points » de la diapositive suivante.
+
+⚠ « quatre fois sur dix » pour 39,7 % et « deux fois sur trois » pour 66,1 % :
+les deux sont justes. Garder le script tel quel.
 
 ⚠ p = 0,0066. hintCoverage 0,697 contre 0,596.
 
 ⚠ Ne PAS dire que hintCoverage valide le juge : il corrobore un CLASSEMENT et
 mesure une autre propriété.
 
-⚠ La réserve à énoncer : sur ce corpus, selon ce juge — dont l'alignement est de
-0,44. Un écart de 25 points est large, mais c'est une comparaison, pas une
-vérité sur GraphRAG.</p></div><div class="bespoke-marp-note" data-index="24" tabindex="0"><p>[À REFORMULER AVEC TES MOTS]
+⚠ LA RÉSERVE EST MAINTENANT À L'ÉCRAN, et elle dit quel juge a tourné. Preuve
+directe : dans `benchmarks/rag-quality-detail.jsonl`, les **120** lignes du
+scénario portent `judgeModel` =
+`…Qwen2.5-Coder-14B-Instruct-4bit+adapters/14b-judge-ckpt200`. C'est la variante
+ENTRAÎNÉE, pas celle décrite jusqu'ici.
+
+⚠ LE PIÈGE κ, à connaître avant qu'on le tende. Les deux variantes sont
+indiscernables EN JUSTESSE (76 % contre 76 %), pas en alignement : la variante à
+conventions affichée diapo 21 est à κ 0,48, celle qui a tourné le banc à κ 0,44.
+Donc dire « même justesse », jamais « même juge ». Si on demande pourquoi le banc
+n'a pas tourné avec la meilleure : parce qu'il a tourné avant, et que rejouer est
+impossible — `RetrievalBenchmark.java:447` stocke `generated` tronqué à 3000
+caractères là où le juge en recevait 6000 mélangés (cf. notes diapo 13).
+
+⚠ Un écart de 25 points est large, mais c'est une comparaison, pas une vérité
+sur GraphRAG.</p></div><div class="bespoke-marp-note" data-index="24" tabindex="0"><p>[À REFORMULER AVEC TES MOTS]
 
 Mais attention. Mon pipeline Neo4j fait deux choses : il cherche, puis il étend
 la recherche en suivant les liens du graphe. Lequel des deux pose problème ?
