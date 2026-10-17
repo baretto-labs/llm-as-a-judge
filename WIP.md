@@ -1,7 +1,7 @@
 # WIP — Work In Progress
 
 > Mémoire de travail. Mise à jour après chaque session.
-> Dernière mise à jour : 2026-10-14
+> Dernière mise à jour : 2026-10-17
 >
 > **L'historique détaillé n'est plus ici.** Il vit dans les documents qui font foi :
 > `judge-finetune/REX_TRAME.md` (tous les chiffres), `AUDIT.md` (les défauts du corpus),
@@ -26,6 +26,147 @@ Benchmark RAG (Lucene vs GraphRAG-Neo4j) jugé par un LLM entraîné et servi en
    `demo/CONFERENCE-V2.md`, versions longues dans `demo/SCHEMA-ETATS.md`).
 
 Tout le reste améliore sans être indispensable.
+
+### Tombé le 2026-10-17 à 14 h 27 — la quatrième ligne existe
+
+**`32B-baseline-conventions`**, 150/150 générations. Même invite, mêmes conventions, mêmes 50 items,
+3 passes : **seule la taille change**. Paire pré-déclarée dans `configs/variants.json`
+(« effet de la taille, à conventions identiques »). ~80 s par génération mesurées (et non 65 estimées), 150 générations, ≈ **3 h 10**.
+But : donner une **quatrième ligne** au tableau des variantes de la diapositive 21.
+
+Lecture fixée avant le résultat, et **appliquée telle quelle** :
+
+| le 32B rend | conclusion | ce qui est sorti |
+|---|---|---|
+| **~76 %** | trois tailles au même chiffre ⇒ c'est l'étalon qui plafonne | non |
+| **hors [61 %, 91 %]** | résultat détectable, rapporté avec son intervalle | non |
+| **entre les deux** | **non concluant**, et c'est le mot qui sera employé | **← 90 %** |
+
+```
+  justesse stricte (vote majoritaire)   90 %   contre 76 %
+  accord κ moyen                        0,80   contre 0,48   IC95 [0,64 ; 0,93]
+  stabilité du verdict                  92 %   contre 76 %
+  format strict (« schéma »)             0 %   contre 0 %
+
+  Δ justesse apparié = +14,0 points, IC95 bootstrap [+2,0 ; +26,0],
+  McNemar p = 0,0654, 11 paires discordantes.   (produit par le harnais,
+  paire pré-déclarée — aucun calcul écrit après coup)
+```
+
+**Non concluant**, et c'est le mot employé. ⚠️ **Ne pas plaider** que l'IC95 exclut zéro : McNemar ne
+rejette pas, et la bande était écrite avant. À un item près — 92 % — le résultat sortait de la bande.
+C'est un fait à dire si on insiste, pas un argument pour déplacer la conclusion.
+
+**Ce que ce chiffre tue quand même : l'hypothèse de plafond.** Le corpus ne plafonne pas à 76 %,
+puisqu'un modèle plus gros atteint 90 % sur le **même** corpus avec la **même** invite. L'écart n'est
+pas déclarable à n = 50 **et** le plafond n'est plus défendable — les deux tiennent ensemble, et c'est
+le propos.
+
+**Appliqué au support, en un passage** (`CONFERENCE-V2.md`, HTML régénéré, 31 sections) :
+- diapositive 21, à l'écran : quatrième ligne `| + un modèle 32B | 90 % | 0,80 | 92 % | 0 % |` ;
+- **trois affirmations devenaient fausses, corrigées** : « achètent **toute** la justesse » → « l'essentiel
+  de » (76 sur 90) ; « aucun des **deux** leviers n'a amélioré cette colonne » → « ni les conventions ni
+  l'entraînement », puisqu'un troisième l'a améliorée (κ 0,80) ; le script disait « les **trois** versions »
+  et « la justesse ne bouge plus **après la deuxième ligne** » ;
+- **une réponse préparée fausse, refaite** — la question hostile « pourquoi pas un plus gros modèle ? »
+  répondait « 76,0 % contre 76,0 %, p = 1,0000 », qui mesure **l'entraînement**, et concluait « le plafond
+  n'est pas la taille du modèle ». Deux questions, une seule mesure, et une conclusion que le banc
+  contredit. C'est la **huitième** affirmation fausse retirée, et la première qui n'était pas à l'écran
+  mais dans une réponse qu'on aurait prononcée devant 400 personnes ;
+- la piste n° 4 de la liste des leviers portait la même faute, corrigée ;
+- **la ligne « plus gros modèle » de la diapositive 29 ne revient pas** : elle ne devait revenir que sur
+  un résultat détectable. Règle pré-déclarée, appliquée.
+
+⚠️ **La seule chose à vérifier à l'œil** : la diapositive 21 était déjà la plus chargée et passe à
+**cinq lignes de tableau**. Si ça débord, `<!-- _class: dense -->` est le remède déjà utilisé sur deux
+autres diapositives. Je ne l'ai pas appliqué : c'est un choix visuel.
+
+**Le dépouillement est déjà écrit et éprouvé**, pour que l'application de la grille ne soit pas
+rédigée une fois les chiffres connus :
+
+- `scratchpad/quatrieme_ligne.py` — importe `majority_verdicts` et `strict_accuracy` du harnais
+  lui-même, refuse de dépouiller une variante dont les 150 générations ne sont pas en cache, et
+  **se contrôle d'abord sur le 14B** : à blanc, il a reproduit mot pour mot la troisième ligne déjà
+  publiée sur la diapositive 21 — `76 % | 0,44 | 58 % | 100 %`. Il sort la ligne à coller et
+  applique la grille ci-dessus, sans tolérance inventée (« au même chiffre » = le même chiffre).
+- `scratchpad/rapport_complet.sh` — reconstruit `results/report.md` et `metrics.json` sur toutes
+  les variantes complètes. **Nécessaire** : `bench_variant.sh` passe `--variants <une seule>` et
+  `benchmark_judges.py` ne sérialise que les variantes sélectionnées, donc chaque banc **écrase**
+  le rapport des précédents — et `results/` est dans `.gitignore`, il n'y avait aucun filet.
+  La reconstruction ne relance aucune génération (`--report-only` ne lit que `runs/`) et sa fidélité
+  est prouvée : le rapport reconstruit est **identique octet pour octet** à la sauvegarde.
+  Sauvegarde des trois variantes : `scratchpad/backup-results-3variantes/`.
+
+C'est aussi le moyen d'obtenir le Δ, l'IC95 et le McNemar de la paire 14B↔32B : la comparaison est
+**déclarée dans `configs/variants.json`**, donc c'est le harnais qui les produit, pas un calcul écrit
+après coup.
+
+`train-32b` reste **non lancé** et sa faisabilité QLoRA sur 36 Go reste ouverte. Volontaire : servir
+n'est pas entraîner, et la variante fine-tunée mélangerait taille et entraînement.
+
+### En cours — Mistral, lancé par la chaîne le 2026-10-17 à 14 h 27
+
+La chaîne a franchi son portail : **3 fichiers `.safetensors`, 12 663 Mo** vérifiés avant lancement,
+pas seulement un processus terminé. `Mistral-24B-baseline-conventions` tourne. Lecture déjà fixée dans
+`PREENREGISTREMENT_JURY.md`, écrite avant toute génération : 8 items cibles, n = 8, jamais de
+pourcentage, bandes ≥ 6/8 · 4–5 · ≤ 3/8.
+
+**Avancement au 2026-10-17 à 20 h 05 : 29 générations sur 150**, soit ~36 s par génération et une
+fin attendue vers **21 h 20**. Un `caffeinate -i -w` est attaché au PID du banc lui-même, pas à un
+processus plus court. La suite est **déjà enchaînée et n'attend personne** : à l'extinction du banc,
+reconstruction du rapport multi-variantes (`--report-only`, aucune génération — elle répare l'écrasement
+de `metrics.json` par les passes mono-variante), puis dépouillement.
+
+**Le dépouillement est écrit et éprouvé AVANT le chiffre**, c'est tout son intérêt. Il importe
+l'extraction de verdict du harnais — aucune seconde logique de lecture ne peut diverger — et il
+s'arrête sans rien conclure si ses témoins ne retombent pas. À l'essai à blanc ce soir, ils retombent :
+les effectifs de `TRIAGE_POSTHOC.md` sont reproduits à l'identique sur les deux variantes
+(38/30/8 · 12/8/4 et 29/24/5 · 21/14/7), et surtout **les deux listes gelées d'items sont bien
+exactement ce que disent les données** — les 8 systématiquement faux du juge et les 5 de la variante
+fine-tunée. La grille ne peut donc plus être réécrite après coup.
+
+### Le dispositif de la file — lancé le 2026-10-17 à 11 h 56
+
+Le Mac est tenu éveillé par `caffeinate -i -w <pid de la chaîne>` : il **survit à la fin du 32B**,
+contrairement au premier `caffeinate` qui surveillait le banc lui-même et serait mort avec lui.
+⚠️ **Rabattre l'écran endort la machine quand même** et tue tout : l'écran reste ouvert.
+
+Script : `scratchpad/chaine.sh`. Journal horodaté append-only : `scratchpad/chaine.log`.
+
+1. attend la fin du banc 32B ;
+2. attend la fin du téléchargement Mistral (13 Go, lancé en parallèle car il ne coûte ni RAM ni GPU)
+   et **vérifie des poids présents** — pas seulement un processus terminé. Téléchargement incomplet
+   ⇒ la chaîne s'arrête et ne lance pas le banc ;
+3. lance `Mistral-24B-baseline-conventions`.
+
+Lecture **déjà fixée** dans `judge-finetune/PREENREGISTREMENT_JURY.md`, écrite avant toute
+génération : 8 items cibles, n = 8, jamais de pourcentage, bandes ≥6/8 · 4–5 · ≤3/8.
+
+### Mort-né — le re-jugement RAG hors-ligne est impossible
+
+Objectif visé : rejuger les 240 contextes stockés avec le juge **à conventions**, pour savoir si les
+chiffres du titre (48,3 % Lucene / 23,7 % Neo4j) tiennent quand le juge change. Le contrôle de
+lecture passait sur les quatre cellules publiées.
+
+**Bloqué par `RetrievalBenchmark.java:447-449`.** Le champ `generated` du journal est un champ
+d'**affichage** : ordre **non mélangé** et troncature à **3000** caractères, là où le juge recevait
+l'ordre mélangé par `question.hashCode()` tronqué à **6000**. Le prompt réellement jugé n'est donc
+pas reconstituable depuis le disque.
+
+Et la perte est **asymétrique**, ce qui achève la piste :
+
+| stratégie | contextes amputés | reproductibles |
+|---|---|---|
+| lucene | **118 / 120 (98 %)** | **2** |
+| neo4j | 4 / 120 (3 %) | 116 |
+
+Rejuger ne comparerait plus que **2 items Lucene contre 116 Neo4j**. Ce n'est pas un biais à
+déclarer, c'est l'absence de matériel. Pour obtenir ce chiffre il faut **rejouer la récupération**
+(Java + Lucene + Neo4j), et au passage stocker le prompt réellement envoyé. Non lançable sans
+surveillance, et hors du chemin critique.
+
+**Au passage, un fait mesuré et utilisable** : Lucene rend des contextes systématiquement plus longs
+que Neo4j — 98 % dépassent 3000 caractères contre 3 %. Du bruit, pas de la couverture.
 
 ### En cours, et qui ne se rattrape pas
 
@@ -70,14 +211,25 @@ pas celui qui échoue — « mon banc a mesuré le vide » devient « je l'ai at
 | HyDE uniquement sur le vecteur, pas BM25 | Le code Java généré casse le parser fulltext |
 | `hintCoverage` programmatique, pas LLM | Un LLM peut halluciner « j'ai vu X » ; corrobore un **classement**, ne valide pas le juge |
 | Panel indépendant, pas délibératif | Évite la sycophancy — standard MT-Bench |
+| **Le support raconte le juge À CONVENTIONS, de bout en bout** | Arbitré le 2026-10-17, annulant celui du 2026-10-14 qui disait l'inverse. Motif : les diapositives 22 et 29 se contredisaient sur la même quantité, et la mesure montre que le motif d'origine ne coûte presque rien — aucun chiffre d'indulgence ne bouge de plus de 4 points. κ 0,48 et stabilité 76 % sont désormais les chiffres de référence |
 
 ---
 
 ## Questions ouvertes
 
-- **Matrice de la diapositive 14** — celle affichée (16 recalés / 11 passés / 22 validés) est celle du
-  **fine-tuné**, alors que l'exposé raconte la variante à conventions. Récupérer l'équivalent depuis
-  `results/runs/`, ou introduire le fine-tuning plus tôt. **Dernier arbitrage ouvert du support.**
+- **Métrique « format normalisé » jamais produite** — l'amendement du 2026-09-19 la déclare, le
+  Makefile prévient que sans `BENCH_ARGS=--format-normalise` elle ne sort d'aucune commande, et
+  constat du 2026-10-17 : **aucune variante ne l'a**. `results/runs/` ne contient aucune entrée
+  suffixée, `report.md` n'en parle pas. Les quatre variantes sont donc comparables entre elles, mais
+  une mesure déclarée reste sans données. À savoir avant les questions de la salle.
+- **Une phrase manque à « Le résultat », et c'est tout ce qui reste de l'arbitrage.** Le banc RAG a
+  tourné avec le juge **fine-tuné** au checkpoint 200 (`REX_TRAME.md` l.110), et le support ne le dit
+  nulle part à l'écran. Le gage existe déjà dans le tableau de la 21 : **76 % contre 76 %,
+  p = 1,0000** — les deux juges sont indiscernables en justesse. Formulation proposée dans les notes
+  de la 14, à valider. Alternative écartée : rejouer le banc RAG avec le juge à conventions, deux
+  heures de machine, et ça redéfinirait les chiffres du titre.
+- **Accord par contrôle : disponible pour le fine-tuné seulement.** Désormais ce n'est plus le juge
+  décrit à l'écran. Noté dans les notes de la 21 ; à ne pas présenter comme celui du juge raconté.
 - **Réparer le test de verbosité** — `AUDIT.md` §2 : les deux groupes ne se chevauchent pas en longueur,
   et sur 40 familles du golden **3 seulement** portent les deux longueurs, donc l'appariement que la
   diapositive annonce n'existe pas. Correctif : jeu dédié `data/verbosity/`, **hors du tirage** — sinon
@@ -86,11 +238,198 @@ pas celui qui échoue — « mon banc a mesuré le vide » devient « je l'ai at
 - **Bug latent** — le preset `hybrid-graph-hyde` pose `hydeEnabled=true` et `rerankingEnabled=false`, or
   `Neo4jGraphRagStrategy.java:246` ne branche le modèle HyDE que si le reranking est actif. Ce preset
   tournerait **sans HyDE** en annonçant son nom. Jamais publié, donc rien d'invalidé.
-- **Abandonné pour l'exposé, versé à l'article de blog** : le jury multi-modèles (sous-dimensionné — il
-  faudrait rattraper 10 des 12 désaccords pour conclure) et `citations_exactes` dégénéré (vrai 25 fois
+- **Abandonné pour l'exposé, versé à l'article de blog** : `citations_exactes` dégénéré (vrai 25 fois
   sur 25).
+- **Jury multi-modèles : décision réouverte sciemment le 2026-10-17.** Il avait été écarté comme
+  sous-dimensionné — il faudrait rattraper 10 des 12 désaccords pour conclure. **La question a
+  changé** : il ne s'agit plus de montrer qu'un jury juge mieux, hors de portée à n = 50, mais de
+  vérifier la **condition d'existence** du levier sur 8 items nommés. Déclaré avant toute génération
+  dans `PREENREGISTREMENT_JURY.md`. Motif : c'est la dernière affirmation non mesurée de l'écran.
 
 ---
+
+## Fait le 2026-10-17
+
+- **Le commit unique est fait** — `f317add`, sur `talk/v1`, **non poussé**. Il plie tout d'un coup :
+  la quatrième ligne, les trois affirmations d'écran qu'elle a rendues fausses, la réponse hostile
+  qui était fausse hors écran, la carte des dépendances, l'audit, le correctif du schéma, les deux
+  pièges armés et le pré-enregistrement Mistral.
+
+- **Le minutage était faux de 2 %, et c'est moi qui l'avais cassé en le remesurant.** Un recompte
+  intermédiaire a donné **4453 mots** contre les 4207 publiés, et l'écart ne se raccordait pas à mon
+  ajout d'environ 95 mots. Plutôt que de publier, j'ai cherché : mon compte prenait pour des mots les
+  jetons de **ponctuation isolée** (« : », « ? » entourés d'espaces) et le terminateur `-->`, soit
+  environ 5 mots par diapositive. La preuve qui tranche : la méthode corrigée, appliquée à la version
+  commise, rend **4195 mots = 30,0 min**, donc les 30,1 min déjà publiés, et **seul le bloc 19-22
+  bouge** dans le tableau par bloc — les sept autres sont inchangés au dixième près.
+  **Chiffre juste : 30,7 min, 10,7 min à couper.** La diapositive 21 est désormais la plus chère du
+  support, **2 min 20**, deux fois et demie la médiane qui est à 52 s.
+  → Ce chiffre est celui sur lequel tu vas choisir les diapositives à retirer, d'où l'insistance.
+
+- **Un piège de définition sur la colonne κ, trouvé parce que le contrôle a échoué.** En auditant les
+  quatre chiffres de la quatrième ligne j'ai d'abord rendu **κ 0,53** pour la variante à conventions
+  là où l'écran affiche **0,48**. Ce n'est pas l'écran qui a tort : la colonne du support est
+  `kappa_mean`, la moyenne des trois passes, et j'avais calculé `kappa_majority`. Les deux clefs
+  existent dans `metrics.json` et divergent de cinq centièmes sur le 14B (0,479 contre 0,529).
+  Elles ne se séparent que lorsque le juge est **instable**, puisque le vote majoritaire lisse ce que
+  la moyenne par passe subit. **Pour le 32B elles coïncident** (0,8011 et 0,8006) : le 0,80 affiché
+  est donc juste dans les deux définitions — chance, pas méthode, et c'est écrit comme tel.
+  → Consigné dans `demo/MINUTAGE-ET-AUDIT.md`. **Ne jamais comparer un κ du support à un κ recalculé
+  sur le vote majoritaire** : cela fabrique un écart qui n'existe pas.
+
+- **Un piège en moins, celui-là vérifié : l'ambiguïté du 76 % ne se reproduit pas sur la quatrième
+  ligne.** Le dépôt publie une « Exactitude » qui est la moyenne des passes, l'écran montre le vote
+  majoritaire — 73,3 % contre 76,0 % sur la variante à conventions, 71,3 % contre 76,0 % sur la
+  fine-tunée. Pour le 32B les deux valent **90,0 %**. Cet écart **est** la valeur du vote par
+  auto-cohérence, et il s'effondre quand le juge est déjà stable : il n'y a plus rien à départager.
+  La question hostile « pourquoi deux exactitudes ? » ne porte donc que sur les trois premières lignes.
+
+- **Balayage du plafond à l'écran : rien à corriger.** L'hypothèse de plafond étant morte, j'ai
+  extrait la portion visible des 31 diapositives et cherché toute formulation de plafond. **Zéro
+  occurrence à l'écran** ; les six occurrences du fichier sont toutes dans des notes, et toutes
+  enregistrent l'abandon. L'inventaire des chiffres visibles est également ressorti, 15 valeurs
+  distinctes, tous couverts par l'audit.
+
+- **Une coupe gratuite de 30 à 42 s, trouvée en cartographiant les dépendances.** La dette ouverte
+  diapositive 14 (« ne pas faire juger un modèle par sa propre famille, mon juge est tout seul,
+  j'y reviens à la fin ») est réglée **deux fois** : diapositive 28 (70 mots, 30 s) et diapositive 29
+  (98 mots, 42 s), avec la **même prémisse et le même 8/12**. Lequel garder est éditorial, donc à toi.
+  Carte complète des renvois prononcés ajoutée à `demo/MINUTAGE-ET-AUDIT.md` — elle dit aussi ce
+  qu'on ne peut **pas** couper : la chaîne cumulative des 9 marqueurs de schéma (9→10→11→12→13→16→17→20→21),
+  et les deux ancrages de la 16 (diapos 7 et 15).
+  Contrôle : le découpage retrouve les 31 `<section>` du HTML **et** place les 9 marqueurs exactement
+  là où `SCHEMA-ETATS.md` les avait recalés hier — la même conclusion par un autre chemin.
+- **Vérifié, et le pré-enregistrement n'est pas amendé.** La duplication ci-dessus posait la question :
+  un résultat Mistral ≤ 3/8 oblige-t-il à changer la **28** autant que la **29** ? Non. La 28 ne
+  promet aucun jury, elle ne constate que « rejouer le même modèle ne fait varier que
+  l'échantillonnage » — qu'une autre famille échoue aussi ne la contredit pas. `PREENREGISTREMENT_JURY.md`
+  a donc raison de ne viser que la 29.
+- **Un écrasement silencieux désamorcé avant qu'il se produise.** Chaque banc réécrit
+  `results/metrics.json` avec sa seule variante, et `results/` n'est pas versionné : à la fin du
+  banc 32B, les trois variantes du rapport publié auraient disparu. Trouvé en lisant ce que
+  `benchmark_judges.py` sérialise (ligne 914, `serializable` ne contient que les variantes
+  sélectionnées) plutôt qu'en supposant une fusion. Sauvegardé, puis prouvé réparable gratuitement.
+- **Les deux images du support sont prêtes à être écrasées, sans autre travail.** Vérifié : les
+  gabarits `img/ollamassist-marketplace.png` et `img/qr-feedback.png` sont **déjà aux dimensions
+  exactes** que les notes demandent (768 × 638 et 620 × 620, soit le double de l'affichage). Écraser
+  les deux fichiers au même nom et relancer le rendu suffit — **aucune modification du markdown, ni
+  du HTML**. Ce sont les deux seules images référencées par le support.
+  ⚠️ `img/judge_dredd_casque.jpeg` n'est référencé **nulle part** : reste d'une diapositive coupée,
+  ou image jamais branchée. À trancher par toi, le fichier n'est pas supprimé.
+
+- **Le support est minuté : 30,1 min pour une cible de 20.** Script parlé seul, 4207 mots à
+  140 mots/min ; contrôle de lecture, le découpage retrouve les 31 `<section>` du HTML. Nouveau
+  document `demo/MINUTAGE-ET-AUDIT.md` : prix de chaque diapositive, et des blocs.
+  **Le fait qui change la stratégie de coupe : le support est plat.** La plus longue diapositive fait
+  1 min 47, la médiane à peine moins d'une minute. Rogner les huit plus longues de 30 % ne rendrait
+  que ~2 min sur 10. **Les 10 minutes sont dans le NOMBRE de diapositives, pas dans du gras** — il
+  faut en retirer une dizaine. Retirer 10 diapos de méthode (moyenne 0,93 min) amène à 20,7 min.
+  Et la mesure **confirme la ligne éditoriale par le chiffre** : méthode (6-18, 13 diapos) =
+  **12,1 min = 40 %** du temps, preuves (23-26, 4 diapos) = **4,5 min = 15 %**. Le choix des
+  diapositives reste éditorial et n'a pas été fait.
+- **Les renvois du schéma étaient périmés, et ça aurait coûté 2-3 h de dessin.** `SCHEMA-ETATS.md`
+  faisait pointer les états **3 à 10 une diapositive trop loin**, et les états 1 et 2 ont fusionné en
+  **un seul marqueur** (diapo 9) depuis la suppression de « quand évaluer ? » le 2026-10-14. Recalé
+  par le CONTENU des marqueurs, pas par leur numéro. Contrôle : 9 marqueurs `[AJOUT AU SCHÉMA]`
+  (diapos 9, 10, 11, 12, 13, 16, 17, 20, 21) + l'état 11 en récapitulatif = **les dix états à
+  dessiner**, ce qui recoupe le chemin critique. Deux avertissements ajoutés en en-tête, dont :
+  **ne pas recopier « κ 0,880 » tel quel** dans les états 10 et 11 — c'est le κ rétrogradé.
+- **Septième chiffre faux retiré de l'écran — diapositive 24.** La ligne « contexte jugé
+  insuffisant » affichait **40 % / 66 %**. Recalculé depuis `benchmarks/rag-quality-detail.jsonl`
+  (scénario `hybrid|hybrid`, contrôle `contexte_suffisant` à faux) : **lucene 26/60 = 43,3 %**,
+  **neo4j 40/60 = 66,7 %**. Affiché désormais **43 % / 67 %**. Le 40 % était faux de 3 points et
+  **dans le sens qui flatte la conclusion** : 26 points d'écart au lieu de 24. Vérifié qu'aucun autre
+  contrôle ne produit 40 % (`contexte_pertinent` 38,3/45,0 · `bruit_maitrise` 26,7/26,7), donc ce
+  n'était pas une autre mesure mal étiquetée.
+- **Le reste de l'audit passe, au chiffre près**, parseur du harnais importé pour la justesse :
+  diapos 11 (46 %), 12 (12/60), 13 (27/23 → 17/10/21, 76 %), 18 (47/50 · 17 incises · 30/30),
+  21 (κ et stabilités), 24 (48,3 / 23,7 · 24 départagent 19–5), 25 (22,0 % · Lucene inchangé),
+  26 (8–0 · 5/7 · 6/9, totaux retombent sur 24 et 19).
+- **L'audit des chiffres affichés est maintenant complet.** Les diapositives que la passe d'hier
+  n'avait pas couvertes sont vérifiées : **14, 19 et 20 ne portent aucun chiffre à l'écran** (la 20
+  n'affiche que le schéma ASCII) ; la **23** (« 60 questions, les mêmes pour les deux stratégies »)
+  retombe sur les 240 lignes de `rag-quality-detail.jsonl` = 60 × 2 stratégies × 2 scénarios ; la
+  **27** tient sur ses deux chiffres — « 150 réponses » = 50 items × 3 passes, et la « dégradation de
+  76 % » est le **miroir exact** du +76,0 points que `report.md` publie pour `nu → conventions`
+  (IC95 [+64, +88], McNemar p = 0,0000) : l'adaptateur ignoré faisait servir la variante fine-tunée
+  **sans ses conventions**, donc à 0 %. Formulation d'origine retrouvée dans `CONFERENCE-2026.md`
+  ligne 1197 — « le fine-tuning dégrade la justesse de 76 % » — ce qui confirme la lecture.
+  Restent hors de portée : les citations externes des diapositives 2 à 5, qui ne sont pas dans le dépôt.
+- **La diapositive 22 passe au chiffre près**, et elle n'était pas dans la passe d'hier : 50 copies,
+  38 stables / 12 instables, « 12 relectures au lieu de 50 » = 76 % du travail écarté, « 4 de ses 12
+  erreurs » et les 8 manquées — tout recoupe `TRIAGE_POSTHOC.md`. Le 8/12 répété diapos 28 et 29
+  est juste lui aussi.
+  **Un piège trouvé au passage, armé hors écran** : la 21 affiche 76 % de justesse (= **38** copies
+  justes) et la 22 affiche **38** stables. Deux 38 sans rapport — les 38 stables contiennent
+  **8 copies fausses**. Note de mise en garde ajoutée aux notes de la 22, avec la phrase de réponse
+  si quelqu'un fait le rapprochement.
+- **Deux ambiguïtés armées hors écran.** (a) Le **76 %** est le *vote majoritaire* ; `report.md`
+  publie aussi « Exactitude **73 %** », la moyenne des trois passes (70, 76, 74). Les deux sont
+  justes, ce sont deux estimateurs — réponse courte notée en diapositive 13. (b) Le **12/60** de la
+  diapositive 12 **sous-estime** le biais : les 12 bascules surviennent parmi les **39** questions à
+  contenu identique, soit 31 % et non 20 %. La formulation affichée est donc conservatrice.
+  **Témoin trouvé au passage, et il est net** : rejoué *avec* la graine, le même bras Lucene donne
+  **0 bascule sur 60** et 60/60 hintCoverage identiques entre les deux scénarios.
+
+- **La diapositive 21 devient le tableau des variantes** (`REX_TRAME.md:257`, 450 générations). Les
+  trois lignes κ / stabilité / hintCoverage sont remplacées par `invite nue` · `+ 4 conventions` ·
+  `+ entraînement` × justesse / accord / stabilité / schéma. Motif : **un chiffre faible seul est une
+  note, le même entouré de ses voisins de même nature est une information.** Le 0,44 n'est plus un
+  bulletin, c'est la cellule qui prouve que l'entraînement n'a pas acheté le jugement. hintCoverage
+  sort — il est déjà sur « Le résultat », à sa place.
+- **Fusion 20+21 écartée.** La 20 pose la question, la 21 répond : les notes de la 20 l'exigent
+  (« ne pas annoncer la réponse ici »), et c'est aussi ce que fait le support de Villaren. Le support
+  reste donc à **31 diapositives** — la coupe des 12 minutes devra venir d'ailleurs.
+- **Sixième fausse affirmation retirée de l'écran.** La diapositive 29 disait « Pas un plus gros
+  modèle — mesuré, **76,0 % contre 76,0 %** ». Faux : le 32B n'a jamais été entraîné
+  (`REX_TRAME.md:431`) et ce chiffre est `14B-baseline-conventions` contre `14B-finetuned`, deux
+  variantes de **même taille**. La feuille de route ne cite plus de chiffre et renvoie au tableau.
+
+- **Famille disjointe déclarée** — `Mistral-24B-baseline-conventions` dans `configs/variants.json`
+  (port 8085, aucun adaptateur, **le même** `configs/conventions.md`), avec sa paire de comparaison.
+  Mistral Small 3.2 plutôt que Gemma 3 : Gemma traite le rôle `system` autrement, et un suffixe non
+  appliqué en silence rendrait une ligne d'apparence normale sur un juge sans conventions — le mode
+  de défaillance dont l'exposé fait sa conclusion. Lecture fixée avant mesure dans
+  `PREENREGISTREMENT_JURY.md`, avec son **seuil de coût** (au-delà de 25 relectures sur 50, levier
+  trop cher quelle que soit sa couverture). **Non lancé** : le 32B occupe la machine.
+- **Mesuré au passage, et nulle part ailleurs dans le dépôt : « systématique » n'est pas une
+  propriété de l'item.** Des 8 erreurs systématiques du juge à conventions, l'entraînement en
+  **corrige 3**, en rend **4 instables** — donc rattrapables par le triage — et n'en laisse **qu'une**
+  systématique (`b03-014`, le seul item que les deux juges ratent trois fois sur trois). Un simple
+  changement d'entraînement déplace donc **7 des 8** angles morts. Ce 3/8 corrigé devient le plancher
+  que le jury doit battre pour valoir mieux qu'un entraînement de plus. Obtenu en réutilisant
+  `extract_judgment` du harnais, et **recoupé** contre les effectifs publiés de `TRIAGE_POSTHOC.md`
+  (38/30/8/12/8/4 et 29/24/5/21/14/7 reproduits à l'identique) avant d'émettre la moindre cible.
+- **Contradiction 22/29 relevée**, versée à l'arbitrage ouvert ci-dessus. Rien n'a été corrigé à
+  l'écran : les deux branches ont un coût, c'est une décision éditoriale.
+- **Veille système** — la machine était réglée sur `sleep 1` min, retenue seulement par l'assertion
+  « display is on » de `powerd` et `displaysleep 180`. Le banc 32B demande ~3 h 08 : l'écran se serait
+  éteint **avant la fin**, et la machine aurait dormi une minute après. `caffeinate -i -w <pid>` posé,
+  il s'arrête avec le banc. À refaire avant tout banc long. Le capot rabattu endort malgré tout.
+
+- **Arbitrage tranché : tout le support en « à conventions ».** Diapositive **22** alignée sur les
+  quatre preuves — 38/12 au lieu de 29/21, **12 relectures au lieu de 50**, et **4 désaccords sur 12**
+  rattrapés au lieu de 7, les **8 autres** systématiques. Ses notes étaient *déjà* écrites pour ce
+  juge (« relire 16 au lieu de 12 et rattraper les mêmes 4 », « pourquoi les 8 échappent ») : c'était
+  une restauration, comme la 21. Diapositive **14** suivie : matrice **17/10/21**, « près de
+  4 défauts sur 10 », verbosité 46 %/40 %, PASS 65 %. La 29 (« 8 erreurs sur 12 ») devient juste
+  sans y toucher. Script parlé réécrit aux deux endroits, notes d'arbitrage datées à la place des
+  anciennes. 31 sections rendues.
+- **Ce que l'arbitrage coûte, mesuré et non supposé** : la 22 perd de la couverture (4/12 au lieu de
+  7/12) mais gagne en économie (12 relectures au lieu de 21), et elle **installe mieux la 29** — 8
+  erreurs systématiques à attaquer au lieu de 5. Sur la 14, aucun chiffre ne bouge de plus de
+  4 points. La matrice publiée (16/11/22) a été reproduite à l'identique comme contrôle avant
+  d'émettre le moindre nouveau chiffre.
+- **Mesures gratuites relevées, aucune machine consommée** — à garder **hors écran** pour les
+  questions, phase de coupe oblige :
+  - **noyau d'erreurs commun** : les deux juges ont **12** désaccords chacun, **6 communs** seulement,
+    union **18 sur 50**. La moitié des erreurs n'est donc pas partagée entre deux juges de la même
+    famille qui ne diffèrent que par l'entraînement — ça rend le pari « familles disjointes »
+    crédible, et ça donne une référence au banc Mistral.
+  - **coût réel** : **0,30 à 0,38 $ pour mille jugements** (`metrics.json`,
+    `cost_per_1k_judgments_usd`, déjà calculé et jamais utilisé). Seul candidat à l'écran, et
+    seulement en remplacement d'une ligne de méthode.
+  - **les 450 générations ont coûté 3,15 h et 441 721 jetons** (314 220 entrée / 127 501 sortie).
 
 ## Backlog technique, après l'exposé
 

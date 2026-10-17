@@ -592,7 +592,7 @@ Chez moi, 46 % de faux PASS sur les défauts bavards.
 en version longue et en version courte. C'est une contrainte sur le corpus, pas
 sur le pipeline.]
 
-⚠ Le chiffre exact : 46 % de faux PASS sur défauts verbeux contre 42 % sur
+⚠ Le chiffre exact : 46 % de faux PASS sur défauts verbeux contre 40 % sur
 défauts concis — l'écart lui-même est petit, c'est le NIVEAU qui est mauvais.
 Ne pas vendre l'écart, vendre le niveau.
 -->
@@ -639,6 +639,23 @@ est le préalable. Puis une boîte « mélange grainé » entre elle et le juge.
 ⚠ Sans graine, les exécutions de la veille faisaient bouger le même bras de
 55,9 % à 43,3 %. Une mesure qui ne se rejoue pas n'est pas une mesure.
 
+⚠ SOURCE DU 12/60, recalculée le 2026-10-17. Comparaison du bras **Lucene**, qui
+était configuré à l'identique dans les deux scénarios du run non graîné
+(`benchmarks/non-reproductible-20260923-melange-non-graine/`) :
+    contextes stockés identiques  60/60   (la récupération ne bouge pas)
+    hintCoverage identique        39/60   (les 21 autres : la troncature à 6000
+                                           après mélange ne garde pas les mêmes extraits)
+    bascules de verdict           24/60   dont **12 à hintCoverage identique**
+Ce sont ces 12 que la diapositive annonce : contenu strictement inchangé, ordre
+seul modifié. Le dénominateur affiché (60) est le nombre de questions, pas les 39
+à contenu identique — donc le chiffre **sous-estime** le biais (12/39 = 31 %).
+Si on est challengé, c'est l'argument : la formulation est conservatrice.
+
+⚠ LE TÉMOIN, et il est net : rejoué AVEC la graine, le même bras Lucene donne
+**0 bascule sur 60** et 60/60 hintCoverage identiques entre les deux scénarios
+(48,3 % des deux côtés). C'est ce qui prouve que la graine a tenu — et c'est le
+même témoin que celui invoqué diapositive 25.
+
 ⚠ Ne pas confondre avec le « A contre B puis B contre A » de la comparaison par
 paires : là c'est l'ordre de DEUX RÉPONSES, ici c'est l'ordre des EXTRAITS.
 -->
@@ -651,11 +668,11 @@ Il valide presque tout, donc il se trompe rarement —
 seulement sur les copies qu'il aurait dû recaler.
 
 ```
-   27 mauvaises copies   →  il en recale 16.  Il en laisse passer 11.
-   23 bonnes copies      →  il en valide 22.
+   27 mauvaises copies   →  il en recale 17.  Il en laisse passer 10.
+   23 bonnes copies      →  il en valide 21.
 ```
 
-**76 % de décisions justes. Et 4 défauts sur 10 qui passent.**
+**76 % de décisions justes. Et près de 4 défauts sur 10 qui passent.**
 
 Le même juge, deux chiffres. **Ne publiez jamais le premier sans le second.**
 
@@ -674,8 +691,8 @@ Troisième biais, et c'est celui qu'aucun tableau ne montre : l'indulgence.
 Un correcteur qui valide presque tout se trompe rarement. Forcément : il ne se
 trompe que sur les copies qu'il aurait dû recaler.
 
-Mon juge, sur vingt-sept mauvaises réponses, en recale seize. Il en laisse passer
-onze. Sur vingt-trois bonnes, il en valide vingt-deux.
+Mon juge, sur vingt-sept mauvaises réponses, en recale dix-sept. Il en laisse
+passer dix. Sur vingt-trois bonnes, il en valide vingt et une.
 
 Ça fait soixante-seize pour cent de décisions justes — et quatre défauts sur dix
 qui passent. Le même juge, deux chiffres.
@@ -690,13 +707,50 @@ recalé, c'est juste une relecture inutile.
 qui le mesure — une boîte en aval, avec deux cadrans : les décisions justes, et
 les erreurs attrapées.]
 
-⚠ TRANCHÉ le 2026-10-14 : tout le talk parle du juge FINE-TUNÉ, parce que c'est
-LUI qui a tourné sur le banc RAG (REX_TRAME l.110, « juge 14B fine-tuné au
-checkpoint 200 »). Cette matrice (16 recalés, 11 passés, 22 validés) est donc la
-bonne, ainsi que les 46 % / 42 % de verbosité et les 64 % de PASS ci-dessous.
-Ne pas réintroduire les chiffres de la variante à conventions (κ 0,48,
-stabilité 76 %, 40 % de faux PASS concis) : ils appartiennent à un juge qui n'a
-pas produit le résultat.
+⚠ RE-TRANCHÉ le 2026-10-17, dans l'AUTRE SENS : tout le support parle désormais
+du juge À CONVENTIONS, de bout en bout. L'arbitrage du 2026-10-14 disait
+l'inverse ; il est annulé parce qu'il laissait les diapositives 22 et 29 se
+contredire sur la même quantité, et parce que la mesure montre que son motif ne
+coûtait presque rien ici. Mesuré le 2026-10-17 sur results/runs/, la matrice
+publiée (16/11/22) étant reproduite à l'identique comme contrôle de lecture :
+
+  |                        | fine-tuné | À CONVENTIONS |
+  | matrice                | 16/11/22  | 17/10/21      |
+  | défauts qui passent    | 11/27 41% | 10/27 37%     |
+  | verbosité verbeux/concis | 46/42 % | 46/40 %       |
+  | taux de PASS (150 passes)| 64 %    | 65 %          |
+  | justesse               | 76 %      | 76 %          |
+
+Aucun chiffre ne bouge de plus de 4 points et le message est intact. La crainte
+du 2026-10-14 portait sur κ 0,48 et stabilité 76 %, qui diffèrent VRAIMENT entre
+les deux juges — l'indulgence, non.
+
+⚠ CE QUI RESTE À FAIRE, ET C'EST ÉDITORIAL : le banc RAG a tourné avec le juge
+FINE-TUNÉ (REX_TRAME l.110, « 14B fine-tuné au checkpoint 200 »). Le support ne
+le dit nulle part à l'écran. Il faut donc une phrase à « Le résultat », et elle
+est déjà gagée par le tableau de la 21 : les deux juges rendent 76 % contre 76 %,
+p = 1,0000 — indiscernables en justesse. Formulation proposée, à valider :
+« le banc a tourné avec la variante entraînée ; sur l'étalon les deux sont
+indiscernables, 76 % contre 76 % — je vous décris la plus simple. »
+⚠ L'alternative — rejouer le banc RAG avec le juge à conventions — est
+IMPOSSIBLE hors-ligne, mesuré le 2026-10-17. `RetrievalBenchmark.java:447-449`
+stocke `generated` **non mélangé et tronqué à 3000** caractères, là où le juge
+recevait l'ordre mélangé par `question.hashCode()` tronqué à **6000**. Le prompt
+réellement jugé n'est donc pas reconstituable. Et la perte est asymétrique :
+**118/120 contextes Lucene amputés (98 %)** contre 4/120 côté Neo4j — rejuger ne
+comparerait plus que 2 items Lucene à 116 Neo4j. Il faudrait rejouer la
+RÉCUPÉRATION entière (Java + Lucene + Neo4j), hors chemin critique.
+→ Donc la phrase éditoriale ci-dessus n'est pas une commodité : c'est la seule
+  option. Elle est gagée par 76 % contre 76 %, p = 1,0000.
+
+⚠ QUEL ESTIMATEUR, si on ouvre le dépôt — vérifié le 2026-10-17. L'écran dit
+76 % ; `results/report.md` affiche DEUX chiffres pour la même variante :
+« Exactitude 73 % » (ligne 11, moyenne des trois passes : 70, 76, 74) et
+« Justesse stricte du verdict (vote majoritaire) 76,0 % » (ligne 69). Le support
+prend le second, et il est correctement sourcé : la matrice 27/23 → 17/10/21
+affichée ici EST le vote majoritaire, et (17+21)/50 = 76 %. Les deux sont justes,
+ce sont deux estimateurs. Réponse courte si on la demande : « 76 %, c'est le vote
+majoritaire des trois passes ; la moyenne passe par passe donne 73 %. »
 
 ⚠ Le n, si on demande — et c'est LA question qui viendra sur cette diapositive :
 les 46 % portent sur **8 items verbeux à défaut caché**, contre 19 concis
@@ -708,7 +762,7 @@ bonnes afficherait 95 % d'exactitude et attraperait zéro erreur. C'est l'exempl
 à donner si quelqu'un doute.
 
 ⚠ Ce biais recoupe les deux autres : 46 % de faux PASS sur les défauts verbeux,
-et un juge qui rend PASS 64 % du temps là où l'étalon en compte 46 %. Trois
+et un juge qui rend PASS 65 % du temps là où l'étalon en compte 46 %. Trois
 mesures indépendantes, un même diagnostic.
 -->
 
@@ -1092,22 +1146,21 @@ d'abord.
 
 ## Est-ce qu'il marche, oui ou non ?
 
-```
-  d'accord avec une référence ?          κ = 0,44
-  d'accord avec lui-même ?               même verdict 3 fois sur 5
-  un comptage sans LLM dit-il pareil ?   oui, même classement
-```
+| | justesse | accord | stabilité | schéma |
+|---|---|---|---|---|
+| **invite nue** | 0 % | 0,00 | 0 % | 0 % |
+| **+ 4 conventions** | **76 %** | 0,48 | **76 %** | 0 % |
+| **+ entraînement** | **76 %** | 0,44 | 58 % | **100 %** |
+| **+ un modèle 32B** | **90 %** | **0,80** | **92 %** | 0 % |
 
-**κ, c'est l'accord une fois retiré ce que le hasard donne.** 0,44, c'est moyen.
-**Et je le sais, parce que je l'ai mesuré.**
+**Quatre paragraphes achètent l'essentiel de la justesse.
+91 minutes d'entraînement n'achètent qu'une colonne — la dernière.**
+
+κ, c'est l'accord une fois retiré ce que le hasard donne.
+**Ni les conventions ni l'entraînement n'ont amélioré cette colonne.**
 
 **Je ne lui fais pas confiance sur une copie.
 Je lui fais confiance sur soixante.**
-
-<span class="ref">Mesuré : l'entraînement achète le format, pas la justesse.</span>
-
-**Assez net pour départager deux moteurs de 25 points** — et compter les
-identifiants attendus dans le contexte, sans aucun LLM, les classe pareil.
 
 *Et vous, vous la connaissez, la précision de votre évaluateur ?*
 
@@ -1124,30 +1177,45 @@ identifiants attendus dans le contexte, sans aucun LLM, les classe pareil.
 <!--
 [À REFORMULER AVEC TES MOTS]
 
-Alors est-ce qu'il marche ? Trois réponses.
+Alors est-ce qu'il marche ? Voilà les quatre versions de mon juge, et ce que
+chacune a acheté.
 
-Une précision d'abord, parce qu'elle compte pour la suite : ce juge-là, je l'ai
-aussi entraîné sur mon corpus. Ça lui a donné le format — du JSON exploitable à
-tous les coups — pas la justesse. Et c'est lui qui a tourné sur le banc que je
-vais vous montrer.
+Première ligne, l'invite nue : le modèle, ma question, rien d'autre. Zéro. Et pas
+zéro de justesse — zéro JSON exploitable. Cent cinquante générations, aucune
+lisible par une machine.
 
-Est-il d'accord avec une référence ? Kappa zéro virgule quarante-quatre —
-l'accord une fois retiré ce que le hasard donne tout seul. C'est moyen.
+Deuxième ligne : j'ajoute mes quatre paragraphes de conventions. Rien d'autre ne
+change — même modèle, même question, le suffixe d'invite et c'est tout.
+Soixante-seize pour cent.
 
-Est-il d'accord avec lui-même ? Je lui donne la même copie trois fois. Il ne rend
-le même verdict que trois fois sur cinq.
+Troisième ligne : je l'entraîne. Quatre-vingt-onze minutes sur mon corpus.
+Soixante-seize pour cent. Le même chiffre.
 
-Ce qui veut dire une chose très concrète : je ne lui fais pas confiance sur une
-copie. Si je lui en soumets une seule et qu'il répond PASS, je ne sais pas si
-c'est son jugement ou son tirage. Mais sur soixante questions, le bruit se
-moyenne — et c'est comme ça que je l'utilise.
+Maintenant lisez les colonnes, pas les cases.
 
-Mais la troisième compte plus que les deux autres. J'ai vérifié mon juge avec une
-mesure qui ne contient aucun LLM — compter les identifiants attendus dans le
-contexte. Elle classe les deux moteurs dans le même ordre que lui.
+La justesse ne bouge plus entre la deuxième et la troisième ligne. L'accord — le kappa, c'est
+l'accord une fois retiré ce que le hasard donne tout seul — ne s'améliore pas
+non plus : zéro quarante-huit, puis zéro quarante-quatre. Et la stabilité, elle,
+BAISSE : soixante-seize, puis cinquante-huit.
 
-Les deux ne partagent aucun mode de défaillance. C'est ça qui tient l'écart de
-vingt-cinq points.
+La seule colonne que l'entraînement a achetée, c'est la dernière. Le schéma
+imbriqué, cent cinquante fois sur cent cinquante — donc un accord mesurable
+contrôle par contrôle. De l'auditabilité. Pas du jugement.
+
+Quatrième ligne, et celle-là est arrivée tard : le même juge, la même invite,
+les mêmes conventions — un modèle deux fois plus gros. Quatre-vingt-dix pour
+cent. L'accord passe de zéro quarante-huit à zéro quatre-vingts, la stabilité de
+soixante-seize à quatre-vingt-douze. Mais sur cinquante copies, cet écart de
+quatorze points, je ne peux pas le déclarer : ma lecture était fixée d'avance, et
+elle dit NON CONCLUANT. Et vous voyez la dernière colonne : zéro. La taille
+n'achète pas le schéma. L'entraînement, lui, l'achète en entier.
+
+Et ça compte pour la suite : c'est la troisième ligne qui a tourné sur le banc
+que je vais vous montrer.
+
+Donc je ne lui fais pas confiance sur une copie. Si je lui en soumets une seule
+et qu'il répond PASS, je ne sais pas si c'est son jugement ou son tirage. Sur
+soixante questions, le bruit se moyenne — et c'est comme ça que je l'utilise.
 
 Et vous, vous la connaissez, la précision de votre évaluateur ?
 
@@ -1164,16 +1232,86 @@ avant. Motif : le κ portait deux diapositives, il est faible, et il est mesuré
 contre un étalon fragile — il donnait à tout l'exposé une couleur d'excuse. Ne
 pas le réintroduire comme sujet.
 
-⚠ C'est hintCoverage qui porte la réponse, pas le κ. Pour une salle de devs,
-« j'ai vérifié mon juge LLM avec une mesure sans aucun LLM » est plus fort qu'un
-coefficient. Mais ne PAS dire qu'il valide le juge : il corrobore un CLASSEMENT.
+⚠ LE TABLEAU, posé le 2026-10-17. Source : REX_TRAME.md:257 — banc du juge du
+2026-09-24, 450 générations, 50 items, 3 passes, T = 0,2, bootstrap 10 000.
+`invite nue` et `+ conventions` ne diffèrent QUE par le suffixe d'invite, les
+quatre conventions reprises mot pour mot. C'est ce qui autorise à lire la ligne 2
+comme un effet de l'invite seule.
 
-⚠ Les chiffres, si on demande : κ du juge 0,44 IC [0,27 — 0,60] pour le juge
-fine-tuné, CELUI QUI A TOURNÉ SUR LE BANC. La variante à conventions est à 0,48
-[0,29 — 0,66] mais elle n'a pas produit le résultat — ne pas les mélanger. κ du
-corpus 0,880 IC [0,720 — 1,000], et c'est UN relecteur contre des étiquettes
-écrites par un modèle, jamais deux humains. Stabilité 76 % (conventions) contre
-58 % (fine-tuné). hintCoverage 0,697 contre 0,596.
+⚠ POURQUOI un tableau et plus trois lignes : un chiffre faible tout seul est une
+note, le même chiffre entouré de ses voisins de même nature est une information.
+Le 0,44 n'est plus un bulletin — c'est la cellule qui PROUVE que l'entraînement
+n'a pas acheté le jugement.
+
+⚠ NE PAS ajouter le κ du corpus (0,880) à la colonne accord. Ce n'est pas la même
+mesure — UN relecteur contre des étiquettes écrites par un modèle — et le
+pré-enregistrement de la seconde relecture a tranché : « il ne peut pas servir de
+plafond » (PREENREGISTREMENT_RELECTURE2.md). L'y mettre réintroduirait à l'écran
+l'erreur corrigée le 2026-10-13.
+
+⚠ hintCoverage a QUITTÉ cette diapositive le 2026-10-17. Il vit sur « Le
+résultat », à sa place, avec la comparaison des deux moteurs. Il y corrobore un
+CLASSEMENT — ne jamais dire qu'il valide le juge.
+
+⚠ Les chiffres hors écran, si on demande : κ 0,48 IC [0,29 — 0,66] pour la
+variante À CONVENTIONS, celle que raconte le support depuis l'arbitrage du
+2026-10-17 ; κ 0,44 [0,27 — 0,60] pour le fine-tuné, celui qui a tourné sur le
+banc RAG — ne pas les mélanger. Les intervalles se chevauchent largement :
+aucun des deux n'est meilleur que l'autre à cet effectif. Justesse
+76,0 % contre 76,0 %, Δ = 0,0 %, IC apparié [-14 %, +14 %], McNemar exact
+p = 1,0000 sur 12 paires discordantes, 6 de chaque côté. À n = 50 l'étude ne
+détecte pas moins de ~15 points, et cette limite était écrite AVANT les
+résultats. Accord par contrôle, DISPONIBLE POUR LE FINE-TUNÉ SEULEMENT — le dire tel quel
+si on demande, ne pas le présenter comme celui du juge décrit à l'écran :
+validation_entree 100 %,
+contexte_pertinent 89 %, absence_invention 83 %, format_impose 33 %,
+bruit_maitrise 50 %.
+
+⚠ QUATRIÈME LIGNE TOMBÉE le 2026-10-17, et la lecture pré-déclarée est appliquée
+telle quelle. `32B-baseline-conventions` : même invite, mêmes conventions, mêmes
+50 items, 3 passes — seule la TAILLE change. Paire pré-déclarée dans
+configs/variants.json, « effet de la taille, à conventions identiques ».
+
+  justesse stricte (vote majoritaire)   90 %   contre 76 %
+  accord κ moyen                        0,80   contre 0,48   IC95 [0,64 ; 0,93]
+  stabilité du verdict                  92 %   contre 76 %
+  format strict (le « schéma »)          0 %   contre 0 %
+
+  Écart apparié produit par le harnais : Δ justesse = +14,0 points,
+  IC95 bootstrap [+2,0 ; +26,0], McNemar p = 0,0654, 11 paires discordantes.
+
+LA LECTURE, FIXÉE AVANT LE CHIFFRE : 90 % tombe DANS la bande [61 %, 91 %] sans
+égaler 76 %, donc ⇒ **NON CONCLUANT**, et c'est ce mot qui doit être employé sur
+scène. Ne pas plaider que l'IC95 exclut zéro : McNemar ne rejette pas (p = 0,065),
+et la bande était écrite avant. À un item près — 92 % — le résultat sortait de la
+bande. Ce n'est pas un argument, c'est un fait à dire si on insiste.
+
+⚠ LE PIÈGE DU κ 0,80, armé le 2026-10-17. La quatrième ligne affiche κ = 0,80.
+Deux rapprochements vont venir, et ce sont deux erreurs :
+  — « 0,80, c'est le seuil de reproductibilité entre humains de
+    PREENREGISTREMENT_RELECTURE2.md » — non : ce seuil porte sur κ(relecteur 1,
+    relecteur 2), un accord ENTRE DEUX HUMAINS. Ici κ mesure juge contre étalon.
+    Deux quantités différentes qui portent le même nom.
+  — « 0,80, c'est presque le 0,880 de la relecture du corpus » — non, et c'est le
+    rapprochement le plus dangereux du support : ce 0,880 est l'accord d'UN
+    relecteur avec des étiquettes écrites par un MODÈLE, il a déjà été rétrogradé
+    pour cette raison. Le comparer au κ du juge ferait dire au support qu'un juge
+    automatique atteint le niveau humain, ce qu'aucune mesure du dépôt n'établit.
+Réponse courte si on insiste : « les deux s'appellent kappa et ne mesurent pas la
+même chose ; l'accord entre deux humains sur cette grille, je ne l'ai pas encore —
+la seconde relecture est pré-enregistrée. »
+
+⚠ CE QUE CETTE LIGNE A COÛTÉ À L'ÉCRAN, à relire quand tu reformuleras. Trois
+affirmations devenaient fausses et ont été corrigées le 2026-10-17 :
+  — « Quatre paragraphes achètent TOUTE la justesse » → « l'essentiel de » (76 sur 90) ;
+  — « Aucun des DEUX leviers n'a amélioré cette colonne » → « ni les conventions
+    ni l'entraînement », parce qu'un troisième levier l'a améliorée : κ 0,80 ;
+  — le script disait « les TROIS versions » et « la justesse ne bouge plus après la
+    deuxième ligne ». Corrigé en quatre versions, et « entre la deuxième et la
+    troisième ».
+L'hypothèse de plafond est donc ABANDONNÉE : le corpus ne plafonne pas à 76 %,
+puisqu'un modèle plus gros atteint 90 % sur le même corpus. Mais l'écart n'est pas
+déclarable à n = 50. Les deux phrases tiennent ensemble, et c'est tout le propos.
 
 ⚠ Si on demande comment faire mieux sur l'étalon : une seconde relecture est
 PRÉ-ENREGISTRÉE et le paquet aveugle est prêt (judge-finetune/data/relecture2/),
@@ -1189,37 +1327,44 @@ Les copies où il **change d'avis** entre trois lectures, je les relis.
 
 ```
    50 copies
-   ├─ 29 stables     →  je n'y touche pas
-   └─ 21 instables   →  je relis
+   ├─ 38 stables     →  je n'y touche pas
+   └─ 12 instables   →  je relis
 ```
 
-**21 relectures au lieu de 50.** Et ça rattrape **7 de ses 12 erreurs.**
+**12 relectures au lieu de 50** — les trois quarts du travail écartés.
 
-**L'hésitation en attrape 7 sur 12.** Les 5 autres, il les rend trois fois
-identiques et fausses — **rejouer le même modèle fait varier l'échantillonnage,
-jamais la compréhension.**
+**Mais l'hésitation n'attrape que 4 de ses 12 erreurs.** Les 8 autres, il les
+rend trois fois identiques et fausses — **rejouer le même modèle fait varier
+l'échantillonnage, jamais la compréhension.**
 
 <!--
 [À REFORMULER AVEC TES MOTS]
 
-Bon. Mon juge hésite deux fois sur cinq. Mais cette hésitation, je peux m'en
-servir.
+Bon. Mon juge hésite sur une copie sur quatre. Mais cette hésitation, je peux
+m'en servir.
 
 L'idée est simple : les copies où il rend trois fois le même verdict, je lui fais
 confiance. Celles où il change d'avis, je les relis moi-même.
 
-Résultat : je relis vingt et une copies au lieu de cinquante. La moitié du
-travail, c'est lui qui l'a trié — et il a trié ce qu'il y avait de plus ambigu.
+Résultat : je relis douze copies au lieu de cinquante. Les trois quarts du
+travail, c'est lui qui les a écartés — et il a gardé ce qu'il y avait de plus
+ambigu.
 
 Et sur les douze fois où il n'est pas d'accord avec mon étalon, l'hésitation m'en
-signale sept. Plus de la moitié. Les cinq
-autres, il les a rendues trois fois de suite, identiques, et fausses. Il ne
-doutait pas. Il se trompait.
+signale quatre. Un tiers. Les huit autres, il les a rendues trois fois de suite,
+identiques, et fausses. Il ne doutait pas. Il se trompait.
 
 Et c'est exactement ce que je vous disais tout à l'heure : un juge qui change
 d'avis n'est pas un juge, mais un juge constant et faux non plus.
 
 ==============================================================
+
+⚠ ARBITRÉ LE 2026-10-17 — cette diapositive montrait le juge FINE-TUNÉ (29/21,
+7 sur 12) alors que les quatre preuves du REX, la 29 et les notes ci-dessous
+parlaient toutes du juge À CONVENTIONS. Le support raconte désormais le juge à
+conventions de bout en bout. Ce qui change : 12 relectures au lieu de 21, et 4
+désaccords rattrapés au lieu de 7. Les deux chiffres étaient vrais, d'un juge
+différent. Si on demande pourquoi moins : voir le curseur, plus bas.
 
 ⚠ MESURE A POSTERIORI, pas pré-enregistrée. Le dire si on insiste. Tout est
 consigné dans judge-finetune/TRIAGE_POSTHOC.md, méthode et limites comprises.
@@ -1239,6 +1384,17 @@ cet ordre.
      2024 : un panel de petits modèles bat un seul gros juge, moins de biais
      intra-modèle, plus de sept fois moins cher. Et c'est cohérent avec ma
      parade contre l'auto-préférence.
+
+⚠ LE PIÈGE DES DEUX 38, vérifié le 2026-10-17. La diapositive 21 annonce
+**76 % de justesse**, soit **38 copies justes sur 50**. Celle-ci annonce
+**38 stables**. Ce sont **deux 38 différents**, et leur coïncidence est un
+hasard arithmétique : les 38 stables se décomposent en 30 justes + **8 FAUSSES**,
+les 38 justes en 30 stables + 8 instables. Ne jamais dire ni laisser entendre
+que « les stables sont les bonnes » — c'est précisément l'inverse du propos de la
+diapositive. Si quelqu'un fait le rapprochement, la réponse est : « les deux font
+38 par hasard ; huit copies stables sont fausses, et c'est tout mon problème. »
+Recoupement : 50 − 38 justes = 12 erreurs, et le triage compte 12 désaccords
+(8 stables + 4 instables). Les deux lectures se referment exactement.
 
 ⚠ POURQUOI les 8 échappent : rejouer le même modèle ne fait varier que
 l'échantillonnage, pas la compréhension. Une convention mal lue est mal lue
@@ -1302,7 +1458,7 @@ bouger le même bras de cinquante-six à quarante-trois pour cent.
 | | Lucene | Neo4j |
 |---|---|---|
 | **Réponses justes** | **48 %** | **24 %** |
-| Contexte jugé insuffisant | 40 % | **66 %** |
+| Contexte jugé insuffisant | 43 % | **67 %** |
 
 Sur 60 questions, **24 les départagent**. Lucene en gagne **19**, Neo4j **5**.
 Le hasard donnerait 12–12 : c'est tirer **19 fois pile sur 24 lancers**.
@@ -1334,6 +1490,17 @@ dans le même ordre. Elle ne valide pas les verdicts, elle mesure autre chose.
 Mais deux instruments indépendants qui classent pareil, c'est mieux qu'un seul.
 
 ==============================================================
+
+⚠ CORRIGÉ le 2026-10-17 — la ligne « contexte jugé insuffisant » affichait
+40 % / 66 %. Mesuré depuis `benchmarks/rag-quality-detail.jsonl`, scénario
+`hybrid|hybrid`, contrôle `contexte_suffisant` à faux :
+    lucene 26/60 = 43,3 %      neo4j 40/60 = 66,7 %
+Affiché désormais 43 % / 67 %. Le 40 % était faux de 3 points, et dans le sens
+qui FLATTE la conclusion : il donnait 26 points d'écart au lieu de 24.
+Aucun autre contrôle ne produit 40 % (`contexte_pertinent` 38,3/45,0 ·
+`bruit_maitrise` 26,7/26,7), donc ce n'était pas une autre mesure mal étiquetée.
+→ En reformulant le script, « quatre fois sur dix » reste juste pour 43,3 %,
+   mais « deux fois sur trois » contre « plus de quatre sur dix » est plus exact.
 
 ⚠ p = 0,0066. hintCoverage 0,697 contre 0,596.
 
@@ -1543,9 +1710,9 @@ Un modèle génère de gauche à droite. L'ordre des champs change tout.
 **3. Exigez une preuve positive avant de dépenser du calcul.**
 Un banc qui ne prouve pas ce qu'il mesure ne mesure rien — silencieusement.
 
-**Et moi, ensuite ?** Pas un plus gros modèle — mesuré, **76,0 % contre 76,0 %**.
-Pas un entraînement — il achète le format. **Un jury de familles disjointes :**
-8 erreurs sur 12 sont systématiques, et aucun rejeu ne les verra.
+**Et moi, ensuite ?** Pas un entraînement de plus — vous venez de voir ce qu'il
+achète. **Un jury de familles disjointes :** 8 erreurs sur 12 sont systématiques,
+et aucun rejeu du même modèle ne les verra.
 
 <!--
 [À REFORMULER AVEC TES MOTS]
@@ -1567,9 +1734,8 @@ silencieusement.
 Et moi, ensuite ? Je vous dois une réponse, parce que je vous ai dit de ne pas
 faire juger un modèle par sa propre famille, et mon juge est tout seul.
 
-Ce ne sera pas un plus gros modèle : je l'ai mesuré, soixante-seize contre
-soixante-seize, p égal à un. Ce ne sera pas un entraînement non plus : j'ai
-essayé, ça lui a donné le format, pas la justesse. Ce sera un jury plutôt qu'un
+Ce ne sera pas un entraînement de plus : vous avez vu le tableau, ça lui a donné
+le schéma, pas la justesse ni la constance. Ce sera un jury plutôt qu'un
 juge — des modèles de familles différentes, et on relit là où ils se
 contredisent. Parce que huit de ses douze erreurs sont systématiques, et
 qu'aucune répétition du même modèle ne les montrera jamais.
@@ -1582,10 +1748,23 @@ les générations écartées avec la raison de leur mise à l'écart.
 ⚠ Les trois sont applicables sans budget et sans installation. C'est ce qui en
 fait des actions et pas des conseils.
 
-⚠ Le quatrième bloc n'est pas une action pour la salle, c'est MON plan. Deux
-leviers écartés PAR LA MESURE, un seul retenu — et c'est ce qui l'empêche de
+⚠ Le quatrième bloc n'est pas une action pour la salle, c'est MON plan. Un
+levier écarté PAR LA MESURE, un seul retenu — et c'est ce qui l'empêche de
 sonner comme une liste de ce qui manque. Ne jamais le dire comme « il reste
 du travail ».
+
+⚠ CORRIGÉ le 2026-10-17. La version précédente disait « pas un plus gros modèle —
+mesuré, 76,0 % contre 76,0 % ». FAUX : le 32B n'a jamais été entraîné
+(REX_TRAME.md:431, lignes 32B-* gelées sans données), et ce 76,0 contre 76,0 est
+`14B-baseline-conventions` contre `14B-finetuned` — deux variantes de MÊME taille.
+TRANCHÉ LE 2026-10-17 : le banc 32B a rendu son chiffre, et la règle
+pré-déclarée s'applique — la ligne « plus gros modèle » NE REVIENT PAS. Elle ne
+devait revenir que sur un résultat détectable ; 90 % contre 76 % donne
+Δ +14 points, IC95 [+2 ; +26], McNemar p = 0,0654, soit NON CONCLUANT à n = 50.
+Détail complet dans les notes de la diapositive 21.
+⚠ Ce qui change quand même, et qui n'est pas sur cette diapositive : l'hypothèse
+« c'est le corpus qui plafonne » est abandonnée. Un modèle plus gros atteint 90 %
+sur le MÊME corpus. L'écart n'est pas déclarable, le plafond n'est plus défendable.
 -->
 
 ---
@@ -1690,7 +1869,11 @@ Toutes les valeurs sont vérifiées ; les sources sont nommées.
       exemples de plus reproduit l'ambiguïté au lieu de la lever.
    3. Puis un JURY : des familles disjointes, on relit là où elles divergent.
       Seul levier contre l'angle mort partagé. Verga et al., arXiv:2404.18796.
-   4. PAS un plus gros modèle : mesuré, 76,0 % contre 76,0 %, p = 1,0000.
+   4. Un plus gros modèle : mesuré le 2026-10-17, 90 % contre 76 %, mais
+      Δ +14 points NON CONCLUANT à n = 50 (McNemar p = 0,0654). Et 0 % de
+      format strict : il n'achète pas le schéma. ⚠ Ne plus dire « PAS un plus
+      gros modèle — 76,0 % contre 76,0 % » : ce chiffre-là mesurait
+      l'entraînement, pas la taille.
    ⚠ Levier mesuré et NÉGATIF, à sortir si on le propose : router sur « un
      contrôle a bougé » au lieu du verdict fait relire 16 copies au lieu de 12
      et rattrape exactement les mêmes 4. Détail dans TRIAGE_POSTHOC.md.
@@ -1713,10 +1896,20 @@ Toutes les valeurs sont vérifiées ; les sources sont nommées.
    trouve.
 
 ❓ POURQUOI PAS UN PLUS GROS MODÈLE, OU PLUS DE FINE-TUNING ?
-   Mesuré : 76,0 % contre 76,0 %, p = 1,0000. Le fine-tuning a acheté le
-   CONTRAT DE SORTIE — 100 % de format strict — pas la justesse.
-   Et il a DÉGRADÉ la stabilité : 76 % à 58 %.
-   Le plafond n'est pas la taille du modèle, c'est ce que le corpus enseigne.
+   ⚠ RÉPONSE REFAITE LE 2026-10-17 : l'ancienne répondait « 76,0 % contre
+   76,0 %, p = 1,0000 », qui est la mesure du FINE-TUNING, et l'appliquait à la
+   TAILLE — deux questions, une seule mesure. Elle concluait « le plafond n'est
+   pas la taille du modèle » : le banc 32B dit le contraire.
+   Le fine-tuning : 76,0 % contre 76,0 %, p = 1,0000. Il a acheté le CONTRAT DE
+   SORTIE — 100 % de format strict — pas la justesse. Et il a DÉGRADÉ la
+   stabilité : 76 % à 58 %.
+   Un plus gros modèle : MESURÉ, et c'est le seul levier qui ait bougé les trois
+   premières colonnes. 90 % contre 76 %, κ 0,80 contre 0,48, stabilité 92 %
+   contre 76 %. Δ = +14 points, IC95 [+2 ; +26], McNemar p = 0,0654 —
+   NON CONCLUANT à n = 50, et c'est le mot pré-déclaré. Il n'achète toujours
+   pas le schéma : 0 % de format strict.
+   Ce qui reste vrai sans réserve : AUCUN des deux leviers que j'ai payés
+   n'a amélioré l'accord. Et le corpus, lui, n'a pas bougé d'un item.
 
 ❓ DONC LUCENE BAT GRAPHRAG ? EN GÉNÉRAL ?
    Non. Sur ma codebase, 162 fichiers Java, avec CE pipeline Neo4j.

@@ -67,6 +67,20 @@
       "ram_gb": 18.4,
       "api_key_env": null,
       "cost_per_hour_usd": 0.05
+    },
+    {
+      "name": "Mistral-24B-baseline-conventions",
+      "size": "24B",
+      "family": "mistral",
+      "fine_tuned": false,
+      "base_url": "http://127.0.0.1:8085/v1",
+      "model": "mlx-community/Mistral-Small-3.2-24B-Instruct-2506-4bit",
+      "serve_model": "mlx-community/Mistral-Small-3.2-24B-Instruct-2506-4bit",
+      "serve_adapter": null,
+      "system_suffix_file": "configs/conventions.md",
+      "ram_gb": 13.5,
+      "api_key_env": null,
+      "cost_per_hour_usd": 0.05
     }
   ],
   "comparisons": {
@@ -90,6 +104,11 @@
         "a": "14B-finetuned",
         "b": "32B-finetuned",
         "note": "effet de la taille, à fine-tuning identique"
+      },
+      {
+        "a": "14B-baseline-conventions",
+        "b": "Mistral-24B-baseline-conventions",
+        "note": "famille disjointe, conventions identiques. DECLARE LE 2026-10-17, avant toute generation. But : les erreurs systematiques coincident-elles entre familles ? La comparaison de justesse ne porte AUCUN verdict (n=50 sous-dimensionne, et la taille confond). Lecture fixee d'avance dans PREENREGISTREMENT_JURY.md"
       }
     ]
   }

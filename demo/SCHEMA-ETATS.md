@@ -22,11 +22,34 @@ Le numéro de diapositive en titre est celui du support.
 Quand les PNG Excalidraw existeront, on remplace chaque bloc par une image et ce
 fichier disparaît.
 
+⚠ RENVOIS RECALÉS le 2026-10-17. Les numéros de diapositive de ce fichier étaient
+périmés : les états 3 à 10 pointaient tous **une diapositive trop loin**, et les
+états 1 et 2 ont fusionné en **un seul marqueur** (diapo 9) depuis la suppression
+de la diapositive « quand évaluer ? » le 2026-10-14. La correspondance a été
+rétablie par le CONTENU des marqueurs, pas par leur numéro. Vérification : le
+support porte **9 marqueurs** `[AJOUT AU SCHÉMA]` (diapos 9, 10, 11, 12, 13, 16,
+17, 20, 21) et l'état 11 est un récapitulatif sans marqueur — soit les **dix
+états à dessiner**.
+
+⚠ « C'EST LUI QUI PLAFONNE TOUT » A ÉTÉ RETIRÉ DE L'ÉTAT 10 le 2026-10-17, et
+ne doit pas revenir dans le dessin. Le banc `32B-baseline-conventions` rend
+**90 %** sur le MÊME corpus avec la MÊME invite, contre 76 % pour le 14B : le
+corpus ne plafonne donc pas à 76 %. Ce qui reste vrai, et qui est la légende
+désormais : **tout est mesuré contre lui**. (L'écart de +14 points n'est pas
+déclarable à n = 50 — « non concluant », cf. notes de la diapositive 21 — mais
+cela ne rend pas le plafond défendable pour autant.)
+
+⚠ NE PAS RECOPIER « 50 items relus en aveugle · κ 0,880 » TEL QUEL dans les
+dessins (états 10 et 11). Ce κ est l'accord d'**un** relecteur avec des
+étiquettes écrites par un modèle, pas un accord entre deux humains, et le support
+l'a rétrogradé pour cette raison. Attendre la seconde relecture, ou écrire
+« 50 items relus · un relecteur ».
+
 Rendu : docker run --rm -v "$(pwd)/demo:/home/marp/app" marpteam/marp-cli \
           SCHEMA-ETATS.md --html --output SCHEMA-ETATS.html
 -->
 
-## État 1 — diapo 9 · le filtre L0
+## État 1 — diapo 9 · le filtre L0  ⟨avec l'état 2 : UN SEUL marqueur⟩
 
 ```
    réponse à juger
@@ -45,7 +68,7 @@ Rien de ce qu'elle recale n'atteint le LLM.
 
 ---
 
-## État 2 — diapo 10 · ce qui entre
+## État 2 — diapo 9 (même marqueur que l'état 1) · ce qui entre
 
 ```
    ┌────────┐   les MÊMES questions    ┌──────────────┐
@@ -60,7 +83,7 @@ Rien de ce qu'elle recale n'atteint le LLM.
 
 ---
 
-## État 3 — diapo 11 · le contrat de sortie
+## État 3 — diapo 10 · le contrat de sortie
 
 ```
    CI ──► FILTRE L0 ──►  ┌───────────┐
@@ -78,7 +101,7 @@ L'ordre des champs est le contrat : **on raisonne, on constate, on conclut.**
 
 ---
 
-## État 4 — diapo 12 · première parade
+## État 4 — diapo 11 · première parade
 
 ```
    CI ──► FILTRE L0 ──►  ┌───────────┐  ──► thinking / checks / verdict
@@ -93,7 +116,7 @@ L'ordre des champs est le contrat : **on raisonne, on constate, on conclut.**
 
 ---
 
-## État 5 — diapo 13 · la récupération entre en scène
+## État 5 — diapo 12 · la récupération entre en scène
 
 ```
    ┌──────────────┐    extraits    ┌─────────────┐
@@ -111,7 +134,7 @@ Graîné par la question : **la mesure se rejoue à l'identique.**
 
 ---
 
-## État 6 — diapo 14 · le banc qui mesure le juge
+## État 6 — diapo 13 · le banc qui mesure le juge
 
 ```
    RÉCUPÉRATION ─► MÉLANGE ─┐
@@ -131,7 +154,7 @@ Graîné par la question : **la mesure se rejoue à l'identique.**
 
 ---
 
-## État 7 — diapo 17 · le contexte entre DANS le juge
+## État 7 — diapo 16 · le contexte entre DANS le juge
 
 ```
    RÉCUPÉRATION ─► MÉLANGE ─────────┐
@@ -150,7 +173,7 @@ C'est ce qui sépare un **défaut de récupération** d'un **défaut de généra
 
 ---
 
-## État 8 — diapo 18 · les conventions, le cadre
+## État 8 — diapo 17 · les conventions, le cadre
 
 ```
   ╔══════════════ LES 4 CONVENTIONS ══════════════════════════════╗
@@ -168,7 +191,7 @@ Ce n'est pas une boîte de plus : **elles s'appliquent à chaque contrôle.**
 
 ---
 
-## État 9 — diapo 21 · la boucle
+## État 9 — diapo 20 · la boucle
 
 ```
   ╔══════════════ LES 4 CONVENTIONS ══════════════════════════════╗
@@ -187,11 +210,11 @@ Le schéma cesse d'être une chaîne. **Il se vérifie.**
 
 ---
 
-## État 10 — diapo 23 · le corpus, et les deux cadrans
+## État 10 — diapo 21 · le corpus, et les deux cadrans
 
 ```
-  ┌──────────────┐  c'est lui qui plafonne tout
-  │  LE CORPUS   │  50 items relus en aveugle · κ 0,880
+  ┌──────────────┐  tout est mesuré contre lui
+  │  LE CORPUS   │  50 items relus en aveugle · κ 0,880  ⚠ voir en-tête
   └──────┬───────┘
          │ étalon
          ▼
@@ -213,7 +236,7 @@ Le schéma cesse d'être une chaîne. **Il se vérifie.**
 
 ```
   ┌──────────────┐
-  │  LE CORPUS   │  200 exemples · 50 relus en aveugle · κ 0,880
+  │  LE CORPUS   │  200 exemples · 50 relus en aveugle · κ 0,880  ⚠ voir en-tête
   └──────┬───────┘
          │ étalon
          ▼
