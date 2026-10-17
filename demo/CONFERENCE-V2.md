@@ -796,9 +796,14 @@ tout seul. Gardez-le en tête, j'y reviens à la fin.
 
 ==============================================================
 
-⚠ LA DETTE OUVERTE ICI SE PAIE EN CONCLUSION (« un jury, pas un juge »). Dix mots
-posés tôt pour que la fin soit un remboursement et pas une idée qui tombe du
-ciel. Si la conclusion change, retirer cette phrase.
+⚠ LA DETTE OUVERTE ICI SE PAIE EN CONCLUSION — PAR UNE MESURE, PAS PAR UN PLAN
+(recalé le 2026-10-17). Dix mots posés tôt pour que la fin soit un remboursement
+et pas une idée qui tombe du ciel. La version précédente la remboursait par
+« un jury, pas un juge ». Le jury a tourné le 2026-10-17 : 2 sur 8, bande ≤ 3/8,
+il ne peut donc plus être annoncé comme la suite. Ce qui le remplace parle
+TOUJOURS DE FAMILLE — « je vous l'ai dit, alors je l'ai fait, et ce n'est pas la
+famille » — donc **cette phrase reste valable telle quelle**. Ne la retirer que
+si la conclusion cesse de parler de famille.
 
 ⚠ RÉSOLU le 2026-10-14 — la question « votre juge est-il de la même famille que
 ce qu'il juge ? » a une réponse nette : NON, pas dans les résultats publiés.
@@ -1202,13 +1207,20 @@ La seule colonne que l'entraînement a achetée, c'est la dernière. Le schéma
 imbriqué, cent cinquante fois sur cent cinquante — donc un accord mesurable
 contrôle par contrôle. De l'auditabilité. Pas du jugement.
 
-Quatrième ligne, et celle-là est arrivée tard : le même juge, la même invite,
-les mêmes conventions — un modèle deux fois plus gros. Quatre-vingt-dix pour
-cent. L'accord passe de zéro quarante-huit à zéro quatre-vingts, la stabilité de
-soixante-seize à quatre-vingt-douze. Mais sur cinquante copies, cet écart de
-quatorze points, je ne peux pas le déclarer : ma lecture était fixée d'avance, et
-elle dit NON CONCLUANT. Et vous voyez la dernière colonne : zéro. La taille
-n'achète pas le schéma. L'entraînement, lui, l'achète en entier.
+Quatrième ligne. Pas pour gagner des points : pour poser à mon banc la question
+que vous devriez poser au vôtre. Est-ce que je mesure encore mon juge, ou
+est-ce que je mesure mes copies ?
+
+Le contrôle tient en une phrase : faites passer un modèle que vous attendez
+meilleur, et regardez si l'aiguille bouge. Mêmes copies, mêmes conventions, un
+modèle deux fois plus gros. Trente-huit copies justes chez moi, quarante-cinq
+chez lui.
+
+Elle a bougé. Mon banc a de la marge : mes soixante-seize pour cent parlent de
+mon juge, pas de mon corpus.
+
+Et la dernière colonne : zéro. La taille n'achète pas le schéma. L'entraînement,
+lui, l'achète en entier.
 
 Et ça compte pour la suite : c'est la troisième ligne qui a tourné sur le banc
 que je vais vous montrer.
@@ -1280,11 +1292,56 @@ configs/variants.json, « effet de la taille, à conventions identiques ».
   Écart apparié produit par le harnais : Δ justesse = +14,0 points,
   IC95 bootstrap [+2,0 ; +26,0], McNemar p = 0,0654, 11 paires discordantes.
 
-LA LECTURE, FIXÉE AVANT LE CHIFFRE : 90 % tombe DANS la bande [61 %, 91 %] sans
-égaler 76 %, donc ⇒ **NON CONCLUANT**, et c'est ce mot qui doit être employé sur
-scène. Ne pas plaider que l'IC95 exclut zéro : McNemar ne rejette pas (p = 0,065),
-et la bande était écrite avant. À un item près — 92 % — le résultat sortait de la
-bande. Ce n'est pas un argument, c'est un fait à dire si on insiste.
+CE QUI EST DIT SUR SCÈNE, ARBITRÉ LE 2026-10-17 AU SOIR : **le contrôle de
+plafond, pas la comparaison de justesse.** « Le corpus plafonne à 76 % » est une
+affirmation UNIVERSELLE ; un seul contre-exemple la détruit, et 90 % sur le même
+corpus avec la même invite en est un. **Cela ne demande aucun test** — on ne
+teste pas l'existence, on la constate. C'est pourquoi le script ne prononce ni
+valeur-p ni « non concluant » : il n'en a pas besoin.
+
+NE PAS DIRE, en revanche : « la taille améliore la justesse », « un modèle plus
+gros est meilleur ». Ça, c'est la question générale, elle n'est PAS tranchée, et
+ce n'est pas le sujet. Dire les comptes : **38 copies justes sur 50 contre 45**.
+Un décompte n'a pas d'intervalle de confiance.
+
+⚠ SI ON POUSSE SUR LA STATISTIQUE — tout donner, jamais un seul test. Les paires
+discordantes sont 9 contre 2 en faveur du gros modèle, et le test se comporte
+comme ceci :
+
+  McNemar exact (PRÉ-ENREGISTRÉ, §5 l.68)    p = 0,0654   ne rejette pas
+  McNemar mid-p                              p = 0,0386   rejette
+  McNemar asymptotique, sans correction      p = 0,0348   rejette
+  McNemar asymptotique, avec correction      p = 0,0704   ne rejette pas
+
+Deux sur quatre franchissent le seuil. Le pré-enregistrement avait déclaré le
+plus conservateur des quatre. **Réponse honnête, et c'est la seule : « le
+résultat est posé sur la frontière, et le côté où il tombe dépend du test. C'est
+exactement pour ça que je ne fonde rien dessus. »** La littérature déconseille
+d'ailleurs le test exact conditionnel, trop conservateur. Ne PAS s'en servir pour
+changer de test après coup : ce serait choisir le test après avoir vu le
+résultat, et quelqu'un dans la salle le dira.
+
+  ✓ RÉFÉRENCE VÉRIFIÉE le 2026-10-17 (Europe PMC, enregistrement complet) :
+  Fagerland M. W., Lydersen S., Laake P., « The McNemar test for binary
+  matched-pairs data: mid-p and asymptotic are better than exact conditional »,
+  BMC Medical Research Methodology, 2013, vol. 13, article 91.
+  DOI 10.1186/1471-2288-13-91 — PMID 23848987.
+  FORMULATION SÛRE, parce qu'elle est portée par le TITRE lui-même : « le mid-p
+  et l'asymptotique font mieux que l'exact conditionnel ». L'article recommande
+  le mid-p et l'exact inconditionnel en toute situation, et l'asymptotique si de
+  petites violations du niveau nominal sont acceptables ; le mid-p n'a violé le
+  niveau dans aucun des 9 595 scénarios étudiés.
+  ⚠ Ne PAS dire « l'article dit que l'exact conditionnel est trop conservateur » :
+  le résumé qualifie d'« overly conservative » les méthodes EXACTES en général,
+  et ne juge l'exact conditionnel que par comparaison. Dire le titre, pas plus.
+
+⚠ Pour mémoire, et à ne pas plaider : la table de conclusion du
+PREENREGISTREMENT (§7) a un TROU. Elle prévoit « p < 0,05 ET intervalle excluant
+0 », et « intervalle CONTENANT 0 ». Notre cas — IC [+2 ; +26] excluant zéro mais
+p = 0,065 — ne tombe dans aucune ligne. Le « non concluant » employé plus tôt
+venait d'une grille écrite le matin même, pas du pré-enregistrement. C'est une
+raison de plus de ne rien fonder sur la statistique ici, et de s'en tenir au
+contre-exemple, qui lui est inattaquable.
 
 ⚠ LE PIÈGE DU κ 0,80, armé le 2026-10-17. La quatrième ligne affiche κ = 0,80.
 Deux rapprochements vont venir, et ce sont deux erreurs :
@@ -1354,8 +1411,9 @@ Et sur les douze fois où il n'est pas d'accord avec mon étalon, l'hésitation 
 signale quatre. Un tiers. Les huit autres, il les a rendues trois fois de suite,
 identiques, et fausses. Il ne doutait pas. Il se trompait.
 
-Et c'est exactement ce que je vous disais tout à l'heure : un juge qui change
-d'avis n'est pas un juge, mais un juge constant et faux non plus.
+Les trois plus coriaces ont la même forme : une phrase fausse entourée de
+paragraphes justes. « Arrays.asList renvoie une liste immuable » — faux, et tout
+le reste de la copie est impeccable. Mon juge a noté l'entourage.
 
 ==============================================================
 
@@ -1400,6 +1458,44 @@ Recoupement : 50 − 38 justes = 12 erreurs, et le triage compte 12 désaccords
 l'échantillonnage, pas la compréhension. Une convention mal lue est mal lue
 pareil aux trois passes. Ces erreurs sont systématiques — c'est structurel,
 aucun rejeu du même modèle ne les exposera.
+
+⚠ LES TROIS ITEMS, LUS LE 2026-10-17 — matière de la phrase dite sur scène, et
+réponse à « quelles erreurs rate-t-il, concrètement ? ». Sur les 8 désaccords,
+trois sont rendus PASS par les QUATRE configurations essayées (juge, fine-tuné,
+32B, jury 24B d'une autre famille). Ils ont été ouverts : l'étalon a raison dans
+les trois cas, ce n'est PAS un défaut de corpus. Tracé dans
+judge-finetune/JURY_RESULTAT.md.
+
+  b04-002 — « Arrays.asList renvoie une liste immuable ». FAUX. Autour : l'idiome
+     toArray(new String[0]) le plus rapide, l'exposition de la représentation
+     interne sur un return hosts, le coût de la copie défensive. Trois
+     développements exacts.
+  b06-008 — « ajouter T00:00:00 force une lecture cohérente ». FAUX, et le
+     correctif CRÉE le décalage. Autour : getMonth() indexé à zéro, le
+     remplissage manquant. Exacts, mais hors sujet.
+  b07-002 — « c'est de la contention, passez en verrou équitable ». FAUX, c'est
+     un interblocage. Autour : tryLock, lockInterruptibly, Condition, le
+     unlock() dans le finally. Tout exact.
+
+  LE MOTIF, et c'est lui le propos : l'erreur centrale est enrobée de
+  développements annexes exacts et bien écrits. Le juge valide une copie
+  d'expert sans peser la phrase qui compte plus lourd que celles qui l'entourent.
+  C'est le biais de l'épaisseur (diapo 11) dans sa forme adulte : il ne joue pas
+  sur la LONGUEUR, il joue sur la DENSITÉ DE VRAI AUTOUR DU FAUX. Le test apparié
+  de la 11 fait varier la longueur à défaut égal — il ne peut donc pas couvrir
+  ces trois-là, et les 46 % ne parlent pas d'eux.
+
+  ⚠ SI ON TE REPREND SUR Arrays.asList — « c'est une vue de taille fixe, pas une
+  liste immuable » : c'est la BONNE réponse, et elle te sert. Dire exactement :
+  « Oui, et c'est précisément l'erreur. add et remove lèvent bien, mais set
+  passe : Arrays.asList("a","b").set(0,"z") réussit et la liste devient
+  [z, b]. Là où List.of lève. La copie a dit immuable, et mon juge a validé. »
+  NE PAS improviser cette réponse : la dire comme ça.
+
+  ⚠ Limites, si on insiste : n = 3, post hoc. La lecture tranche « corpus ou
+  modèle » — c'est le modèle — mais elle ne mesure pas la fréquence du motif.
+  Aucun test ne le couvre aujourd'hui. Piste outillable : un jeu apparié
+  faux dense / faux nu. C'est une piste, pas un chiffre.
 
 ⚠ Le curseur, si on demande : la variante fine-tunée est plus instable, elle
 envoie 21 copies à l'humain au lieu de 12, et rattrape 7 désaccords sur 12 au
@@ -1710,9 +1806,10 @@ Un modèle génère de gauche à droite. L'ordre des champs change tout.
 **3. Exigez une preuve positive avant de dépenser du calcul.**
 Un banc qui ne prouve pas ce qu'il mesure ne mesure rien — silencieusement.
 
-**Et moi, ensuite ?** Pas un entraînement de plus — vous venez de voir ce qu'il
-achète. **Un jury de familles disjointes :** 8 erreurs sur 12 sont systématiques,
-et aucun rejeu du même modèle ne les verra.
+**Et moi, ensuite ?** Je vous ai dit de ne pas faire juger un modèle par sa
+famille. Je l'ai fait : **2 erreurs sur 8**, et la même complaisance.
+
+**Ce n'est pas la famille** — c'est le faux dense.
 
 <!--
 [À REFORMULER AVEC TES MOTS]
@@ -1731,14 +1828,19 @@ Trois. Exigez une preuve positive avant de dépenser du calcul. Un banc qui ne
 sait pas prouver qu'il a mesuré la bonne chose ne mesure rien, et il le fait
 silencieusement.
 
-Et moi, ensuite ? Je vous dois une réponse, parce que je vous ai dit de ne pas
-faire juger un modèle par sa propre famille, et mon juge est tout seul.
+Et moi, ensuite ? Je vous ai dit de ne pas faire juger un modèle par sa propre
+famille, et mon juge est tout seul.
 
-Ce ne sera pas un entraînement de plus : vous avez vu le tableau, ça lui a donné
-le schéma, pas la justesse ni la constance. Ce sera un jury plutôt qu'un
-juge — des modèles de familles différentes, et on relit là où ils se
-contredisent. Parce que huit de ses douze erreurs sont systématiques, et
-qu'aucune répétition du même modèle ne les montrera jamais.
+Alors je l'ai fait. Un juge d'une autre famille, sur mes huit erreurs
+systématiques. Il en attrape deux. Et sur six d'entre elles, il se trompe comme
+le mien : trop indulgent. Deux familles sans ancêtre commun, la même
+complaisance, sur les mêmes copies.
+
+Donc ce n'est pas la famille. Les trois copies que rien ne corrige ont toutes la
+même forme : une phrase fausse, entourée de paragraphes justes.
+
+Voilà ce que je vais apprendre à mesurer. Pas un modèle de plus — un test de
+plus.
 
 Tout est dans le dépôt : le corpus, le protocole avec ses amendements datés, et
 les générations écartées avec la raison de leur mise à l'écart.
@@ -1748,10 +1850,70 @@ les générations écartées avec la raison de leur mise à l'écart.
 ⚠ Les trois sont applicables sans budget et sans installation. C'est ce qui en
 fait des actions et pas des conseils.
 
-⚠ Le quatrième bloc n'est pas une action pour la salle, c'est MON plan. Un
-levier écarté PAR LA MESURE, un seul retenu — et c'est ce qui l'empêche de
-sonner comme une liste de ce qui manque. Ne jamais le dire comme « il reste
-du travail ».
+⚠ Le quatrième bloc n'est pas une action pour la salle. Et depuis le 2026-10-17
+ce n'est plus un PLAN, c'est un RÉSULTAT : deux leviers écartés par la mesure
+(jury, entraînement), un troisième non déclarable (taille), et une seule piste
+retenue — celle que la mesure désigne. Ne jamais le dire comme « il reste du
+travail » : le sujet de la phrase est celui qui a mesuré, pas celui qui a raté.
+
+⚠ LE JURY A TOURNÉ, et il est la raison de cette réécriture.
+`Mistral-Small-3.2-24B-Instruct-2506-4bit`, banc terminé le 2026-10-17 à 15 h 44,
+lecture appliquée telle qu'écrite dans PREENREGISTREMENT_JURY.md AVANT toute
+génération. **2 sur 8**, bande ≤ 3/8 — conclusion déclarée d'avance : « le jury
+ne fait pas mieux qu'un entraînement de plus » (l'entraînement en corrigeait 3).
+Appliquée sans renégociation. Détail complet dans judge-finetune/JURY_RESULTAT.md.
+  Le « six » dit sur scène : 7 des 8 items sont étalon FAIL / juge PASS — le juge
+  n'erre pas au hasard, il est TROP INDULGENT — et Mistral partage cette
+  indulgence sur 6 d'entre eux. C'est le chiffre le plus fort du bloc.
+  ⚠ Ne PAS dire « une famille juge mieux qu'une autre » : cette variante confond
+  famille et taille (24B contre 14B), c'est écrit dans le pré-enregistrement.
+  ⚠ Si on demande ce que le jury gagne quand même : l'union triage ∪ jury couvre
+  6 des 12 désaccords pour 18 relectures, contre 4 pour 12 au triage seul.
+  Descriptif, et ce n'était pas la question posée.
+
+⚠ « LE FAUX DENSE » est un terme maison, il n'existe dans aucune littérature.
+Ne pas le présenter comme un concept établi. Ce qu'il désigne est mesuré et lu :
+les trois items que les QUATRE configurations ratent portent une affirmation
+centrale fausse entourée de développements annexes exacts. Lus le 2026-10-17,
+l'étalon a raison dans les trois cas — ce n'est pas un défaut de corpus. Détail,
+contre-exemples et limites dans judge-finetune/JURY_RESULTAT.md, et matière
+parlée dans les notes de la diapositive 22.
+  La distinction qui tient le terme : le biais de la diapositive 11 joue sur la
+  LONGUEUR, celui-ci sur la DENSITÉ DE VRAI AUTOUR DU FAUX. Le test apparié
+  actuel fait varier la longueur à défaut égal, il ne peut donc pas couvrir ces
+  trois-là. Piste outillable annoncée sur scène : un jeu apparié faux dense /
+  faux nu. ⚠ C'est une piste, pas un chiffre. n = 3, post hoc, fréquence non
+  mesurée.
+
+⚠ « VOS MODÈLES SONT TROP PETITS POUR LA TÂCHE » — l'objection la plus forte du
+talk, et ce sont tes propres chiffres qui l'alimentent : dans la table post hoc,
+la taille corrige 5 items sur 8, l'entraînement 3, le jury 2. La taille est le
+levier dominant. Cinq réponses, dans cet ordre.
+  1. C'EST LA QUESTION, PAS UNE LIMITE. OllamAssist tourne dans IntelliJ, en
+     local. Un juge qui exige un 70B ne peut pas juger un assistant local : il a
+     perdu la prémisse. Qwen2.5-Coder-14B en 4 bits, c'est ce qui tient à côté de
+     l'IDE sur 36 Go.
+  2. TU L'AS VÉRIFIÉ — c'est l'argument qui ferme la question. Le 32B a tourné :
+     90 %, Δ +14 points, IC95 [+2 ; +26], McNemar p = 0,0654. NON CONCLUANT à
+     n = 50. « J'ai regardé, et à mon échantillon je ne peux pas le déclarer »
+     vaut mieux que ne pas avoir regardé. Détail : notes de la diapositive 21.
+  3. LA TAILLE N'ACHÈTE PAS LE SCHÉMA. Dernière colonne : zéro. Le 32B sans
+     conventions ne respecte pas le format. La thèse n'est pas touchée.
+  4. DANS TES CHIFFRES, LES CONVENTIONS PÈSENT PLUS QUE LA TAILLE : 0 % → 76 %
+     pour quatre paragraphes, +14 points pour un modèle deux fois plus gros.
+     C'est la réponse en une phrase si le temps manque.
+  5. ET ÇA NE SAUVE PAS LE JURY : le juge de l'autre famille était un **24B,
+     plus gros que le 14B**, et il n'attrape que 2 sur 8. « Trop petit »
+     n'explique pas ce résultat-là.
+  CE QUI SE CONCÈDE, franchement et sans détour : 76 % ne suffit pas pour un
+  contrôle automatique sans relecture, et une part de cet écart EST de la
+  capacité. Le concéder est ce qui rend les quatre points précédents crédibles.
+  ⚠ La dernière ligne dite sur scène — « pas un modèle de plus, un test de
+  plus » — pose cette réponse AVANT la question. Ne pas la couper.
+
+⚠ CE QUI A QUITTÉ L'ÉCRAN le 2026-10-17 : « 8 erreurs sur 12 sont systématiques,
+et aucun rejeu du même modèle ne les verra ». Ce n'est pas une coupe, c'est du
+dédoublonnage — la diapositive 22 le dit déjà presque mot pour mot.
 
 ⚠ CORRIGÉ le 2026-10-17. La version précédente disait « pas un plus gros modèle —
 mesuré, 76,0 % contre 76,0 % ». FAUX : le 32B n'a jamais été entraîné

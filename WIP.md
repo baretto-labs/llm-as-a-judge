@@ -104,7 +104,7 @@ après coup.
 `train-32b` reste **non lancé** et sa faisabilité QLoRA sur 36 Go reste ouverte. Volontaire : servir
 n'est pas entraîner, et la variante fine-tunée mélangerait taille et entraînement.
 
-### En cours — Mistral, lancé par la chaîne le 2026-10-17 à 14 h 27
+### Terminé — Mistral, lancé à 14 h 27, rendu à 15 h 44
 
 La chaîne a franchi son portail : **3 fichiers `.safetensors`, 12 663 Mo** vérifiés avant lancement,
 pas seulement un processus terminé. `Mistral-24B-baseline-conventions` tourne. Lecture déjà fixée dans
@@ -124,6 +124,19 @@ les effectifs de `TRIAGE_POSTHOC.md` sont reproduits à l'identique sur les deux
 (38/30/8 · 12/8/4 et 29/24/5 · 21/14/7), et surtout **les deux listes gelées d'items sont bien
 exactement ce que disent les données** — les 8 systématiquement faux du juge et les 5 de la variante
 fine-tunée. La grille ne peut donc plus être réécrite après coup.
+
+**LE RÉSULTAT, lecture appliquée sans renégociation : 2 sur 8.** Bande ≤ 3/8, dont la conclusion
+était écrite d'avance — « le jury ne fait pas mieux qu'un entraînement de plus », qui en corrigeait 3.
+Consigné dans `judge-finetune/JURY_RESULTAT.md`. **Le jury ne peut donc plus être la suite annoncée**,
+et la diapositive 29 a été réécrite en conséquence (voir plus bas).
+
+Ce que la mesure a sorti de plus fort que le plan qu'elle a tué : **7 des 8 items sont étalon FAIL /
+juge PASS** — le juge n'erre pas au hasard sur ses erreurs systématiques, il est **trop indulgent** —
+et **Mistral partage cette indulgence sur 6 d'entre eux**. Deux familles sans ancêtre commun, le même
+biais de complaisance, sur les mêmes copies.
+
+Post hoc, et sans pouvoir de décision : sur ces mêmes 8 items, le jury corrige 2, l'entraînement 3,
+la taille 5. **Trois items résistent aux quatre configurations** — `b04-002`, `b06-008`, `b07-002`.
 
 ### Le dispositif de la file — lancé le 2026-10-17 à 11 h 56
 
@@ -250,7 +263,53 @@ pas celui qui échoue — « mon banc a mesuré le vide » devient « je l'ai at
 
 ## Fait le 2026-10-17
 
-- **Le commit unique est fait** — `f317add`, sur `talk/v1`, **non poussé**. Il plie tout d'un coup :
+- **Les trois items incorrigibles ont été lus, et l'étalon tient.** `JURY_RESULTAT.md` disait
+  explicitement que distinguer « étiquette discutable » de « cas difficile » demandait de les lire,
+  et que ça n'avait pas été fait. C'est fait. Dans les trois cas l'affirmation centrale de la copie
+  est fausse et l'étalon la réfute par un contre-exemple vérifiable : `Arrays.asList` est une vue de
+  taille fixe et non une liste immuable (`set` passe), `"2026-03-01"` est lu en UTC là où
+  `"2026-03-01T00:00:00"` est lu en local (le correctif proposé **crée** le décalage), et le gel sous
+  charge est un interblocage par ordre d'acquisition inversé et non de la contention.
+  **Ce n'est donc pas un défaut de corpus.** La question « corpus ou modèle ? » est refermée : c'est
+  le modèle.
+
+- **Le motif commun est le résultat, et il n'a pas de test.** Dans les trois, l'erreur centrale est
+  enrobée de développements annexes **exacts et bien écrits**. C'est le biais de verbosité dans sa
+  forme adulte : la parade appariée de la diapositive 11 fait varier la **longueur** à défaut égal,
+  pas la **densité de vrai autour du faux**. Elle ne peut pas couvrir ces trois-là, et les 46 % de
+  faux PASS sur défauts bavards ne parlent pas d'eux. Piste outillable, **non mesurée** : un jeu
+  apparié *faux dense* / *faux nu*. n = 3, post hoc, fréquence inconnue.
+
+- **Les diapositives 14 et 29 sont recalées — la dette est passée d'un plan à un résultat.** La 14
+  ouvre une dette en une ligne (« mon juge est tout seul, j'y reviens à la fin ») que la 29
+  remboursait par « un jury de familles disjointes ». Le jury ayant rendu 2/8, c'était faux à
+  l'écran. **La 14 ne bouge pas d'un mot** — elle parle de famille, et la nouvelle conclusion aussi.
+  La 29 dit désormais « je vous l'ai dit, alors je l'ai fait : 2 erreurs sur 8, et la même
+  complaisance. Ce n'est pas la famille — c'est le faux dense », et se ferme sur « pas un modèle de
+  plus, un test de plus ».
+
+- **L'objection « vos modèles sont trop petits » est armée hors écran**, avec cinq réponses dans
+  l'ordre et la concession franche qui les rend crédibles. Le détail qui la désarme : le juge de
+  l'autre famille était un **24B, plus gros que le 14B**, et il n'attrape que 2 sur 8 — « trop
+  petit » n'explique pas ce résultat. Et la dernière ligne de la 29 pose la réponse **avant** la
+  question.
+
+- **Les trois items sont aussi matière parlée, à coût quasi nul.** Une phrase entre sur scène à la
+  diapositive 22 (« une phrase fausse entourée de paragraphes justes — *Arrays.asList renvoie une
+  liste immuable*, faux, et tout le reste est impeccable »), **payée** par la coupe du rappel
+  redondant qui suivait : **+7 mots net**. Le reste vit dans les notes, y compris la formulation
+  exacte à dire si quelqu'un reprend sur « vue de taille fixe » — à ne pas improviser devant 400
+  personnes.
+
+- **Minutage après les trois interventions du soir : 4339 mots = 31,0 min**, soit 11,0 min à couper.
+  Détail du coût, mesuré et non estimé : option A resserrée sur la 21 **+20 mots**, phrase de la 22
+  **+7**, réécriture de la 29 **+14** (écran +2, parlé +14). Aucune n'a été appliquée sans son
+  chiffre.
+
+- **`CONFERENCE-V2.html` est à jour** — rendu le 2026-10-17 à 16 h 57, **31 sections**, et le
+  contenu neuf vérifié dans le rendu lui-même, pas seulement dans la source.
+
+- **Le commit unique est fait** — `a376d69`, sur `talk/v1`, **non poussé**. (Le hash `f317add` noté plus tôt est l'objet d'AVANT l'amend : il existe encore mais n'est pas dans l'historique de la branche. Vérifié le 2026-10-17 par `git merge-base --is-ancestor`.) Il plie tout d'un coup :
   la quatrième ligne, les trois affirmations d'écran qu'elle a rendues fausses, la réponse hostile
   qui était fausse hors écran, la carte des dépendances, l'audit, le correctif du schéma, les deux
   pièges armés et le pré-enregistrement Mistral.
