@@ -40,7 +40,16 @@ PYEOF
 )
 EOF
 
-SERVER_ARGS=(--model "$MODEL" --port "$PORT" --log-level WARNING)
+# Le serveur retient par défaut 10 caches KV distincts (--prompt-cache-size 10).
+# À 930 jetons d'invite c'est invisible ; à 6 900 jetons (suffixe few-shot), chaque
+# cache pèse ~1,35 Go et le serveur est mort d'un « [METAL] Insufficient Memory »
+# après 22 items le 2026-10-17. Le préfixe n'étant de toute façon jamais réutilisé
+# d'un appel à l'autre (sonde du 2026-10-17 : 37 s de préremplissage payées à chaque
+# appel), retenir ces caches ne coûte que de la mémoire. Un cache conservé suffit.
+# Réglage de service : il ne change ni les items, ni les verdicts, ni la métrique.
+PROMPT_CACHE_SIZE=${PROMPT_CACHE_SIZE:-1}
+SERVER_ARGS=(--model "$MODEL" --port "$PORT" --log-level WARNING \
+             --prompt-cache-size "$PROMPT_CACHE_SIZE")
 [ "$ADAPTER" != "-" ] && SERVER_ARGS+=(--adapter-path "$ADAPTER")
 
 LOG="$(mktemp -t mlx-server-XXXX).log"

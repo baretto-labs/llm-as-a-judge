@@ -140,8 +140,13 @@ public class RagService {
 
     /**
      * Construit le prompt augmenté avec le contexte récupéré.
+     *
+     * <p>Publique et statique depuis le 2026-10-17 pour que le banc de qualité
+     * ({@code RagAnswerer}) génère ses réponses avec <b>l'invite du produit</b> et non avec une
+     * copie : une copie dériverait en silence et le banc mesurerait autre chose que ce que les
+     * utilisateurs exécutent.</p>
      */
-    private String buildPrompt(String question, String context) {
+    public static String buildPrompt(String question, String context) {
         return """
                 Tu es un assistant expert en analyse de code. Utilise le contexte fourni pour répondre à la question.
 

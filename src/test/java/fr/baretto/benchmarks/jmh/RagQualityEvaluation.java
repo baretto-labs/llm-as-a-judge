@@ -15,6 +15,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -46,12 +47,36 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
  *     -Drag.source.dir=/chemin/vers/OllamAssist/src/main/java \
  *     -Djmh.judge.url=http://127.0.0.1:8082/v1
  * </pre>
+ *
+ * <p><b>Évaluation de la réponse, ajoutée le 2026-10-17.</b> Jusque-là ce banc ne jugeait que le
+ * contexte récupéré : aucune réponse n'était générée nulle part dans le dépôt, et le champ
+ * {@code generated} du détail contenait en réalité les extraits Java retournés par le moteur —
+ * d'où son renommage en {@code context}, le champ {@code answer} portant désormais la vraie
+ * réponse. Deux verdicts sont produits par stratégie et par question :</p>
+ *
+ * <ul>
+ *   <li><b>contexte</b> ({@link RagContextJudge}, {@code RAG_CONTEXT_RELEVANCE}) — le moteur
+ *       a-t-il ramené de quoi répondre ;</li>
+ *   <li><b>réponse</b> ({@link RagAnswerJudge}, {@code RAG_FAITHFULNESS}) — la réponse produite
+ *       à partir de ce contexte s'y tient-elle, ou brode-t-elle.</li>
+ * </ul>
+ *
+ * <p>Les deux ne se remplacent pas : une récupération pauvre peut donner une réponse
+ * <i>fidèle et inutile</i>, et c'est la lecture conjointe qui le montre. La génération utilise
+ * l'invite du produit et un modèle d'une <b>autre famille</b> que le juge, pour que le juge ne
+ * note pas sa propre sortie.</p>
+ *
+ * <pre>
+ *   -Drag.answer.enabled=false   désactive la génération et retrouve le banc d'avant
+ * </pre>
  */
 @Tag("benchmark")
 class RagQualityEvaluation {
 
     private static final Path SORTIE = Path.of("benchmarks");
-    private static final String SCHEMA = "binaire-v1";
+    // v2 : `generated` (qui contenait le contexte) devient `context`, et les champs de réponse
+    // apparaissent. Les lignes « binaire-v1 » déjà publiées restent lisibles telles quelles.
+    private static final String SCHEMA = "binaire-v2";
 
     /** Une propriété vide vaut absente : surefire les transmet toutes, y compris non renseignées. */
     private static String prop(String cle, String defaut) {
@@ -59,9 +84,18 @@ class RagQualityEvaluation {
         return (v == null || v.isBlank()) ? defaut : v.trim();
     }
 
-    private record Paire(QuestionCorpus.Question question,
+    /**
+     * @param aLucene réponse générée depuis le contexte Lucene, {@code null} si la génération
+     *                est désactivée ; {@code rLucene} porte alors son jugement de fidélité
+     */
+    record Paire(QuestionCorpus.Question question,
                          List<String> ctxLucene, RagContextJudge.Judgement jLucene,
-                         List<String> ctxNeo4j,  RagContextJudge.Judgement jNeo4j) {}
+                         List<String> ctxNeo4j,  RagContextJudge.Judgement jNeo4j,
+                         RagAnswerer.Answer aLucene, RagContextJudge.Judgement rLucene,
+                         RagAnswerer.Answer aNeo4j,  RagContextJudge.Judgement rNeo4j) {
+
+        boolean aDesReponses() { return rLucene != null && rNeo4j != null; }
+    }
 
     @Test
     void evalueLesDeuxStrategies() throws Exception {
@@ -96,6 +130,16 @@ class RagQualityEvaluation {
         var lucene = new LuceneRagStrategy(dirLucene, flagsLucene);
         var neo4j  = new Neo4jGraphRagStrategy(dirNeo4j.toString(), flagsNeo4j);
         var judge  = new RagContextJudge();
+
+        // Génération active par défaut : l'exposé affirme que la réponse est évaluée, et une
+        // option par défaut à false laisserait cette affirmation sans rien derrière.
+        boolean avecReponse = !"false".equalsIgnoreCase(prop("rag.answer.enabled", "true"));
+        var repondeur   = avecReponse ? new RagAnswerer() : null;
+        var jugeReponse = avecReponse ? new RagAnswerJudge() : null;
+        System.out.printf("[Qualité] réponse : %s%n", avecReponse
+            ? repondeur.getModelLabel() + " jugée par " + jugeReponse.getModelLabel()
+            : "désactivée (-Drag.answer.enabled=false)");
+
         List<Paire> paires = new ArrayList<>();
 
         try {
@@ -115,10 +159,24 @@ class RagQualityEvaluation {
                 List<String> cn = neo4j.retrieveContext(q.text());
                 var jl = judge.judge(q.text(), cl, q.expectedFqnHints());
                 var jn = judge.judge(q.text(), cn, q.expectedFqnHints());
-                paires.add(new Paire(q, cl, jl, cn, jn));
-                System.out.printf("  [%2d/%d] %-58s lucene=%-7s neo4j=%-7s%n",
-                    i, questions.size(), q.text().substring(0, Math.min(58, q.text().length())),
-                    jl.verdict(), jn.verdict());
+
+                // Le juge de fidélité reçoit le contexte EXACT soumis au générateur
+                // (Answer.contexte), jamais la liste brute : sinon il sanctionnerait comme
+                // invention une phrase tirée d'un extrait qu'il n'aurait pas reçu.
+                RagAnswerer.Answer al = null, an = null;
+                RagContextJudge.Judgement rl = null, rn = null;
+                if (avecReponse) {
+                    al = repondeur.answer(q.text(), cl);
+                    an = repondeur.answer(q.text(), cn);
+                    rl = jugeReponse.judge(q.text(), al.contexte(), al.texte(), q.expectedFqnHints());
+                    rn = jugeReponse.judge(q.text(), an.contexte(), an.texte(), q.expectedFqnHints());
+                }
+
+                paires.add(new Paire(q, cl, jl, cn, jn, al, rl, an, rn));
+                System.out.printf("  [%2d/%d] %-52s ctx l=%-7s n=%-7s  rep l=%-7s n=%-7s%n",
+                    i, questions.size(), q.text().substring(0, Math.min(52, q.text().length())),
+                    jl.verdict(), jn.verdict(),
+                    rl == null ? "-" : rl.verdict(), rn == null ? "-" : rn.verdict());
             }
         } finally {
             lucene.close();
@@ -127,9 +185,11 @@ class RagQualityEvaluation {
             supprime(dirNeo4j);
         }
 
+        String modeleReponse = avecReponse ? repondeur.getModelLabel() : "disabled";
+        String jugeReponseLabel = avecReponse ? jugeReponse.getModelLabel() : "disabled";
         resume(paires, judge.getModelLabel(), scenario);
-        ecrisSynthese(paires, judge.getModelLabel(), scenario);
-        ecrisDetail(paires, judge.getModelLabel(), scenario);
+        ecrisSynthese(paires, judge.getModelLabel(), scenario, modeleReponse, jugeReponseLabel);
+        ecrisDetail(paires, judge.getModelLabel(), scenario, modeleReponse, jugeReponseLabel);
     }
 
     // ── Mesures ───────────────────────────────────────────────────────────
@@ -143,10 +203,27 @@ class RagQualityEvaluation {
      * nombre est le vrai déterminant de la puissance — il est publié avec le p.</p>
      */
     private static McNemar mcNemar(List<Paire> paires) {
+        return mcNemar(paires, Paire::jLucene, Paire::jNeo4j);
+    }
+
+    /** Seam de test : McNemar est privé, mais ligneSynthese en exige un. */
+    static McNemar mcNemarPourTest(List<Paire> paires) {
+        return mcNemar(paires);
+    }
+
+    /**
+     * Même arithmétique, appliquée soit aux verdicts de contexte, soit à ceux de réponse.
+     * Paramétré plutôt que dupliqué : deux copies de ce calcul finiraient par diverger.
+     */
+    private static McNemar mcNemar(List<Paire> paires,
+                                   Function<Paire, RagContextJudge.Judgement> cote,
+                                   Function<Paire, RagContextJudge.Judgement> autre) {
         int b = 0, c = 0;
         for (Paire p : paires) {
-            if (p.jLucene().isInvalid() || p.jNeo4j().isInvalid()) continue;
-            boolean l = p.jLucene().isPass(), n = p.jNeo4j().isPass();
+            RagContextJudge.Judgement ja = cote.apply(p);
+            RagContextJudge.Judgement jb = autre.apply(p);
+            if (ja == null || jb == null || ja.isInvalid() || jb.isInvalid()) continue;
+            boolean l = ja.isPass(), n = jb.isPass();
             if (l && !n) b++;
             else if (!l && n) c++;
         }
@@ -188,19 +265,56 @@ class RagQualityEvaluation {
             System.out.println("  → aucune paire discordante : les deux stratégies s'accordent partout, "
                 + "rien à conclure sur leur différence.");
         }
+
+        if (paires.stream().allMatch(Paire::aDesReponses)) {
+            var rl = paires.stream().map(Paire::rLucene).toList();
+            var rn = paires.stream().map(Paire::rNeo4j).toList();
+            var mcr = mcNemar(paires, Paire::rLucene, Paire::rNeo4j);
+            System.out.println("  ── fidélité de la réponse (RAG_FAITHFULNESS) ──");
+            for (var e : Map.of("lucene", rl, "neo4j", rn).entrySet()) {
+                var js = e.getValue();
+                long inval = js.stream().filter(RagContextJudge.Judgement::isInvalid).count();
+                System.out.printf("  %-7s    pass=%.1f%%  indicesDansReponse=%.3f  invalides=%d/%d%n",
+                    e.getKey(), tauxPass(js) * 100,
+                    js.stream().mapToDouble(RagContextJudge.Judgement::hintCoverage).average().orElse(Double.NaN),
+                    inval, js.size());
+            }
+            System.out.printf("  McNemar    : p=%.4f sur %d paires discordantes%n",
+                mcr.p(), mcr.b() + mcr.c());
+            // Le croisement est la vraie lecture : contexte FAIL + réponse PASS = le modèle se
+            // tait proprement ; contexte FAIL + réponse FAIL = il a brodé par-dessus un contexte
+            // qui ne portait pas la réponse. C'est cette case-là qui intéresse un REX.
+            for (String strat : new String[]{"lucene", "neo4j"}) {
+                boolean luc = strat.equals("lucene");
+                long brode = paires.stream().filter(p -> {
+                    var jc = luc ? p.jLucene() : p.jNeo4j();
+                    var jr = luc ? p.rLucene() : p.rNeo4j();
+                    return !jc.isInvalid() && !jr.isInvalid() && !jc.isPass() && !jr.isPass();
+                }).count();
+                long tait = paires.stream().filter(p -> {
+                    var jc = luc ? p.jLucene() : p.jNeo4j();
+                    var jr = luc ? p.rLucene() : p.rNeo4j();
+                    return !jc.isInvalid() && !jr.isInvalid() && !jc.isPass() && jr.isPass();
+                }).count();
+                System.out.printf("  %-7s    contexte FAIL → réponse infidèle %d, réponse fidèle %d%n",
+                    strat, brode, tait);
+            }
+        }
     }
 
     // ── Écriture ──────────────────────────────────────────────────────────
 
-    private void ecrisSynthese(List<Paire> paires, String modele, String scenario) throws Exception {
+    private void ecrisSynthese(List<Paire> paires, String modele, String scenario,
+                               String modeleReponse, String jugeReponse) throws Exception {
         Files.createDirectories(SORTIE);
         StringBuilder sb = new StringBuilder();
         var mc = mcNemar(paires);
         for (String strat : new String[]{"lucene", "neo4j"}) {
-            ligneSynthese(sb, paires, strat, "ALL", modele, scenario, mc);
+            ligneSynthese(sb, paires, strat, "ALL", modele, scenario, mc, modeleReponse, jugeReponse);
             for (QuestionCorpus.Difficulty d : QuestionCorpus.Difficulty.values()) {
                 var sous = paires.stream().filter(p -> p.question().difficulty() == d).toList();
-                if (!sous.isEmpty()) ligneSynthese(sb, sous, strat, d.name(), modele, scenario, mcNemar(sous));
+                if (!sous.isEmpty()) ligneSynthese(sb, sous, strat, d.name(), modele, scenario,
+                    mcNemar(sous), modeleReponse, jugeReponse);
             }
         }
         Files.writeString(SORTIE.resolve("rag-quality.jsonl"), sb.toString(),
@@ -208,57 +322,111 @@ class RagQualityEvaluation {
         System.out.println("  écrit : benchmarks/rag-quality.jsonl");
     }
 
-    private void ligneSynthese(StringBuilder sb, List<Paire> paires, String strat, String diff,
-                               String modele, String scenario, McNemar mc) {
-        var js = paires.stream().map(p -> strat.equals("lucene") ? p.jLucene() : p.jNeo4j()).toList();
+    static void ligneSynthese(StringBuilder sb, List<Paire> paires, String strat, String diff,
+                               String modele, String scenario, McNemar mc,
+                               String modeleReponse, String jugeReponse) {
+        boolean luc = strat.equals("lucene");
+        var js = paires.stream().map(p -> luc ? p.jLucene() : p.jNeo4j()).toList();
         var valides = js.stream().filter(j -> !j.isInvalid()).toList();
         if (valides.isEmpty()) return;
         double insuffisant = (double) valides.stream()
             .filter(j -> Boolean.FALSE.equals(j.checks().get("contexte_suffisant"))).count() / valides.size();
+
+        // Volet réponse. Absent (null) quand la génération est désactivée : on écrit alors
+        // `null` plutôt que 0, qu'un lecteur confondrait avec « aucune réponse fidèle ».
+        boolean avecRep = paires.stream().allMatch(Paire::aDesReponses);
+        var rs = avecRep ? paires.stream().map(p -> luc ? p.rLucene() : p.rNeo4j()).toList() : List.<RagContextJudge.Judgement>of();
+        var rValides = rs.stream().filter(j -> !j.isInvalid()).toList();
+        var mcr = avecRep ? mcNemar(paires, Paire::rLucene, Paire::rNeo4j) : null;
+        long brode = !avecRep ? 0 : paires.stream().filter(p -> {
+            var jc = luc ? p.jLucene() : p.jNeo4j();
+            var jr = luc ? p.rLucene() : p.rNeo4j();
+            return !jc.isInvalid() && !jr.isInvalid() && !jc.isPass() && !jr.isPass();
+        }).count();
+
         sb.append(String.format(Locale.ROOT,
             "{\"ts\":\"%s\",\"strategy\":\"%s\",\"scenario\":\"%s\",\"difficulty\":\"%s\","
             + "\"passRate\":%.3f,\"avgHintCoverage\":%.3f,\"contexteInsuffisantRate\":%.3f,"
             + "\"coherenceRate\":%.3f,\"n\":%d,\"nInvalid\":%d,"
             + "\"mcnemarP\":%.4f,\"discordantes\":%d,\"luceneSeulPass\":%d,\"neo4jSeulPass\":%d,"
-            + "\"schema\":\"%s\",\"judgeModel\":\"%s\"}%n",
+            + "\"answerPassRate\":%s,\"answerHintCoverage\":%s,\"answerNInvalid\":%s,"
+            + "\"answerMcnemarP\":%s,\"answerDiscordantes\":%s,\"contexteFailReponseInfidele\":%s,"
+            + "\"schema\":\"%s\",\"judgeModel\":\"%s\",\"answerModel\":\"%s\","
+            + "\"answerJudgeModel\":\"%s\"}%n",
             java.time.Instant.now(), strat, scenario, diff,
             tauxPass(js),
             js.stream().mapToDouble(RagContextJudge.Judgement::hintCoverage).average().orElse(-1),
             insuffisant,
             (double) valides.stream().filter(RagContextJudge.Judgement::coherent).count() / valides.size(),
             valides.size(), js.size() - valides.size(),
-            mc.p(), mc.b() + mc.c(), mc.b(), mc.c(), SCHEMA, modele));
+            mc.p(), mc.b() + mc.c(), mc.b(), mc.c(),
+            avecRep ? String.format(Locale.ROOT, "%.3f", tauxPass(rs)) : "null",
+            avecRep ? String.format(Locale.ROOT, "%.3f",
+                rs.stream().mapToDouble(RagContextJudge.Judgement::hintCoverage).average().orElse(-1)) : "null",
+            avecRep ? String.valueOf(rs.size() - rValides.size()) : "null",
+            avecRep ? String.format(Locale.ROOT, "%.4f", mcr.p()) : "null",
+            avecRep ? String.valueOf(mcr.b() + mcr.c()) : "null",
+            avecRep ? String.valueOf(brode) : "null",
+            SCHEMA, modele, modeleReponse, jugeReponse));
     }
 
-    private void ecrisDetail(List<Paire> paires, String modele, String scenario) throws Exception {
+    private void ecrisDetail(List<Paire> paires, String modele, String scenario,
+                             String modeleReponse, String jugeReponse) throws Exception {
         StringBuilder sb = new StringBuilder();
         for (Paire p : paires) {
-            ligneDetail(sb, p, "lucene", p.ctxLucene(), p.jLucene(), modele, scenario);
-            ligneDetail(sb, p, "neo4j",  p.ctxNeo4j(),  p.jNeo4j(),  modele, scenario);
+            ligneDetail(sb, p, "lucene", p.ctxLucene(), p.jLucene(), p.aLucene(), p.rLucene(),
+                modele, scenario, modeleReponse, jugeReponse);
+            ligneDetail(sb, p, "neo4j",  p.ctxNeo4j(),  p.jNeo4j(),  p.aNeo4j(),  p.rNeo4j(),
+                modele, scenario, modeleReponse, jugeReponse);
         }
         Files.writeString(SORTIE.resolve("rag-quality-detail.jsonl"), sb.toString(),
             StandardOpenOption.CREATE, StandardOpenOption.APPEND);
         System.out.println("  écrit : benchmarks/rag-quality-detail.jsonl");
     }
 
-    private void ligneDetail(StringBuilder sb, Paire p, String strat, List<String> ctx,
-                             RagContextJudge.Judgement j, String modele, String scenario) {
-        String genere = String.join("\n---\n", ctx);
-        if (genere.length() > 3000) genere = genere.substring(0, 3000) + "\n[...]";
+    static void ligneDetail(StringBuilder sb, Paire p, String strat, List<String> ctx,
+                             RagContextJudge.Judgement j, RagAnswerer.Answer a,
+                             RagContextJudge.Judgement r, String modele, String scenario,
+                             String modeleReponse, String jugeReponse) {
+        // `context` et non `generated` : ce champ a toujours contenu les extraits Java
+        // retournés par le moteur, jamais une réponse. Le nom d'avant a déjà induit en erreur
+        // une lecture du support ; il est corrigé avec le schéma binaire-v2.
+        String contexte = String.join("\n---\n", ctx);
+        if (contexte.length() > 3000) contexte = contexte.substring(0, 3000) + "\n[...]";
         String attendu = java.util.Arrays.stream(p.question().expectedFqnHints())
             .map(h -> "\"" + echappe(h) + "\"").collect(Collectors.joining(",", "[", "]"));
         // Les contrôles un par un : c'est eux qui disent *quel* critère la stratégie rate.
         String checks = RagContextJudge.CONTROLES.stream()
             .map(c -> "\"" + c + "\":" + j.checks().getOrDefault(c, false))
             .collect(Collectors.joining(",", "{", "}"));
+        String answerChecks = r == null ? "null" : RagAnswerJudge.CONTROLES.stream()
+            .map(c -> "\"" + c + "\":" + r.checks().getOrDefault(c, false))
+            .collect(Collectors.joining(",", "{", "}"));
         sb.append(String.format(Locale.ROOT,
             "{\"ts\":\"%s\",\"strategy\":\"%s\",\"scenario\":\"%s\",\"question\":\"%s\","
-            + "\"difficulty\":\"%s\",\"expected\":%s,\"generated\":\"%s\",\"verdict\":\"%s\","
+            + "\"difficulty\":\"%s\",\"expected\":%s,\"context\":\"%s\",\"verdict\":\"%s\","
             + "\"checks\":%s,\"reason\":\"%s\",\"hintCoverage\":%.3f,\"coherent\":%b,"
-            + "\"schema\":\"%s\",\"judgeModel\":\"%s\"}%n",
+            + "\"answer\":%s,\"answerMillis\":%s,\"answerVerdict\":%s,\"answerChecks\":%s,"
+            + "\"answerReason\":%s,\"answerHintCoverage\":%s,\"answerCoherent\":%s,"
+            + "\"schema\":\"%s\",\"judgeModel\":\"%s\",\"answerModel\":\"%s\","
+            + "\"answerJudgeModel\":\"%s\"}%n",
             java.time.Instant.now(), strat, scenario, echappe(p.question().text()),
-            p.question().difficulty().name(), attendu, echappe(genere), j.verdict(),
-            checks, echappe(j.reason()), j.hintCoverage(), j.coherent(), SCHEMA, modele));
+            p.question().difficulty().name(), attendu, echappe(contexte), j.verdict(),
+            checks, echappe(j.reason()), j.hintCoverage(), j.coherent(),
+            a == null ? "null" : "\"" + echappe(tronque(a.texte())) + "\"",
+            a == null ? "null" : String.valueOf(a.millis()),
+            r == null ? "null" : "\"" + r.verdict() + "\"",
+            answerChecks,
+            r == null ? "null" : "\"" + echappe(r.reason()) + "\"",
+            r == null ? "null" : String.format(Locale.ROOT, "%.3f", r.hintCoverage()),
+            r == null ? "null" : String.valueOf(r.coherent()),
+            SCHEMA, modele, modeleReponse, jugeReponse));
+    }
+
+    /** Même plafond que pour le contexte : le JSONL reste lisible et diffable. */
+    private static String tronque(String s) {
+        if (s == null) return "";
+        return s.length() > 3000 ? s.substring(0, 3000) + "\n[...]" : s;
     }
 
     private static String echappe(String s) {

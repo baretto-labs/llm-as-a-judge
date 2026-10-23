@@ -37,7 +37,7 @@ LORA_ARGS   = --train --fine-tune-type lora --mask-prompt --batch-size 1 --grad-
               --val-batches -1 --seed 42
 
 .PHONY: help setup validate stats split split-poc smoke smoke-bench smoke-all train-14b train-32b \
-        bench bench-14b bench-32b report clean-results clean
+        bench bench-14b bench-32b bench-fewshot fewshot report clean-results clean
 
 help:
 	@echo "Dataset :  make validate | make stats | make split | make split-poc"
@@ -119,6 +119,19 @@ bench-14b:
 bench-32b:
 	./scripts/bench_variant.sh 32B-baseline-conventions $(BENCH_ARGS)
 	./scripts/bench_variant.sh 32B-finetuned $(BENCH_ARGS)
+
+# Critiques en few-shot — PREENREGISTREMENT_FEWSHOT.md, déclaré le 2026-10-17.
+# Le suffixe se régénère, il ne s'édite pas : la règle de sélection vit dans
+# scripts/build_fewshot.py, qui refuse de produire un fichier contenant un item
+# du golden set.
+fewshot:
+	$(PY) scripts/build_fewshot.py
+
+# Sans --format-normalise : la passe secondaire doublerait un banc déjà à ~2h30,
+# le préremplissage du bloc few-shot (37 s par appel, préfixe non mis en cache)
+# n'étant pas amorti par le serveur MLX.
+bench-fewshot: fewshot
+	./scripts/bench_variant.sh 14B-baseline-conventions-fewshot
 
 bench: bench-14b bench-32b report
 

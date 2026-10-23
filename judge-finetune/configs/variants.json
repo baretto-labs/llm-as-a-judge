@@ -81,6 +81,35 @@
       "ram_gb": 13.5,
       "api_key_env": null,
       "cost_per_hour_usd": 0.05
+    },
+    {
+      "_amendement": "AJOUTEE LE 2026-10-17, avant toute generation : results/runs/ n'en contient aucun fichier a cet instant. Declaree par PREENREGISTREMENT_FEWSHOT.md, avec sa paire de comparaison et sa lecture fixee. Ne differe de 14B-baseline-conventions QUE par le suffixe systeme : meme modele, meme adaptateur (aucun), memes 50 items, 3 passes, T=0,2.",
+      "name": "14B-baseline-conventions-fewshot",
+      "size": "14B",
+      "fine_tuned": false,
+      "base_url": "http://127.0.0.1:8086/v1",
+      "model": "mlx-community/Qwen2.5-Coder-14B-Instruct-4bit",
+      "serve_model": "mlx-community/Qwen2.5-Coder-14B-Instruct-4bit",
+      "serve_adapter": null,
+      "system_suffix_file": "configs/conventions-fewshot.md",
+      "ram_gb": 8.3,
+      "api_key_env": null,
+      "cost_per_hour_usd": 0.05
+    },
+    {
+      "_amendement": "AJOUTEE LE 2026-10-20 a 19h36, avant toute generation : results/runs/ n'en contient aucun fichier a cet instant (six fichiers, aucun portant 'gemma'). Declaree par PREENREGISTREMENT_JURY2.md, avec sa regle de vote et ses trois lectures fixees. Troisieme famille du jury : aucun ancetre de pre-entrainement commun avec Qwen ni avec Mistral. Modele DENSE 31b, distinct du 26b-a4b MoE ecarte deux fois pour INVALID. Memes 50 items, 3 passes, T=0,2, max-tokens 1024, meme configs/conventions.md.",
+      "name": "Gemma-4-31B-baseline-conventions",
+      "size": "31B",
+      "family": "gemma",
+      "fine_tuned": false,
+      "base_url": "http://127.0.0.1:8087/v1",
+      "model": "mlx-community/gemma-4-31b-it-4bit",
+      "serve_model": "mlx-community/gemma-4-31b-it-4bit",
+      "serve_adapter": null,
+      "system_suffix_file": "configs/conventions.md",
+      "ram_gb": 17.0,
+      "api_key_env": null,
+      "cost_per_hour_usd": 0.05
     }
   ],
   "comparisons": {
@@ -90,6 +119,11 @@
       "claim": "le fine-tuning améliore la justesse du juge"
     },
     "secondary": [
+      {
+        "a": "32B-baseline-conventions",
+        "b": "Gemma-4-31B-baseline-conventions",
+        "note": "DECLARE LE 2026-10-20 a 19h36, avant toute generation. Troisieme famille du jury de PREENREGISTREMENT_JURY2.md. Cette paire ne porte AUCUN verdict de justesse : les deux modeles different par la taille autant que par la famille, et n=50. Elle n'existe que pour alimenter le vote majoritaire a trois familles (Q1) et le sens des erreurs de Gemma (Q2). Lecture fixee d'avance dans PREENREGISTREMENT_JURY2.md"
+      },
       {
         "a": "14B-baseline-nu",
         "b": "14B-baseline-conventions",
@@ -109,6 +143,11 @@
         "a": "14B-baseline-conventions",
         "b": "Mistral-24B-baseline-conventions",
         "note": "famille disjointe, conventions identiques. DECLARE LE 2026-10-17, avant toute generation. But : les erreurs systematiques coincident-elles entre familles ? La comparaison de justesse ne porte AUCUN verdict (n=50 sous-dimensionne, et la taille confond). Lecture fixee d'avance dans PREENREGISTREMENT_JURY.md"
+      },
+      {
+        "a": "14B-baseline-conventions",
+        "b": "14B-baseline-conventions-fewshot",
+        "note": "DECLARE LE 2026-10-17, avant toute generation. Isole ce qu'apportent SIX CRITIQUES EN FEW-SHOT, a conventions identiques et sans entrainement — le levier que la litterature (Husain, critique shadowing) designe comme principal et que cette etude n'avait jamais essaye. Metrique principale : l'accord kappa. Lecture fixee d'avance dans PREENREGISTREMENT_FEWSHOT.md"
       }
     ]
   }

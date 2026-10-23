@@ -1,7 +1,7 @@
 # WIP — Work In Progress
 
 > Mémoire de travail. Mise à jour après chaque session.
-> Dernière mise à jour : 2026-10-17
+> Dernière mise à jour : 2026-10-20
 >
 > **L'historique détaillé n'est plus ici.** Il vit dans les documents qui font foi :
 > `judge-finetune/REX_TRAME.md` (tous les chiffres), `AUDIT.md` (les défauts du corpus),
@@ -13,7 +13,9 @@
 ## Où on en est
 
 Benchmark RAG (Lucene vs GraphRAG-Neo4j) jugé par un LLM entraîné et servi en local.
-**Le code est figé. Tout le travail restant est éditorial.**
+**Le code n'est plus tout à fait figé** : la sortie structurée a été ajoutée aux deux juges
+de campagne le 2026-10-18, derrière un drapeau par défaut inactif. Hors de ce chantier, tout
+le travail restant est éditorial.
 
 **Branche active** : `talk/v1`
 **Objectif** : l'exposé de **novembre 2026 — DevFest Paris, 20 min, ~400 personnes**.
@@ -181,6 +183,13 @@ surveillance, et hors du chemin critique.
 **Au passage, un fait mesuré et utilisable** : Lucene rend des contextes systématiquement plus longs
 que Neo4j — 98 % dépassent 3000 caractères contre 3 %. Du bruit, pas de la couverture.
 
+**Levé le 2026-10-18, pour la campagne à venir et non pour celle du 2026-09-24.** Les 240 contextes
+de septembre restent irrécupérables : rien ne les répare. Mais la prescription de ce paragraphe —
+« rejouer la récupération et au passage stocker le prompt réellement envoyé » — est exactement ce
+que fait `RagCampaignGenerate` : contexte **entier, extrait par extrait, jamais tronqué**, plus la
+chaîne exacte soumise au générateur. Rejuger hors-ligne est désormais possible **sur les nouvelles
+générations**, et c'est ce qui rend le second juge abordable.
+
 ### En cours, et qui ne se rattrape pas
 
 **Seconde relecture du golden set par un collègue.** Pré-enregistrée le 2026-10-14, paquet aveugle et
@@ -261,7 +270,202 @@ pas celui qui échoue — « mon banc a mesuré le vide » devient « je l'ai at
 
 ---
 
+## Plan arrêté le 2026-10-18 — la sortie structurée du juge
+
+**Constat, vérifié et non déduit.** Aucun juge du dépôt n'utilise la sortie structurée.
+`RagContextJudge` et `RagAnswerJudge` appellent `model.chat(...)` en brut — jamais `AiServices`,
+donc aucun schéma n'est généré implicitement. Trois regex extraient le verdict
+(`RagContextJudge:141-143`) ; toute sortie inanalysable vaut `INVALID`, jamais PASS.
+
+**Le commentaire `RagContextJudge:40-44` est faux tel qu'il est écrit.** Il justifie l'absence de
+schéma par le bloc `<thinking>` qui précède le JSON — « la sortie structurée de LangChain4j exige
+un JSON seul et échouerait ». Lu dans les jars : `OllamaChatRequest` porte `setFormat(Object)`
+**et** `setThink(Boolean)`, et le builder expose `.responseFormat(...)`, `.think(true)`,
+`.returnThinking(true)`. Raisonnement et schéma sont orthogonaux. La contrainte réelle est celle
+d'un seul serveur : **`mlx_lm.server` 0.31.3 n'implémente pas `response_format`** — aucune
+occurrence dans `server.py`, aucun décodage sous grammaire, champ **ignoré en silence**. Ollama
+0.40.6 accepte un schéma complet. À corriger dans la javadoc, hors campagne.
+
+**Ce que ça reclasse.** Repassé dans le parseur du dépôt, `14B-baseline-nu` rend **150/150
+INVALID**, et **rien n'est tronqué** (budget 1024 jetons, plus longue sortie 831). L'invite nue
+n'est pas un juge qui juge mal : c'est un juge qui ne rend jamais le format — il raisonne, il
+emploie les bons noms de contrôles, il s'arrête avant le JSON. Le levier derrière le **0 % → 76 %**
+est donc « écrire le format attendu », pas « écrire des règles de jugement ». INVALID ailleurs :
+`32B-baseline-conventions` 0, `14B-finetuned` 0, `Mistral-24B` 10/150 (6,7 %),
+`14B-baseline-conventions-fewshot` 3 — plus 3 erreurs HTTP, d'où ses 153 lignes.
+
+**L'ordre, révisé le 2026-10-18 à la demande de l'utilisateur.** Le plan initial faisait
+juger les deux juges MLX d'abord et le juge à schéma ensuite. La consigne était l'inverse :
+dès que les 180 réponses existent, **contraindre le schéma puis lancer les bancs**. Le juge
+à schéma passe donc en premier. Les juges MLX, eux, ne peuvent pas porter de schéma et sont
+inchangés — l'ordre entre eux et le juge à schéma ne change aucun verdict, chaque juge relisant
+les **mêmes 180 réponses figées**.
+
+1. la campagne à trois bras produit ses 180 réponses — **fait, 180/180, zéro échec** ;
+2. le **juge à schéma** servi par Ollama rejuge ces mêmes 180 réponses ;
+3. les **deux juges MLX déjà déclarés** suivent — Qwen2.5-Coder-32B, puis gemma-4-26b-a4b ;
+4. aucune régénération à aucune étape ;
+5. paire de comparaison et lecture **fixées au pré-enregistrement avant la première génération**.
+
+Ce juge est une **comparaison supplémentaire**, jamais un remplacement rétroactif des deux autres.
+Arbitrage restant, mesurable et non mesuré : contraindre le décodage change ce que le modèle
+produit — le raisonnement devient une valeur de chaîne échappée.
+
+## Fait le 2026-10-18
+
+- **La campagne à trois bras a produit ses 180 réponses** : `vector` 60, `vector-bm25` 60,
+  `graphrag` 60, **zéro échec**, dans `benchmarks/rag-campaign.jsonl`. Générateur `qwen3.8:27b`
+  via Ollama, un index par bras dans son propre répertoire temporaire.
+- **La sortie structurée est en place dans les deux juges de campagne.** `RagContextJudge` et
+  `RagAnswerJudge` exposent un `ResponseFormat` à schéma JSON (`checks` avant `verdict`, les trois
+  contrôles requis, `additionalProperties: false`), derrière `-Djmh.judge.schema` et
+  `-Djmh.answerjudge.schema`, **défaut `false`** : le comportement publié ne bouge pas. Activer le
+  drapeau avec le fournisseur `openai`/MLX **lève une erreur franche** plutôt que de produire un
+  run qui se croit contraint — `mlx_lm.server` ignore le champ en silence. La javadoc
+  `RagContextJudge:40-44` ne justifie plus l'absence de schéma par une raison fausse : la phrase y
+  est **citée puis réfutée**, datée.
+- **`think` a dû être retiré, et la divergence est déclarée.** Le dispositif gelé prévoyait
+  `think(true)` pour que le raisonnement parte dans le champ natif d'Ollama. Sonde de 2 items :
+  Ollama refuse l'appel — `{"error":"\"qwen2.5-coder:32b\" does not support thinking"}`. Le
+  pré-enregistrement avait fixé la conduite pour ce cas exact — déclarer la divergence, surtout
+  pas ajouter un champ `thinking` au schéma après coup. Appliquée telle quelle, amendement daté
+  en fin de `benchmarks/PREENREGISTREMENT_SCHEMA.md`.
+  **Conséquence à ne pas enjoliver** : sous schéma contraint le juge **ne raisonne pas** — le
+  décodage ne peut émettre que le JSON. C'est un **quatrième confondu**, le plus lourd, et il joue
+  *contre* le juge à schéma. Le taux d'INVALID reste lisible (propriété de forme) ; **aucun chiffre
+  d'accord issu de ce dispositif ne va à l'écran**.
+- **Ce que la sonde a évité.** Deux items ont suffi à attraper le blocage : sans elle, 360
+  jugements revenaient tous INVALID pour cause d'appel en échec, et le résultat se serait lu comme
+  « le schéma ne tient pas ».
+- **Le run MLX lancé avant le patch a été arrêté à 14/180 et supprimé.** Il jugeait sans schéma,
+  dans le mauvais ordre. Il avait déjà relevé **5 INVALID sur 28 jugements** chez un 32B *avec*
+  conventions — à comparer aux 0 du banc golden set. Chiffre non publiable (n = 28, run interrompu),
+  noté ici parce qu'il a motivé l'intérêt porté au taux d'INVALID.
+
+
+- **La boucle du banc RAG est scindée en deux.** `RagQualityEvaluation` générait et jugeait dans la
+  même itération, deux bras, un juge. Deux classes la remplacent pour la campagne du talk :
+  `RagCampaignGenerate` (récupère, répond, persiste — aucun juge) et `RagCampaignJudge` (relit,
+  juge, écrit un fichier par étiquette de juge — aucune génération). Raison mesurée : 18 Go de
+  générateur plus 18,4 Go de juge ne tiennent pas résidents sous ~27 Go, et un second juge ne doit
+  pas re-payer 180 générations. `RagQualityEvaluation` n'est pas touché : les chiffres publiés
+  restent lisibles tels quels.
+- **Trois bras indépendants, un index chacun** : `vector` (Lucene `knn-only`), `vector-bm25`
+  (Lucene `hybrid`), `graphrag` (Neo4j `hybrid-graph`). **Le graphrag n'est donc plus mesuré deux
+  fois** — l'ancien protocole le passait dans deux exécutions appariées. La stabilité gratuite que
+  ce doublon offrait est remplacée par le second juge, qui mesure mieux la même chose.
+- **Générateur : `llama3.1:latest` (4,9 Go) → `qwen3.8:27b` (18 Go), raisonnement actif.** Sondé
+  avant de dépenser : **73 s par génération**, soit ~3 h 45 pour les 180. Ollama range le
+  raisonnement dans un champ séparé — **aucune fuite de `<think>`** dans la réponse persistée,
+  vérifié sur la ligne de sonde.
+- **La disjonction de famille générateur/juge est abandonnée, et déclarée comme telle.**
+  `qwen3.8:27b` partage sa famille avec le premier juge (`Qwen2.5-Coder-32B`). La javadoc de
+  `RagAnswerer` affirmait que la disjonction était « une condition de validité » : la phrase est
+  réécrite, pas laissée fausse. Ce qui la remplace : **le second juge est un Gemma, disjoint du
+  générateur**. Si les deux juges classent les trois bras dans le même ordre, la parenté n'a pas
+  porté le résultat ; s'ils divergent, aucun classement ne va à l'écran et c'est le désaccord qui
+  se raconte. Aucun troisième juge ne départagera — il n'y a pas de référence contre quoi départager.
+- **`PREENREGISTREMENT_REPONSE.md` amendé avant la moindre génération.** Preuve positive à
+  l'instant de l'écriture : `rag-quality-detail.jsonl` = 240 lignes, **0** en `binaire-v2`, et
+  aucun fichier `benchmarks/rag-campaign*`.
+- **Écrit avant de lancer, pour qu'aucune diapo ne le lise à l'envers : l'accord entre les deux
+  juges n'est pas une justesse.** Les réponses de la campagne RAG n'ont aucune étiquette de
+  référence. Le seul endroit du dépôt où un juge peut être dit faux reste l'étalon
+  `judge-finetune/data/golden/test.jsonl`. Un désaccord dira que les deux juges divergent, jamais
+  lequel a raison.
+- **Génération lancée**, 180 réponses. Les deux passes de juge suivent, l'une après l'autre.
+
+---
+
 ## Fait le 2026-10-17
+
+- **Le banc few-shot a rendu : κ = 0,348, IC95 [0,17 ; 0,53] → « NON CONCLUANT ».** C'est la
+  bande du milieu de `PREENREGISTREMENT_FEWSHOT.md` (0,29–0,66), déclarée la plus probable à
+  n = 50 et **acceptée d'avance**. Le mot qui va à l'écran est « non concluant », pas
+  l'estimation ponctuelle — la référence des conventions, κ = 0,479 IC95 [0,29 ; 0,66], est
+  dans l'intervalle. Les 150 générations sont passées sans arrêt anticipé ni examen
+  intermédiaire, et **aucun second jeu d'exemples ne sera tiré** : les six identifiants étaient
+  gelés.
+  Secondaires, descriptives : **3 des 8 erreurs systématiques corrigées** (`b03-005`, `b09-014`,
+  `b12-011`) — exactement le même décompte que l'entraînement — mais **8 erreurs nouvelles
+  introduites**, soit un solde nul. Justesse majoritaire 0,68 contre 0,76 ; stabilité 82 %
+  contre 76 % ; **415 jetons de complétion contre 237**, ce qui confirme la sonde. Le portail
+  du harnais affiche « non recevable », mais son contrôle de format strict ne vaut rien ici :
+  `bench-fewshot` tourne délibérément sans `--format-normalise`.
+  **Ce que ça arme à l'oral** : « le levier que la littérature désigne comme principal, je ne
+  l'avais pas essayé — je l'ai essayé, mon banc ne sait pas trancher à cette taille. »
+
+- **Le juge du banc RAG passe à Qwen2.5-Coder-32B, et c'est une correction d'un choix fait trois
+  heures plus tôt le même soir.** `RagContextJudge` et `RagAnswerJudge` étaient réglés sur
+  `Mistral-24B` (port 8085) sur un **argument** : famille disjointe du générateur Qwen, donc pas
+  de biais d'auto-préférence. Le rapport multi-variantes reconstruit dans la foulée le contredit
+  par une **mesure** : Mistral-24B accorde κ = 0,349 avec l'étalon, le 32B **κ = 0,801**
+  (justesse 90 %, stabilité 92 %, et 0,97 de justesse moyenne sur les trois contrôles de
+  fidélité — ceux-là mêmes qu'applique le juge de réponse). Un risque contre un défaut constaté :
+  on prend le meilleur juge mesuré. **La contrainte de disjonction est déplacée sur le
+  générateur**, qui est une constante identique sur les trois bras : `RagAnswerer` passe de
+  `qwen2.5:7b` à `llama3.1:latest` (4,9 Go, déjà en cache). Les deux arguments sont préservés.
+  `benchmarks/PREENREGISTREMENT_REPONSE.md` porte l'amendement daté, **légitime parce qu'aucune
+  génération n'a eu lieu** : preuve positive relevée au moment de l'écrire — 240 lignes dans
+  `rag-quality-detail.jsonl`, **0** en `binaire-v2`, **0** portant un champ `answer`.
+  **Reste à sonder avant de lancer** : 18,4 Go + ~5 Go résidents contre la limite *wired* de
+  ~27 Go qui a déjà provoqué un OOM Metal ce soir. À mesurer, jamais à supposer.
+
+- **Le plan de l'exposé est arrêté et écrit : `demo/PLAN-DEVFEST-2026.md`.** 13 diapositives,
+  **16 min 55**, avec une **réserve de coupe déclarée d'avance** (cinq coupes, une minute, aucune
+  ne touche aux diapos 4, 6, 9, 10, 11, 12, 14). Le plan ajoute une **diapositive 11 neuve** —
+  trois biais RAG constatés sur les runs — qui comble le seul trou unanimement relevé par les
+  trois agents d'évaluation : l'abstract promet « quelques biais des systèmes RAG » et le plan
+  précédent y consacrait une demi-phrase. La diapo 9 (« juger le juge ») redescend de 3:00 à
+  **1:30** : j'avais eu tort de la monter, je la jugeais sur sa valeur intrinsèque et non sur ce
+  que l'abstract paie.
+
+- **Les trois biais sont tirés des 240 jugements du 2026-09-24, pas de la littérature.**
+  (1) ce n'est pas le bruit mais le manque — `bruit_maitrise` est le contrôle qui échoue le moins,
+  27 % pour les deux stratégies, contre 43 % et 67 % pour `contexte_suffisant` ; (2) le graphe
+  ramène la structure et pas le corps — 22 % de Neo4j *pertinent mais insuffisant* contre 7 % pour
+  Lucene ; (3) l'angle mort est le cross-module, 10 % Neo4j contre 50 % Lucene, précisément là où
+  j'attendais le gain du GraphRAG. **Les biais 2 et 3 partagent une racine unique** (des nœuds sans
+  corps de méthode) qui est probablement mon code de projection : c'est la phrase qui relie les
+  diapos 10 et 11, et elle vaut mieux que les trois biais séparés.
+
+- **L'évaluation de la réponse est implémentée.** Jusqu'ici le banc ne jugeait que le contexte :
+  aucune réponse n'était générée nulle part dans le dépôt, et le champ `generated` du détail
+  contenait **les extraits Java retournés par le moteur** — origine probable de l'erreur
+  « réponses justes » du support. Trois fichiers neufs, un modifié :
+  - `RagAnswerer` — génère la réponse avec **l'invite du produit** (`RagService.buildPrompt`,
+    rendue `public static` pour ça : une copie de l'invite dériverait en silence) et **Ollama
+    `qwen2.5:7b`**, T = 0 ;
+  - `RagAnswerJudge` — marqueur `RAG_FAITHFULNESS`, contrat d'invite et intitulés des trois
+    contrôles **repris mot pour mot** de l'item `b14-011` du corpus, pas inventés ;
+  - `RagQualityLigneTest` — 3 tests, sans appel de modèle, qui prouvent que les lignes JSONL sont
+    du JSON valide dans les deux régimes. Ces lignes sortent d'un `String.format` à plus de vingt
+    arguments et l'erreur d'arité ne se manifeste qu'**après** la boucle de génération : sur un
+    banc de deux heures, elle coûterait la campagne.
+  - `RagQualityEvaluation` — schéma **`binaire-v2`** : `generated` devient `context`, les champs
+    `answer*` apparaissent, McNemar est paramétré pour servir les deux verdicts, et le résumé
+    imprime le croisement qui porte la thèse (contexte FAIL → réponse fidèle *contre* infidèle).
+
+- **Deux défauts du juge corrigés, avec leurs raisons.** Le défaut par défaut de `RagContextJudge`
+  était `adapters/14b-judge-ckpt200`, c'est-à-dire **le juge fine-tuné — la pire variante
+  mesurée** (κ 0,44 contre 0,48 pour les conventions seules, stabilité 58 % contre 76 %). La
+  campagne du 2026-09-24 a donc été jugée par elle. Désormais : **aucun adaptateur**, **Mistral-24B**
+  au lieu de Qwen-14B, et **les conventions en suffixe système** (`jmh.judge.suffix`, le levier que
+  le banc mesure à κ 0,00 → 0,48). Mistral et non Qwen parce que le **générateur** tourne sous Qwen :
+  un juge de la même famille que le générateur surnote — biais d'auto-préférence, qui est aussi un
+  des biais présentés à l'oral.
+
+- **`benchmarks/PREENREGISTREMENT_REPONSE.md`, écrit avant la moindre génération.** Preuve positive
+  à l'écriture : `rag-quality-detail.jsonl` ne porte que `"schema":"binaire-v1"` et zéro champ
+  `answer`. Il déclare les **trois bras** — `knn-only` (vectoriel), `hybrid` (vectoriel + BM25),
+  `hybrid-graph` (graphrag) —, les **paires de comparaison avant exécution** (principale :
+  vectoriel contre vectoriel + BM25, le chiffre que la diapo 12 affirme sans l'avoir), la lecture
+  fixée d'avance, et le fait que **le bras graphrag est mesuré deux fois sur les mêmes 60 questions**
+  — ce sont 60 observations, jamais 120. Il interdit explicitement toute comparaison avec la
+  campagne du 2026-09-24 : le juge a changé de modèle, perdu son adaptateur et gagné les
+  conventions, les deux campagnes ne sont pas commensurables.
+  ⚠ **Le coût n'est pas estimé, il reste à sonder** : trois appels de chaque sorte avant de lancer
+  les 720. La sonde du few-shot avait fait passer un budget de 54 min à 2 h 30.
 
 - **La 4ᵉ ligne du tableau de la diapositive 21 n'est plus en gras, et une phrase fausse est corrigée.**
   Sous une légende « ce que chaque version achète », les trois cellules grasses de `+ un modèle 32B`
@@ -592,3 +796,216 @@ pas celui qui échoue — « mon banc a mesuré le vide » devient « je l'ai at
 - **Cross-encoder reranker** local (BGE) à la place de `LLMReranker` : 10 à 50× plus rapide.
 - **Multi-query retrieval** : N variantes de la question, fusion RRF.
 - **Comparaison de modèles d'embedding** : voyage-code-3, jina-embeddings-v3.
+
+## 2026-10-19 — bancs notation, échelle, et le plafond de 6000 caractères
+
+- **Campagne RAG close à deux juges.** gemma-4-26b-a4b déclaré inutilisable une seconde fois
+  (38 INVALID sur 238 à 4096 jetons, seuil 18/360) ; run écarté de `benchmarks/`. Conséquence à
+  assumer : les deux juges restants sont **le même modèle**, le contrôle de parenté de famille
+  n'existe plus. La phrase que `rapport_campagne.py` génère à ce sujet ne doit pas aller à l'écran.
+- **Diagnostic de budget** (`PREENREGISTREMENT_SCHEMA.md`, relance 1) : **35/37** items redevenus
+  analysables à 2048 jetons. Seuil ≥ 28 ⇒ effet de budget, pas de format.
+- **Banc permutation** (`PREENREGISTREMENT_NOTATION.md`) : 120 jugements, témoin propre,
+  **0 retournement** des deux côtés, amplitude de note nulle sur 12 items. Lecture déclarée :
+  rien ne va à l'écran. L'instabilité de la notation n'est pas reproduite à température 0.
+- **Banc échelle** (`PREENREGISTREMENT_ECHELLE.md`) : 180 notes, 0 échec. **4 valeurs vivantes
+  sur 11** (1 ×70, 10 ×67, 6 ×28, 0 ×13) ⇒ va à l'écran. κ note/verdict = **0,918**. Même ordre
+  des bras par la note et par le verdict ⇒ concordance à l'écran.
+- **Plafond de 6000 caractères — à traiter le 2026-10-20.** Mesuré : vector-bm25 coupé **46/60**
+  (médiane 4 179 car. perdus), vector 10/60, graphrag 1/60. Couverture sans LLM, vue contre réelle :
+  vector-bm25 **68,6 → 87,4 %**, vector 75,0 → 76,7 %, graphrag 59,6 → 59,6 %. Donc le « non
+  concluant » de la paire principale est un aveuglement de l'appareil, et le classement
+  `vector > vector-bm25` corroboré sans LLM **s'inverse** sans le plafond. Les conclusions contre
+  graphrag, elles, sont renforcées. À faire : pré-enregistrer plafond/paire/lecture, **fixer
+  `num_ctx` explicitement** (son défaut tronque l'invite en silence), puis rejuger les 180.
+- Outils ajoutés : `scripts/banc_notation.py`, `scripts/banc_echelle.py`, `scripts/java_ordre.py`
+  (réplique vérifiée de l'ordre et de la troncature Java), `scripts/rapport_notation.py`,
+  `scripts/rapport_echelle.py`.
+
+### File du 2026-10-20 — **faite**, voir la section suivante
+
+---
+
+## 2026-10-20 — le plafond tombe, et l'échelle se réduit à trois crans
+
+Deux bancs pré-enregistrés avant le premier jugement, lancés en chaîne, **0 échec sur 540
+jugements**. `benchmarks/PREENREGISTREMENT_PLAFOND.md` et
+`benchmarks/PREENREGISTREMENT_NOTE_BC.md` portent le dispositif, la lecture et le résultat.
+
+### Banc plafond — la paire principale n'était pas à égalité, elle était mal mesurée
+
+`RagContextJudge` coupait le contexte à 6000 caractères **après** le mélange, ce qui touchait
+57/180 contextes et **46/60 du seul bras `vector-bm25`**. Rejugés sans plafond :
+
+| bras | avec plafond | sans plafond | écart |
+|---|---|---|---|
+| `vector` | 55,0 % | 60,0 % | +5,0 |
+| `vector-bm25` | 48,3 % | **78,3 %** | **+30,0** |
+| `graphrag` | 16,7 % | 16,7 % | 0,0 |
+
+- **Q1, principale** — `vector` ↔ `vector-bm25` sans plafond : **+18,3 pts en faveur de
+  `vector-bm25`**, discordantes **11 contre 0**, **p = 0,0010**. La lecture déclarée dit : le
+  chiffre va à l'écran. **Le « non concluant » était une cécité de l'appareil.**
+- **Q2** — sur les 57 contextes tronqués, 49,1 % → 86,0 % de PASS, **21 FAIL→PASS et 0
+  PASS→FAIL**. La bascule est unilatérale : couper n'a jamais aidé un contexte.
+- **Q3, secondaire** — `graphrag` passe de −31,7 pts à **−61,7 pts** (p < 0,0001). La
+  conclusion sur `graphrag` est **renforcée**, le biais jouait contre elle.
+- **Contrôles** : 0 échec ; **0 verdict changé** sur les 123 contextes intacts ; contrôle de
+  reproduction **12/12** → `num_ctx` (4096 par défaut → 20480) ne change aucun verdict, et le
+  bras A en banque reste valide. L'invite la plus longue sous plafond pesait 8020 caractères :
+  **le piège `num_ctx` ne nous avait pas touchés.**
+- **Le signal non-LLM concorde enfin** : couverture réelle 87,4 % (`vector-bm25`) contre
+  76,7 % (`vector`). Avec plafond, banc et signal se contredisaient.
+
+### Bras B et C — l'échelle de 0 à 10 est un interrupteur déguisé
+
+| bras | distribution | valeurs vivantes (≥5/180) | κ contre le verdict de A | note moyenne |
+|---|---|---|---|---|
+| **B** — note seule, sans critères | `0×128 2×21 5×2 6×1 8×25 10×3` | **3** (0, 2, 8) | 0,381 | 1,60 |
+| **C** — note seule, critères énoncés | `0×44 1×2 2×42 3×2 5×1 6×9 7×12 8×68` | **5** (0, 2, 6, 7, 8) | 0,841 | 4,33 |
+
+- **Va à l'écran** (Q1, seuil déclaré ≤ 4) : **B utilise 3 valeurs sur 11, et rend zéro dans
+  71 % des cas.** C'est la pratique courante — « note ce contexte de 0 à 10 » — et elle ne
+  produit pas une échelle.
+- **Brut, pas écran** : C reste à 5 valeurs vivantes, au-dessus du seuil.
+- **Q3 — la phrase « la note décide pareil » est INTERDITE** : B classe
+  `vector-bm25 > vector`, A et C l'inverse. Lecture déclarée appliquée.
+- **Q4** — énoncer les critères sans les faire sortir déplace la note moyenne de **+2,73
+  points sur 10** et fait passer κ de 0,381 à 0,841. κ(B, C) = 0,278, notes identiques 46,1 %.
+  **Ce n'est pas l'échelle qui porte l'information, c'est le cadrage.**
+- **Post hoc, noté, non présentable** : l'ordre rendu par B est celui que le banc plafond
+  établit comme correct — mais A et C ont tourné **sous le plafond**. Les rapprocher demande
+  de rejouer B et C sans plafond, et un nouveau pré-enregistrement.
+
+### Ce que ça change dans la présentation
+
+1. La conclusion 4 change de chiffre **et de sens sur la paire principale** :
+   `vector-bm25` bat `vector` de 18,3 pts (p = 0,0010), et `graphrag` tombe à −61,7 pts.
+   La phrase « indiscernables » doit **sortir**.
+2. Une leçon neuve et chiffrée sur le plafond lui-même : **un détail d'implémentation du
+   harnais — couper le contexte à 6000 caractères — inversait le classement.** 21 verdicts
+   basculent, tous dans le même sens.
+3. La leçon sur la notation existe enfin sans confusion : **3 valeurs sur 11**.
+
+### Outils ajoutés
+
+`scripts/banc_jour2.py` (quatre dispositifs, une seule invite partagée),
+`scripts/banc_jour2.sh` (enchaînement + `caffeinate`), `scripts/controle_repro.py`,
+`scripts/rapport_plafond.py`, `scripts/rapport_note_bc.py`. `scripts/java_ordre.py` accepte
+désormais `plafond=None`, le défaut 6000 restant vérifié identique sur les 180 contextes.
+
+### File, dans cet ordre
+
+1. **Corriger le plafond dans le code**, pas seulement dans le banc : `RagContextJudge`
+   tronque toujours à 6000 caractères, et `num_ctx` n'est fixé nulle part dans le dépôt.
+2. **Museler ou qualifier** la phrase auto-générée « la parenté de famille générateur/juge
+   n'a pas porté le résultat » dans `scripts/rapport_campagne.py` : le contrôle est **vide**,
+   les deux juges restants sont le même modèle.
+3. Reporter les nouveaux chiffres dans les supports (`demo/llm-as-a-judge/`, `REX_TRAME.md`).
+
+### Soir — JURY2, et le plafond de sortie qui recommence
+
+`judge-finetune/PREENREGISTREMENT_JURY2.md`, écrit **avant la première génération** Gemma.
+Deuxième tentative de jury après le 2/8 du 2026-10-17, mais la question a changé : population
+8 items → **50**, métrique « corrections » → **justesse du vote**, comparateur 3/8 → **45/50**
+(le 32B seul). Trois familles, un vote chacun : Qwen2.5-Coder-32B et Mistral-24B **déjà en
+banque**, seul Gemma-4-31B reste à jouer — le banc coûte **un run, pas trois**.
+
+Ce qui a motivé la relance, mesuré sans dépenser un jeton, en rejouant les runs en banque :
+
+| variante | justes | indulgent | sévère | p binomial |
+|---|---|---|---|---|
+| few-shot | 34 | 15 | 1 | 0,0005 |
+| conventions | 38 | 10 | 2 | 0,0386 |
+| fine-tunée | 38 | 11 | 1 | 0,0063 |
+| 32B | 45 | 4 | 1 | 0,3750 |
+| Mistral-24B | 35 | 15 | 0 | 0,0001 |
+| **total** | | **55** | **5** | **≈ 10⁻¹²** |
+
+Et le **jury simulé** sur ces 5 configurations : **38/50 = 76 %**, 12 erreurs **toutes
+indulgentes**, contre **45/50 = 90 %** pour le 32B seul. Les deux chiffres sont **post hoc**,
+et le vote est pondéré 4 Qwen pour 1 Mistral : ils motivent le banc, ils ne le remplacent pas.
+L'étalon est quasi équilibré (27 FAIL / 23 PASS) : la direction n'est pas un artefact.
+
+- **Dépouillement écrit avant le chiffre** : `judge-finetune/scripts/rapport_jury2.py`,
+  réutilisant `extract_judgment` du harnais pour qu'aucune seconde logique de lecture ne
+  diverge. **Témoin** : il reproduit les 10/150 non extractibles de Mistral (6,7 % publiés).
+- Variante ajoutée à `configs/variants.json` par **insertion ciblée**, jamais par recréation,
+  avec sa paire de comparaison déclarée. Sauvegarde avant modification.
+- **Sonde déclarée** : 3 items, **3/3 extractibles ⇒ lancement**, ≤ 2/3 ⇒ JURY2 meurt et
+  aucune quatrième famille n'est essayée. Passée 3/3.
+
+#### L'incident : le plafond de sortie a mordu une famille sur trois
+
+À 37 générations sur 150, inspection du run en cours : **9 sorties sur 36 exactement à 1024
+jetons**, et les **8 verdicts non extractibles étaient exactement les 9 tronquées**.
+Projection 33/150, contre un garde-fou déclaré à 15.
+
+| variante | max jetons de sortie | médiane | au plafond 1024 |
+|---|---|---|---|
+| Qwen-32B | 818 | 415 | 0 / 150 |
+| Mistral-24B | 429 | 238 | 0 / 150 |
+| few-shot | 960 | — | 0 / 150 |
+| fine-tunée | 813 | — | 0 / 150 |
+| **Gemma-4-31B** | **1024** | **857** | **9 / 36** |
+
+Le plafond **n'a jamais contraint deux familles sur trois et annulait la troisième** : un
+réglage identique pour tous n'est pas un réglage neutre. C'est la **même forme** que le
+plafond de 6000 caractères du matin, qui coupait 46/60 du seul bras `vector-bm25`, et la
+**troisième occurrence** du piège dans le projet après les 37 INVALID du défaut MLX à 512.
+
+Décision, et son prix : run **arrêté**, 37 générations **archivées** dans
+`results/invalide-20261020-gemma-plafond-1024/` pour que les chiffres ci-dessus restent
+auditables, **amendement daté** (20 h 48) ajouté au pré-enregistrement avec les deux tables
+de jetons, et **nouveau contrôle** inscrit dans `rapport_jury2.py` :
+
+```python
+PLAFOND_SORTIE = 2048   # >0 sortie au plafond ⇒ variante ANNULÉE
+```
+
+Ce contrôle interdit une **seconde** remontée : si 2048 mord encore, la variante tombe, on ne
+renégocie pas une troisième fois. Relancé à 2048 (`nohup caffeinate -i ./scripts/bench_variant.sh
+Gemma-4-31B-baseline-conventions --max-tokens 2048`), ~143 s par génération, **fin attendue
+vers 03 h 00**. Dépouillement : `cd judge-finetune && .venv/bin/python -I scripts/rapport_jury2.py`.
+
+> Un run mono-variante écrase `metrics.json` : prévoir une reconstruction `--report-only`
+> après coup, comme le 2026-10-17.
+
+## 2026-10-21 — JURY2 : deuxième non concluant, et le juré qu'on a failli disqualifier
+
+Run Gemma terminé (150/150). Dépouillement par `scripts/rapport_jury2.py`, écrit avant le
+premier verdict. Résultat complet dans `judge-finetune/PREENREGISTREMENT_JURY2.md`.
+
+**Garde-fous passés** : Gemma **0 non extractible sur 150**, **0 sortie au plafond de 2048**.
+Les 8 verdicts perdus la veille venaient du plafond de 1024, pas du modèle.
+
+- **Q1, principale** — jury des 3 familles **47/50 = 94 %** contre **45/50 = 90 %** pour le
+  32B seul. Discordantes **2 contre 0**, McNemar exact **p = 0,5000**. **NON CONCLUANT**, et
+  c'est le mot qui va à l'écran. La diapositive 29 ne gagne pas son chiffre : deuxième
+  tentative de jury, deuxième non concluant — mais cette fois sur la bonne population et la
+  bonne métrique, ce qui est en soi un résultat propre.
+- **Q2** — Gemma : **1 indulgent, 0 sévère**, p = 1,0000. Sens rapporté brut, **sans la
+  phrase**. L'indulgence ne gagne **pas** de confirmation par une troisième famille : avec une
+  seule erreur, il n'y a rien à conclure sur sa direction. Le 55 contre 5 reste porté par les
+  configurations en banque, et reste post hoc.
+- **Q3** — les 3 erreurs du jury sont **toutes indulgentes**.
+
+**Brut, noté, non présentable** : **Gemma seul rend 49/50**, contre 45/50 (Qwen) et 35/50
+(Mistral). Discordantes Gemma/Qwen **4–0**, p = 0,1250, accord 46/50, et l'unique erreur de
+Gemma est aussi une erreur de Qwen. Ce n'est pas une question déclarée de ce banc, et 8 points
+à n = 50 tombent dans la zone que le dispositif ne tranche pas (seuil ~15 points,
+`PREENREGISTREMENT.md` § 5). Consigné, pas exploité : l'exploiter demande un nouveau
+pré-enregistrement.
+
+Deux observations post hoc à ne pas mettre à l'écran en l'état, mais qui orientent la suite :
+le vote majoritaire **tire le jury sous son meilleur juré** (47 contre 49) parce qu'un juré à
+35/50 pèse autant que les autres ; et la famille qu'on a failli annuler pour un défaut de
+harnais est la plus juste des trois.
+
+### File, mise à jour
+
+0. Reconstruire `metrics.json` (`--report-only`) : le run mono-variante l'a écrasé.
+1. **Corriger le plafond de 6000 dans `RagContextJudge`** et fixer `num_ctx` dans le dépôt.
+2. **Museler** la phrase auto-générée sur la parenté de famille dans `rapport_campagne.py`.
+3. Reporter les chiffres dans `demo/llm-as-a-judge/` et `REX_TRAME.md`, **diapositive 29
+   comprise** : le jury y reste une piste, désormais avec deux mesures non concluantes.
