@@ -31,7 +31,7 @@
 <script setup lang="ts">
 const regles = [
   { texte: 'Écris tes 50 copies d’abord.', marge: 'personne ne le fera pour toi' },
-  { texte: 'Écris ton barème.', marge: 'quatre phrases' },
+  { texte: 'Écris ton barème.', marge: 'quatre règles' },
   { texte: 'Vérifie ce que ton juge lit.', marge: 'pas ce que tu lui envoies' },
   { texte: 'Ne relis que les doutes.', marge: '12 au lieu de 50' },
 ]

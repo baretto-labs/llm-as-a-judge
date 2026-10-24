@@ -1,5 +1,5 @@
 <!--
-  The generic LLM-as-a-judge, as the literature describes it — no project numbers here.
+  The generic LLM-as-a-judge, as the literature describes it; no project numbers here.
   0 copy → judge → verdict · 1 the rubric · 2 a deterministic filter before the judge
   · 3 an imposed output format · 4 a human-graded reference set to check the judge
   · 5 doubtful copies routed to a human.

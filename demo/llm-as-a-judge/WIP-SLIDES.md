@@ -36,7 +36,7 @@
   **L2** jury / vérification par étapes. Mehdi est en **L0 + L1** ; le doute part chez un
   humain. Le jury a été **essayé** (non concluant) : c'est l'acte final du REX.
 - **Le REX est une histoire, pas une liste** (arbitré le 2026-10-21) : je veux noter mon RAG →
-  il faut un étalon → le juge ne sait pas juger → deux raccourcis → je m'en sers (bug, banc
+  il faut un étalon → le juge ne rend pas de verdict → deux raccourcis → je m'en sers (bug, banc
   menteur) → un jury → pour le choisir… l'étalon. **La boucle** est la chute : « chaque
   raccourci m'a ramené à l'étalon, la seule chose que je n'ai pas pu déléguer à un modèle ».
   Une phrase-chute surlignée par acte à l'écran ; κ, p et citations dans les notes.
@@ -96,11 +96,11 @@ tombe comme un tampon (`scale` + rotation, rebond) ; trait rouge qui se dessine
 
 ## Carte du deck (21 diapos au 2026-10-21)
 
-1 couverture · 2 Imaginez… · 3 un chatbot n'est pas un POC (Air Canada) · 4 pas un cas isolé ·
+1 couverture · 2 Imaginez… · 3 un chatbot n'est pas un POC (Air Canada) · ~~4 pas un cas isolé~~ (coupée le 2026-10-24, numéros suivants -1) ·
 5 pourquoi personne n'a rien vu · 6 OllamAssist · 7 comment savoir si j'améliore ·
-8 LLM-as-a-Judge (théorie) · 9 4 façons · 10 rapide à coder (LangChain4j) ·
+8 LLM-as-a-Judge (théorie) · ~~9 4 façons~~ (coupée le 2026-10-24) · 10 rapide à coder (LangChain4j) ·
 11 biais des LLM (verbosité, position, indulgence — mesurés sur mon juge) ·
-**REX en actes** : 12 qui juge le juge ? (l'étalon, acte 1) · 13 mon juge ne sait pas juger
+**REX en actes** : 12 qui juge le juge ? (l'étalon, acte 1) · 13 mon juge ne rend pas de verdict
 (0 → 76 %, acte 2) · 14 deux raccourcis (entraîner 76 → 76 %, plus gros 76 → 90 % ; actes 3+4,
 « l'instrument est prêt ») · 15 premier verdict (GraphRAG 16,7 % vs vectoriel 60 % : c'est ton
 code, acte 5) · 16 « aucune différence » (détecteur / panne / plafond retiré 60 → 78,3 %,
@@ -122,10 +122,11 @@ triage (12/50) et sondes (cinq fois) : dans les notes.
 
 1. **Abstract** (« biais des systèmes RAG ») : couvert par la position (ordre des extraits,
    diapo 11) et le banc qui tronquait (diapo 16) ; la littérature est coupée (archivée).
-2. **Diapos 13–18** : confirmer les chiffres après la relance, retirer les annotations rouges.
-   « 3 valeurs sur 11 » : **tranché**, c'est le bras B de `PREENREGISTREMENT_ECHELLE.md` (les
-   « 4 valeurs vivantes » sont un autre banc).
-   « Quatre phrases » (récit) contre « quatre paragraphes » (WIP.md) — trancher.
+2. **Diapos 13–18** : chiffres vérifiés le 2026-10-23 (voir Fait). Reste : titre de la diapo 13
+   tranché le 2026-10-24 : « Mon juge ne rend pas de verdict » ; si la relance a lieu, rejuger 15 à 18.
+   « 3 valeurs sur 11 » : **tranché**, c'est le bras B de `PREENREGISTREMENT_NOTE_BC.md` (les
+   « 4 valeurs vivantes » sont `PREENREGISTREMENT_ECHELLE.md`, un autre banc).
+   « Quatre phrases » : tranché, « quatre règles » (4 conventions, 173 mots).
    Diapo 13 : préparer la réponse à « les conventions n'ont réparé que le format ? ».
    Diapo 14 : 14B → 32B = +14 points, sous le seuil de 15 → tampon « retenu », pas « prouvé ».
    Diapo 15 : exemple `ContextRetriever` à préparer.
@@ -137,7 +138,7 @@ triage (12/50) et sondes (cinq fois) : dans les notes.
    récent (~26–27B, nom exact à obtenir) → mettre à jour la ligne `modelName`. Le surlignage
    couvre 3 lignes (7–9), le plan en veut une.
 4. **Diapos 20–21** : QR des
-   sources à générer ; `img/qr-feedback.png` est un **placeholder** (« QR à remplacer ») à écraser ;
+   sources à générer ; QR feedback fait (`img/openfeedback.png`, à scanner une fois avant le jour J) ;
    la diapo 21 reste à l’écran pendant les questions.
 5. Renommer la diapo 11 « Les biais de mon juge » (proposé, pas tranché).
 6. Images : PNG OllamAssist magenta à remplacer ; `judge_dredd_casque.jpeg` inutilisé (ce
@@ -146,6 +147,40 @@ triage (12/50) et sondes (cinq fois) : dans les notes.
 
 ## Fait
 
+- **2026-10-24** : diapo 15 « Aucune différence » simplifiée en trois temps : 55 vs 48 non concluant → la panne (46/60 coupés) → contextes entiers 60 → 78,3 % (+18 points) → « Vérifie ce que ton juge lit. » (même mot que la conclusion). Hint coverage passé en RÉSERVE dans les notes. Chute orale : « la modification qui gagne, c'est la moins sexy : une recherche par mots-clés des années 90. Pas le graphe. » À éprouver au deuxième déroulé.
+- **2026-10-24** : notes mises à jour après vérification des chiffres du premier passage : « plus de trois fois » (pas quatre), BM25 60 → 78,3 % (+18 points, c'est le contexte qui est jugé), jury « deux copies sur 50 », pas de « 50 à 200 selon la littérature », pas de « la note coûte plus cher en jetons » (non mesuré), 76 % pas 77, indulgence ≠ auto-préférence. Commentaires obsolètes retirés (« quatre phrases », « à l'essai », renvoi à l'acte « J'en prends trois ? », « la moitié des copies » → 46 contextes BM25 sur 60).
+- **2026-10-24** : « Noter sur dix ? » déplacée entre « Mon juge ne rend pas de verdict » (11) et « Deux raccourcis » (devient 12) : elle coupait l'acte RAG, calage au premier passage. Notes : transition « le format est réparé, tentation suivante : une échelle plus fine » ; « le classement des bras change » passe en réserve (le public ne connaît pas encore les bras) ; doublon retiré des notes de la 11. Renvois « diapo N » recalés. Ordre : … 11 verdict · 12 noter sur dix · 13 deux raccourcis · 14 premier verdict · 15 aucune différence · 16 un juge se trompe · 17 conclusion.
+- **2026-10-24** : diapo « 4 façons » (QuatreFacons) coupée : taxonomie générique, sautée d'instinct au premier passage. Le choix oui/non passe dans les notes de « LLM-as-a-Judge » ; « Noter sur dix ? » s'ouvre seule à l'oral (« J'aurais pu lui demander une note sur dix. »). Renvois « diapo N » décalés. Composant `QuatreFacons.vue` conservé, non utilisé. Deck : 19 diapos. Sauvegarde : scratchpad `slides.avant-coupe-d8.md`.
+- **2026-10-24** : diapo 4 « pas un cas isolé » coupée (M3), après le premier passage chronométré (30:51 pour 20 min). « Et ce n'est pas un cas isolé » se dit à l'oral ; MyCity passe en RÉSERVE dans les notes de la diapo 3. Renvois « diapo N » des notes décalés de un. Sauvegarde : scratchpad `slides.avant-coupe-d4.md`.
+- **2026-10-23** — vérification des chiffres des diapos 13–18 (deux sous-agents, recomptes
+  JSONL). Relance non faite : juges = 14B (13, 14, triage 18), 32B MLX (14, jury 18),
+  32B Ollama à schéma (15–17). Corrigé : diapo 16 « 18 FAIL → PASS » (21 = trois bras) ;
+  diapo 18 ligne 1 « 8 / 12 erreurs rendues à l'identique » (le 2/8 était le jury Mistral) ;
+  diapo 13 « quatre règles » (+ CopieCorrigee) ; notes : 0 % = échec de format (WIP.md:289),
+  « format strict » et non « JSON valide », 37/360 = effet de budget, −61,7 pts = face à
+  BM25 (−43,3 face au vectoriel, a posteriori), source 3/11 = NOTE_BC.md bras B, « 11 questions
+  où seul BM25 passe ». Annotations « chiffres à confirmer » retirées sauf diapo 13.
+- **2026-10-23** — diapo 21 : QR OpenFeedback (`img/openfeedback.png`) à la place du placeholder.
+- **2026-10-23** — tirets cadratins (—) supprimés de tout le deck (écran, notes, commentaires
+  CSS/Vue) : remplacés selon le cas par « : », « , », « . », « · » ou des parenthèses. Règle :
+  plus de « — » dans le deck, ça fait réponse de LLM. Copie avant : scratchpad
+  `slides.avant-tirets.md`.
+- **2026-10-23** — passage « révélation progressive » sur tout le deck. Ajouté : diapo 3
+  (plaidoirie, puis clic tribunal + citation, puis clic tampon 650,88 $) ; diapo 7 (deux puces
+  puis le surligné, un par clic). Déjà progressives : 5, 6, 9, 11 à 19. Laissées entières : 4
+  (liste de cas, M3 en suspens), 8 (schéma de trois boîtes), 10 (code surligné). `[clic]` posés
+  dans les notes.
+- **2026-10-23** — diapo 6 : capture IntelliJ d'OllamAssist en place (480 × 316, le placeholder
+  indiquait à tort `demo/img/`) ; chatbot, agent et chute révélés un par clic, `[clic]` dans
+  les notes.
+- **2026-10-23** — diapo 5 mise en scène : l'extrait du mémoire (Mata v. Avianca) en papier
+  scotché, clic 1 tampon « Cet arrêt n'existe pas », clic 2 surligné « Avec un LLM, le faux a
+  exactement la forme du vrai. » Les deux puces (test unitaire, mot à mot) retirées de l'écran,
+  gardées à l'oral dans les notes.
+  Puis : Mata v. Avianca retiré de la diapo 4 (il grillait le tampon) et raconté seulement en
+  diapo 5 ; étiquette neutre « Mémoire déposé devant un tribunal fédéral américain, 2023 » ;
+  la référence S.D.N.Y. apparaît avec le tampon (clic 1). La diapo 4 garde MyCity, Deloitte,
+  Chevrolet ; M3 (la couper) reste à trancher après vendredi.
 - **2026-10-21** — diapo 11 sans chiffres : les trois biais posés en questions (« Ce que je
   crains de mon juge »), surligné « Pour le savoir, il me faut un corrigé. » → étalon. Raison :
   les mesures supposaient l'étalon (diapo 12) et les conventions (diapo 13). Indulgence 10/27
@@ -157,7 +192,7 @@ triage (12/50) et sondes (cinq fois) : dans les notes.
   la vraie question (croire mon juge) vit sur la couverture et la conclusion. M4 : exemple
   de la diapo 15 remplacé — ContextRetriever passe sur les trois bras, DocumentIndexingPipeline
   « implements AutoCloseable » : FAIL graphrag / PASS vectoriel (`plafond/sans-plafond.jsonl`,
-  AutoCloseable absent du contexte graphrag dans `rag-campaign.jsonl`). M3 (couper diapo 4)
+  AutoCloseable absent du contexte graphrag dans `rag-campaign.jsonl`). M3 (couper diapo 4, fait le 2026-10-24)
   et M5 (retirer les six marqueurs) reportés après la démo de vendredi.
 - **2026-10-19** — nettoyage du starter Slidev, headmatter, coquilles ; logo + LinkedIn ;
   code réduit à LangChain4j ; illustration « Imaginez » (Anne Worner, CC BY-SA 2.0) ;
