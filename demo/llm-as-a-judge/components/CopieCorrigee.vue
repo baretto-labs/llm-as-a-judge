@@ -1,7 +1,7 @@
 <!--
   The closing picture: the cover said "Copie à corriger", this is the copy, corrected.
   Four rules to take home, ticked one per click in red pen, then the grader's remark
-  (the loop: every shortcut led back to the gold set) and the stamp. Keep the rules in
+  (the loop back to the opening: Air Canada's 650,88 $) and the stamp. Keep the rules in
   sync with the REX acts (slides 12–18).
 -->
 <template>
@@ -22,7 +22,7 @@
     </ol>
 
     <div v-click class="appreciation">
-      <p class="annotation">Chaque raccourci m’a ramené à l’étalon.</p>
+      <p class="annotation">650,88 $ : ce n’était pas le montant, c’était la direction.</p>
       <div class="tampon-final"><Tampon :angle="-9" taille="1.3rem">Copie corrigée</Tampon></div>
     </div>
   </div>

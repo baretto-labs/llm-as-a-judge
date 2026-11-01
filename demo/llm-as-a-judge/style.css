@@ -106,13 +106,13 @@
   color: var(--rouge);
 }
 
-/* Highlighter: a slanted, uneven yellow stroke behind the words */
-.fluo {
-  background: linear-gradient(100deg, transparent 0.2em, var(--fluo) 0.25em, var(--fluo) calc(100% - 0.25em), transparent calc(100% - 0.2em));
-  background-size: 100% 0.7em;
-  background-position: 0 75%;
-  background-repeat: no-repeat;
-  padding: 0 0.15em;
+/* Corrector's mark: an uneven red ring drawn around the words */
+.entoure {
+  display: inline-block;
+  padding: 0.12em 0.6em;
+  border: 2.5px solid var(--rouge);
+  border-radius: 255px 18px 225px 18px / 18px 225px 18px 255px;
+  transform: rotate(-1deg);
 }
 
 /* Handwritten remark in the margin, in red */
@@ -444,3 +444,20 @@
   font-size: 0.75rem;
   letter-spacing: 0.05em;
 }
+
+/* A stamp that lands on click: it drops from above the page and hits the paper. */
+.coup-de-tampon {
+  transition: opacity 0.12s ease-in, scale 0.22s cubic-bezier(0.3, 1.5, 0.6, 1);
+}
+.coup-de-tampon.slidev-vclick-hidden { scale: 1.8; }
+
+/* The four prompt conventions behind 0 % -> 76 % (slide 12), short enough to read in one pass. */
+.conventions {
+  margin: 0;
+  padding-left: 1.6rem;
+  font-size: 1.15rem;
+  line-height: 1.45;
+  text-align: left;
+}
+.conventions li { margin: 0.35rem 0; }
+.conventions li::marker { font-weight: 800; color: var(--rouge); }
