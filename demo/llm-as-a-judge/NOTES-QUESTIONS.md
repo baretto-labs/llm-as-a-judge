@@ -410,7 +410,7 @@ La couverture disait « copie à corriger ». La voici corrigée.
 
 ## Diapo 19 · Les sources
 
-TODO : générer le QR des sources (repo, articles, données) et le mettre à la place du cadre.
+La diapo liste directement les sources (plus de QR). Liste complète, avec Cohen 1960 et Kohli 2026 pour les questions : SOURCES.md.
 
 ## Diapo 20 · Votre avis
 
@@ -442,3 +442,12 @@ Référence : J. Cohen, « A Coefficient of Agreement for Nominal Scales », Edu
 2. Je peux le vérifier : oui/non se compare à l'étalon. Un 6 sur 10 n'est ni juste ni faux.
 3. Le barème m'oblige à être clair : dire ce qui fait échouer.
 4. Je peux agir dessus : une note impose un seuil, qui redevient un booléen (et on finit par baisser le seuil).
+
+## « Et les erreurs dont le juge est sûr ? »
+
+Source : `judge-finetune/TRIAGE_POSTHOC.md` (post hoc, variante à conventions, le juge à 76 %).
+
+- Relire les doutes : 12 copies sur 50, 4 erreurs sur 12 rattrapées. Les 8 autres sont rendues trois fois à l'identique.
+- Relancer le même modèle fait varier la formulation, pas la compréhension : ces erreurs sont systématiques.
+- La piste qui les vise : un jury de familles différentes, routé sur leur désaccord (Verga et al., *Replacing Judges with Juries*, arXiv:2404.18796). Pas encore mesuré chez moi.
+- Router sur « un contrôle a bougé » au lieu du verdict : 16 relectures, toujours 4 sur 12. Mesuré, inutile.

@@ -431,7 +431,7 @@
   color: var(--encre-douce);
 }
 
-/* The GDG logo ships white text: it sits on an ink label */
+/* The DevFest badge has a black background: it sits on an ink label */
 .etiquette-logo {
   display: inline-flex;
   align-items: center;
@@ -461,3 +461,9 @@
 }
 .conventions li { margin: 0.35rem 0; }
 .conventions li::marker { font-weight: 800; color: var(--rouge); }
+
+/* Sources slide: one entry per paragraph, tight */
+.sources p {
+  margin: 0.35rem 0 0.7rem;
+  line-height: 1.3;
+}

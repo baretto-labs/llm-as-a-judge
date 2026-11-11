@@ -1,7 +1,7 @@
 <!--
   The closing picture: the cover said "Copie à corriger", this is the copy, corrected.
   Four rules to take home, ticked one per click in red pen, then the grader's remark
-  (the loop back to the opening: Air Canada's 650,88 $) and the stamp. Keep the rules in
+  (the loop back to the opening: Jake Moffatt, who had to go to court) and the stamp. Keep the rules in
   sync with the REX acts (slides 12–18).
 -->
 <template>
@@ -22,7 +22,7 @@
     </ol>
 
     <div v-click class="appreciation">
-      <p class="annotation">650,88 $ : ce n’était pas le montant, c’était la direction.</p>
+      <p class="annotation">Jake Moffatt a dû aller au tribunal. Vérifiez avant lui.</p>
       <div class="tampon-final"><Tampon :angle="-9" taille="1.3rem">Copie corrigée</Tampon></div>
     </div>
   </div>
@@ -33,7 +33,7 @@ const regles = [
   { texte: 'Écris tes 50 copies d’abord.', marge: 'personne ne le fera pour toi' },
   { texte: 'Écris ton barème.', marge: 'quatre règles' },
   { texte: 'Vérifie ce que ton juge lit.', marge: 'pas ce que tu lui envoies' },
-  { texte: 'Ne relis que les doutes.', marge: '12 au lieu de 50' },
+  { texte: 'Ne relis que les doutes.', marge: '12 relues : 4 erreurs sur 12' },
 ]
 </script>
 

@@ -32,7 +32,7 @@ duration: 20min
 
 <div class="abs-bl ml-18 mb-10">
   <span class="etiquette-logo">
-    <img src="./img/devfest-paris-logo.svg" class="h-6" alt="GDG Paris">
+    <img src="./img/devfest-paris-logo.png" class="h-10 rounded-full" alt="DevFest Paris 2026">
     DevFest Paris · 27 novembre 2026
   </span>
 </div>
@@ -40,7 +40,7 @@ duration: 20min
 <!--
 ⏱ 0:00. Cible : 18 min max. ⏱ = budget de la diapo (cumul).
 - Silence, puis « Imaginez ».
-- Si je dis « je vous rappelle » ou « la littérature dit » : je m'arrête.
+- Je raconte ce que j'ai fait, avec mes chiffres.
 - Détails et questions : NOTES-QUESTIONS.md
 -->
 
@@ -91,7 +91,6 @@ Le tribunal :
 - Air Canada : « le chatbot est responsable de ses actes ».
 - [click] Le tribunal : il fait partie du site. (laisser lire)
 - [click] 650,88 $. (laisser le tampon) Un chatbot n'est pas un POC.
-- ✂ Pas « ce n'est pas le montant » : c'est la fin du talk.
 -->
 
 ---
@@ -114,7 +113,7 @@ transition: fade-out
 
 <div class="abs-bl ml-18 mb-10">
   <span class="etiquette-logo">
-    <img src="./img/devfest-paris-logo.svg" class="h-6" alt="GDG Paris">
+    <img src="./img/devfest-paris-logo.png" class="h-10 rounded-full" alt="DevFest Paris 2026">
     DevFest Paris · 27 novembre 2026
   </span>
 </div>
@@ -339,9 +338,9 @@ Premier prompt : rien d'exploitable.
 <!--
 ⏱ 1:00 (10:05)
 - Premier prompt : 0 %. Pas faux : illisible. Il s'arrête avant le verdict.
-- [click] Quatre règles dans le prompt, même modèle : 76 %. (ne pas les lire)
+- [click] Quatre règles dans le prompt, même modèle : 76 %. (je laisse l'écran parler)
 - [click] Le plus gros levier : quatre règles.
-- Mais indulgent : 10 mauvaises copies sur 27 passent.
+- Mon étalon me montre qu'il est indulgent : 10 mauvaises copies sur 27 passent.
 - Si question, règle 3 : Optional&lt;String&gt; demandé, String rendu. Seule la case signature est rouge.
 -->
 
@@ -375,7 +374,7 @@ Onze notes possibles. Combien en utilise-t-il ?
 - Il n'utilise que 3 notes sur 11.
 - [click] Avec des critères, la note colle au oui/non : 92 %.
 - [click] Un interrupteur déguisé en potentiomètre. Demandez le booléen.
-- ✂ Les quatre raisons du booléen : seulement si question (NOTES-QUESTIONS.md).
+- Si question : les quatre raisons du booléen (NOTES-QUESTIONS.md).
 -->
 
 ---
@@ -406,9 +405,10 @@ Entraîner mon juge, ou en prendre un plus gros ?
 
 <!--
 ⏱ 0:35 (11:30)
+- Une phrase par clic.
 - 76 %. Comment monter ?
 - [click] J'entraîne : rien ne bouge.
-- [click] Plus gros, 32 milliards : 90 %.
+- [click] Plus gros, 32 milliards : 90 %. Et les mauvaises copies qui passent tombent de 10 à 4.
 - [click] L'instrument est prêt.
 -->
 
@@ -490,17 +490,17 @@ transition: fade-out
 
 <div class="bulletin mt-6">
   <div v-click class="ligne">
-    <span class="candidat">Le relancer trois fois <small>erreurs rendues à l'identique</small></span>
+    <span class="candidat">Le relancer trois fois <small>juge à 76 %</small></span>
     <span class="note">8 / 12</span>
     <Tampon couleur="rouge" taille="0.9rem" :angle="-3">mêmes erreurs</Tampon>
   </div>
   <div v-click class="ligne">
-    <span class="candidat">Un jury de trois familles <small>mon juge seul : 45 / 50</small></span>
+    <span class="candidat">Un jury de trois familles <small>juge à 90 % : 45 / 50 seul</small></span>
     <span class="note">47 / 50</span>
     <Tampon couleur="encre" taille="0.9rem" :angle="3">non concluant</Tampon>
   </div>
   <div v-click class="ligne">
-    <span class="candidat">Relire là où il hésite <small>verdicts qui changent d'une passe à l'autre</small></span>
+    <span class="candidat">Relire là où il hésite <small>juge à 76 %</small></span>
     <span class="note">12 / 50</span>
     <Tampon couleur="vert" taille="0.9rem" :angle="-4">à relire</Tampon>
   </div>
@@ -514,12 +514,13 @@ transition: fade-out
 <!--
 ⏱ 1:15 (15:00)
 - Mon juge se trompe encore. Que faire ?
-- [click] Relancé trois fois : 8 erreurs sur 12 reviennent identiques.
-- [click] Jury de trois familles : 47 contre 45. Sous 15 points : non concluant.
-- [click] Là où il change d'avis, il hésite : 12 copies sur 50.
-- [click] Je ne relis que celles-là.
-- [click] Tout ça, je le sais grâce à mes 50 copies.
-- ✂ Pas de température. Si question : ce banc tournait à 0,2, pour voir ses hésitations.
+- [click] Juge à 76 %, relancé trois fois : 8 erreurs sur 12 reviennent identiques.
+- [click] Juge à 90 % : un jury de trois familles fait 47 contre 45. Sous 15 points : non concluant.
+- [click] Juge à 76 % : là où il change d'avis, il hésite : 12 copies sur 50.
+- [click] Je ne relis que celles-là. J'attrape 4 erreurs sur 12. Les 8 autres, il les répète trois fois : ce sont ses angles morts.
+- [click] Je ne le sais que grâce à mes 50 copies.
+- Si question sur la température : ce banc tournait à 0,2, pour voir ses hésitations.
+- Si question « et les erreurs sûres d'elles ? » : un jury de familles différentes, la seule piste qui vise ces angles morts. Pas encore mesuré.
 -->
 
 ---
@@ -533,29 +534,42 @@ transition: fade-out
 <!--
 ⏱ 1:00 (16:00)
 - La couverture disait « copie à corriger ». La voici.
+- Pour chaque règle : je la lis, je lis l'annotation rouge, je clique.
 - [click] Écris tes 50 copies d'abord.
 - [click] Écris ton barème.
 - [click] « Vérifie ce que ton juge lit. » (mot pour mot)
 - [click] Ne relis que les doutes.
-- [click] Air Canada : 650,88 $. Ce n'était pas le montant, c'était la direction. Alors jugez-le, et jugez votre juge.
+- [click] Dernière phrase : « Jake Moffatt a dû aller jusqu'au tribunal pour qu'on vérifie la réponse du chatbot. Vérifiez-la avant lui. »
+- 2 s de silence. Puis « Merci ».
 -->
 
 
 
 ---
-layout: center
-class: text-center
 transition: fade-out
 ---
 # Les sources
 
-<div class="scotch qr-cadre mx-auto mt-4"><span>QR sources</span></div>
-
-<p class="ref mt-4">lien à venir</p>
+<div class="deux mt-8 sources">
+<div>
+  <span class="etiquette">le code</span>
+  <p><b>OllamAssist</b><br><span class="ref">github.com/baretto-labs/OllamAssist</span></p>
+  <p><b>Le banc et le juge</b><br><span class="ref">github.com/baretto-labs/llm-as-a-judge</span></p>
+  <span class="etiquette mt-6 block">les affaires</span>
+  <p><b>Moffatt v. Air Canada</b><br><span class="ref">2024 BCCRT 149</span></p>
+  <p><b>Mata v. Avianca</b><br><span class="ref">S.D.N.Y., 22-cv-1461, 22 juin 2023</span></p>
+</div>
+<div>
+  <span class="etiquette">les articles</span>
+  <p><b>Using LLM-as-a-Judge For Evaluation</b><br><span class="ref">Hamel Husain · hamel.dev/blog/posts/llm-judge</span></p>
+  <p><b>SelfCheckGPT</b><br><span class="ref">Manakul, Liusie, Gales · EMNLP 2023 · arXiv:2303.08896</span></p>
+  <p><b>Replacing Judges with Juries</b><br><span class="ref">Verga et al. · 2024 · arXiv:2404.18796</span></p>
+</div>
+</div>
 
 <!--
 ⏱ 0:15 (16:15)
-- Le code, les articles, les données : derrière ce QR.
+- Le code, le banc et les articles : tout est ici.
 -->
 
 ---
