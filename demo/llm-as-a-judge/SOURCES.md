@@ -19,5 +19,8 @@ Liste complète. La diapo 19 en affiche l'essentiel. Chaque entrée dit où elle
 - Yukyung Lee et al., *CheckEval: A reliable LLM-as-a-Judge framework for evaluating text generation using checklists*, 2024. https://arxiv.org/abs/2403.18771 (questions oui/non plutôt qu'une échelle ; diapo 13).
 - Jacob Cohen, *A Coefficient of Agreement for Nominal Scales*, Educational and Psychological Measurement 20(1):37-46, 1960. Le kappa (réponse en questions).
 - Potsawee Manakul, Adian Liusie, Mark J. F. Gales, *SelfCheckGPT: Zero-Resource Black-Box Hallucination Detection for Generative Large Language Models*, EMNLP 2023. https://arxiv.org/abs/2303.08896 (relancer le modèle avec un peu de hasard : là où les réponses divergent, il hésite ; diapo 17).
-- Pat Verga et al., *Replacing Judges with Juries: Evaluating LLM Generations with a Panel of Diverse Models*, 2024. https://arxiv.org/abs/2404.18796 (jury de familles différentes ; diapo 17 et questions).
-- Kohli, *Nine Judges, Two Effective Votes*, mai 2026. https://arxiv.org/abs/2605.29800 (jury ; réponse en questions).
+
+## Le jury
+
+- Pat Verga et al., *Replacing Judges with Juries: Evaluating LLM Generations with a Panel of Diverse Models*, 2024. https://arxiv.org/abs/2404.18796 (pour : un panel de petits modèles de familles différentes bat un seul gros juge ; diapo 17 et questions).
+- Kohli, *Nine Judges, Two Effective Votes*, mai 2026. https://arxiv.org/abs/2605.29800 (contre : 9 juges de 7 familles valent environ 2 votes indépendants, le meilleur juge seul égale ou bat le panel ; questions).

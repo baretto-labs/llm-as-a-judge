@@ -573,7 +573,9 @@ transition: fade-out
   <p><b>Judging LLM-as-a-Judge</b><br><span class="ref">Zheng et al. · NeurIPS 2023 · arXiv:2306.05685</span></p>
   <p><b>CheckEval</b><br><span class="ref">Lee et al. · 2024 · arXiv:2403.18771</span></p>
   <p><b>SelfCheckGPT</b><br><span class="ref">Manakul, Liusie, Gales · EMNLP 2023 · arXiv:2303.08896</span></p>
-  <p><b>Replacing Judges with Juries</b><br><span class="ref">Verga et al. · 2024 · arXiv:2404.18796</span></p>
+  <span class="etiquette mt-6 block">le jury</span>
+  <p><b>Replacing Judges with Juries</b> <span class="annotation text-base">pour</span><br><span class="ref">Verga et al. · 2024 · arXiv:2404.18796</span></p>
+  <p><b>Nine Judges, Two Effective Votes</b> <span class="annotation text-base">contre</span><br><span class="ref">Kohli · 2026 · arXiv:2605.29800</span></p>
 </div>
 </div>
 
