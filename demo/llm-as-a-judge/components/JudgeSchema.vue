@@ -1,8 +1,8 @@
 <!--
-  The judge pipeline, drawn after demo/SCHEMA-ETATS.md (state 11), revealed in four clicks:
+  The judge pipeline, drawn after .notes/brouillons/SCHEMA-ETATS.md (state 11), revealed in four clicks:
   0 the judge alone · 1 CI + L0 filter · 2 retrieval + seeded shuffle · 3 the bench loop
   · 4 the corpus and the four conventions.
-  The corpus legend says "un relecteur" on purpose: never "κ 0,880" (see SCHEMA-ETATS.md header).
+  The corpus legend says "un relecteur" on purpose: never "κ 0,880" (see .notes/brouillons/SCHEMA-ETATS.md header).
 -->
 <template>
   <svg viewBox="0 0 900 450" class="judge-schema w-full" role="img"

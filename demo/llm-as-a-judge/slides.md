@@ -45,7 +45,7 @@ duration: 20min
 ⏱ 0:00. Cible : 18 min max. ⏱ = budget de la diapo (cumul).
 - Silence, puis « Imaginez ».
 - Je raconte ce que j'ai fait, avec mes chiffres.
-- Détails et questions : NOTES-QUESTIONS.md
+- Détails et questions : .notes/deck/NOTES-QUESTIONS.md
 -->
 
 ---
@@ -382,7 +382,7 @@ Onze notes possibles. Combien en utilise-t-il ?
 - Il n'utilise que 3 notes sur 11.
 - [click] Avec des critères, la note colle au oui/non : 92 %.
 - [click] Un interrupteur déguisé en potentiomètre. Demandez le booléen.
-- Si question : les quatre raisons du booléen (NOTES-QUESTIONS.md).
+- Si question : les quatre raisons du booléen (.notes/deck/NOTES-QUESTIONS.md).
 -->
 
 ---

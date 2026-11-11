@@ -37,3 +37,8 @@ build/
 
 ### Mac OS ###
 .DS_Store
+### Working notes (local only) ###
+.notes/
+CLAUDE.md
+__pycache__/
+*.pyc
