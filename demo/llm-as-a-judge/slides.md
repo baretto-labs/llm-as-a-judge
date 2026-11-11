@@ -24,13 +24,13 @@ duration: 20min
 
 <p class="sous-titre">votre chatbot <span class="entoure">passe devant le juge</span></p>
 
-<p class="mt-10">
+<p class="mt-10 flex items-center">
   <a href="https://fr.linkedin.com/in/melketroussi" target="_blank" class="inline-flex items-center gap-2">
     <carbon:logo-linkedin class="text-2xl" /> Mehdi Elketroussi
   </a>
   <span class="mx-3 text-gray-400">·</span>
   <a href="https://www.baretto.fr" target="_blank" class="inline-flex items-center gap-2">
-    <img src="./img/baretto-symbole.svg" class="h-6" alt=""> Baretto
+    <img src="./img/baretto-symbole.svg" class="h-6 m-0" alt=""> Baretto
   </a>
 </p>
 
@@ -109,13 +109,13 @@ transition: fade-out
 
 <p class="sous-titre">votre chatbot <span class="entoure">passe devant le juge</span></p>
 
-<p class="mt-10">
+<p class="mt-10 flex items-center">
   <a href="https://fr.linkedin.com/in/melketroussi" target="_blank" class="inline-flex items-center gap-2">
     <carbon:logo-linkedin class="text-2xl" /> Mehdi Elketroussi
   </a>
   <span class="mx-3 text-gray-400">·</span>
   <a href="https://www.baretto.fr" target="_blank" class="inline-flex items-center gap-2">
-    <img src="./img/baretto-symbole.svg" class="h-6" alt=""> Baretto
+    <img src="./img/baretto-symbole.svg" class="h-6 m-0" alt=""> Baretto
   </a>
 </p>
 
