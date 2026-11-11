@@ -28,6 +28,10 @@ duration: 20min
   <a href="https://fr.linkedin.com/in/melketroussi" target="_blank" class="inline-flex items-center gap-2">
     <carbon:logo-linkedin class="text-2xl" /> Mehdi Elketroussi
   </a>
+  <span class="mx-3 text-gray-400">·</span>
+  <a href="https://www.baretto.fr" target="_blank" class="inline-flex items-center gap-2">
+    <img src="./img/baretto-symbole.svg" class="h-6" alt=""> Baretto
+  </a>
 </p>
 
 <div class="abs-bl ml-18 mb-10">
@@ -108,6 +112,10 @@ transition: fade-out
 <p class="mt-10">
   <a href="https://fr.linkedin.com/in/melketroussi" target="_blank" class="inline-flex items-center gap-2">
     <carbon:logo-linkedin class="text-2xl" /> Mehdi Elketroussi
+  </a>
+  <span class="mx-3 text-gray-400">·</span>
+  <a href="https://www.baretto.fr" target="_blank" class="inline-flex items-center gap-2">
+    <img src="./img/baretto-symbole.svg" class="h-6" alt=""> Baretto
   </a>
 </p>
 
@@ -584,6 +592,13 @@ transition: fade-out
 <div class="scotch qr-cadre mx-auto mt-4"><img src="./img/openfeedback.png" alt="QR code OpenFeedback" /></div>
 
 <p class="mt-4"><span class="annotation">merci ! des questions ?</span></p>
+
+<div class="abs-br mr-14 mb-10 text-center">
+  <a href="https://www.baretto.fr" target="_blank">
+    <img src="./img/baretto-logo.png" class="h-24 mx-auto" alt="Baretto">
+    <span class="ref">www.baretto.fr</span>
+  </a>
+</div>
 
 <!--
 ⏱ 0:15 (16:30)

@@ -148,6 +148,7 @@ triage (12/50) et sondes (cinq fois) : dans les notes.
 
 ## Fait
 
+- **2026-11-11** : Baretto dans le deck. Logo et symbole récupérés sur baretto.fr (`img/baretto-logo.png`, `img/baretto-symbole.svg`). Diapos 1 et 4 : « Mehdi Elketroussi · [symbole] Baretto » (lien www.baretto.fr). Diapo 20 (reste pendant les questions) : logo complet + www.baretto.fr en bas à droite. Vérifié en capture diapos 1 et 20.
 - **2026-11-11** : diapo 19 complétée : Zheng et al. (biais, NeurIPS 2023, arXiv:2306.05685), CheckEval (Lee et al., arXiv:2403.18771, vérifié), liens canlii.org et courtlistener.com pour les deux affaires. URL complètes dans SOURCES.md. Vérifié en capture.
 - **2026-11-11** : diapo 19, le QR des sources est remplacé par la liste directe (deux colonnes, classe `.sources`) : OllamAssist et le banc (github.com/baretto-labs, vérifiés publics), Moffatt v. Air Canada, Mata v. Avianca, Hamel Husain, SelfCheckGPT, Verga et al. Cohen et Kohli restent dans SOURCES.md (questions). Vérifié en capture.
 - **2026-11-11** : `SOURCES.md` créé, page cible du QR de la diapo 19 : Moffatt v. Air Canada, Mata v. Avianca, Hamel Husain, Cohen 1960, SelfCheckGPT (Manakul et al., EMNLP 2023, arXiv:2303.08896, vérifié : l'auto-cohérence de la diapo 17), Verga et al. 2024, Kohli 2026. Reste : publier la page et générer le QR.
