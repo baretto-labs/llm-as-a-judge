@@ -556,12 +556,14 @@ transition: fade-out
   <p><b>OllamAssist</b><br><span class="ref">github.com/baretto-labs/OllamAssist</span></p>
   <p><b>Le banc et le juge</b><br><span class="ref">github.com/baretto-labs/llm-as-a-judge</span></p>
   <span class="etiquette mt-6 block">les affaires</span>
-  <p><b>Moffatt v. Air Canada</b><br><span class="ref">2024 BCCRT 149</span></p>
-  <p><b>Mata v. Avianca</b><br><span class="ref">S.D.N.Y., 22-cv-1461, 22 juin 2023</span></p>
+  <p><b>Moffatt v. Air Canada</b><br><span class="ref">2024 BCCRT 149 · canlii.org</span></p>
+  <p><b>Mata v. Avianca</b><br><span class="ref">S.D.N.Y., 22-cv-1461, 22 juin 2023 · courtlistener.com</span></p>
 </div>
 <div>
   <span class="etiquette">les articles</span>
   <p><b>Using LLM-as-a-Judge For Evaluation</b><br><span class="ref">Hamel Husain · hamel.dev/blog/posts/llm-judge</span></p>
+  <p><b>Judging LLM-as-a-Judge</b><br><span class="ref">Zheng et al. · NeurIPS 2023 · arXiv:2306.05685</span></p>
+  <p><b>CheckEval</b><br><span class="ref">Lee et al. · 2024 · arXiv:2403.18771</span></p>
   <p><b>SelfCheckGPT</b><br><span class="ref">Manakul, Liusie, Gales · EMNLP 2023 · arXiv:2303.08896</span></p>
   <p><b>Replacing Judges with Juries</b><br><span class="ref">Verga et al. · 2024 · arXiv:2404.18796</span></p>
 </div>
