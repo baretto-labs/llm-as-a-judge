@@ -20,7 +20,7 @@ exactement les `verdict_stability` publiées (76 % et 58 %), ce qui vaut contrô
 
 ## Résultats
 
-### Variante à conventions — celle que raconte le talk
+### Variante à conventions, le juge à 76 % (raconté dans le talk jusqu'au 2026-11-11)
 
 ```
   50 items
@@ -33,6 +33,27 @@ exactement les `verdict_stability` publiées (76 % et 58 %), ce qui vaut contrô
 | Relecture humaine | **12 items sur 50** au lieu de 50 — **−76 % de travail** |
 | Désaccords rattrapés | **4 sur 12**, soit **33 %** |
 | Désaccords manqués | **8** — rendus trois fois de suite, identiques et faux |
+
+### Le juge à 90 % (32B, conventions) : ajouté le 2026-11-11, celui que raconte le talk désormais
+
+Même méthode, même run que le résultat JURY2 (`results/runs/32B-baseline-conventions.jsonl`, trois passes).
+Le calcul retrouve à l'identique les chiffres de la variante 14B ci-dessus, ce qui vaut contrôle.
+
+```
+  50 items, 45 d'accord avec l'étalon (90 %)
+  ├─ 46 stables     dont 43 d'accord,  3 en DÉSACCORD
+  └─  4 instables   dont  2 d'accord,  2 en désaccord
+```
+
+| | |
+|---|---|
+| Relecture humaine | **4 items sur 50** |
+| Désaccords rattrapés | **2 sur 5** |
+| Désaccords manqués | **3**, rendus trois fois de suite, identiques et faux |
+
+Le juge plus gros ne rend pas le triage meilleur (toujours un tiers à deux cinquièmes des erreurs
+rattrapées) : il se trompe moins au départ, donc il y a moins à relire et moins d'angles morts.
+Effectifs minuscules (4 items, 5 erreurs) : descriptif, rien de plus.
 
 ### Variante fine-tunée, pour comparaison
 

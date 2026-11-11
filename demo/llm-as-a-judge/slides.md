@@ -42,10 +42,8 @@ duration: 20min
 </div>
 
 <!--
-⏱ 0:00. Cible : 18 min max. ⏱ = budget de la diapo (cumul).
+⏱ 0:00. Cible : 18 min max.
 - Silence, puis « Imaginez ».
-- Je raconte ce que j'ai fait, avec mes chiffres.
-- Détails et questions : .notes/deck/NOTES-QUESTIONS.md
 -->
 
 ---
@@ -239,7 +237,7 @@ transition: fade-out
 - [click] Filtre sans LLM : la copie est signée ? Chez moi : ça compile ?
 - [click] Format imposé : il coche d'abord, il tranche ensuite.
 - [click] Étalon : 50 copies que j'ai corrigées. L'expert d'OllamAssist, c'est moi.
-- [click] Le doute part chez un humain. (détail diapo 17)
+- [click] Le doute part chez un humain.
 -->
 ---
 transition: fade-out
@@ -349,7 +347,6 @@ Premier prompt : rien d'exploitable.
 - [click] Quatre règles dans le prompt, même modèle : 76 %. (je laisse l'écran parler)
 - [click] Le plus gros levier : quatre règles.
 - Mon étalon me montre qu'il est indulgent : 10 mauvaises copies sur 27 passent.
-- Si question, règle 3 : Optional&lt;String&gt; demandé, String rendu. Seule la case signature est rouge.
 -->
 
 ---
@@ -382,7 +379,6 @@ Onze notes possibles. Combien en utilise-t-il ?
 - Il n'utilise que 3 notes sur 11.
 - [click] Avec des critères, la note colle au oui/non : 92 %.
 - [click] Un interrupteur déguisé en potentiomètre. Demandez le booléen.
-- Si question : les quatre raisons du booléen (.notes/deck/NOTES-QUESTIONS.md).
 -->
 
 ---
@@ -498,18 +494,18 @@ transition: fade-out
 
 <div class="bulletin mt-6">
   <div v-click class="ligne">
-    <span class="candidat">Le relancer trois fois <small>juge à 76 %</small></span>
-    <span class="note">8 / 12</span>
+    <span class="candidat">Le relancer trois fois <small>juge à 90 %</small></span>
+    <span class="note">3 / 5</span>
     <Tampon couleur="rouge" taille="0.9rem" :angle="-3">mêmes erreurs</Tampon>
   </div>
   <div v-click class="ligne">
-    <span class="candidat">Un jury de trois familles <small>juge à 90 % : 45 / 50 seul</small></span>
+    <span class="candidat">Un jury de trois familles <small>45 / 50 seul</small></span>
     <span class="note">47 / 50</span>
     <Tampon couleur="encre" taille="0.9rem" :angle="3">non concluant</Tampon>
   </div>
   <div v-click class="ligne">
-    <span class="candidat">Relire là où il hésite <small>juge à 76 %</small></span>
-    <span class="note">12 / 50</span>
+    <span class="candidat">Relire là où il hésite</span>
+    <span class="note">4 / 50</span>
     <Tampon couleur="vert" taille="0.9rem" :angle="-4">à relire</Tampon>
   </div>
 </div>
@@ -522,13 +518,11 @@ transition: fade-out
 <!--
 ⏱ 1:15 (15:00)
 - Mon juge se trompe encore. Que faire ?
-- [click] Juge à 76 %, relancé trois fois : 8 erreurs sur 12 reviennent identiques.
-- [click] Juge à 90 % : un jury de trois familles fait 47 contre 45. Sous 15 points : non concluant.
-- [click] Juge à 76 % : là où il change d'avis, il hésite : 12 copies sur 50.
-- [click] Je ne relis que celles-là. J'attrape 4 erreurs sur 12. Les 8 autres, il les répète trois fois : ce sont ses angles morts.
+- [click] Mon meilleur juge, à 90 %, relancé trois fois : 3 erreurs sur 5 reviennent identiques.
+- [click] Un jury de trois familles fait 47 contre 45. Sous 15 points : non concluant.
+- [click] Là où il change d'avis, il hésite : 4 copies sur 50.
+- [click] Je ne relis que celles-là. J'attrape 2 erreurs sur 5. Les 3 autres, il les répète trois fois : ce sont ses angles morts.
 - [click] Je ne le sais que grâce à mes 50 copies.
-- Si question sur la température : ce banc tournait à 0,2, pour voir ses hésitations.
-- Si question « et les erreurs sûres d'elles ? » : un jury de familles différentes, la seule piste qui vise ces angles morts. Pas encore mesuré.
 -->
 
 ---
@@ -604,7 +598,7 @@ transition: fade-out
 
 <!--
 ⏱ 0:15 (16:30)
-- Merci. Vos questions ?
+- Vos questions ?
 - Laisser cette diapo pendant les questions.
 
 -->
