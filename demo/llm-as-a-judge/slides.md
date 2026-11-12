@@ -300,26 +300,28 @@ transition: fade-out
 ---
 # Qui juge le juge ?
 
-Avant de lui confier mon RAG, je lui fais passer un examen dont j'ai le corrigé.
+Moi. 50 copies dont je connais le verdict.
 
 <div class="deux mt-6">
 <div class="lecon">
-  <span class="etiquette">l'examen · l'étalon</span>
-  <div class="chiffre">50 <small>copies</small></div>
-  <p>dont je connais le verdict. Mon juge est noté en % d'accord avec moi.</p>
+  <span class="etiquette">le corrigé · moi</span>
+  <div class="chiffre">100&nbsp;%</div>
+  <p>Mon juge est noté sur ces 50 copies : % d'accord avec moi.</p>
 </div>
 <div v-click class="lecon">
-  <span class="etiquette">pour comparer deux scores</span>
-  <div class="chiffre">15 <small>points</small></div>
-  <p>Deux juges, ou deux RAG. En dessous, je ne dis pas «&nbsp;pareil&nbsp;», je dis «&nbsp;je&nbsp;ne&nbsp;vois&nbsp;pas&nbsp;».</p>
+  <span class="etiquette">pour dire qu'un juge est meilleur</span>
+  <div class="chiffre">+15 <small>points</small></div>
+  <p>Le plus petit écart que 50 copies laissent voir&nbsp;: 8 copies de plus. En dessous, je ne tranche pas.</p>
   <span class="annotation">50 copies, c'est peu</span>
 </div>
 </div>
 
 <!--
 ⏱ 1:00 (9:00)
-- 50 copies dont je connais le verdict. Mon juge est noté sur une seule chose : son accord avec moi, en %.
-- [click] Pour comparer deux scores, deux juges ou deux RAG : 15 points d'écart minimum. Ce n'est pas mon choix, c'est ce que 50 copies permettent de voir.
+- Qui juge le juge ? Moi. 50 copies dont je connais le verdict : le corrigé, c'est moi, 100 %.
+- Mon juge est noté sur une seule chose : son accord avec moi, en %.
+- [click] Pour dire qu'un juge est meilleur : 15 points. C'est le plus petit écart que 50 copies laissent voir : 8 copies de plus. En dessous, je ne tranche pas : je dis « je ne vois pas ».
+- Aujourd'hui, je fixerais aussi une barre avant de commencer, par exemple 85 %. Je ne l'avais pas fait.
 -->
 
 ---
@@ -418,7 +420,7 @@ Entraîner mon juge, ou en prendre un plus gros ?
 - Une phrase par clic.
 - 76 %. Comment monter ?
 - [click] J'entraîne : rien ne bouge.
-- [click] Plus gros, 32 milliards : 90 %. +14, juste sous le seuil : je ne peux pas prouver qu'il est meilleur. Je le garde : les mauvaises copies qui passent tombent de 10 à 4.
+- [click] Plus gros, 32 milliards : 90 %. +14, soit 7 copies : il en fallait 8. je ne peux pas prouver qu'il est meilleur. Je le garde : les mauvaises copies qui passent tombent de 10 à 4.
 - [click] L'entraînement lui apprend le format, pas le jugement.
 -->
 
@@ -540,7 +542,7 @@ Vectoriel, ou vectoriel + BM25 ? Mon banc : « aucune différence ».
 - Vectoriel + BM25 (mots-clés) : mon premier passage ne voit pas de différence.
 - Je ne l'ai pas cru.
 - [click] Mon banc coupait les contextes à 6 000 caractères : 46 sur 60.
-- [click] Contextes entiers : 60 contre 78 %. 18 points : au-dessus du seuil.
+- [click] Contextes entiers : 60 contre 78 %. Même règle que pour le juge : 18 points, au-dessus du seuil.
 - [click] « Vérifie ce que ton juge lit. »
 - J'ai corrigé mon banc, pas le juge. En prod le jour même.
 -->
@@ -557,7 +559,7 @@ transition: fade-out
 ⏱ 1:00 (15:50)
 - La couverture disait « copie à corriger ». La voici.
 - Pour chaque règle : je la lis, je lis l'annotation, je clique.
-- [click] Écris tes 50 copies d'abord.
+- [click] Écris tes copies et ta barre d'abord.
 - [click] Écris ton barème.
 - [click] Ne relis que les doutes.
 - [click] « Vérifie ce que ton juge lit. » (mot pour mot)
