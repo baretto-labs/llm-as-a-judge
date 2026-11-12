@@ -252,14 +252,14 @@ ChatModel juge = OllamaChatModel.builder()
 
 ChatResponse r = juge.chat(
     SystemMessage.from(BAREME),                // les trois contrôles + les conventions
-    UserMessage.from(contexte + question));
+    UserMessage.from(question + contexte + reponse));
 
-Judgement j = parse(r.aiMessage().text());     // {checks, verdict, reason}
+Judgement j = parse(r.aiMessage().text());     // { critères, verdict, raison }
 ```
 
 <!--
 ⏱ 0:40 (7:10)
-- Vingt lignes de LangChain4j.
+- Dix lignes de LangChain4j.
 - Facile à coder. Mais un LLM a des biais.
 -->
 ---
@@ -402,6 +402,7 @@ Entraîner mon juge, ou en prendre un plus gros ?
     <span class="candidat">J'entraîne <small>QLoRA, 91 min, sur le MacBook</small></span>
     <span class="note">76 → 76 %</span>
     <Tampon couleur="encre" taille="0.9rem" :angle="3">rien gagné</Tampon>
+    <span v-click="3" class="annotation faute" style="grid-column: 1 / -1">le format, pas le jugement</span>
   </div>
   <div v-click class="ligne">
     <span class="candidat">Je prends plus gros <small>Qwen 14B → 32B, quantifié</small></span>
@@ -410,7 +411,6 @@ Entraîner mon juge, ou en prendre un plus gros ?
   </div>
 </div>
 
-<p v-click class="mt-8"><span class="annotation faute">le format, pas le jugement</span></p>
 
 
 <!--
@@ -479,7 +479,7 @@ transition: fade-out
 ---
 # Premier verdict
 
-Mon assistant, noté par mon juge : % de bonnes réponses.
+Mon assistant, noté par mon juge : % de contextes suffisants.
 
 <div class="barres mt-8">
   <div v-click class="barre-ligne">
@@ -489,8 +489,8 @@ Mon assistant, noté par mon juge : % de bonnes réponses.
   </div>
   <div v-click class="barre-ligne">
     <span>Vectoriel <small>Lucene</small></span>
-    <div class="piste"><div class="plein" style="--v: 55"></div></div>
-    <strong>55,0 %</strong>
+    <div class="piste"><div class="plein" style="--v: 60"></div></div>
+    <strong>60,0 %</strong>
   </div>
 </div>
 
@@ -504,7 +504,7 @@ Mon assistant, noté par mon juge : % de bonnes réponses.
 ⏱ 1:00 (13:35)
 - Alors, j'améliore ?
 - [click] Graphe : 16,7 %.
-- [click] Vectoriel : 55 %.
+- [click] Vectoriel : 60 %.
 - [click] Un tel écart, c'est mon code : le graphe perd des liens. Il ramène la classe, pas ce qu'elle implémente.
 - Je m'attendais à l'inverse.
 - Un juge sert d'abord à trouver tes bugs.
@@ -515,19 +515,19 @@ transition: fade-out
 ---
 # « Aucune différence »
 
-Vectoriel, ou vectoriel + BM25 ? 55 % contre 48 % : sous le seuil.
+Vectoriel, ou vectoriel + BM25 ? Mon banc : « aucune différence ».
 
 <div class="fiches mt-6">
 <div v-click class="fiche">
   <span class="etiquette">01 · la panne</span>
-  <strong>Copies coupées</strong>
+  <strong>Contextes coupés</strong>
   <p>Mon banc coupait chaque contexte à 6&nbsp;000&nbsp;caractères : 46 sur 60 côté BM25.</p>
-  <span class="annotation faute">copies arrachées</span>
+  <span class="annotation faute">contextes arrachés</span>
 </div>
 <div v-click class="fiche">
   <span class="etiquette">02 · contextes entiers</span>
-  <strong>60 % contre 78,3 %</strong>
-  <p>Bonnes réponses : vectoriel contre vectoriel + BM25.</p>
+  <strong>60,0 % contre 78,3 %</strong>
+  <p>Contextes suffisants : vectoriel contre vectoriel + BM25.</p>
   <span class="annotation" style="color: var(--vert)">+18 points : au-dessus du seuil</span>
 </div>
 </div>
@@ -537,7 +537,7 @@ Vectoriel, ou vectoriel + BM25 ? 55 % contre 48 % : sous le seuil.
 
 <!--
 ⏱ 1:15 (14:50)
-- Vectoriel + BM25 (mots-clés) : 55 contre 48. Sous le seuil : je ne vois pas de différence.
+- Vectoriel + BM25 (mots-clés) : mon premier passage ne voit pas de différence.
 - Je ne l'ai pas cru.
 - [click] Mon banc coupait les contextes à 6 000 caractères : 46 sur 60.
 - [click] Contextes entiers : 60 contre 78 %. 18 points : au-dessus du seuil.
@@ -561,7 +561,7 @@ transition: fade-out
 - [click] Écris ton barème.
 - [click] Ne relis que les doutes.
 - [click] « Vérifie ce que ton juge lit. » (mot pour mot)
-- [click] Dernière phrase : « Jake Moffatt a dû aller jusqu'au tribunal pour qu'on vérifie la réponse du chatbot. Vérifiez-la avant lui. »
+- [click] Dernière phrase : « Jake Moffatt a dû aller au tribunal. Vérifiez avant lui. »
 - 2 s de silence. Puis « Merci ».
 -->
 

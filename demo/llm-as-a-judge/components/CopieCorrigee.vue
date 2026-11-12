@@ -2,7 +2,7 @@
   The closing picture: the cover said "Copie à corriger", this is the copy, corrected.
   Four rules to take home, ticked one per click in green, then the grader's remark
   (the loop back to the opening: Jake Moffatt, who had to go to court) and the stamp. Keep the rules in
-  sync with the REX acts (slides 12–18).
+  sync with the REX acts (slides 12-19).
 -->
 <template>
   <div class="copie">
@@ -31,7 +31,7 @@
 <script setup lang="ts">
 const regles = [
   { texte: 'Écris tes 50 copies d’abord.', marge: 'personne ne le fera pour toi' },
-  { texte: 'Écris ton barème.', marge: 'quatre règles' },
+  { texte: 'Écris ton barème.', marge: 'trois cases' },
   { texte: 'Ne relis que les doutes.', marge: '4 relues : 2 erreurs sur 5' },
   { texte: 'Vérifie ce que ton juge lit.', marge: 'pas ce que tu lui envoies' },
 ]
