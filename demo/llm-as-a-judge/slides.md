@@ -316,13 +316,10 @@ Avant de lui confier mon RAG, je lui fais passer un examen dont j'ai le corrigé
 </div>
 </div>
 
-<p v-click class="mt-8"><span class="entoure font-bold">Avant d'écrire le juge, écris le corrigé.</span></p>
-
 <!--
 ⏱ 1:00 (9:00)
 - 50 copies dont je connais le verdict. Mon juge est noté sur une seule chose : son accord avec moi, en %.
 - [click] Pour comparer deux scores, deux juges ou deux RAG : 15 points d'écart minimum. Ce n'est pas mon choix, c'est ce que 50 copies permettent de voir.
-- [click] Avant d'écrire le juge, écris le corrigé.
 -->
 
 ---
@@ -350,12 +347,15 @@ Mon examen vise les biais de mon juge.
 </div>
 </div>
 
+<p v-click class="mt-8"><span class="entoure font-bold">Avant d'écrire le juge, écris le corrigé.</span></p>
+
 <!--
 ⏱ 0:40 (9:40)
 - Mon examen n'est pas au hasard : il vise les biais.
 - [click] 27 fausses sur 50. Un juge qui dit toujours oui : 46 %.
 - [click] 11 réponses longues, 8 fausses. S'il aime le long, il tombe.
 - [click] Et il ne compare jamais deux réponses : une copie à la fois. Pas de duel, pas d'ordre.
+- [click] Avant d'écrire le juge, écris le corrigé.
 -->
 
 ---
@@ -489,8 +489,8 @@ Mon assistant, noté par mon juge : % de bonnes réponses.
   </div>
   <div v-click class="barre-ligne">
     <span>Vectoriel <small>Lucene</small></span>
-    <div class="piste"><div class="plein" style="--v: 60"></div></div>
-    <strong>60,0 %</strong>
+    <div class="piste"><div class="plein" style="--v: 55"></div></div>
+    <strong>55,0 %</strong>
   </div>
 </div>
 
@@ -504,7 +504,7 @@ Mon assistant, noté par mon juge : % de bonnes réponses.
 ⏱ 1:00 (13:35)
 - Alors, j'améliore ?
 - [click] Graphe : 16,7 %.
-- [click] Vectoriel : 60 %.
+- [click] Vectoriel : 55 %.
 - [click] Un tel écart, c'est mon code : le graphe perd des liens. Il ramène la classe, pas ce qu'elle implémente.
 - Je m'attendais à l'inverse.
 - Un juge sert d'abord à trouver tes bugs.
@@ -526,8 +526,8 @@ Vectoriel, ou vectoriel + BM25 ? 55 % contre 48 % : sous le seuil.
 </div>
 <div v-click class="fiche">
   <span class="etiquette">02 · contextes entiers</span>
-  <strong>60 % → 78,3 %</strong>
-  <p>Bonnes réponses : vectoriel, puis vectoriel + BM25.</p>
+  <strong>60 % contre 78,3 %</strong>
+  <p>Bonnes réponses : vectoriel contre vectoriel + BM25.</p>
   <span class="annotation" style="color: var(--vert)">+18 points : au-dessus du seuil</span>
 </div>
 </div>
@@ -540,7 +540,7 @@ Vectoriel, ou vectoriel + BM25 ? 55 % contre 48 % : sous le seuil.
 - Vectoriel + BM25 (mots-clés) : 55 contre 48. Sous le seuil : je ne vois pas de différence.
 - Je ne l'ai pas cru.
 - [click] Mon banc coupait les contextes à 6 000 caractères : 46 sur 60.
-- [click] Contextes entiers : 60 → 78 %. 18 points : au-dessus du seuil.
+- [click] Contextes entiers : 60 contre 78 %. 18 points : au-dessus du seuil.
 - [click] « Vérifie ce que ton juge lit. »
 - J'ai corrigé mon banc, pas le juge. En prod le jour même.
 -->
