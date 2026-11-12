@@ -20,6 +20,10 @@ comark: true
 duration: 20min
 ---
 
+<div v-click class="abs-tr mt-14 mr-16 coup-de-tampon">
+  <Tampon :angle="10">Copie à corriger</Tampon>
+</div>
+
 # RAGots et <span class="rouge">Hallucinations</span>
 
 <p class="sous-titre">votre chatbot <span class="entoure">passe devant le juge</span></p>
@@ -42,14 +46,16 @@ duration: 20min
 </div>
 
 <!--
-⏱ 0:00. Cible : 18 min max.
-- Silence, puis « Imaginez ».
+⏱ 0:30 (0:30). Cible : 18 min max.
+- Bonsoir, je m'appelle Mehdi Elketroussi, software engineer chez Baretto.
+- Un assistant de code : comment savoir s'il s'améliore ? Aujourd'hui : comment on juge le juge.
+- [click] Tampon. 1 s de silence.
 -->
 
 ---
 transition: fade-out
 ---
-# Imaginez…
+# Jake Moffatt, 2022
 
 <div class="scotch mx-auto w-[92%]">
   <img src="./img/imaginez-attente.jpg" class="h-80 w-full object-cover" alt="Une voyageuse seule attend dans un terminal d'aéroport">
@@ -58,8 +64,8 @@ transition: fade-out
 <p class="ref text-right mt-3">« The Long Lonely Wait », Anne Worner, CC BY-SA 2.0</p>
 
 <!--
-⏱ 0:40 (0:40)
-- Un deuil, un voyage en urgence.
+⏱ 0:35 (1:05)
+- Jake Moffatt, 2022. Un deuil, un voyage en urgence.
 - Le chatbot : « partez, demandez le tarif réduit au retour ».
 - Au retour : « c'était une erreur du chatbot ».
 -->
@@ -88,79 +94,52 @@ Le tribunal :
 </div>
 
 <!--
-⏱ 0:50 (1:30)
-- Jake Moffatt l'a vécu. 2022.
+⏱ 0:55 (2:00)
 - Air Canada : « le chatbot est responsable de ses actes ».
 - [click] Le tribunal : il fait partie du site. (laisser lire)
 - [click] 650,88 $. (laisser le tampon) Un chatbot n'est pas un POC.
--->
-
----
-layout: cover
-transition: fade-out
----
-<div v-click class="abs-tr mt-14 mr-16 coup-de-tampon">
-  <Tampon :angle="10">Copie à corriger</Tampon>
-</div>
-
-# RAGots et <span class="rouge">Hallucinations</span>
-
-<p class="sous-titre">votre chatbot <span class="entoure">passe devant le juge</span></p>
-
-<p class="mt-10 flex items-center">
-  <a href="https://fr.linkedin.com/in/melketroussi" target="_blank" class="inline-flex items-center gap-2">
-    <carbon:logo-linkedin class="text-2xl" /> Mehdi Elketroussi
-  </a>
-  <span class="mx-3 text-gray-400">·</span>
-  <a href="https://www.baretto.fr" target="_blank" class="inline-flex items-center gap-2">
-    <img src="./img/baretto-symbole.svg" class="h-6 m-0" alt=""> Baretto
-  </a>
-</p>
-
-<div class="abs-bl ml-18 mb-10">
-  <span class="etiquette-logo">
-    <img src="./img/devfest-paris-logo.png" class="h-10 rounded-full" alt="DevFest Paris 2026">
-    DevFest Paris · 27 novembre 2026
-  </span>
-</div>
-
-<!--
-⏱ 0:45 (2:15)
-- Mehdi Elketroussi, software engineer.
-- Un assistant de code : comment savoir s'il s'améliore ?
-- Aujourd'hui : comment on juge le juge.
-- [click] Tampon. 1 s de silence.
 - Mains levées : qui a un LLM en prod ? (2 s) Qui l'évalue ? (2 s, un mot de réaction)
 -->
+
 ---
 transition: fade-out
 ---
-# Pourquoi personne n'a rien vu ?
+# Même un expert n'a rien vu
 
-<div class="scotch extrait mx-auto mt-14">
-  <span class="source">Mémoire déposé devant un tribunal fédéral américain, 2023</span>
-  <p class="citation"><em>Varghese v. China Southern Airlines Co.</em>,<br>925 F.3d 1339 (11th Cir. 2019)</p>
-  <div v-click="1" class="tampon-faux coup-de-tampon"><Tampon :angle="-9" taille="1.5rem">Cet arrêt n'existe pas</Tampon></div>
+<div class="scotch extrait mx-auto mt-8">
+  <span class="source">Autre affaire · un avocat, New York, 2023</span>
+  <ol class="citations">
+    <li><b>Varghese</b> v. China Southern Airlines <span>2019</span></li>
+    <li><b>Shaboon</b> v. Egyptair <span>2013</span></li>
+    <li><b>Petersen</b> v. Iran Air <span>2012</span></li>
+    <li><b>Martinez</b> v. Delta Airlines <span>2019</span></li>
+    <li><b>Durden</b> v. KLM <span>2017</span></li>
+    <li><b>Miller</b> v. United Airlines <span>1999</span></li>
+  </ol>
+  <div v-click="1" class="tampon-faux coup-de-tampon"><Tampon :angle="-9" taille="1.5rem">Aucun n'existe</Tampon></div>
 </div>
 
-<p v-click="1" class="text-center mt-6"><span class="ref">Mata v. Avianca, S.D.N.Y., 22-cv-1461, juge P. Kevin Castel, 22 juin 2023</span></p>
+<p v-click="1" class="text-center mt-4"><span class="ref">Mata v. Avianca, S.D.N.Y., 22-cv-1461, juge P. Kevin Castel, 22 juin 2023</span></p>
 
-<p v-click="2" class="text-center" style="margin-top: 2.5rem"><span class="entoure font-bold">Avec un LLM, le faux a exactement la forme du vrai.</span></p>
+<p v-click="2" class="text-center" style="margin-top: 1.5rem"><span class="entoure font-bold">Avec un LLM, le faux a exactement la forme du vrai.</span></p>
 
 <style>
-.extrait { position: relative; width: 640px; padding: 1.6rem 2rem; }
+.extrait { position: relative; width: 640px; padding: 1.1rem 2rem; }
 .extrait .source {
   font-family: 'JetBrains Mono', monospace; font-size: 0.75rem;
   letter-spacing: 0.05em; color: var(--encre-douce);
 }
-.extrait .citation { font-family: Georgia, serif; font-size: 1.6rem; line-height: 1.4; margin: 0.6rem 0 0; }
-.tampon-faux { position: absolute; right: -1.5rem; bottom: 0.2rem; }
+.extrait .citations { list-style: decimal; padding-left: 1.6rem; margin: 0.8rem 0 0; font-size: 1.35rem; line-height: 1.6; }
+.extrait .citations li { margin: 0; padding-left: 0.3rem; }
+.extrait .citations li::marker { color: var(--encre-douce); font-size: 1rem; }
+.extrait .citations span { font-family: 'JetBrains Mono', monospace; font-size: 0.9rem; color: var(--encre-douce); margin-left: 0.5rem; }
+.tampon-faux { position: absolute; right: -2rem; bottom: -0.6rem; }
 </style>
 
 <!--
-⏱ 1:00 (3:15)
-- Regardez ce jugement. Tout a l'air juste.
-- [click] Mata contre Avianca, New York, 2023. Six jugements cités, aucun n'existe : ChatGPT. 5 000 dollars.
+⏱ 1:00 (3:00)
+- Autre affaire, New York, 2023 : un avocat dépose ce mémoire. Tout a l'air juste.
+- [click] Six jugements, tous inventés par ChatGPT. L'avocat paie 5 000 dollars.
 - Test unitaire, comparaison mot à mot : ils ne voient rien.
 - [click] « Avec un LLM, le faux a exactement la forme du vrai. »
 -->
@@ -187,7 +166,7 @@ Elle dépend de ce qu’il a trouvé.</strong></p>
 </div>
 
 <!--
-⏱ 0:40 (3:55)
+⏱ 0:40 (3:40)
 - OllamAssist : assistant de code, en local. Mon labo.
 - [click] D'abord un chatbot.
 - [click] Puis un agent : il lit mon code.
@@ -199,25 +178,44 @@ transition: fade-out
 ---
 # Comment savoir si j'améliore mon assistant ?
 
- Deux stratégies de RAG : vectorielle ou graphe.
-  **Aucun moyen de les départager.**
+Deux façons de lui trouver les bons extraits.
 
-<v-clicks>
+<div class="fiches mt-6">
+<div class="fiche">
+  <span class="etiquette">vectoriel</span>
+  <strong>Cherche ce qui ressemble</strong>
+  <p>Les passages les plus proches de la question, par le sens.</p>
+</div>
+<div class="fiche">
+  <span class="etiquette">graphe</span>
+  <strong>Suit les liens du code</strong>
+  <p>Qui appelle qui, qui implémente quoi : un Ctrl+clic automatique.</p>
+  <span class="annotation">sur du code, il devrait gagner</span>
+</div>
+</div>
 
-- Trois rôles, une seule personne : **j'écris, je choisis, je juge.** **Un dispositif qui ne peut pas me contredire ne mesure rien.**
-
-- Ma crainte : **avancer à l'aveugle.**
-
-</v-clicks>
+<p v-click class="mt-8">J'écris, je choisis, je juge : <strong>rien ne me contredit.</strong></p>
 
 <p v-click><span class="entoure font-bold">Il me faut un juge.</span></p>
 
 <!--
-⏱ 0:45 (4:40)
-- Deux RAG : vectoriel ou graphe. Lequel est meilleur ?
-- [click] J'écris, je choisis, je juge : rien ne me contredit.
-- [click] Ma crainte : que mes utilisateurs le voient avant moi.
+⏱ 0:45 (4:25)
+- Deux façons de trouver les extraits. Vectoriel : ce qui ressemble à la question. Graphe : il suit les liens du code, comme un Ctrl+clic.
+- Sur du code, le graphe devrait gagner. Lequel est meilleur ?
+- [click] J'écris, je choisis, je juge : rien ne me contredit. Mes utilisateurs le verraient avant moi.
 - [click] Il me faut un juge.
+-->
+
+---
+layout: center
+transition: fade-out
+---
+
+<Exercices :courant="1" />
+
+<!--
+⏱ 0:05 (4:30)
+- Trois exercices. Exercice 1 : le principe.
 -->
 
 ---
@@ -225,15 +223,15 @@ transition: fade-out
 ---
 # LLM-as-a-Judge
 
-Écrire un livre est difficile. Le juger, beaucoup moins.
-
 <JugeTheorie />
 
 <!--
-⏱ 2:00 (6:40)
-- Un LLM qui ne rédige pas : il corrige la copie (question, contexte, réponse).
-- Il rend un verdict et une raison.
-- [click] Barème : des critères explicites, écrits avant.
+⏱ 2:00 (6:30)
+- [click] La copie : la question, le contexte, la réponse.
+- [click] Un LLM qui ne rédige pas : il la lit.
+- [click] Il rend un verdict et une raison.
+- [click] Barème : des cases à cocher, écrites avant. Rien hors contexte, même vrai.
+- Les six arrêts de l'avocat ? Recalés dès la case 1.
 - [click] Filtre sans LLM : la copie est signée ? Chez moi : ça compile ?
 - [click] Format imposé : il coche d'abord, il tranche ensuite.
 - [click] Étalon : 50 copies que j'ai corrigées. L'expert d'OllamAssist, c'est moi.
@@ -249,7 +247,7 @@ transition: fade-out
 ChatModel juge = OllamaChatModel.builder()
     .baseUrl("http://localhost:11434")
     .modelName("qwen2.5-coder:32b")
-    .temperature(0.0)
+    .temperature(0.2)
     .build();
 
 ChatResponse r = juge.chat(
@@ -260,9 +258,8 @@ Judgement j = parse(r.aiMessage().text());     // {checks, verdict, reason}
 ```
 
 <!--
-⏱ 0:40 (7:20)
+⏱ 0:40 (7:10)
 - Vingt lignes de LangChain4j.
-- Température 0 : il juge pareil à chaque fois.
 - Facile à coder. Mais un LLM a des biais.
 -->
 ---
@@ -272,18 +269,30 @@ transition: fade-out
 
 Ce que je crains de mon juge.
 
-- **Biais de verbosité** : est-ce qu'il se laisse impressionner par une réponse longue ?
-- **Biais de position** : est-ce que l'ordre des extraits change son verdict ?
 - **Biais d'indulgence** : est-ce qu'il valide trop facilement ?
+- **Biais de verbosité** : est-ce qu'il se laisse impressionner par une réponse longue ?
+- **Biais de position** : entre deux réponses, est-ce qu'il préfère la première ?
 
 <p v-click class="mt-8"><span class="entoure font-bold">Pour le savoir, il me faut un corrigé.</span></p>
 
 <!--
-⏱ 0:45 (8:05)
-- Verbosité : le long l'impressionne ?
-- Position : l'ordre des extraits change le verdict ?
+⏱ 0:45 (7:55)
 - Indulgence : il laisse passer le faible ?
+- Verbosité : le long l'impressionne ?
+- Position : entre deux réponses, il préfère la première ?
 - [click] Pour le savoir, il me faut un corrigé.
+-->
+
+---
+layout: center
+transition: fade-out
+---
+
+<Exercices :courant="2" />
+
+<!--
+⏱ 0:05 (8:00)
+- Exercice 2 : je construis mon juge.
 -->
 
 ---
@@ -296,13 +305,13 @@ Avant de lui confier mon RAG, je lui fais passer un examen dont j'ai le corrigé
 <div class="deux mt-6">
 <div class="lecon">
   <span class="etiquette">l'examen · l'étalon</span>
-  <div class="chiffre">50 <small>réponses</small></div>
-  <p>dont je connais le bon verdict.</p>
+  <div class="chiffre">50 <small>copies</small></div>
+  <p>dont je connais le verdict. Mon juge est noté en % d'accord avec moi.</p>
 </div>
 <div v-click class="lecon">
-  <span class="etiquette">sa limite</span>
+  <span class="etiquette">pour comparer deux scores</span>
   <div class="chiffre">15 <small>points</small></div>
-  <p>Un écart plus petit, je ne peux pas le voir.</p>
+  <p>Deux juges, ou deux RAG. En dessous, je ne dis pas «&nbsp;pareil&nbsp;», je dis «&nbsp;je&nbsp;ne&nbsp;vois&nbsp;pas&nbsp;».</p>
   <span class="annotation">50 copies, c'est peu</span>
 </div>
 </div>
@@ -310,11 +319,43 @@ Avant de lui confier mon RAG, je lui fais passer un examen dont j'ai le corrigé
 <p v-click class="mt-8"><span class="entoure font-bold">Avant d'écrire le juge, écris le corrigé.</span></p>
 
 <!--
-⏱ 1:00 (9:05)
-- 50 copies dont je connais le verdict.
-- [click] 50, c'est peu : je ne conclus qu'au-delà de 15 points.
-- Hasard : si 90 % des copies sont bonnes, un juge « toujours oui » fait 90 %. Mon étalon : moitié-moitié.
+⏱ 1:00 (9:00)
+- 50 copies dont je connais le verdict. Mon juge est noté sur une seule chose : son accord avec moi, en %.
+- [click] Pour comparer deux scores, deux juges ou deux RAG : 15 points d'écart minimum. Ce n'est pas mon choix, c'est ce que 50 copies permettent de voir.
 - [click] Avant d'écrire le juge, écris le corrigé.
+-->
+
+---
+transition: fade-out
+---
+# Un examen piégé
+
+Mon examen vise les biais de mon juge.
+
+<div class="trois mt-6">
+<div v-click class="lecon">
+  <span class="etiquette">indulgence</span>
+  <div class="chiffre">27 <small>fausses</small></div>
+  <p>Un juge qui dit toujours «&nbsp;oui&nbsp;» ne fait que 46&nbsp;%.</p>
+</div>
+<div v-click class="lecon">
+  <span class="etiquette">verbosité</span>
+  <div class="chiffre">11 <small>longues</small></div>
+  <p>dont 8 fausses. La longueur ne rapporte rien.</p>
+</div>
+<div v-click class="lecon">
+  <span class="etiquette">position</span>
+  <div class="chiffre">1 <small>copie à la fois</small></div>
+  <p>jugée seule, contre le barème. Pas de duel, pas d'ordre.</p>
+</div>
+</div>
+
+<!--
+⏱ 0:40 (9:40)
+- Mon examen n'est pas au hasard : il vise les biais.
+- [click] 27 fausses sur 50. Un juge qui dit toujours oui : 46 %.
+- [click] 11 réponses longues, 8 fausses. S'il aime le long, il tombe.
+- [click] Et il ne compare jamais deux réponses : une copie à la fois. Pas de duel, pas d'ordre.
 -->
 
 ---
@@ -326,9 +367,9 @@ Premier prompt : rien d'exploitable.
 
 <div class="grid gap-10 mt-8 items-center" style="grid-template-columns: auto 1fr">
 <div class="lecon items-center text-center">
-  <span class="etiquette">même modèle</span>
+  <span class="etiquette">mon juge · même modèle</span>
   <div class="chiffre grand whitespace-nowrap"><span class="barre">0 %</span> → 76 %</div>
-  <p>de verdicts justes sur l'étalon</p>
+  <p>d'accord avec moi sur les 50 copies</p>
 </div>
 <ol v-click class="conventions">
   <li>Une seule case rouge, et la copie est recalée.</li>
@@ -342,43 +383,11 @@ Premier prompt : rien d'exploitable.
 
 
 <!--
-⏱ 1:00 (10:05)
-- Premier prompt : 0 %. Pas faux : illisible. Il s'arrête avant le verdict.
+⏱ 1:00 (10:40)
+- 50 copies, il n'en juge aucune : 0 %. Pas faux : illisible. Il s'arrête avant le verdict.
 - [click] Quatre règles dans le prompt, même modèle : 76 %. (je laisse l'écran parler)
 - [click] Le plus gros levier : quatre règles.
 - Mon étalon me montre qu'il est indulgent : 10 mauvaises copies sur 27 passent.
--->
-
----
-transition: fade-out
----
-# Noter sur dix ?
-
-Onze notes possibles. Combien en utilise-t-il ?
-
-<div class="deux mt-6">
-<div class="lecon">
-  <span class="etiquette">« note de 0 à 10 »</span>
-  <div class="chiffre">3 <small>/ 11</small></div>
-  <p>valeurs utilisées par le juge.</p>
-</div>
-<div v-click class="lecon">
-  <span class="etiquette">avec des critères</span>
-  <div class="chiffre">92,2 <small>%</small></div>
-  <p>d'accord entre la note et le oui / non.</p>
-  <span class="annotation">demande le booléen</span>
-</div>
-</div>
-
-<p v-click class="mt-8"><span class="entoure font-bold">L'échelle fine est un interrupteur déguisé en potentiomètre.</span></p>
-
-
-<!--
-⏱ 0:50 (10:55)
-- J'aurais pu demander une note sur 10.
-- Il n'utilise que 3 notes sur 11.
-- [click] Avec des critères, la note colle au oui/non : 92 %.
-- [click] Un interrupteur déguisé en potentiomètre. Demandez le booléen.
 -->
 
 ---
@@ -401,19 +410,68 @@ Entraîner mon juge, ou en prendre un plus gros ?
   </div>
 </div>
 
-<div v-click class="deux mt-8">
-  <p><span class="annotation">le format, pas le jugement</span></p>
-  <p class="text-right"><span class="entoure font-bold">L'instrument est prêt.</span></p>
-</div>
+<p v-click class="mt-8"><span class="annotation faute">le format, pas le jugement</span></p>
 
 
 <!--
-⏱ 0:35 (11:30)
+⏱ 0:35 (11:15)
 - Une phrase par clic.
 - 76 %. Comment monter ?
 - [click] J'entraîne : rien ne bouge.
-- [click] Plus gros, 32 milliards : 90 %. Et les mauvaises copies qui passent tombent de 10 à 4.
-- [click] L'instrument est prêt.
+- [click] Plus gros, 32 milliards : 90 %. +14, juste sous le seuil : je ne peux pas prouver qu'il est meilleur. Je le garde : les mauvaises copies qui passent tombent de 10 à 4.
+- [click] L'entraînement lui apprend le format, pas le jugement.
+-->
+
+---
+transition: fade-out
+---
+# Un juge se trompe. Que faire ?
+
+<div class="bulletin mt-6">
+  <div v-click class="ligne">
+    <span class="candidat">Un jury de trois familles <small>mon juge seul : 90 %</small></span>
+    <span class="note">94 %</span>
+    <Tampon couleur="rouge" taille="0.9rem" :angle="3">sous le seuil</Tampon>
+  </div>
+  <div v-click class="ligne">
+    <span class="candidat">Relire où il change d'avis <small>relancé trois fois</small></span>
+    <span class="note">4 <span class="unite">copies sur 50</span></span>
+    <Tampon couleur="vert" taille="0.9rem" :angle="-4">à relire</Tampon>
+  </div>
+</div>
+
+<p v-click class="mt-8"><span class="entoure font-bold">Ne relis que les doutes.</span></p>
+
+<div v-click class="deux mt-6 items-center">
+  <p><span class="annotation">et tout ça, mesuré sur… l'étalon ↺</span></p>
+  <p class="text-right"><span class="entoure font-bold">L'instrument est prêt.</span></p>
+</div>
+
+<style>
+.note .unite { font-size: 1rem; font-weight: 500; color: var(--encre-douce); }
+</style>
+
+
+<!--
+⏱ 1:15 (12:30)
+- Mon juge se trompe encore. Que faire ?
+- [click] Un jury de trois familles : 94 % contre 90 %. Trois modèles à faire tourner, sous le seuil des 15 points.
+- [click] Je relance mon juge trois fois. Là où il change d'avis, il hésite : 4 copies sur 50.
+- [click] Je ne relis que celles-là. J'attrape 2 erreurs sur 5. Les 3 autres, il les répète : ce sont ses angles morts.
+- [click] Je ne le sais que grâce à mes 50 copies. Pour mon labo, 50 suffisent. Pour un chatbot qui engage la compagnie, il en faut beaucoup plus.
+- L'instrument est prêt.
+-->
+
+---
+layout: center
+transition: fade-out
+---
+
+<Exercices :courant="3" />
+
+<!--
+⏱ 0:05 (12:35)
+- Exercice 3 : mon juge est prêt. Je l'applique à mon RAG.
 -->
 
 ---
@@ -421,7 +479,7 @@ transition: fade-out
 ---
 # Premier verdict
 
-Alors, est-ce que j'améliore mon assistant ?
+Mon assistant, noté par mon juge : % de bonnes réponses.
 
 <div class="barres mt-8">
   <div v-click class="barre-ligne">
@@ -437,13 +495,13 @@ Alors, est-ce que j'améliore mon assistant ?
 </div>
 
 <div v-click class="deux mt-10">
-  <p><span class="annotation">un écart pareil ? c’est ton code</span></p>
+  <p><span class="annotation faute">un écart pareil ? c’est ton code</span></p>
   <p class="text-right"><span class="entoure font-bold">Un juge sert d'abord à trouver tes bugs.</span></p>
 </div>
 
 
 <!--
-⏱ 1:00 (12:30)
+⏱ 1:00 (13:35)
 - Alors, j'améliore ?
 - [click] Graphe : 16,7 %.
 - [click] Vectoriel : 60 %.
@@ -457,20 +515,20 @@ transition: fade-out
 ---
 # « Aucune différence »
 
-Vectoriel, ou vectoriel + BM25 ? 55 % contre 48 % : non concluant.
+Vectoriel, ou vectoriel + BM25 ? 55 % contre 48 % : sous le seuil.
 
 <div class="fiches mt-6">
 <div v-click class="fiche">
   <span class="etiquette">01 · la panne</span>
   <strong>Copies coupées</strong>
   <p>Mon banc coupait chaque contexte à 6&nbsp;000&nbsp;caractères : 46 sur 60 côté BM25.</p>
-  <span class="annotation">copies arrachées</span>
+  <span class="annotation faute">copies arrachées</span>
 </div>
 <div v-click class="fiche">
   <span class="etiquette">02 · contextes entiers</span>
   <strong>60 % → 78,3 %</strong>
-  <p>Vectoriel, puis vectoriel + BM25.</p>
-  <span class="annotation">+18 points</span>
+  <p>Bonnes réponses : vectoriel, puis vectoriel + BM25.</p>
+  <span class="annotation" style="color: var(--vert)">+18 points : au-dessus du seuil</span>
 </div>
 </div>
 
@@ -478,51 +536,13 @@ Vectoriel, ou vectoriel + BM25 ? 55 % contre 48 % : non concluant.
 
 
 <!--
-⏱ 1:15 (13:45)
-- Vectoriel + BM25 (mots-clés) : 55 contre 48. Aucune différence.
+⏱ 1:15 (14:50)
+- Vectoriel + BM25 (mots-clés) : 55 contre 48. Sous le seuil : je ne vois pas de différence.
 - Je ne l'ai pas cru.
 - [click] Mon banc coupait les contextes à 6 000 caractères : 46 sur 60.
-- [click] Contextes entiers : 60 → 78 %.
+- [click] Contextes entiers : 60 → 78 %. 18 points : au-dessus du seuil.
 - [click] « Vérifie ce que ton juge lit. »
 - J'ai corrigé mon banc, pas le juge. En prod le jour même.
--->
-
----
-transition: fade-out
----
-# Un juge se trompe. Que faire ?
-
-<div class="bulletin mt-6">
-  <div v-click class="ligne">
-    <span class="candidat">Le relancer trois fois <small>juge à 90 %</small></span>
-    <span class="note">3 / 5</span>
-    <Tampon couleur="rouge" taille="0.9rem" :angle="-3">mêmes erreurs</Tampon>
-  </div>
-  <div v-click class="ligne">
-    <span class="candidat">Un jury de trois familles <small>45 / 50 seul</small></span>
-    <span class="note">47 / 50</span>
-    <Tampon couleur="encre" taille="0.9rem" :angle="3">non concluant</Tampon>
-  </div>
-  <div v-click class="ligne">
-    <span class="candidat">Relire là où il hésite</span>
-    <span class="note">4 / 50</span>
-    <Tampon couleur="vert" taille="0.9rem" :angle="-4">à relire</Tampon>
-  </div>
-</div>
-
-<p v-click class="mt-8"><span class="entoure font-bold">Ne relis que les doutes.</span></p>
-
-<p v-click class="mt-2 text-right"><span class="annotation">et tout ça, mesuré sur… l'étalon ↺</span></p>
-
-
-<!--
-⏱ 1:15 (15:00)
-- Mon juge se trompe encore. Que faire ?
-- [click] Mon meilleur juge, à 90 %, relancé trois fois : 3 erreurs sur 5 reviennent identiques.
-- [click] Un jury de trois familles fait 47 contre 45. Sous 15 points : non concluant.
-- [click] Là où il change d'avis, il hésite : 4 copies sur 50.
-- [click] Je ne relis que celles-là. J'attrape 2 erreurs sur 5. Les 3 autres, il les répète trois fois : ce sont ses angles morts.
-- [click] Je ne le sais que grâce à mes 50 copies.
 -->
 
 ---
@@ -534,13 +554,13 @@ transition: fade-out
 <CopieCorrigee />
 
 <!--
-⏱ 1:00 (16:00)
+⏱ 1:00 (15:50)
 - La couverture disait « copie à corriger ». La voici.
-- Pour chaque règle : je la lis, je lis l'annotation rouge, je clique.
+- Pour chaque règle : je la lis, je lis l'annotation, je clique.
 - [click] Écris tes 50 copies d'abord.
 - [click] Écris ton barème.
-- [click] « Vérifie ce que ton juge lit. » (mot pour mot)
 - [click] Ne relis que les doutes.
+- [click] « Vérifie ce que ton juge lit. » (mot pour mot)
 - [click] Dernière phrase : « Jake Moffatt a dû aller jusqu'au tribunal pour qu'on vérifie la réponse du chatbot. Vérifiez-la avant lui. »
 - 2 s de silence. Puis « Merci ».
 -->
@@ -574,7 +594,7 @@ transition: fade-out
 </div>
 
 <!--
-⏱ 0:15 (16:15)
+⏱ 0:15 (16:05)
 - Le code, le banc et les articles : tout est ici.
 -->
 
@@ -597,7 +617,7 @@ transition: fade-out
 </div>
 
 <!--
-⏱ 0:15 (16:30)
+⏱ 0:15 (16:20)
 - Vos questions ?
 - Laisser cette diapo pendant les questions.
 

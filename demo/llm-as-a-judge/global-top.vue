@@ -1,5 +1,5 @@
 <!--
-  Progress as a rubric: one box per slide, ticked in red once graded, the current one circled.
+  Progress as a rubric: one box per slide, ticked in blue once graded, the current one circled.
   Hidden on the cover.
 -->
 <script setup lang="ts">
@@ -45,20 +45,21 @@ const { currentPage, total, currentLayout } = useNav()
   top: -0.12rem;
   width: 0.22rem;
   height: 0.45rem;
-  border: solid var(--rouge);
+  border: solid var(--bleu);
   border-width: 0 2px 2px 0;
   transform: rotate(40deg);
 }
 
 .case.courante {
-  border-color: var(--rouge);
-  box-shadow: 0 0 0 2px rgba(214, 40, 57, 0.25);
+  border-color: var(--bleu);
+  box-shadow: 0 0 0 2px rgba(43, 79, 168, 0.25);
 }
 
 .numero {
   margin-left: 0.6rem;
   font-family: 'JetBrains Mono', monospace;
-  font-size: 0.7rem;
-  color: rgba(28, 37, 65, 0.55);
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: rgba(28, 37, 65, 0.8);
 }
 </style>
