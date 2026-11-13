@@ -109,12 +109,12 @@ transition: fade-out
 <div class="scotch extrait mx-auto mt-8">
   <span class="source">Autre affaire · un avocat, New York, 2023</span>
   <ol class="citations">
-    <li><b>Varghese</b> v. China Southern Airlines <span>2019</span></li>
-    <li><b>Shaboon</b> v. Egyptair <span>2013</span></li>
-    <li><b>Petersen</b> v. Iran Air <span>2012</span></li>
-    <li><b>Martinez</b> v. Delta Airlines <span>2019</span></li>
-    <li><b>Durden</b> v. KLM <span>2017</span></li>
-    <li><b>Miller</b> v. United Airlines <span>1999</span></li>
+    <li>Affaire <b>Varghese</b> <span>2019</span></li>
+    <li>Affaire <b>Shaboon</b> <span>2013</span></li>
+    <li>Affaire <b>Petersen</b> <span>2012</span></li>
+    <li>Affaire <b>Martinez</b> <span>2019</span></li>
+    <li>Affaire <b>Durden</b> <span>2017</span></li>
+    <li>Affaire <b>Miller</b> <span>1999</span></li>
   </ol>
   <div v-click="1" class="tampon-faux coup-de-tampon"><Tampon :angle="-9" taille="1.5rem">Aucun n'existe</Tampon></div>
 </div>
@@ -178,7 +178,7 @@ transition: fade-out
 ---
 # Comment savoir si j'améliore mon assistant ?
 
-Deux façons de lui trouver les bons extraits.
+Deux façons de récupérer les extraits.
 
 <div class="fiches mt-6">
 <div class="fiche">
@@ -196,14 +196,14 @@ Deux façons de lui trouver les bons extraits.
 
 <p v-click class="mt-8">J'écris, je choisis, je juge : <strong>rien ne me contredit.</strong></p>
 
-<p v-click><span class="entoure font-bold">Il me faut un juge.</span></p>
+<p v-click><span class="entoure font-bold">Il me faut un autre juge.</span></p>
 
 <!--
 ⏱ 0:45 (4:25)
-- Deux façons de trouver les extraits. Vectoriel : ce qui ressemble à la question. Graphe : il suit les liens du code, comme un Ctrl+clic.
+- Deux façons de récupérer les extraits. Vectoriel : ce qui ressemble à la question. Graphe : il suit les liens du code, comme un Ctrl+clic.
 - Sur du code, le graphe devrait gagner. Lequel est meilleur ?
 - [click] J'écris, je choisis, je juge : rien ne me contredit. Mes utilisateurs le verraient avant moi.
-- [click] Il me faut un juge.
+- [click] Il me faut un autre juge.
 -->
 
 ---
@@ -226,16 +226,14 @@ transition: fade-out
 <JugeTheorie />
 
 <!--
-⏱ 2:00 (6:30)
-- [click] La copie : la question, le contexte, la réponse.
+⏱ 1:40 (6:10)
+- [click] Une question de la copie : son contexte, la réponse de mon assistant.
 - [click] Un LLM qui ne rédige pas : il la lit.
-- [click] Il rend un verdict et une raison.
+- [click] Il rend un verdict.
 - [click] Barème : des cases à cocher, écrites avant. Rien hors contexte, même vrai.
 - Les six arrêts de l'avocat ? Recalés dès la case 1.
-- [click] Filtre sans LLM : la copie est signée ? Chez moi : ça compile ?
-- [click] Format imposé : il coche d'abord, il tranche ensuite.
-- [click] Étalon : 50 copies que j'ai corrigées. L'expert d'OllamAssist, c'est moi.
-- [click] Le doute part chez un humain.
+- [click] Filtre sans LLM : chez moi, ça compile ? Sinon, inutile de le lire.
+- [click] Format imposé : il coche les critères, il tranche, il donne sa raison. Sinon, il bavarde.
 -->
 ---
 transition: fade-out
@@ -258,7 +256,7 @@ Judgement j = parse(r.aiMessage().text());     // { critères, verdict, raison }
 ```
 
 <!--
-⏱ 0:40 (7:10)
+⏱ 0:40 (6:50)
 - Dix lignes de LangChain4j.
 - Facile à coder. Mais un LLM a des biais.
 -->
@@ -269,18 +267,23 @@ transition: fade-out
 
 Ce que je crains de mon juge.
 
-- **Biais d'indulgence** : est-ce qu'il valide trop facilement ?
-- **Biais de verbosité** : est-ce qu'il se laisse impressionner par une réponse longue ?
-- **Biais de position** : entre deux réponses, est-ce qu'il préfère la première ?
+<ul class="biais">
+  <li><strong>Biais d'indulgence</strong> : est-ce qu'il valide trop facilement ?</li>
+  <li><strong>Biais de verbosité</strong> : est-ce qu'il se laisse impressionner par une réponse longue ?</li>
+</ul>
 
-<p v-click class="mt-8"><span class="entoure font-bold">Pour le savoir, il me faut un corrigé.</span></p>
+<p v-click class="mt-12"><span class="entoure font-bold">Pour le savoir, il me faut un corrigé : un étalon.</span></p>
+
+<style>
+.biais { margin-top: 2.5rem; font-size: 1.4rem; line-height: 1.5; }
+.biais li { margin-bottom: 1.6rem; }
+</style>
 
 <!--
-⏱ 0:45 (7:55)
+⏱ 0:40 (7:30)
 - Indulgence : il laisse passer le faible ?
 - Verbosité : le long l'impressionne ?
-- Position : entre deux réponses, il préfère la première ?
-- [click] Pour le savoir, il me faut un corrigé.
+- [click] Pour le savoir, il me faut un corrigé : un étalon.
 -->
 
 ---
@@ -291,8 +294,8 @@ transition: fade-out
 <Exercices :courant="2" />
 
 <!--
-⏱ 0:05 (8:00)
-- Exercice 2 : je construis mon juge.
+⏱ 0:05 (7:35)
+- Exercice 2 : j'étalonne mon juge.
 -->
 
 ---
@@ -300,67 +303,65 @@ transition: fade-out
 ---
 # Qui juge le juge ?
 
-Moi. 50 copies dont je connais le verdict.
+Moi. Ma copie test : 50 questions dont je connais le verdict.
 
-<div class="deux mt-6">
-<div class="lecon">
-  <span class="etiquette">le corrigé · moi</span>
-  <div class="chiffre">100&nbsp;%</div>
-  <p>Mon juge est noté sur ces 50 copies : % d'accord avec moi.</p>
+<div class="etalon mt-5">
+<div class="scotch copie-test">
+  <div class="entete"><span></span><span>moi</span><span>mon juge</span><span></span></div>
+  <div class="q"><span>Question 1</span><span class="ok">✓</span><span class="ok">✓</span><span class="egal">=</span></div>
+  <div class="q"><span>Question 2</span><span class="ko">✗ faux</span><span class="ok">✓</span><span class="diff">≠</span></div>
+  <div class="q"><span>Question 3</span><span class="ko">✗ long, faux</span><span class="ko">✗</span><span class="egal">=</span></div>
+  <div class="q"><span>…</span><span></span><span></span><span></span></div>
+  <div class="q"><span>Question 50</span><span class="ok">✓</span><span class="ok">✓</span><span class="egal">=</span></div>
+  <p class="accord">Sa note : le % de questions où il tranche comme moi.</p>
 </div>
-<div v-click class="lecon">
-  <span class="etiquette">pour dire qu'un juge est meilleur</span>
-  <div class="chiffre">+15 <small>points</small></div>
-  <p>Le plus petit écart que 50 copies laissent voir&nbsp;: 8 copies de plus. En dessous, je ne tranche pas.</p>
-  <p class="ref">calculé avec le test de McNemar, la méthode classique</p>
-  <span class="annotation">50 copies : un petit sondage</span>
-</div>
-</div>
-
-<!--
-⏱ 1:00 (9:00)
-- Qui juge le juge ? Moi. 50 copies dont je connais le verdict : le corrigé, c'est moi, 100 %.
-- Mon juge est noté sur une seule chose : son accord avec moi, en %.
-- [click] Un juge est-il meilleur dès une copie d'écart ? Non. C'est comme un sondage : plus l'échantillon est petit, plus on peut se tromper.
-- Pour le mesurer, un test classique : McNemar. Sur 50 copies, il dit 15 points, soit 8 copies. En dessous, je ne tranche pas.
-- Sujet critique, médical ou juridique : pour diviser cet écart par deux, quatre fois plus de copies.
-- Aujourd'hui, je fixerais aussi une barre avant de commencer, par exemple 85 %. Je ne l'avais pas fait.
--->
-
----
-transition: fade-out
----
-# Un examen piégé
-
-Mon examen vise les biais de mon juge.
-
-<div class="trois mt-6">
-<div v-click class="lecon">
-  <span class="etiquette">indulgence</span>
-  <div class="chiffre">27 <small>fausses</small></div>
-  <p>Un juge qui dit toujours «&nbsp;oui&nbsp;» ne fait que 46&nbsp;%.</p>
-</div>
-<div v-click class="lecon">
-  <span class="etiquette">verbosité</span>
-  <div class="chiffre">11 <small>longues</small></div>
-  <p>dont 8 fausses. La longueur ne rapporte rien.</p>
-</div>
-<div v-click class="lecon">
-  <span class="etiquette">position</span>
-  <div class="chiffre">1 <small>copie à la fois</small></div>
-  <p>jugée seule, contre le barème. Pas de duel, pas d'ordre.</p>
+<div class="pieges">
+  <div v-click class="lecon">
+    <span class="etiquette">piège · indulgence</span>
+    <div class="chiffre">27 <small>fausses</small></div>
+    <p>Un juge qui dit toujours «&nbsp;oui&nbsp;» ne fait que 46&nbsp;%.</p>
+  </div>
+  <div v-click class="lecon">
+    <span class="etiquette">piège · verbosité</span>
+    <div class="chiffre">11 <small>longues</small></div>
+    <p>dont 8 fausses. La longueur ne rapporte rien.</p>
+  </div>
 </div>
 </div>
 
-<p v-click class="mt-8"><span class="entoure font-bold">Avant d'écrire le juge, écris le corrigé.</span></p>
+<p v-click class="mt-6"><span class="entoure font-bold">Avant d'écrire le juge, écris le corrigé.</span></p>
+
+<style>
+.etalon { display: grid; grid-template-columns: 1.35fr 1fr; gap: 2.5rem; align-items: start; }
+.copie-test { padding: 1rem 1.4rem 0.8rem; }
+.copie-test .entete, .copie-test .q {
+  display: grid; grid-template-columns: 1fr 7.5rem 5.5rem 2rem; align-items: center;
+}
+.copie-test .entete {
+  font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; letter-spacing: 0.12em;
+  text-transform: uppercase; color: var(--encre-douce); padding-bottom: 0.3rem;
+}
+.copie-test .q { font-size: 1.05rem; padding: 0.35rem 0; border-bottom: 1px dashed rgba(28, 37, 65, 0.18); }
+.copie-test .ok { color: var(--vert); font-weight: 700; }
+.copie-test .ko { color: var(--rouge); font-weight: 700; }
+.copie-test .egal { color: var(--encre-douce); font-weight: 700; text-align: center; }
+.copie-test .diff { color: var(--rouge); font-weight: 800; text-align: center; }
+.copie-test .accord { margin: 0.7rem 0 0; font-weight: 700; font-size: 1rem; }
+.pieges { display: flex; flex-direction: column; gap: 1.4rem; }
+.pieges .chiffre { font-size: 2.6rem; }
+.pieges p { font-size: 0.95rem; line-height: 1.4; margin: 0; }
+</style>
 
 <!--
-⏱ 0:40 (9:40)
-- Mon examen n'est pas au hasard : il vise les biais.
+⏱ 1:15 (8:50)
+- Qui juge le juge ? Moi. Ma copie test : 50 questions, je connais chaque verdict.
+- Mon juge corrige la même copie. Je compare question par question : sa note, c'est le % de questions où il tranche comme moi.
+- Même note finale que moi, ça ne suffit pas : il faut les mêmes verdicts, aux mêmes questions.
+- La copie n'est pas au hasard : elle vise les biais.
 - [click] 27 fausses sur 50. Un juge qui dit toujours oui : 46 %.
-- [click] 11 réponses longues, 8 fausses. S'il aime le long, il tombe.
-- [click] Et il ne compare jamais deux réponses : une copie à la fois. Pas de duel, pas d'ordre.
+- [click] 11 longues, dont 8 fausses. S'il aime le long, il tombe.
 - [click] Avant d'écrire le juge, écris le corrigé.
+- Aujourd'hui, je fixerais aussi une barre avant de commencer, par exemple 85 %. Je ne l'avais pas fait.
 -->
 
 ---
@@ -373,98 +374,76 @@ Premier prompt : rien d'exploitable.
 <div class="grid gap-10 mt-8 items-center" style="grid-template-columns: auto 1fr">
 <div class="lecon items-center text-center">
   <span class="etiquette">mon juge · même modèle</span>
-  <div class="chiffre grand whitespace-nowrap"><span class="barre">0 %</span> → 76 %</div>
-  <p>d'accord avec moi sur les 50 copies</p>
+  <div class="chiffre grand whitespace-nowrap"><span class="zero">0 %<span v-click="1" class="trait"></span></span><span v-click="1"> → 76 %</span></div>
+  <p>d'accord avec moi sur les 50 questions</p>
 </div>
-<ol v-click class="conventions">
-  <li>Une seule case rouge, et la copie est recalée.</li>
+<ol v-click="1" class="conventions">
+  <li>Une seule case rouge, et la réponse est recalée.</li>
   <li>« Si possible », c'est un bonus, pas une obligation.</li>
   <li>Chaque faute se note à un seul endroit.</li>
   <li>Ne rien citer, ce n'est pas mal citer : l'invention est punie ailleurs.</li>
 </ol>
 </div>
 
-<p v-click class="mt-8 text-center"><span class="entoure font-bold">Le plus gros levier m'a coûté quatre règles.</span></p>
+<p v-click="2" class="mt-8 text-center"><span class="entoure font-bold">Le plus gros levier m'a coûté quatre règles.</span></p>
 
+<style>
+.zero { position: relative; }
+.zero .trait {
+  position: absolute; left: -0.1em; right: -0.1em; top: 52%;
+  height: 0.12em; background: var(--rouge); rotate: -8deg;
+}
+</style>
 
 <!--
-⏱ 1:00 (10:40)
-- 50 copies, il n'en juge aucune : 0 %. Pas faux : illisible. Il s'arrête avant le verdict.
+⏱ 1:00 (9:50)
+- 50 questions, il n'en juge aucune : 0 %. Pas faux : illisible. Il s'arrête avant le verdict.
 - [click] Quatre règles dans le prompt, même modèle : 76 %. (je laisse l'écran parler)
 - [click] Le plus gros levier : quatre règles.
-- Mon étalon me montre qu'il est indulgent : 10 mauvaises copies sur 27 passent.
+- Mon étalon me montre qu'il est indulgent : 10 mauvaises réponses sur 27 passent.
 -->
 
 ---
 transition: fade-out
 ---
-# Deux raccourcis
+# Trois pistes
 
-Entraîner mon juge, ou en prendre un plus gros ?
+Mon juge fait 76 %. Comment monter ?
 
-<div class="bulletin mt-6">
-  <div v-click class="ligne">
+<div class="bulletin mt-4">
+  <div v-click="1" class="ligne">
     <span class="candidat">J'entraîne <small>QLoRA, 91 min, sur le MacBook</small></span>
     <span class="note">76 → 76 %</span>
     <Tampon couleur="encre" taille="0.9rem" :angle="3">rien gagné</Tampon>
-    <span v-click="3" class="annotation faute" style="grid-column: 1 / -1">le format, pas le jugement</span>
+    <span v-click="2" class="annotation faute" style="grid-column: 1 / -1">le format, pas le jugement</span>
   </div>
-  <div v-click class="ligne">
+  <div v-click="3" class="ligne">
     <span class="candidat">Je prends plus gros <small>Qwen 14B → 32B, quantifié</small></span>
     <span class="note">76 → 90 %</span>
     <Tampon couleur="vert" taille="0.9rem" :angle="-4">retenu</Tampon>
+    <span v-click="4" class="annotation" style="grid-column: 1 / -1">+14 : dans la marge (McNemar : il faut 15)</span>
   </div>
-</div>
-
-
-
-<!--
-⏱ 0:35 (11:15)
-- Une phrase par clic.
-- 76 %. Comment monter ?
-- [click] J'entraîne : rien ne bouge.
-- [click] Plus gros, 32 milliards : 90 %. +14, soit 7 copies : il en fallait 8. je ne peux pas prouver qu'il est meilleur. Je le garde : les mauvaises copies qui passent tombent de 10 à 4.
-- [click] L'entraînement lui apprend le format, pas le jugement.
--->
-
----
-transition: fade-out
----
-# Un juge se trompe. Que faire ?
-
-<div class="bulletin mt-6">
-  <div v-click class="ligne">
-    <span class="candidat">Un jury de trois familles <small>mon juge seul : 90 %</small></span>
-    <span class="note">94 %</span>
+  <div v-click="5" class="ligne">
+    <span class="candidat">Un jury de trois familles <small>trois modèles à faire tourner</small></span>
+    <span class="note">90 → 94 %</span>
     <Tampon couleur="rouge" taille="0.9rem" :angle="3">sous le seuil</Tampon>
   </div>
-  <div v-click class="ligne">
-    <span class="candidat">Relire où il change d'avis <small>relancé trois fois</small></span>
-    <span class="note">4 <span class="unite">copies sur 50</span></span>
-    <Tampon couleur="vert" taille="0.9rem" :angle="-4">à relire</Tampon>
-  </div>
 </div>
 
-<p v-click class="mt-8"><span class="entoure font-bold">Ne relis que les doutes.</span></p>
-
-<div v-click class="deux mt-6 items-center">
-  <p><span class="annotation">et tout ça, mesuré sur… l'étalon ↺</span></p>
-  <p class="text-right"><span class="entoure font-bold">L'instrument est prêt.</span></p>
-</div>
-
-<style>
-.note .unite { font-size: 1rem; font-weight: 500; color: var(--encre-douce); }
-</style>
-
+<p v-click="6" class="mt-6"><span class="entoure font-bold">Mon juge est retenu : qwen2.5-coder 32B.</span></p>
 
 <!--
-⏱ 1:15 (12:30)
-- Mon juge se trompe encore. Que faire ?
-- [click] Un jury de trois familles : 94 % contre 90 %. Trois modèles à faire tourner, sous le seuil des 15 points.
-- [click] Je relance mon juge trois fois. Là où il change d'avis, il hésite : 4 copies sur 50.
-- [click] Je ne relis que celles-là. J'attrape 2 erreurs sur 5. Les 3 autres, il les répète : ce sont ses angles morts.
-- [click] Je ne le sais que grâce à mes 50 copies. Pour mon labo, 50 suffisent. Pour un chatbot qui engage la compagnie, il en faut beaucoup plus.
-- L'instrument est prêt.
+⏱ 1:30 (11:20)
+- 76 %. Comment monter ? Une phrase par clic.
+- [click] J'entraîne, sur le MacBook : rien ne bouge.
+- [click] Il apprend le format, pas le jugement.
+- [click] Plus gros, 32 milliards : 90 %.
+- [click] +14, soit 7 questions. C'est comme un sondage : sur 50 questions, il en faut 8. Ça se calcule : test de McNemar.
+- Je le garde quand même : les mauvaises réponses qui passent tombent de 10 à 4.
+- Sujet critique, médical ou juridique : pour diviser cette marge par deux, quatre fois plus de questions.
+- [click] Un jury de trois familles : 94 %. Trois modèles à faire tourner, sous le seuil.
+- [click] Mon juge est retenu. L'instrument est prêt.
+- Je ne le sais que grâce à ma copie test. Pour mon labo, 50 questions suffisent. Pour un chatbot qui engage la compagnie, il en faut beaucoup plus.
 -->
 
 ---
@@ -475,8 +454,42 @@ transition: fade-out
 <Exercices :courant="3" />
 
 <!--
-⏱ 0:05 (12:35)
-- Exercice 3 : mon juge est prêt. Je l'applique à mon RAG.
+⏱ 0:05 (11:25)
+- Exercice 3 : mon juge est retenu. Je le mets au travail sur mon RAG.
+-->
+
+---
+transition: fade-out
+---
+# Quand mon juge hésite
+
+Je le relance trois fois sur chaque question.
+
+<div class="bulletin mt-6">
+  <div v-click class="ligne">
+    <span class="candidat">Il change d'avis <small>sur ma copie test de 50</small></span>
+    <span class="note">4 <span class="unite">questions</span></span>
+    <Tampon couleur="vert" taille="0.9rem" :angle="-4">à relire</Tampon>
+  </div>
+  <div v-click class="ligne">
+    <span class="candidat">Je relis ces 4 questions <small>il se trompait sur 5</small></span>
+    <span class="note">2 <span class="unite">sur 5</span></span>
+    <Tampon couleur="vert" taille="0.9rem" :angle="3">attrapées</Tampon>
+  </div>
+</div>
+
+<p v-click class="mt-8"><span class="entoure font-bold">Ne relis que les doutes.</span></p>
+
+<style>
+.note .unite { font-size: 1rem; font-weight: 500; color: var(--encre-douce); }
+</style>
+
+<!--
+⏱ 0:45 (12:10)
+- Au travail, mon juge n'est pas toujours sûr de lui. Je le relance trois fois sur chaque question.
+- [click] Là où il change d'avis, il hésite : 4 questions sur 50, mesuré sur ma copie test.
+- [click] Je ne relis que celles-là : 2 erreurs attrapées sur 5. Les 3 autres, il les répète : ce sont ses angles morts.
+- [click] Ne relis que les doutes.
 -->
 
 ---
@@ -484,18 +497,18 @@ transition: fade-out
 ---
 # Premier verdict
 
-Mon assistant, noté par mon juge : % de contextes suffisants.
+La copie de mon assistant : 60 questions. Mon juge compte les contextes suffisants.
 
 <div class="barres mt-8">
   <div v-click class="barre-ligne">
     <span>GraphRAG <small>Neo4j</small></span>
     <div class="piste"><div class="plein rouge" style="--v: 16.7"></div></div>
-    <strong>16,7 %</strong>
+    <strong>10 / 60</strong>
   </div>
   <div v-click class="barre-ligne">
     <span>Vectoriel <small>Lucene</small></span>
     <div class="piste"><div class="plein" style="--v: 60"></div></div>
-    <strong>60,0 %</strong>
+    <strong>36 / 60</strong>
   </div>
 </div>
 
@@ -506,10 +519,10 @@ Mon assistant, noté par mon juge : % de contextes suffisants.
 
 
 <!--
-⏱ 1:00 (13:35)
+⏱ 1:00 (13:10)
 - Alors, j'améliore ?
-- [click] Graphe : 16,7 %.
-- [click] Vectoriel : 60 %.
+- [click] Graphe : 10 contextes suffisants sur 60.
+- [click] Vectoriel : 36 sur 60.
 - [click] Un tel écart, c'est mon code : le graphe perd des liens. Il ramène la classe, pas ce qu'elle implémente.
 - Je m'attendais à l'inverse.
 - Un juge sert d'abord à trouver tes bugs.
@@ -531,9 +544,9 @@ Vectoriel, ou vectoriel + BM25 ? Mon banc : « aucune différence ».
 </div>
 <div v-click class="fiche">
   <span class="etiquette">02 · contextes entiers</span>
-  <strong>60,0 % contre 78,3 %</strong>
+  <strong>36 contre 47, sur 60</strong>
   <p>Contextes suffisants : vectoriel contre vectoriel + BM25.</p>
-  <span class="annotation" style="color: var(--vert)">+18 points : au-dessus du seuil</span>
+  <span class="annotation" style="color: var(--vert)">+11 contextes : au-dessus du seuil</span>
 </div>
 </div>
 
@@ -541,11 +554,11 @@ Vectoriel, ou vectoriel + BM25 ? Mon banc : « aucune différence ».
 
 
 <!--
-⏱ 1:15 (14:50)
+⏱ 1:15 (14:25)
 - Vectoriel + BM25 (mots-clés) : mon premier passage ne voit pas de différence.
 - Je ne l'ai pas cru.
 - [click] Mon banc coupait les contextes à 6 000 caractères : 46 sur 60.
-- [click] Contextes entiers : 60 contre 78 %. Même règle que pour le juge : 18 points, au-dessus du seuil.
+- [click] Contextes entiers : 36 contre 47 sur 60. Même calcul que pour le juge : 11 de plus, au-dessus du seuil.
 - [click] « Vérifie ce que ton juge lit. »
 - J'ai corrigé mon banc, pas le juge. En prod le jour même.
 -->
@@ -559,10 +572,10 @@ transition: fade-out
 <CopieCorrigee />
 
 <!--
-⏱ 1:00 (15:50)
+⏱ 1:00 (15:25)
 - La couverture disait « copie à corriger ». La voici.
 - Pour chaque règle : je la lis, je lis l'annotation, je clique.
-- [click] Écris tes copies et ta barre d'abord.
+- [click] Écris ta copie test et ta barre d'abord.
 - [click] Écris ton barème.
 - [click] Ne relis que les doutes.
 - [click] « Vérifie ce que ton juge lit. » (mot pour mot)
@@ -601,7 +614,7 @@ transition: fade-out
 </div>
 
 <!--
-⏱ 0:15 (16:05)
+⏱ 0:15 (15:40)
 - Le code, le banc et les articles : tout est ici.
 -->
 
@@ -624,7 +637,7 @@ transition: fade-out
 </div>
 
 <!--
-⏱ 0:15 (16:20)
+⏱ 0:15 (15:55)
 - Vos questions ?
 - Laisser cette diapo pendant les questions.
 

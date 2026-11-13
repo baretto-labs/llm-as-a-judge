@@ -1,15 +1,15 @@
 <!--
   The generic LLM-as-a-judge, as the literature describes it; no project numbers here.
   Built click by click: 1 the copy · 2 the judge · 3 the verdict · 4 the rubric
-  · 5 a deterministic filter before the judge · 6 an imposed output format
-  · 7 a human-graded reference set to check the judge · 8 doubtful copies routed to a human.
+  · 5 a deterministic filter before the judge · 6 an imposed output format.
+  The reference set and the human review come later, as separate steps (feedback 2026-11-13).
   Main-row boxes share one height (70) so nothing looks more important by size alone.
   Colours follow the grader's code: red only for "wrong", so the neutral notes are in blue ink.
   The project's own judge (JudgeSchema.vue) fills these slots later in the talk.
 -->
 <template>
   <svg viewBox="0 30 900 360" class="juge-theorie w-full" role="img"
-       aria-label="Le principe du LLM juge : copie, barème, filtre, juge, verdict, étalon">
+       aria-label="Le principe du LLM juge : copie, barème, filtre, juge, verdict">
     <defs>
       <marker id="jt-arrow" viewBox="0 0 10 10" refX="9" refY="5"
               markerWidth="7" markerHeight="7" orient="auto-start-reverse">
@@ -20,8 +20,8 @@
     <!-- 1 · the copy -->
     <g v-click class="piece">
       <rect x="10" y="180" width="190" height="70" rx="8" />
-      <text x="105" y="209" class="title">LA COPIE</text>
-      <text x="105" y="231" class="sub">question, contexte, réponse</text>
+      <text x="105" y="209" class="title">UNE QUESTION</text>
+      <text x="105" y="231" class="sub">contexte, réponse</text>
     </g>
 
     <!-- 2 · the judge reads it -->
@@ -37,8 +37,7 @@
       <line x1="540" y1="215" x2="586" y2="215" marker-end="url(#jt-arrow)" />
       <g class="tampon">
         <rect x="590" y="180" width="150" height="70" rx="8" class="verdict" />
-        <text x="665" y="209" class="title bleu">VERDICT</text>
-        <text x="665" y="231" class="sub">+ une raison</text>
+        <text x="665" y="221" class="title bleu">VERDICT</text>
       </g>
     </g>
 
@@ -51,7 +50,7 @@
       <rect x="306" y="102" width="11" height="11" class="case" />
       <text x="326" y="112" class="sub start">aucune citation déformée</text>
       <rect x="306" y="124" width="11" height="11" class="case" />
-      <text x="326" y="134" class="sub start">consigne respectée</text>
+      <text x="326" y="134" class="sub start">consigne du prompt respectée</text>
       <line x1="455" y1="152" x2="455" y2="176" marker-end="url(#jt-arrow)" />
     </g>
 
@@ -61,7 +60,7 @@
       <text x="285" y="209" class="title">FILTRE</text>
       <text x="285" y="231" class="sub">sans LLM</text>
       <line x1="285" y1="250" x2="285" y2="306" marker-end="url(#jt-arrow)" />
-      <text x="285" y="328" class="note">hors-sujet : écartée</text>
+      <text x="285" y="328" class="note">ne compile pas : écartée</text>
       <text x="285" y="348" class="note">avant lecture</text>
     </g>
 
@@ -73,23 +72,6 @@
       <text x="665" y="56" class="note">format imposé, vérifié</text>
     </g>
 
-    <!-- 7 · the judge is graded too, against copies a human graded -->
-    <g v-click class="piece">
-      <rect x="540" y="310" width="250" height="70" rx="8" />
-      <text x="665" y="339" class="title">L'ÉTALON</text>
-      <text x="665" y="361" class="sub">copies corrigées à la main</text>
-      <line x1="665" y1="306" x2="665" y2="254" marker-end="url(#jt-arrow)" />
-      <text x="677" y="286" class="note start">d'accord ?</text>
-    </g>
-
-    <!-- 8 · when the judge hesitates, the copy goes to a human -->
-    <g v-click class="piece">
-      <line x1="740" y1="215" x2="766" y2="215" marker-end="url(#jt-arrow)" />
-      <rect x="770" y="180" width="120" height="70" rx="8" class="humain" />
-      <text x="830" y="209" class="title">HUMAIN</text>
-      <text x="830" y="231" class="sub">relit</text>
-      <text x="830" y="168" class="note">doute ?</text>
-    </g>
   </svg>
 </template>
 
@@ -125,7 +107,6 @@ rect {
 }
 rect.juge { fill: var(--encre); stroke: none; }
 rect.verdict { stroke: var(--bleu); stroke-width: 2.5; stroke-opacity: 1; }
-rect.humain { stroke-dasharray: 5 4; }
 rect.case { fill: none; filter: none; stroke-opacity: 0.8; }
 rect.code { fill: var(--ardoise); stroke: var(--ardoise-bord); stroke-width: 3; stroke-opacity: 1; }
 

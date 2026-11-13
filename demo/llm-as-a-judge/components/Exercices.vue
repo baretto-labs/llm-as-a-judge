@@ -6,7 +6,7 @@
 <script setup lang="ts">
 defineProps<{ courant: number }>()
 
-const exercices = ['Le principe', 'Mon juge', 'Mon RAG']
+const exercices = ['Le principe', 'Étalonner mon juge', 'Mon RAG']
 </script>
 
 <template>

@@ -120,7 +120,7 @@
 .annotation {
   font-family: 'Caveat', cursive;
   color: var(--bleu);
-  font-size: 1.6rem;
+  font-size: 1.8rem;
   line-height: 1.1;
   transform: rotate(-3deg);
   display: inline-block;
@@ -222,7 +222,7 @@
   align-self: flex-end;
   margin-top: auto;
   padding-top: 0.3rem;
-  font-size: 1.3rem;
+  font-size: 1.6rem;
 }
 
 /* One lesson, one key number: label, the number, one line */
