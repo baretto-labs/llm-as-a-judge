@@ -312,7 +312,8 @@ Moi. 50 copies dont je connais le verdict.
   <span class="etiquette">pour dire qu'un juge est meilleur</span>
   <div class="chiffre">+15 <small>points</small></div>
   <p>Le plus petit écart que 50 copies laissent voir&nbsp;: 8 copies de plus. En dessous, je ne tranche pas.</p>
-  <span class="annotation">50 copies, c'est peu</span>
+  <p class="ref">calculé avec le test de McNemar, la méthode classique</p>
+  <span class="annotation">50 copies : un petit sondage</span>
 </div>
 </div>
 
@@ -320,7 +321,9 @@ Moi. 50 copies dont je connais le verdict.
 ⏱ 1:00 (9:00)
 - Qui juge le juge ? Moi. 50 copies dont je connais le verdict : le corrigé, c'est moi, 100 %.
 - Mon juge est noté sur une seule chose : son accord avec moi, en %.
-- [click] Pour dire qu'un juge est meilleur : 15 points. C'est le plus petit écart que 50 copies laissent voir : 8 copies de plus. En dessous, je ne tranche pas : je dis « je ne vois pas ».
+- [click] Un juge est-il meilleur dès une copie d'écart ? Non. C'est comme un sondage : plus l'échantillon est petit, plus on peut se tromper.
+- Pour le mesurer, un test classique : McNemar. Sur 50 copies, il dit 15 points, soit 8 copies. En dessous, je ne tranche pas.
+- Sujet critique, médical ou juridique : pour diviser cet écart par deux, quatre fois plus de copies.
 - Aujourd'hui, je fixerais aussi une barre avant de commencer, par exemple 85 %. Je ne l'avais pas fait.
 -->
 
@@ -582,6 +585,8 @@ transition: fade-out
   <span class="etiquette mt-6 block">les affaires</span>
   <p><b>Moffatt v. Air Canada</b><br><span class="ref">2024 BCCRT 149 · canlii.org</span></p>
   <p><b>Mata v. Avianca</b><br><span class="ref">S.D.N.Y., 22-cv-1461, 22 juin 2023 · courtlistener.com</span></p>
+  <span class="etiquette mt-6 block">le seuil · McNemar</span>
+  <p><b>Approximate Statistical Tests for Comparing Supervised Classification Learning Algorithms</b><br><span class="ref">Dietterich · Neural Computation · 1998</span></p>
 </div>
 <div>
   <span class="etiquette">les articles</span>
