@@ -6,7 +6,7 @@
 
 I built this benchmark because I was stuck on a decision I couldn't resolve by intuition alone.
 
-[OllamAssist](https://github.com/baretto/ollamassist) is an IntelliJ plugin with an AI assistant. Before answering a question, it retrieves context from the codebase through a RAG pipeline. I had two reasonable options in front of me: a classic Lucene-based approach (BM25 + KNN + RRF, embedded, zero external dependencies) and a Neo4j GraphRAG approach (knowledge graph built from the Java AST, K-hop expansion at query time). Both looked promising on paper.
+[OllamAssist](https://github.com/baretto-labs/OllamAssist) is an IntelliJ plugin with an AI assistant. Before answering a question, it retrieves context from the codebase through a RAG pipeline. I had two reasonable options in front of me: a classic Lucene-based approach (BM25 + KNN + RRF, embedded, zero external dependencies) and a Neo4j GraphRAG approach (knowledge graph built from the Java AST, K-hop expansion at query time). Both looked promising on paper.
 
 The usual answer here is to measure latency. But latency tells you how fast a strategy runs, not whether the context it returns actually lets the LLM answer the question. Those are different problems.
 

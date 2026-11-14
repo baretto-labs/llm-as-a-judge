@@ -1,0 +1,87 @@
+{
+  "variante": "14b",
+  "modele": "mlx-community/Qwen2.5-Coder-14B-Instruct-4bit",
+  "adapter": "adapters/14b-judge",
+  "debut": "2026-09-20T13:32:36+02:00",
+  "fin": "2026-09-20T21:32:00+02:00",
+  "entrainement": {
+    "memoire_rss_max_go": 7.66,
+    "note_memoire": "le chiffre à retenir est `memoire_pic_go` (peak memory footprint). Sur Apple Silicon, les allocations Metal n'apparaissent pas dans le RSS, si bien que `memoire_rss_max_go` est très inférieur et ne mesure pas l'empreinte réelle de l'entraînement",
+    "iterations": 400,
+    "batch_size": 1,
+    "jetons_vus_estimes": 396850,
+    "duree_s_horloge_INVALIDE": 28763.6,
+    "duree_lisible_horloge_INVALIDE": "479 min 23 s",
+    "s_par_iteration_horloge_INVALIDE": 71.91,
+    "memoire_pic_go_horloge_INVALIDE": 12.76,
+    "duree_s": 4410,
+    "duree_lisible": "74 min",
+    "s_par_iteration": 11.03,
+    "memoire_pic_go": 11.32,
+    "correction": "La machine a de nouveau ete suspendue pendant l'entrainement : l'horloge de /usr/bin/time -l affiche 479 min et 12,76 Go, soit +552 % sur la duree reelle. Ces deux champs sont conserves sous suffixe _INVALIDE et NE DOIVENT PAS ETRE PUBLIES. Substituts calcules selon la methode declaree le 2026-09-19 avant la premiere veille : duree = 400 / 0.0907 it/s = 4410 s ; pic memoire = maximum des rapports mlx-lm = 11.32 Go. Les 40 rapports ont tous ete retenus, la regle d'exclusion n'a rien eu a ecarter.",
+    "surapprentissage": {
+      "constat": "minimum de validation 1,104 a l'iteration 250, puis remontee 1,206 / 1,202 / 1,183",
+      "courbe_validation": {
+        "1": 1.816,
+        "50": 1.261,
+        "100": 1.165,
+        "150": 1.132,
+        "200": 1.126,
+        "250": 1.104,
+        "300": 1.206,
+        "350": 1.202,
+        "400": 1.183
+      },
+      "reproductibilite": "courbe identique a celle du run du 2026-09-19 sur etiquettes non corrigees, meme graine : le surapprentissage a 150 exemples est reproductible, ce n'est pas un accident de tirage",
+      "points_de_controle": "100, 200, 300, 400 ; aucun a 250 ou se situe le minimum reel"
+    }
+  },
+  "poids": {
+    "integralement_en_cache_avant": true,
+    "duree_recuperation_s": 0,
+    "note": "récupération hors chronomètre d'entraînement : un téléchargement inclus fausserait la durée publiée. « intégralement en cache » signifie que TOUS les fichiers du dépôt étaient présents — un cache partiel (fréquent, mlx-lm ne récupérant que ce qu'il lui faut) compte comme faux et déclenche une complétion, mesurée ici et non dans la durée d'entraînement"
+  },
+  "donnees": {
+    "train": {
+      "exemples": 135,
+      "jetons_total": 133937,
+      "jetons_p50": 987,
+      "jetons_p90": 1209,
+      "jetons_max": 1393
+    },
+    "valid": {
+      "exemples": 15,
+      "jetons_total": 15779,
+      "jetons_p50": 1036,
+      "jetons_p90": 1294,
+      "jetons_max": 1472
+    }
+  },
+  "hyperparametres": {
+    "--train": true,
+    "--fine-tune-type": "lora",
+    "--mask-prompt": true,
+    "--batch-size": "1",
+    "--grad-checkpoint": true,
+    "--num-layers": "16",
+    "--iters": "400",
+    "--learning-rate": "1e-5",
+    "--max-seq-length": "2048",
+    "--steps-per-report": "10",
+    "--steps-per-eval": "50",
+    "--val-batches": "-1",
+    "--seed": "42"
+  },
+  "versions": {
+    "mlx": "0.32.2",
+    "mlx-lm": "0.31.3",
+    "mlx-metal": "0.32.2",
+    "transformers": "5.17.0"
+  },
+  "machine": {
+    "processeur": "Apple M3 Pro",
+    "coeurs": "12",
+    "memoire_go": 36.0,
+    "systeme": "macOS 26.6.2"
+  }
+}

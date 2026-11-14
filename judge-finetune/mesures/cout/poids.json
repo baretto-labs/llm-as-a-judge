@@ -1,0 +1,31 @@
+{
+  "date": "2026-09-19",
+  "objet": "récupération des poids, mesurée hors de tout chronomètre d'entraînement",
+  "pourquoi": "un téléchargement inclus dans la durée d'entraînement fausserait le chiffre publié au titre de « le fine-tuning n'est pas si coûteux » ; les deux phases sont donc mesurées séparément",
+  "modeles": {
+    "mlx-community/Qwen2.5-Coder-14B-Instruct-4bit": {
+      "taille_disque_go": 7.7,
+      "deja_present": true,
+      "note": "l'instantané était signalé incomplet par la sonde : il manquait un fichier de métadonnées, non des poids. Complété en 0 s. Le cas est instructif — la présence du dossier ne vaut pas complétude, et mlx-lm ne récupère que ce dont il a besoin"
+    },
+    "mlx-community/Qwen2.5-Coder-32B-Instruct-4bit": {
+      "taille_disque_go": 17.0,
+      "deja_present": false,
+      "duree_telechargement_s": 249,
+      "note": "mesuré sur la connexion de la machine à cette date ; non reproductible ailleurs"
+    }
+  },
+  "disque_libre_go_apres": 234,
+  "machine": {
+    "processeur": "Apple M3 Pro",
+    "coeurs": "12",
+    "memoire_go": 36.0,
+    "systeme": "macOS 26.6.2"
+  },
+  "versions": {
+    "mlx": "0.32.2",
+    "mlx-lm": "0.31.3",
+    "mlx-metal": "0.32.2",
+    "huggingface-hub": "1.31.0"
+  }
+}

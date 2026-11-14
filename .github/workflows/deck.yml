@@ -1,0 +1,55 @@
+# Builds the Slidev deck and publishes it on GitHub Pages:
+# https://baretto-labs.github.io/llm-as-a-judge/
+# Speaker notes are published with the deck (presenter mode); a PDF export is offered for download.
+name: Deck
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'demo/llm-as-a-judge/**'
+      - '.github/workflows/deck.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: demo/llm-as-a-judge
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 12
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+          cache-dependency-path: demo/llm-as-a-judge/pnpm-lock.yaml
+      - run: pnpm install --frozen-lockfile
+      # Chromium and its system libraries, for the PDF export
+      - run: pnpm exec playwright install --with-deps chromium
+      - run: pnpm exec slidev build --base /llm-as-a-judge/ --download
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: demo/llm-as-a-judge/dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

@@ -1,0 +1,226 @@
+[
+ {
+  "arm": "vector",
+  "difficulty": "CROSS_MODULE",
+  "question": "How does OllamAssistStartup initialize EditorListener on project load?",
+  "expected": [
+   "OllamAssistStartup",
+   "EditorListener",
+   "execute"
+  ],
+  "chunks": [
+   "Method: fr.baretto.ollamassist.chat.askfromcode.EditorListener#handleEditorCreation\nSignature: private static void handleEditorCreation(Editor editor)\nBody: {\n    synchronized (LISTENER_MAP) {\n        if (!LISTENER_MAP.containsKey(editor)) {\n            OllamAssistSelectionListener listener = new OllamAssistSelectionListener();\n            editor.getSelectionModel().addSelectionListener(listener);\n            LISTENER_MAP.put(editor, listener);\n        }\n    }\n}\n",
+   "Method: fr.baretto.ollamassist.chat.askfromcode.EditorListener#initializeExistingEditors\nSignature: private static void initializeExistingEditors()\nBody: {\n    Editor[] editors = EditorFactory.getInstance().getAllEditors();\n    for (Editor editor : editors) {\n        handleEditorCreation(editor);\n    }\n}\n",
+   "Method: fr.baretto.ollamassist.chat.askfromcode.EditorListener#handleEditorRelease\nSignature: private static void handleEditorRelease(Editor editor)\nBody: {\n    synchronized (LISTENER_MAP) {\n        OllamAssistSelectionListener listener = LISTENER_MAP.remove(editor);\n        if (listener != null) {\n            editor.getSelectionModel().removeSelectionListener(listener);\n        }\n    }\n}\n",
+   "Method: fr.baretto.ollamassist.chat.askfromcode.EditorListener#attachListeners\nSignature: public static void attachListeners()\nBody: {\n    EditorFactory editorFactory = EditorFactory.getInstance();\n    editorFactory.addEditorFactoryListener(new EditorFactoryListener() {\n\n        @Override\n        public void editorCreated(@NotNull EditorFactoryEvent event) {\n            handleEditorCreation(event.getEditor());\n        }\n\n        @Override\n        public void editorReleased(@NotNull EditorFactoryEvent event) {\n            handleEditorRelease(event.getEditor());\n        }\n    }, PLUGIN_DISPOSABLE);\n    initializeExistingEditors();\n}\n",
+   "Method: fr.baretto.ollamassist.setting.ConfigurationPanel#initializeListeners\nSignature: private void initializeListeners()\nBody: {\n    // The Settings dialog detects pending changes by polling isModified(), so no manual change\n    // notification is needed. Only the auto-approve toggle has a side effect: it is applied\n    // immediately, without waiting for the \"Apply\" button.\n    actionsPanel.getAutoApproveFileCreationCheckbox().addItemListener(e -> ActionsSettings.getInstance().setAutoApproveFileCreation(actionsPanel.isAutoApproveFileCreation()));\n}\n"
+  ]
+ },
+ {
+  "arm": "vector",
+  "difficulty": "LOCAL",
+  "question": "What does the calculateDynamicThreshold method compute in LuceneEmbeddingStore?",
+  "expected": [
+   "LuceneEmbeddingStore",
+   "calculateDynamicThreshold",
+   "scores"
+  ],
+  "chunks": [
+   "Method: fr.baretto.ollamassist.component.LoadingListRenderer#getListCellRendererComponent\nSignature: public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus)\nBody: {\n    String displayValue = value != null ? value.toString() : \"Loading...\";\n    FontMetrics metrics = getFontMetrics(getFont());\n    int maxWidth = list.getFixedCellWidth() - 10;\n    if (maxWidth > 0 && metrics.stringWidth(displayValue) > maxWidth) {\n        displayValue = truncateText(displayValue, metrics, maxWidth);\n    }\n    return super.getListCellRendererComponent(list, displayValue, index, isSelected, cellHasFocus);\n}\n",
+   "Method: fr.baretto.ollamassist.setting.OllamaSettings#getApprovalTimeoutMinutes\nSignature: public int getApprovalTimeoutMinutes()\nBody: {\n    return myState.approvalTimeoutMinutes > 0 ? myState.approvalTimeoutMinutes : 5;\n}\n",
+   "Method: fr.baretto.ollamassist.setting.OllamaSettings#getRunCommandTimeoutSeconds\nSignature: public int getRunCommandTimeoutSeconds()\nBody: {\n    return myState.runCommandTimeoutSeconds > 0 ? myState.runCommandTimeoutSeconds : 60;\n}\n",
+   "Method: fr.baretto.ollamassist.completion.MultiSuggestionManager#getCurrentSuggestionNumber\nDoc: * Gets the current suggestion index (1-based for display).\nSignature: public int getCurrentSuggestionNumber()\nBody: {\n    return suggestions.isEmpty() ? 0 : currentSuggestionIndex + 1;\n}\n",
+   "Method: fr.baretto.ollamassist.setting.OllamaSettings#setApprovalTimeoutMinutes\nSignature: public void setApprovalTimeoutMinutes(int minutes)\nBody: {\n    myState.approvalTimeoutMinutes = Math.clamp(minutes, 1, 60);\n}\n"
+  ]
+ },
+ {
+  "arm": "vector",
+  "difficulty": "STRUCTURAL",
+  "question": "What does DocumentIndexingPipeline implement?",
+  "expected": [
+   "DocumentIndexingPipeline",
+   "AutoCloseable"
+  ],
+  "chunks": [
+   "Type: class fr.baretto.ollamassist.chat.rag.DocumentIndexingPipeline implements AutoCloseable\nField: private static final int BATCH_SIZE = 10;\nField: private static final String PROCESSING_ERROR_FORMAT = \"Failed to process document: %s\";\nField: private static final String REQUEUE_LOG_FORMAT = \"Re-queueing document (attempt %d/%d): %s\";\nField: private static final String PERMANENT_FAILURE_FORMAT = \"Permanent failure after %d attempts: %s\";\nField: private static final String INDEXED_COUNT_FORMAT = \"Successfully indexed %d documents\";\nField: private static final int SYNCHRONOUS_BATCH_SIZE = 100;\nField: private static final int LOG_INTERVAL = 100;\nField: private static final int MAX_RETRIES = 3;\nField: private final LuceneEmbeddingStore<TextSegment> embeddingStore;\nField: private final Project project;\nField: private final Map<String, AtomicInteger> fileRetries = new ConcurrentHashMap<>();\nField: private final LinkedBlockingDeque<String> processingQueue = new LinkedBlockingDeque<>();\nField: private final Set<String> pendingDocumentIds = ConcurrentHashMap.newKeySet();\nField: private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();\nField: private final ReentrantLock processingLock = new ReentrantLock(true);\nField: private final Phaser processingPhaser = new Phaser(1);\nField: private final AtomicInteger totalIndexedDocuments = new AtomicInteger(0);\nField: private EmbeddingStoreIngestor ingestor;\nField: private volatile boolean isRunning = false;\nMethod: public synchronized void flush(Producer<Boolean> shouldContinue, IntConsumer consumer)\nMethod: public boolean addDocument(String filePath)\nMethod: public int addAllDocuments(Collection<String> filePaths)\nMethod: private void start()\nMethod: private void processBatch()\nMethod: public void processDocuments(List<String> filePaths)\nMethod: private void processSingleDocument(String filePath)\nMethod: public void processSingleDocument(Document document)\nMethod: private void handleDocumentError(String filePath, Exception e)\nMethod: private void reQueueDocument(String filePath)\nMethod: private void logProgress()\nMethod: public void handleCorruption()\nMethod: public void close()\n",
+   "Method: fr.baretto.ollamassist.chat.rag.DocumentIndexingPipeline#reQueueDocument\nSignature: private void reQueueDocument(String filePath)\nBody: {\n    processingQueue.addFirst(filePath);\n    pendingDocumentIds.add(filePath);\n}\n",
+   "Method: fr.baretto.ollamassist.chat.rag.DocumentIndexingPipeline#processSingleDocument\nSignature: public void processSingleDocument(Document document)\nBody: {\n    try {\n        ingestor.ingest(document);\n        totalIndexedDocuments.incrementAndGet();\n    } catch (Exception e) {\n        handleCorruption();\n    }\n}\n",
+   "Method: fr.baretto.ollamassist.chat.rag.DocumentIndexingPipeline#logProgress\nSignature: private void logProgress()\nBody: {\n    int count = totalIndexedDocuments.get();\n    if (count > 0 && count % LOG_INTERVAL == 0) {\n        log.info(String.format(INDEXED_COUNT_FORMAT, count));\n    }\n}\n",
+   "Method: fr.baretto.ollamassist.chat.rag.DocumentIndexingPipeline#start\nSignature: private void start()\nBody: {\n    isRunning = true;\n    scheduler.scheduleWithFixedDelay(this::processBatch, 0, 30, TimeUnit.SECONDS);\n}\n"
+  ]
+ },
+ {
+  "arm": "vector",
+  "difficulty": "CROSS_MODULE",
+  "question": "How does RAGConfigPanel trigger a full reindexation of the project?",
+  "expected": [
+   "RAGConfigPanel",
+   "StoreNotifier",
+   "ProjectFileListener",
+   "clearDatabaseAndRunIndexation"
+  ],
+  "chunks": [
+   "Method: fr.baretto.ollamassist.setting.panels.RAGConfigPanel#notifyEmbeddingModelChanged\nSignature: public void notifyEmbeddingModelChanged()\nBody: {\n    project.getMessageBus().syncPublisher(StoreNotifier.TOPIC).embeddingModelChanged();\n}\n",
+   "Method: fr.baretto.ollamassist.chat.rag.ProjectFileListener#ragSwitchedOn\nSignature: public void ragSwitchedOn()\nBody: {\n    refreshPolicy.ragSwitchedOn();\n}\n",
+   "Method: fr.baretto.ollamassist.setting.panels.RAGConfigPanel#triggerClearLocalStorage\nSignature: public void triggerClearLocalStorage()\nBody: {\n    project.getMessageBus().syncPublisher(StoreNotifier.TOPIC).clear();\n}\n",
+   "Method: fr.baretto.ollamassist.chat.rag.ProjectFileListener#embeddingModelChanged\nSignature: public void embeddingModelChanged()\nBody: {\n    refreshPolicy.embeddingModelChanged();\n}\n",
+   "Method: fr.baretto.ollamassist.setting.ConfigurationPanel#notifyEmbeddingModelChanged\nSignature: public void notifyEmbeddingModelChanged()\nBody: {\n    ragPanel.notifyEmbeddingModelChanged();\n}\n"
+  ]
+ },
+ {
+  "arm": "vector-bm25",
+  "difficulty": "CROSS_MODULE",
+  "question": "How does DocumentIngestFactory authenticate its requests to Ollama?",
+  "expected": [
+   "DocumentIngestFactory",
+   "AuthenticationHelper",
+   "authHeaders"
+  ],
+  "chunks": [
+   "Method: fr.baretto.ollamassist.setting.OllamAssistSettings#getChatOllamaUrl\nDoc: Ollama settings - delegating to OllamaSettings\nSignature: public String getChatOllamaUrl()\nBody: {\n    return OllamaSettings.getInstance().getChatOllamaUrl();\n}\n",
+   "Type: class fr.baretto.ollamassist.prerequiste.UrlHelper\nDoc: * Helper class for URL normalization and validation.\n * Ensures URLs are properly formatted for HTTP requests to Ollama.\nField: private static final String HTTP_SCHEME = \"http://\";\nField: private static final String HTTPS_SCHEME = \"https://\";\nMethod: public static String normalizeUrl(@NotNull String url)\nMethod: public static void validateUrl(@NotNull String url)\nMethod: public static String buildApiUrl(@NotNull String baseUrl, @NotNull String apiPath)\n",
+   "Method: fr.baretto.ollamassist.prerequiste.PrerequisiteService#readAuthenticated\nDoc: * Builds a platform HTTP request to the Ollama endpoint, attaching the configured\n     * {@code Authorization} header (Basic or Bearer) when authentication is enabled.\n     * Required so that prerequisite checks succeed when Ollama sits behind an authenticated\n     * proxy (e.g. OpenWebUI).\nSignature: private static String readAuthenticated(String url) throws IOException\nBody: {\n    String authHeaderValue = AuthenticationHelper.createAuthorizationHeaderValue();\n    return HttpRequests.request(url).connectTimeout(3000).readTimeout(3000).tuner(connection -> {\n        if (authHeaderValue != null) {\n            connection.setRequestProperty(AuthenticationHelper.AUTHORIZATION_HEADER, authHeaderValue);\n        }\n    }).readString();\n}\n",
+   "Method: fr.baretto.ollamassist.setting.OllamaSettings#getInstance\nSignature: public static OllamaSettings getInstance()\nBody: {\n    return ApplicationManager.getApplication().getService(OllamaSettings.class);\n}\n",
+   "Type: class fr.baretto.ollamassist.codec.DefaultJsonCodecFactory implements JsonCodecFactory\nDoc: * Default implementation of {@link JsonCodecFactory} for OllamAssist.\n *\n * LangChain4j requires a JSON codec to serialize and deserialize objects.\n * Since OllamAssist does not rely on external JSON libraries (e.g., Jackson or Gson)\n * in its classpath by default, we provide our own implementation of a codec.\n *\n * This factory ensures that whenever LangChain4j needs a {@link Json.JsonCodec},\n * it can create and use {@link DefaultJsonCodec}.\n *\n * Without this, the framework would not be able to handle JSON\n * serialization and deserialization correctly, leading to runtime errors.\nMethod: public Json.JsonCodec create()\n",
+   "Type: class fr.baretto.ollamassist.agent.tools.files.AppendFileTool implements AgentTool\nDoc: * Appends text to an existing file without touching the rest of its content.\n *\n * <p>Params:\n * <ul>\n *   <li>{@code path}    — relative path from the project root (required)</li>\n *   <li>{@code content} — text to append (required)</li>\n *   <li>{@code newline} — when {@code true} (default), prepend a newline separator\n *                         before the appended content if the file does not already end with one</li>\n * </ul>\n *\n * <p>Requires user approval (MUTATING tier — modifies an existing file).\n * Respects the file's existing charset (same detection logic as {@link EditFileTool}).\nField: private final Project project;\nField: private final ToolApprovalHelper approvalHelper;\nMethod: public String toolId()\nMethod: public ToolResult execute(Map<String, Object> params)\nMethod: private static String truncate(String text, int maxChars)\n",
+   "Method: fr.baretto.ollamassist.completion.CompletionDebouncer#cancelAll\nDoc: * Cancels all pending requests.\nSignature: public void cancelAll()\nBody: {\n    pendingRequests.values().forEach(DebounceEntry::cancel);\n    pendingRequests.clear();\n    log.debug(\"Cancelled all pending debounced requests\");\n}\n",
+   "Method: fr.baretto.ollamassist.setting.OllamAssistSettings#getInstance\nSignature: public static OllamAssistSettings getInstance()\nBody: {\n    return ApplicationManager.getApplication().getService(OllamAssistSettings.class);\n}\n",
+   "Method: fr.baretto.ollamassist.setting.OllamAssistUISettings#getInstance\nSignature: public static OllamAssistUISettings getInstance()\nBody: {\n    return ApplicationManager.getApplication().getService(OllamAssistUISettings.class);\n}\n",
+   "Method: fr.baretto.ollamassist.prerequiste.PrerequisiteService#checkLocalEmbeddingModel\nDoc: * Checks if local DJL embedding model can be loaded.\n     * Attempts to load DJL tokenizer class to detect native library issues.\n     *\n     * @param ollamaUrl URL to check fallback Ollama model\n     * @return Check result with fallback status\nSignature: private EmbeddingModelCheckResult checkLocalEmbeddingModel(String ollamaUrl)\nBody: {\n    try {\n        // Try to load DJL tokenizer class to detect UnsatisfiedLinkError early\n        Class.forName(\"ai.djl.huggingface.tokenizers.jni.TokenizersLibrary\");\n        // Try to trigger native library loading without creating full model\n        // This is a lightweight check to detect Windows/platform issues\n        testDJLNativeLibraries();\n        return EmbeddingModelCheckResult.localAvailable();\n    } catch (UnsatisfiedLinkError | ExceptionInInitializerError | ClassNotFoundException e) {\n        log.warn(\"Local DJL embedding model failed to load (native library error). \" + \"Checking Ollama fallback availability. Error: {}\", e.getMessage());\n        // Check if fallback Ollama model is available\n        boolean fallbackAvailable = checkOllamaModelSync(ollamaUrl, FALLBACK_EMBEDDING_MODEL);\n        return EmbeddingModelCheckResult.localFailedWithFallback(fallbackAvailable);\n    }\n}\n"
+  ]
+ },
+ {
+  "arm": "vector-bm25",
+  "difficulty": "LOCAL",
+  "question": "What does the calculateDynamicThreshold method compute in LuceneEmbeddingStore?",
+  "expected": [
+   "LuceneEmbeddingStore",
+   "calculateDynamicThreshold",
+   "scores"
+  ],
+  "chunks": [
+   "Method: fr.baretto.ollamassist.component.LoadingListRenderer#getListCellRendererComponent\nSignature: public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus)\nBody: {\n    String displayValue = value != null ? value.toString() : \"Loading...\";\n    FontMetrics metrics = getFontMetrics(getFont());\n    int maxWidth = list.getFixedCellWidth() - 10;\n    if (maxWidth > 0 && metrics.stringWidth(displayValue) > maxWidth) {\n        displayValue = truncateText(displayValue, metrics, maxWidth);\n    }\n    return super.getListCellRendererComponent(list, displayValue, index, isSelected, cellHasFocus);\n}\n",
+   "Type: class fr.baretto.ollamassist.chat.rag.IndexSynchronizer\nDoc: * Brings the KnowledgeIndex in line with a list of Workspace files, as decided by\n * {@link IndexCatchUp}. On an empty index every file is queued, so this is also how a full\n * indexing runs: a file already indexed and unchanged is never added a second time.\nField: private final LuceneEmbeddingStore<TextSegment> store;\nField: private final Consumer<Collection<String>> indexing;\nMethod: public IndexCatchUp synchronize(List<String> files)\nMethod: private static Map<String, Instant> lastModified(List<String> files)\n",
+   "Method: fr.baretto.ollamassist.setting.OllamaSettings#getApprovalTimeoutMinutes\nSignature: public int getApprovalTimeoutMinutes()\nBody: {\n    return myState.approvalTimeoutMinutes > 0 ? myState.approvalTimeoutMinutes : 5;\n}\n",
+   "Method: fr.baretto.ollamassist.chat.rag.InitEmbeddingStoreTask#run\nSignature: public void run(@NotNull ProgressIndicator indicator)\nBody: {\n    if (!indexationRegistry.isIndexed(getProject().getName()) || indexationRegistry.isCorrupted(getProject().getName())) {\n        if (indexationRegistry.isCorrupted(getProject().getName())) {\n            documentIndexingPipeline.handleCorruption();\n            indexationRegistry.markAsCleared(getProject().getName());\n        }\n        indexationRegistry.markAsCurrentIndexation(getProject().getName());\n        ClassLoader originalClassLoader = Thread.currentThread().getContextClassLoader();\n        try {\n            indicator.setText(\"Collecting files...\");\n            FilesUtil filesUtil = getProject().getService(FilesUtil.class);\n            List<String> filePaths = filesUtil.collectFilePaths();\n            if (filePaths.size() > filesUtil.getMaxFiles()) {\n                filePaths = filePaths.subList(0, filesUtil.getMaxFiles());\n            }\n            // Only what the index lacks: a stale index is not re-added on top of itself.\n            LuceneEmbeddingStore<TextSegment> store = getProject().getService(LuceneEmbeddingStore.class);\n            IndexCatchUp catchUp = new IndexSynchronizer(store, documentIndexingPipeline::addAllDocuments).synchronize(filePaths);\n            totalFiles = catchUp.toIndex().size();\n            indicator.setText2(\"Indexing files...\");\n            documentIndexingPipeline.flush(indicator::isCanceled, indexedFiles -> updateProgress(indicator, indexedFiles));\n            if (!indicator.isCanceled()) {\n                new IndexRegistry().markAsIndexed(getProject().getName());\n            }\n        } catch (Exception e) {\n            handleError(e, indicator);\n        } finally {\n            indexationRegistry.removeFromCurrentIndexation(getProject().getName());\n            Thread.currentThread().setContextClassLoader(originalClassLoader);\n        }\n    }\n}\n",
+   "Type: interface fr.baretto.ollamassist.chat.rag.IndexStatusReporter\nDoc: * Tells the user what happens to the KnowledgeIndex. Implemented by an IDE notification adapter.\nMethod:  abstract void info(String message)\nMethod:  abstract void warning(String message)\n",
+   "Method: fr.baretto.ollamassist.setting.OllamaSettings#getRunCommandTimeoutSeconds\nSignature: public int getRunCommandTimeoutSeconds()\nBody: {\n    return myState.runCommandTimeoutSeconds > 0 ? myState.runCommandTimeoutSeconds : 60;\n}\n",
+   "Type: class fr.baretto.ollamassist.agent.tools.ApprovalTimeoutException extends RuntimeException\nDoc: * Thrown when the user does not respond to an approval request within the timeout.\n     * Callers must surface this as a visible step failure rather than silently skipping\n     * the operation.\n",
+   "Method: fr.baretto.ollamassist.completion.MultiSuggestionManager#getCurrentSuggestionNumber\nDoc: * Gets the current suggestion index (1-based for display).\nSignature: public int getCurrentSuggestionNumber()\nBody: {\n    return suggestions.isEmpty() ? 0 : currentSuggestionIndex + 1;\n}\n",
+   "Type: class fr.baretto.ollamassist.setting.State\nDoc: * Fields must stay public: IntelliJ's {@code XmlSerializer} only binds public non-final\n     * fields, or properties exposing both a getter and a setter. A private field with only a\n     * Lombok {@code @Getter} is silently skipped, so the value is never persisted and reverts\n     * to the default on IDE restart (same root cause as issue #170).\nField: // Auto-approve file creation without user confirmation\npublic boolean autoApproveFileCreation = false;\nField: // Enable/disable AI tools (function calling) - disabled by default (experimental)\npublic boolean toolsEnabled = false;\nField: // Inline code completion in the editor. On by default; users whose workflow does not\n// want suggestions must be able to switch it off without disabling the whole plugin.\npublic boolean codeCompletionEnabled = true;\n",
+   "Method: fr.baretto.ollamassist.setting.OllamaSettings#setApprovalTimeoutMinutes\nSignature: public void setApprovalTimeoutMinutes(int minutes)\nBody: {\n    myState.approvalTimeoutMinutes = Math.clamp(minutes, 1, 60);\n}\n"
+  ]
+ },
+ {
+  "arm": "vector-bm25",
+  "difficulty": "STRUCTURAL",
+  "question": "What interfaces does OllamaService implement?",
+  "expected": [
+   "OllamaService",
+   "Disposable",
+   "ModelListener"
+  ],
+  "chunks": [
+   "Method: fr.baretto.ollamassist.chat.ui.OllamaContent#createConversationPanel\nSignature: private JPanel createConversationPanel()\nBody: {\n    JPanel conversationPanel = new JPanel(new BorderLayout());\n    conversationPanel.setPreferredSize(new Dimension(0, 30));\n    ConversationManagerPanel conversationManagerPanel = new ConversationManagerPanel(context.project());\n    conversationPanel.add(conversationManagerPanel, BorderLayout.CENTER);\n    OllamaService ollamaService = context.project().getService(OllamaService.class);\n    ollamaService.restoreMemory(context.project().getService(ConversationService.class).getActiveConversation().getMessages());\n    return conversationPanel;\n}\n",
+   "Method: fr.baretto.ollamassist.setting.OllamaSettings#getInstance\nSignature: public static OllamaSettings getInstance()\nBody: {\n    return ApplicationManager.getApplication().getService(OllamaSettings.class);\n}\n",
+   "Method: fr.baretto.ollamassist.events.StoreNotifier#ragSwitchedOn\nDoc: RAG was switched on. What is already indexed stays valid.\nSignature:  abstract void ragSwitchedOn()\n",
+   "Type: class fr.baretto.ollamassist.setting.OllamaSettings implements PersistentStateComponent\nDoc: * Settings for Ollama configuration (URLs, models, authentication, timeout).\nField: public static final String DEFAULT_URL = \"http://localhost:11434\";\nField: public static final String DEFAULT_MODEL = \"llama3.1\";\nField: private State myState = new State();\nMethod: public static OllamaSettings getInstance()\nMethod: public State getState()\nMethod: public void loadState(@NotNull State state)\nMethod: public String getChatOllamaUrl()\nMethod: public void setChatOllamaUrl(String url)\nMethod: public String getCompletionOllamaUrl()\nMethod: public void setCompletionOllamaUrl(String url)\nMethod: public String getEmbeddingOllamaUrl()\nMethod: public void setEmbeddingOllamaUrl(String url)\nMethod: public String getChatModelName()\nMethod: public void setChatModelName(String modelName)\nMethod: public String getCompletionModelName()\nMethod: public void setCompletionModelName(String modelName)\nMethod: public String getEmbeddingModelName()\nMethod: public void setEmbeddingModelName(String embeddingModelName)\nMethod: public Duration getTimeoutDuration()\nMethod: public String getTimeout()\nMethod: public void setTimeout(String timeout)\nMethod: public String getUsername()\nMethod: public void setUsername(String username)\nMethod: public String getPassword()\nMethod: public void setPassword(String password)\nMethod: public String getApiKey()\nMethod: public void setApiKey(String apiKey)\nMethod: public AuthMode getAuthMode()\nMethod: public void setAuthMode(AuthMode authMode)\nMethod: private static boolean notBlank(String value)\nMethod: public int getAgentPlanTimeoutSeconds()\nMethod: public void setAgentPlanTimeoutSeconds(int seconds)\nMethod: public int getRunCommandTimeoutSeconds()\nMethod: public void setRunCommandTimeoutSeconds(int seconds)\nMethod: public int getApprovalTimeoutMinutes()\nMethod: public void setApprovalTimeoutMinutes(int minutes)\nMethod: public boolean isAgentParanoidMode()\nMethod: public void setAgentParanoidMode(boolean paranoidMode)\nMethod: public int getAgentToolTimeoutSeconds()\nMethod: public void setAgentToolTimeoutSeconds(int seconds)\nMethod: public boolean isAgentFileApprovalAuto()\nMethod: public void setAgentFileApprovalAuto(boolean auto)\nMethod: public String getAgentModelName()\nMethod: public void setAgentModelName(String name)\nMethod: public String getAgentPlannerModelName()\nMethod: public void setAgentPlannerModelName(String name)\nMethod: public String getAgentCriticModelName()\nMethod: public void setAgentCriticModelName(String name)\nMethod: public String getAgentAutoValidateMode()\nMethod: public void setAgentAutoValidateMode(String mode)\nMethod: public int getAgentGlobalTimeoutMinutes()\nMethod: public void setAgentGlobalTimeoutMinutes(int minutes)\n",
+   "Method: fr.baretto.ollamassist.setting.OllamAssistUISettings#getInstance\nSignature: public static OllamAssistUISettings getInstance()\nBody: {\n    return ApplicationManager.getApplication().getService(OllamAssistUISettings.class);\n}\n",
+   "Method: fr.baretto.ollamassist.completion.SuggestionActionHandler#isEnabledForCaret\nSignature: protected boolean isEnabledForCaret(@NotNull Editor editor, @NotNull Caret caret, DataContext dataContext)\nBody: {\n    // Always enabled - let doExecute decide what to do\n    return true;\n}\n",
+   "Type: interface fr.baretto.ollamassist.chat.rag.IndexStatusReporter\nDoc: * Tells the user what happens to the KnowledgeIndex. Implemented by an IDE notification adapter.\nMethod:  abstract void info(String message)\nMethod:  abstract void warning(String message)\n",
+   "Method: fr.baretto.ollamassist.setting.OllamAssistSettings#getInstance\nSignature: public static OllamAssistSettings getInstance()\nBody: {\n    return ApplicationManager.getApplication().getService(OllamAssistSettings.class);\n}\n",
+   "Type: class fr.baretto.ollamassist.setting.OllamAssistUISettings implements PersistentStateComponent\nDoc: * Settings for UI state persistence.\nField: private State myState = new State();\nMethod: public static OllamAssistUISettings getInstance()\nMethod: public State getState()\nMethod: public void loadState(@NotNull State state)\nMethod: public boolean getContextPanelCollapsed()\nMethod: public void setContextPanelCollapsed(boolean isCollapsed)\nMethod: public float getFontSizeMultiplier()\nMethod: public void setFontSizeMultiplier(float multiplier)\n",
+   "Type: class fr.baretto.ollamassist.agent.tools.ApprovalTimeoutException extends RuntimeException\nDoc: * Thrown when the user does not respond to an approval request within the timeout.\n     * Callers must surface this as a visible step failure rather than silently skipping\n     * the operation.\n"
+  ]
+ },
+ {
+  "arm": "vector-bm25",
+  "difficulty": "STRUCTURAL",
+  "question": "What class extends AnAction for the refactoring feature?",
+  "expected": [
+   "RefactorAction",
+   "AnAction"
+  ],
+  "chunks": [
+   "Type: class fr.baretto.ollamassist.chat.ui.menu.AddToContextAction extends AnAction\nMethod: public void actionPerformed(@NotNull AnActionEvent e)\nMethod: public void update(@NotNull AnActionEvent e)\nMethod: private VirtualFile getSelectedFile(@NotNull AnActionEvent e)\nMethod: public ActionUpdateThread getActionUpdateThread()\n",
+   "Type: class fr.baretto.ollamassist.actions.refactor.ApplyRefactoringAction extends AnAction\nField: private final Editor editor;\nField: private final String refactoredText;\nMethod: public void actionPerformed(@NotNull AnActionEvent e)\nMethod: public void update(@NotNull AnActionEvent e)\nMethod: public ActionUpdateThread getActionUpdateThread()\n",
+   "Type: class fr.baretto.ollamassist.completion.InlineCompletionAction extends AnAction\nField: /**\n * Marks an editor whose key listener is already attached. Without it a listener was added\n * on every invocation and never removed, so the editor accumulated one listener per\n * completion request for the whole session.\n */\nprivate static final Key<Boolean> KEY_LISTENER_ATTACHED = Key.create(\"ollamassist.completion.keyListenerAttached\");\nField: private EnhancedCompletionService enhancedCompletionService;\nField: private final MultiSuggestionManager multiSuggestionManager;\nMethod: public void actionPerformed(@NotNull AnActionEvent e)\nMethod: private Editor getActiveEditor()\nMethod: public void update(@NotNull AnActionEvent e)\nMethod: private static boolean isCodeCompletionEnabled()\nMethod: public ActionUpdateThread getActionUpdateThread()\n",
+   "Type: class fr.baretto.ollamassist.chat.rag.ProcessingException extends RuntimeException\n",
+   "Type: class fr.baretto.ollamassist.actions.refactor.RefactorAction extends AnAction\nField: private static final Key<Inlay<?>> INLAY_KEY = Key.create(\"OllamAssist.RefactorInlay\");\nField: private static final Key<LineDiffHighlighter> HIGHLIGHTER_KEY = Key.create(\"OllamAssist.RefactorHighlighter\");\nField: private static final Key<MouseAdapter> MOUSE_LISTENER_KEY = Key.create(\"OllamAssist.RefactorMouseListener\");\nField: private static final Key<MouseMotionAdapter> MOUSE_MOTION_LISTENER_KEY = Key.create(\"OllamAssist.RefactorMouseMotionListener\");\nMethod: public void update(@NotNull AnActionEvent e)\nMethod: public void actionPerformed(@NotNull AnActionEvent e)\nMethod: private void displayInlayUI(@NotNull Project project, @NotNull Editor editor, @NotNull String refactoredCode, @NotNull TextRange originalSelection)\nMethod: private static MouseMotionAdapter createMouseMotionAdapter(@NotNull Editor editor, RefactoringInlayRenderer newCodeRenderer)\nMethod: private MouseAdapter createMouseAdapter(@NotNull Project project, @NotNull Editor editor, @NotNull String refactoredCode, @NotNull TextRange originalSelection, RefactoringInlayRenderer newCodeRenderer)\nMethod: private void applyChanges(@NotNull Project project, @NotNull Editor editor, @NotNull String refactoredText, @NotNull TextRange range)\nMethod: private void dismiss(@NotNull Editor editor)\nMethod: public ActionUpdateThread getActionUpdateThread()\nMethod: private static String cleanLlmResponse(String response)\n",
+   "Type: class fr.baretto.ollamassist.chat.ui.menu.OllamAssistGroup extends DefaultActionGroup\nMethod: public void update(@NotNull AnActionEvent e)\nMethod: public ActionUpdateThread getActionUpdateThread()\n",
+   "Type: class fr.baretto.ollamassist.chat.askfromcode.OllamaGutterIconRenderer extends GutterIconRenderer\nField: private Editor editor;\nField: private int lineNumber;\nMethod: public Icon getIcon()\nMethod: public AnAction getClickAction()\nMethod: public boolean equals(Object obj)\nMethod: public int hashCode()\nMethod: public String getTooltipText()\nMethod: public void update(Editor editor, int lineNumber)\n",
+   "Method: fr.baretto.ollamassist.actions.refactor.ApplyRefactoringAction#update\nSignature: public void update(@NotNull AnActionEvent e)\nBody: {\n    e.getPresentation().setEnabled(true);\n}\n",
+   "Type: class fr.baretto.ollamassist.chat.rag.IndexRefreshPolicy\nDoc: * Decides, for each event that affects the KnowledgeIndex, which indexes must be rebuilt and\n * what the user is told. Only an embedding model change or a real corruption discards an index:\n * switching RAG on keeps what is already indexed and only catches up with the files changed\n * meanwhile.\nField: static final String EMBEDDING_MODEL_CHANGED = \"Embedding model changed: the index is being rebuilt with the new model.\";\nField: static final String INDEX_CORRUPTED = \"The index of this project was corrupted and is being rebuilt.\";\nField: private final String projectId;\nField: private final IndexRegistry registry;\nField: private final IndexStatusReporter reporter;\nField: private final Runnable indexing;\nField: private final Runnable catchUp;\nMethod: public void ragSwitchedOn()\nMethod: public void clearRequested()\nMethod: public void embeddingModelChanged()\nMethod: public void indexCorrupted()\n",
+   "Method: fr.baretto.ollamassist.actions.refactor.RefactorAction#update\nSignature: public void update(@NotNull AnActionEvent e)\nBody: {\n    Project project = e.getProject();\n    Editor editor = e.getData(CommonDataKeys.EDITOR);\n    boolean isTextSelected = editor != null && editor.getSelectionModel().hasSelection();\n    e.getPresentation().setEnabledAndVisible(project != null && isTextSelected);\n}\n"
+  ]
+ },
+ {
+  "arm": "graphrag",
+  "difficulty": "CROSS_MODULE",
+  "question": "How does AddToContextAction add a selected file to the workspace context?",
+  "expected": [
+   "AddToContextAction",
+   "WorkspaceContextRetriever",
+   "addFile"
+  ],
+  "chunks": [
+   "=== fr.baretto.ollamassist.chat.ui.menu.AddToContextAction [Class] ===\nVisibility: public\nInheritance paths:\n  fr.baretto.ollamassist.chat.ui.menu.AddToContextAction -[EXTENDS]-> AnAction\n",
+   "=== fr.baretto.ollamassist.chat.ui.MessagesPanel.addContexte(Context) [Function] ===\nVisibility: public\nReturns: void\nParameters:\n  - context: Context\n",
+   "=== java.util.Map<java.lang.String, java.io.File> [Class] ===\n",
+   "=== fr.baretto.ollamassist.component.ActionLogPanel.addAction(String) [Function] ===\nVisibility: public\nReturns: void\nParameters:\n  - message: String\n",
+   "=== fr.baretto.ollamassist.chat.rag.WorkspaceContextRetriever [Class] ===\nVisibility: public\nFields:\n  - private MAX_FILE_SIZE\n  - private WINDOW_SIZE\n  - private project\n  - private filesByPath\n  - private listeners\n"
+  ]
+ },
+ {
+  "arm": "graphrag",
+  "difficulty": "LOCAL",
+  "question": "What constants does DocumentIndexingPipeline define for batch processing?",
+  "expected": [
+   "DocumentIndexingPipeline",
+   "BATCH_SIZE",
+   "MAX_RETRIES",
+   "SYNCHRONOUS_BATCH_SIZE"
+  ],
+  "chunks": [
+   "=== fr.baretto.ollamassist.chat.rag.DocumentIndexingPipeline [Class] ===\nVisibility: public\nFields:\n  - private BATCH_SIZE\n  - private MAX_RETRIES\n  - private embeddingStore\n  - private totalIndexedDocuments\n  - private pendingDocumentIds\n  - private project\n  - private INDEXED_COUNT_FORMAT\n  - private PROCESSING_ERROR_FORMAT\n  - private processingPhaser\n  - private PERMANENT_FAILURE_FORMAT\n  - private isRunning\n  - private processingLock\n  - private fileRetries\n  - private LOG_INTERVAL\n  - private ingestor\n  - private scheduler\n  - private REQUEUE_LOG_FORMAT\n  - private SYNCHRONOUS_BATCH_SIZE\n  - private processingQueue\n",
+   "=== fr.baretto.ollamassist.chat.rag.DocumentIndexingPipeline.processDocuments(List<String>) [Function] ===\nVisibility: public\nReturns: void\nParameters:\n  - filePaths: String>\nGraph paths:\n  fr.baretto.ollamassist.chat.rag.DocumentIndexingPipeline.flush(Producer<Boolean>,IntConsumer) -[CALLS]-> fr.baretto.ollamassist.chat.rag.DocumentIndexingPipeline.processDocuments(List<String>)\n  fr.baretto.ollamassist.chat.rag.DocumentIndexingPipeline.processBatch() -[CALLS]-> fr.baretto.ollamassist.chat.rag.DocumentIndexingPipeline.processDocuments(List<String>)\n  fr.baretto.ollamassist.chat.rag.DocumentIndexingPipeline.processDocuments(List<String>) -[CALLS]-> fr.baretto.ollamassist.chat.rag.DocumentIndexingPipeline.handleDocumentError(String,Exception)\n  fr.baretto.ollamassist.chat.rag.DocumentIndexingPipeline.processDocuments(List<String>) -[CALLS]-> fr.baretto.ollamassist.chat.rag.DocumentIndexingPipeline.processSingleDocument(Document)\n",
+   "=== fr.baretto.ollamassist.chat.rag.IndexRegistry.indexationIsProcessing(String) [Function] ===\nVisibility: public\nReturns: boolean\nParameters:\n  - projectId: String\nGraph paths:\n  fr.baretto.ollamassist.chat.rag.ProjectFileListener.load() -[CALLS]-> fr.baretto.ollamassist.chat.rag.IndexRegistry.indexationIsProcessing(String)\n  fr.baretto.ollamassist.chat.rag.IndexCatchUpTask.run(ProgressIndicator) -[CALLS]-> fr.baretto.ollamassist.chat.rag.IndexRegistry.indexationIsProcessing(String)\n",
+   "=== fr.baretto.ollamassist.chat.rag.DocumentIngestFactory [Class] ===\nVisibility: public\nAnnotations:\n  - NoArgsConstructor\n  - Getter\n  - Slf4j\nFields:\n  - private FALLBACK_EMBEDDING_MODEL\n",
+   "=== Document [Class] ===\n"
+  ]
+ },
+ {
+  "arm": "graphrag",
+  "difficulty": "STRUCTURAL",
+  "question": "What does LuceneEmbeddingStore implement?",
+  "expected": [
+   "LuceneEmbeddingStore",
+   "EmbeddingStore",
+   "Closeable",
+   "Disposable"
+  ],
+  "chunks": [
+   "=== LuceneEmbeddingStore<TextSegment> [Class] ===\n",
+   "=== Topic<StoreNotifier> [Class] ===\n",
+   "=== EmbeddingStore<TextSegment> [Class] ===\n",
+   "=== fr.baretto.ollamassist.setting.ActionsSettings.isToolsEnabled() [Function] ===\nVisibility: public\nReturns: boolean\nGraph paths:\n  fr.baretto.ollamassist.setting.OllamassistSettingsConfigurable.loadAllSettings() -[CALLS]-> fr.baretto.ollamassist.setting.ActionsSettings.isToolsEnabled()\n  fr.baretto.ollamassist.setting.OllamassistSettingsConfigurable.isModified() -[CALLS]-> fr.baretto.ollamassist.setting.ActionsSettings.isToolsEnabled()\n",
+   "=== fr.baretto.ollamassist.setting.panels.ActionsConfigPanel.isToolsEnabled() [Function] ===\nVisibility: public\nReturns: boolean\nGraph paths:\n  fr.baretto.ollamassist.setting.ConfigurationPanel.isToolsEnabled() -[CALLS]-> fr.baretto.ollamassist.setting.panels.ActionsConfigPanel.isToolsEnabled()\n"
+  ]
+ },
+ {
+  "arm": "graphrag",
+  "difficulty": "CROSS_MODULE",
+  "question": "How does AskFromCodeAction notify the chat UI via NewUserMessageNotifier?",
+  "expected": [
+   "AskFromCodeAction",
+   "NewUserMessageNotifier"
+  ],
+  "chunks": [
+   "=== fr.baretto.ollamassist.chat.askfromcode.AskFromCodeAction [Class] ===\nVisibility: public\nInheritance paths:\n  fr.baretto.ollamassist.chat.askfromcode.AskFromCodeAction -[IMPLEMENTS]-> java.awt.event.ActionListener\nFields:\n  - private promptPanel\n  - private editor\n",
+   "=== fr.baretto.ollamassist.component.PluginNotifier.notify(String,String,String,NotificationType) [Function] ===\nVisibility: public\nReturns: void\nParameters:\n  - title: String\n  - message: String\n  - groupId: String\n  - type: NotificationType\nGraph paths:\n  fr.baretto.ollamassist.chat.rag.ContextRetriever.retrieve(Query) -[CALLS]-> fr.baretto.ollamassist.component.PluginNotifier.notify(String,String,String,NotificationType)\n",
+   "=== Topic<NewUserMessageNotifier> [Class] ===\n",
+   "=== fr.baretto.ollamassist.chat.service.Assistant.chat(String,String) [Function] ===\nReturns: TokenStream\nAnnotations:\n  - SystemMessage\nParameters:\n  - message: String\n  - systemPrompt: String\n",
+   "=== fr.baretto.ollamassist.events.NewUserMessageNotifier.newUserMessage(String) [Function] ===\nReturns: void\nParameters:\n  - message: String\n"
+  ]
+ }
+]

@@ -62,8 +62,12 @@ class BenchmarkRunner {
                 .resultFormat(ResultFormatType.JSON)
                 .result(result);
         applyParams(builder);
+        // `jmh.judge.url` et `jmh.judge.provider` doivent figurer ici : sous @Fork(1),
+        // JMH démarre une JVM qui n'hérite pas des -D passés à Maven, si bien qu'une
+        // URL de juge réglée en ligne de commande était jusqu'ici ignorée en silence.
         applyJvmProps(builder, "rag.source.dir", "jmh.judge.enabled",
-                "jmh.judge.model", "jmh.judge.models", "jmh.difficulty");
+                "jmh.judge.model", "jmh.judge.models", "jmh.difficulty",
+                "jmh.judge.provider", "jmh.judge.url");
         new Runner(builder.build()).run();
     }
 

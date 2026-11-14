@@ -1,0 +1,8 @@
+{
+  "variants": [
+    {"name": "14B-baseline", "size": "14B", "fine_tuned": false, "base_url": "http://127.0.0.1:18765/v1", "model": "noisy", "api_key_env": null, "cost_per_hour_usd": 0.05},
+    {"name": "14B-finetuned", "size": "14B", "fine_tuned": true, "base_url": "http://127.0.0.1:18765/v1", "model": "verbose-biased", "api_key_env": null, "cost_per_hour_usd": 0.05},
+    {"name": "32B-baseline", "size": "32B", "fine_tuned": false, "base_url": "http://127.0.0.1:18765/v1", "model": "broken", "api_key_env": null, "cost_per_hour_usd": 2.0},
+    {"name": "32B-finetuned", "size": "32B", "fine_tuned": true, "base_url": "http://127.0.0.1:18765/v1", "model": "oracle", "api_key_env": null, "cost_per_hour_usd": 2.0}
+  ]
+}

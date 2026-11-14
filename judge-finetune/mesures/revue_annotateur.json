@@ -1,0 +1,1048 @@
+{
+  "source": "data/REVUE_GOLDEN.md",
+  "extrait_par": "scripts/kappa_revue.py",
+  "definition": {
+    "annotateur": "premier passage en aveugle ; lignes « après révélation » exclues",
+    "etiquette": "l'etiquette telle que presentee lors de la lecture en aveugle"
+  },
+  "n": 50,
+  "accord_verdict": 47,
+  "kappa_verdict": 0.8796147672552166,
+  "ic95_bootstrap": [
+    0.72,
+    1.0
+  ],
+  "items": {
+    "b01-005": {
+      "annotateur": {
+        "checks": {
+          "exactitude_technique": false,
+          "absence_de_bugs": false,
+          "respect_consignes": false
+        },
+        "verdict": "FAIL",
+        "ligne": 1153
+      },
+      "etiquette": {
+        "checks": {
+          "exactitude_technique": false,
+          "absence_de_bugs": false,
+          "respect_consignes": true
+        },
+        "verdict": "FAIL",
+        "ligne": 1154
+      }
+    },
+    "b02-001": {
+      "annotateur": {
+        "checks": {
+          "exactitude_technique": true,
+          "absence_de_bugs": false,
+          "respect_consignes": true
+        },
+        "verdict": "FAIL",
+        "ligne": 282
+      },
+      "etiquette": {
+        "checks": {
+          "exactitude_technique": true,
+          "absence_de_bugs": false,
+          "respect_consignes": true
+        },
+        "verdict": "FAIL",
+        "ligne": 283
+      }
+    },
+    "b02-002": {
+      "annotateur": {
+        "checks": {
+          "exactitude_technique": true,
+          "absence_de_bugs": true,
+          "respect_consignes": true
+        },
+        "verdict": "PASS",
+        "ligne": 884
+      },
+      "etiquette": {
+        "checks": {
+          "exactitude_technique": true,
+          "absence_de_bugs": true,
+          "respect_consignes": true
+        },
+        "verdict": "PASS",
+        "ligne": 885
+      }
+    },
+    "b02-012": {
+      "annotateur": {
+        "checks": {
+          "exactitude_technique": true,
+          "absence_de_bugs": true,
+          "respect_consignes": true
+        },
+        "verdict": "PASS",
+        "ligne": 1420
+      },
+      "etiquette": {
+        "checks": {
+          "exactitude_technique": true,
+          "absence_de_bugs": true,
+          "respect_consignes": true
+        },
+        "verdict": "PASS",
+        "ligne": 1421
+      }
+    },
+    "b03-001": {
+      "annotateur": {
+        "checks": {
+          "exactitude_technique": false,
+          "absence_de_bugs": false,
+          "respect_consignes": false
+        },
+        "verdict": "FAIL",
+        "ligne": 1382
+      },
+      "etiquette": {
+        "checks": {
+          "exactitude_technique": true,
+          "absence_de_bugs": false,
+          "respect_consignes": false
+        },
+        "verdict": "FAIL",
+        "ligne": 1383
+      },
+      "etiquette_apres_correction": {
+        "checks": {
+          "exactitude_technique": false,
+          "absence_de_bugs": false,
+          "respect_consignes": false
+        },
+        "verdict": "FAIL",
+        "ligne": 1384
+      }
+    },
+    "b03-002": {
+      "annotateur": {
+        "checks": {
+          "exactitude_technique": true,
+          "absence_de_bugs": true,
+          "respect_consignes": true,
+          "validation_entree": true
+        },
+        "verdict": "PASS",
+        "ligne": 1546
+      },
+      "etiquette": {
+        "checks": {
+          "exactitude_technique": true,
+          "absence_de_bugs": true,
+          "respect_consignes": true,
+          "validation_entree": true
+        },
+        "verdict": "PASS",
+        "ligne": 1547
+      }
+    },
+    "b03-003": {
+      "annotateur": {
+        "checks": {
+          "exactitude_technique": false,
+          "absence_de_bugs": false,
+          "respect_consignes": false
+        },
+        "verdict": "FAIL",
+        "ligne": 1209
+      },
+      "etiquette": {
+        "checks": {
+          "exactitude_technique": false,
+          "absence_de_bugs": false,
+          "respect_consignes": true
+        },
+        "verdict": "FAIL",
+        "ligne": 1210
+      }
+    },
+    "b03-004": {
+      "annotateur": {
+        "checks": {
+          "exactitude_technique": true,
+          "absence_de_bugs": true,
+          "respect_consignes": true
+        },
+        "verdict": "PASS",
+        "ligne": 1085
+      },
+      "etiquette": {
+        "checks": {
+          "exactitude_technique": true,
+          "absence_de_bugs": true,
+          "respect_consignes": true
+        },
+        "verdict": "PASS",
+        "ligne": 1086
+      }
+    },
+    "b03-005": {
+      "annotateur": {
+        "checks": {
+          "exactitude_technique": false,
+          "absence_de_bugs": false,
+          "respect_consignes": false
+        },
+        "verdict": "FAIL",
+        "ligne": 1318
+      },
+      "etiquette": {
+        "checks": {
+          "exactitude_technique": false,
+          "absence_de_bugs": false,
+          "respect_consignes": true
+        },
+        "verdict": "FAIL",
+        "ligne": 1319
+      }
+    },
+    "b03-012": {
+      "annotateur": {
+        "checks": {
+          "exactitude_technique": true,
+          "absence_de_bugs": true,
+          "respect_consignes": true
+        },
+        "verdict": "PASS",
+        "ligne": 496
+      },
+      "etiquette": {
+        "checks": {
+          "exactitude_technique": true,
+          "absence_de_bugs": true,
+          "respect_consignes": true
+        },
+        "verdict": "PASS",
+        "ligne": 497
+      }
+    },
+    "b03-014": {
+      "annotateur": {
+        "checks": {
+          "exactitude_technique": true,
+          "absence_de_bugs": true,
+          "respect_consignes": false
+        },
+        "verdict": "FAIL",
+        "ligne": 959
+      },
+      "etiquette": {
+        "checks": {
+          "exactitude_technique": false,
+          "absence_de_bugs": false,
+          "respect_consignes": true
+        },
+        "verdict": "FAIL",
+        "ligne": 960
+      }
+    },
+    "b04-002": {
+      "annotateur": {
+        "checks": {
+          "exactitude_technique": false,
+          "absence_de_bugs": false,
+          "respect_consignes": false
+        },
+        "verdict": "FAIL",
+        "ligne": 1265
+      },
+      "etiquette": {
+        "checks": {
+          "exactitude_technique": false,
+          "absence_de_bugs": false,
+          "respect_consignes": false
+        },
+        "verdict": "FAIL",
+        "ligne": 1266
+      }
+    },
+    "b04-013": {
+      "annotateur": {
+        "checks": {
+          "exactitude_technique": true,
+          "absence_de_bugs": true,
+          "respect_consignes": true
+        },
+        "verdict": "PASS",
+        "ligne": 1247
+      },
+      "etiquette": {
+        "checks": {
+          "exactitude_technique": true,
+          "absence_de_bugs": true,
+          "respect_consignes": true
+        },
+        "verdict": "PASS",
+        "ligne": 1248
+      }
+    },
+    "b04-014": {
+      "annotateur": {
+        "checks": {
+          "exactitude_technique": false,
+          "absence_de_bugs": false,
+          "respect_consignes": false
+        },
+        "verdict": "FAIL",
+        "ligne": 792
+      },
+      "etiquette": {
+        "checks": {
+          "exactitude_technique": false,
+          "absence_de_bugs": false,
+          "respect_consignes": true
+        },
+        "verdict": "FAIL",
+        "ligne": 793
+      }
+    },
+    "b04-015": {
+      "annotateur": {
+        "checks": {
+          "respect_consignes": false
+        },
+        "verdict": "FAIL",
+        "ligne": 1812
+      },
+      "etiquette": {
+        "checks": {
+          "exactitude_technique": true,
+          "absence_de_bugs": true,
+          "respect_consignes": true,
+          "format_impose": false
+        },
+        "verdict": "FAIL",
+        "ligne": 1813
+      }
+    },
+    "b05-008": {
+      "annotateur": {
+        "checks": {
+          "exactitude_technique": true,
+          "absence_de_bugs": true,
+          "respect_consignes": true
+        },
+        "verdict": "PASS",
+        "ligne": 320
+      },
+      "etiquette": {
+        "checks": {
+          "exactitude_technique": true,
+          "absence_de_bugs": true,
+          "respect_consignes": true
+        },
+        "verdict": "PASS",
+        "ligne": 321
+      }
+    },
+    "b05-009": {
+      "annotateur": {
+        "checks": {
+          "exactitude_technique": true,
+          "absence_de_bugs": true,
+          "respect_consignes": true
+        },
+        "verdict": "PASS",
+        "ligne": 1568
+      },
+      "etiquette": {
+        "checks": {
+          "exactitude_technique": true,
+          "absence_de_bugs": true,
+          "respect_consignes": true
+        },
+        "verdict": "PASS",
+        "ligne": 1569
+      }
+    },
+    "b06-006": {
+      "annotateur": {
+        "checks": {
+          "exactitude_technique": true,
+          "absence_de_bugs": true,
+          "respect_consignes": true
+        },
+        "verdict": "PASS",
+        "ligne": 1358
+      },
+      "etiquette": {
+        "checks": {
+          "exactitude_technique": true,
+          "absence_de_bugs": true,
+          "respect_consignes": true
+        },
+        "verdict": "PASS",
+        "ligne": 1359
+      }
+    },
+    "b06-008": {
+      "annotateur": {
+        "checks": {
+          "exactitude_technique": false,
+          "absence_de_bugs": false,
+          "respect_consignes": true
+        },
+        "verdict": "FAIL",
+        "ligne": 1108
+      },
+      "etiquette": {
+        "checks": {
+          "exactitude_technique": false,
+          "absence_de_bugs": false,
+          "respect_consignes": false
+        },
+        "verdict": "FAIL",
+        "ligne": 1109
+      },
+      "etiquette_apres_correction": {
+        "checks": {
+          "exactitude_technique": false,
+          "absence_de_bugs": false,
+          "respect_consignes": true
+        },
+        "verdict": "FAIL",
+        "ligne": 1110
+      }
+    },
+    "b06-013": {
+      "annotateur": {
+        "checks": {
+          "exactitude_technique": true,
+          "absence_de_bugs": true,
+          "respect_consignes": true
+        },
+        "verdict": "PASS",
+        "ligne": 253
+      },
+      "etiquette": {
+        "checks": {
+          "exactitude_technique": true,
+          "absence_de_bugs": true,
+          "respect_consignes": true
+        },
+        "verdict": "PASS",
+        "ligne": 254
+      }
+    },
+    "b06-014": {
+      "annotateur": {
+        "checks": {
+          "exactitude_technique": true,
+          "absence_de_bugs": true,
+          "respect_consignes": true
+        },
+        "verdict": "PASS",
+        "ligne": 932
+      },
+      "etiquette": {
+        "checks": {
+          "exactitude_technique": true,
+          "absence_de_bugs": true,
+          "respect_consignes": true
+        },
+        "verdict": "PASS",
+        "ligne": 933
+      }
+    },
+    "b07-001": {
+      "annotateur": {
+        "checks": {
+          "exactitude_technique": true,
+          "absence_de_bugs": true,
+          "respect_consignes": true
+        },
+        "verdict": "PASS",
+        "ligne": 1294
+      },
+      "etiquette": {
+        "checks": {
+          "exactitude_technique": true,
+          "absence_de_bugs": true,
+          "respect_consignes": true
+        },
+        "verdict": "PASS",
+        "ligne": 1295
+      }
+    },
+    "b07-002": {
+      "annotateur": {
+        "checks": {
+          "exactitude_technique": false,
+          "absence_de_bugs": false,
+          "respect_consignes": true
+        },
+        "verdict": "FAIL",
+        "ligne": 905
+      },
+      "etiquette": {
+        "checks": {
+          "exactitude_technique": false,
+          "absence_de_bugs": false,
+          "respect_consignes": true
+        },
+        "verdict": "FAIL",
+        "ligne": 906
+      }
+    },
+    "b07-005": {
+      "annotateur": {
+        "checks": {
+          "exactitude_technique": true,
+          "absence_de_bugs": true,
+          "respect_consignes": true
+        },
+        "verdict": "PASS",
+        "ligne": 565
+      },
+      "etiquette": {
+        "checks": {
+          "exactitude_technique": true,
+          "absence_de_bugs": true,
+          "respect_consignes": true
+        },
+        "verdict": "PASS",
+        "ligne": 566
+      }
+    },
+    "b07-008": {
+      "annotateur": {
+        "checks": {
+          "exactitude_technique": false,
+          "absence_de_bugs": false,
+          "respect_consignes": true
+        },
+        "verdict": "FAIL",
+        "ligne": 645
+      },
+      "etiquette": {
+        "checks": {
+          "exactitude_technique": false,
+          "absence_de_bugs": false,
+          "respect_consignes": true
+        },
+        "verdict": "FAIL",
+        "ligne": 646
+      }
+    },
+    "b07-011": {
+      "annotateur": {
+        "checks": {},
+        "verdict": "PASS",
+        "ligne": 130
+      },
+      "etiquette": {
+        "checks": {
+          "exactitude_technique": true,
+          "absence_de_bugs": true,
+          "respect_consignes": true,
+          "format_impose": false
+        },
+        "verdict": "FAIL",
+        "ligne": 131
+      }
+    },
+    "b07-014": {
+      "annotateur": {
+        "checks": {
+          "exactitude_technique": true,
+          "absence_de_bugs": true,
+          "respect_consignes": true
+        },
+        "verdict": "PASS",
+        "ligne": 1134
+      },
+      "etiquette": {
+        "checks": {
+          "exactitude_technique": true,
+          "absence_de_bugs": true,
+          "respect_consignes": true
+        },
+        "verdict": "PASS",
+        "ligne": 1135
+      }
+    },
+    "b07-015": {
+      "annotateur": {
+        "checks": {
+          "exactitude_technique": true,
+          "absence_de_bugs": true,
+          "respect_consignes": true
+        },
+        "verdict": "PASS",
+        "ligne": 391
+      },
+      "etiquette": {
+        "checks": {
+          "exactitude_technique": true,
+          "absence_de_bugs": true,
+          "respect_consignes": true
+        },
+        "verdict": "PASS",
+        "ligne": 392
+      }
+    },
+    "b08-003": {
+      "annotateur": {
+        "checks": {
+          "exactitude_technique": true,
+          "absence_de_bugs": true,
+          "respect_consignes": true
+        },
+        "verdict": "PASS",
+        "ligne": 1187
+      },
+      "etiquette": {
+        "checks": {
+          "exactitude_technique": true,
+          "absence_de_bugs": true,
+          "respect_consignes": true
+        },
+        "verdict": "PASS",
+        "ligne": 1188
+      }
+    },
+    "b08-004": {
+      "annotateur": {
+        "checks": {
+          "exactitude_technique": true,
+          "absence_de_bugs": true,
+          "respect_consignes": true,
+          "aucune_dependance_externe": false
+        },
+        "verdict": "FAIL",
+        "ligne": 469
+      },
+      "etiquette": {
+        "checks": {
+          "exactitude_technique": true,
+          "absence_de_bugs": true,
+          "respect_consignes": true,
+          "aucune_dependance_externe": false
+        },
+        "verdict": "FAIL",
+        "ligne": 470
+      }
+    },
+    "b08-007": {
+      "annotateur": {
+        "checks": {
+          "exactitude_technique": true,
+          "absence_de_bugs": true,
+          "respect_consignes": true
+        },
+        "verdict": "PASS",
+        "ligne": 706
+      },
+      "etiquette": {
+        "checks": {
+          "exactitude_technique": true,
+          "absence_de_bugs": true,
+          "respect_consignes": true
+        },
+        "verdict": "PASS",
+        "ligne": 707
+      }
+    },
+    "b08-011": {
+      "annotateur": {
+        "checks": {
+          "exactitude_technique": false,
+          "absence_de_bugs": false,
+          "respect_consignes": false
+        },
+        "verdict": "FAIL",
+        "ligne": 730
+      },
+      "etiquette": {
+        "checks": {
+          "exactitude_technique": false,
+          "absence_de_bugs": false,
+          "respect_consignes": true
+        },
+        "verdict": "FAIL",
+        "ligne": 731
+      }
+    },
+    "b09-006": {
+      "annotateur": {
+        "checks": {
+          "exactitude_technique": false,
+          "absence_de_bugs": false,
+          "respect_consignes": false
+        },
+        "verdict": "FAIL",
+        "ligne": 590
+      },
+      "etiquette": {
+        "checks": {
+          "exactitude_technique": false,
+          "absence_de_bugs": false,
+          "respect_consignes": false
+        },
+        "verdict": "FAIL",
+        "ligne": 591
+      }
+    },
+    "b09-009": {
+      "annotateur": {
+        "checks": {
+          "exactitude_technique": false,
+          "absence_de_bugs": true,
+          "respect_consignes": true,
+          "signature_publique_inchangee": true
+        },
+        "verdict": "FAIL",
+        "ligne": 85
+      },
+      "etiquette": {
+        "checks": {
+          "exactitude_technique": true,
+          "absence_de_bugs": true,
+          "respect_consignes": true,
+          "signature_publique_inchangee": false
+        },
+        "verdict": "FAIL",
+        "ligne": 86
+      }
+    },
+    "b09-011": {
+      "annotateur": {
+        "checks": {
+          "exactitude_technique": true,
+          "absence_de_bugs": true,
+          "respect_consignes": true
+        },
+        "verdict": "PASS",
+        "ligne": 996
+      },
+      "etiquette": {
+        "checks": {
+          "exactitude_technique": true,
+          "absence_de_bugs": true,
+          "respect_consignes": true
+        },
+        "verdict": "PASS",
+        "ligne": 997
+      }
+    },
+    "b09-014": {
+      "annotateur": {
+        "checks": {
+          "exactitude_technique": true,
+          "absence_de_bugs": true,
+          "respect_consignes": true
+        },
+        "verdict": "PASS",
+        "ligne": 621
+      },
+      "etiquette": {
+        "checks": {
+          "exactitude_technique": true,
+          "absence_de_bugs": true,
+          "respect_consignes": true
+        },
+        "verdict": "PASS",
+        "ligne": 622
+      }
+    },
+    "b10-003": {
+      "annotateur": {
+        "checks": {
+          "exactitude_technique": true,
+          "absence_de_bugs": true,
+          "respect_consignes": false
+        },
+        "verdict": "FAIL",
+        "ligne": 1018
+      },
+      "etiquette": {
+        "checks": {
+          "exactitude_technique": false,
+          "absence_de_bugs": false,
+          "respect_consignes": false
+        },
+        "verdict": "FAIL",
+        "ligne": 1019
+      }
+    },
+    "b10-015": {
+      "annotateur": {
+        "checks": {
+          "exactitude_technique": true,
+          "absence_de_bugs": true,
+          "respect_consignes": true,
+          "format_impose": false
+        },
+        "verdict": "FAIL",
+        "ligne": 188
+      },
+      "etiquette": {
+        "checks": {
+          "exactitude_technique": true,
+          "absence_de_bugs": true,
+          "respect_consignes": true,
+          "format_impose": false
+        },
+        "verdict": "FAIL",
+        "ligne": 189
+      }
+    },
+    "b12-005": {
+      "annotateur": {
+        "checks": {
+          "contexte_pertinent": false,
+          "contexte_suffisant": false,
+          "bruit_maitrise": false
+        },
+        "verdict": "FAIL",
+        "ligne": 1828
+      },
+      "etiquette": {
+        "checks": {
+          "contexte_pertinent": true,
+          "contexte_suffisant": false,
+          "bruit_maitrise": true
+        },
+        "verdict": "FAIL",
+        "ligne": 1829
+      }
+    },
+    "b12-007": {
+      "annotateur": {
+        "checks": {
+          "contexte_pertinent": true,
+          "contexte_suffisant": false,
+          "bruit_maitrise": true
+        },
+        "verdict": "FAIL",
+        "ligne": 1620
+      },
+      "etiquette": {
+        "checks": {
+          "contexte_pertinent": true,
+          "contexte_suffisant": true,
+          "bruit_maitrise": true
+        },
+        "verdict": "PASS",
+        "ligne": 1621
+      }
+    },
+    "b12-008": {
+      "annotateur": {
+        "checks": {
+          "contexte_pertinent": true,
+          "contexte_suffisant": false,
+          "bruit_maitrise": true
+        },
+        "verdict": "FAIL",
+        "ligne": 229
+      },
+      "etiquette": {
+        "checks": {
+          "contexte_pertinent": true,
+          "contexte_suffisant": false,
+          "bruit_maitrise": true
+        },
+        "verdict": "FAIL",
+        "ligne": 230
+      }
+    },
+    "b12-011": {
+      "annotateur": {
+        "checks": {
+          "affirmations_etayees": false,
+          "absence_invention": false,
+          "citations_exactes": false
+        },
+        "verdict": "FAIL",
+        "ligne": 1696
+      },
+      "etiquette": {
+        "checks": {
+          "affirmations_etayees": false,
+          "absence_invention": false,
+          "citations_exactes": true
+        },
+        "verdict": "FAIL",
+        "ligne": 1697
+      }
+    },
+    "b12-012": {
+      "annotateur": {
+        "checks": {
+          "affirmations_etayees": true,
+          "absence_invention": true,
+          "citations_exactes": true
+        },
+        "verdict": "PASS",
+        "ligne": 1761
+      },
+      "etiquette": {
+        "checks": {
+          "affirmations_etayees": true,
+          "absence_invention": true,
+          "citations_exactes": true
+        },
+        "verdict": "PASS",
+        "ligne": 1762
+      }
+    },
+    "b13-001": {
+      "annotateur": {
+        "checks": {
+          "contexte_pertinent": true,
+          "contexte_suffisant": false,
+          "bruit_maitrise": true
+        },
+        "verdict": "FAIL",
+        "ligne": 1594
+      },
+      "etiquette": {
+        "checks": {
+          "contexte_pertinent": true,
+          "contexte_suffisant": false,
+          "bruit_maitrise": true
+        },
+        "verdict": "FAIL",
+        "ligne": 1595
+      }
+    },
+    "b13-003": {
+      "annotateur": {
+        "checks": {
+          "contexte_pertinent": false,
+          "contexte_suffisant": false,
+          "bruit_maitrise": false
+        },
+        "verdict": "FAIL",
+        "ligne": 543
+      },
+      "etiquette": {
+        "checks": {
+          "contexte_pertinent": false,
+          "contexte_suffisant": false,
+          "bruit_maitrise": false
+        },
+        "verdict": "FAIL",
+        "ligne": 544
+      }
+    },
+    "b13-004": {
+      "annotateur": {
+        "checks": {
+          "contexte_pertinent": true,
+          "contexte_suffisant": false,
+          "bruit_maitrise": true
+        },
+        "verdict": "FAIL",
+        "ligne": 1452
+      },
+      "etiquette": {
+        "checks": {
+          "contexte_pertinent": true,
+          "contexte_suffisant": true,
+          "bruit_maitrise": true
+        },
+        "verdict": "PASS",
+        "ligne": 1453
+      },
+      "etiquette_apres_correction": {
+        "checks": {
+          "contexte_pertinent": true,
+          "contexte_suffisant": false,
+          "bruit_maitrise": true
+        },
+        "verdict": "FAIL",
+        "ligne": 1454
+      }
+    },
+    "b13-008": {
+      "annotateur": {
+        "checks": {
+          "affirmations_etayees": false,
+          "absence_invention": false,
+          "citations_exactes": false
+        },
+        "verdict": "FAIL",
+        "ligne": 1658
+      },
+      "etiquette": {
+        "checks": {
+          "affirmations_etayees": false,
+          "absence_invention": false,
+          "citations_exactes": true
+        },
+        "verdict": "FAIL",
+        "ligne": 1659
+      }
+    },
+    "b13-009": {
+      "annotateur": {
+        "checks": {
+          "affirmations_etayees": true,
+          "absence_invention": true,
+          "citations_exactes": true
+        },
+        "verdict": "PASS",
+        "ligne": 1726
+      },
+      "etiquette": {
+        "checks": {
+          "affirmations_etayees": true,
+          "absence_invention": true,
+          "citations_exactes": true
+        },
+        "verdict": "PASS",
+        "ligne": 1727
+      }
+    },
+    "b13-012": {
+      "annotateur": {
+        "checks": {
+          "affirmations_etayees": false,
+          "absence_invention": false,
+          "citations_exactes": false
+        },
+        "verdict": "FAIL",
+        "ligne": 356
+      },
+      "etiquette": {
+        "checks": {
+          "affirmations_etayees": false,
+          "absence_invention": false,
+          "citations_exactes": true
+        },
+        "verdict": "FAIL",
+        "ligne": 357
+      }
+    },
+    "b13-013": {
+      "annotateur": {
+        "checks": {
+          "affirmations_etayees": true,
+          "absence_invention": true,
+          "citations_exactes": true
+        },
+        "verdict": "PASS",
+        "ligne": 762
+      },
+      "etiquette": {
+        "checks": {
+          "affirmations_etayees": true,
+          "absence_invention": true,
+          "citations_exactes": true
+        },
+        "verdict": "PASS",
+        "ligne": 763
+      }
+    }
+  }
+}

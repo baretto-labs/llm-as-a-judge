@@ -12,7 +12,22 @@
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <langchain4j.version>1.11.0</langchain4j.version>
+        <langchain4j.version>1.20.0</langchain4j.version>
+
+        <!-- Défauts vides, requis par <systemPropertyVariables> de surefire : sans eux, un
+             ${...} non résolu serait transmis littéralement à la JVM de test. -->
+        <rag.source.dir/>
+        <rag.scenario/>
+        <jmh.judge.enabled/>
+        <jmh.judge.provider/>
+        <jmh.judge.url/>
+        <jmh.judge.model/>
+        <jmh.judge.adapter/>
+        <jmh.difficulty/>
+        <jmh.params/>
+        <jmh.include/>
+        <jmh.result/>
+
         <neo4j.version>2026.01.4</neo4j.version>
         <lucene.version>10.3.2</lucene.version>
     </properties>
@@ -51,6 +66,32 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>3.2.5</version>
+                <configuration>
+                    <!--
+                        Sans ce bloc, les `-D` passés à Maven n'atteignent PAS la JVM de test :
+                        surefire forke et ne transmet rien par défaut. Constaté le 2026-09-21 —
+                        `-Drag.source.dir=...` était ignoré, le banc indexait le corpus synthétique
+                        `com.example.service.Class0Service` au lieu d'OllamAssist, et les 60
+                        questions étaient jugées sur un contexte sans aucun rapport. La mesure
+                        paraissait réussie : BUILD SUCCESS, 120 jugements, hintCoverage 0,000.
+
+                        Les propriétés sont déclarées vides dans <properties> : une valeur absente
+                        arrive donc comme chaîne vide, et le code la traite comme non renseignée.
+                    -->
+                    <systemPropertyVariables>
+                        <rag.source.dir>${rag.source.dir}</rag.source.dir>
+                        <rag.scenario>${rag.scenario}</rag.scenario>
+                        <jmh.judge.enabled>${jmh.judge.enabled}</jmh.judge.enabled>
+                        <jmh.judge.provider>${jmh.judge.provider}</jmh.judge.provider>
+                        <jmh.judge.url>${jmh.judge.url}</jmh.judge.url>
+                        <jmh.judge.model>${jmh.judge.model}</jmh.judge.model>
+                        <jmh.judge.adapter>${jmh.judge.adapter}</jmh.judge.adapter>
+                        <jmh.difficulty>${jmh.difficulty}</jmh.difficulty>
+                        <jmh.params>${jmh.params}</jmh.params>
+                        <jmh.include>${jmh.include}</jmh.include>
+                        <jmh.result>${jmh.result}</jmh.result>
+                    </systemPropertyVariables>
+                </configuration>
             </plugin>
         </plugins>
     </build>
@@ -76,11 +117,32 @@
             <version>${langchain4j.version}</version>
         </dependency>
 
+        <!--
+            Client OpenAI-compatible, pour interroger le juge fine-tuné servi par
+            mlx_lm.server (endpoint /v1/chat/completions).
+
+            OllamaChatModel ne convient pas ici : il parle l'API native d'Ollama
+            (/api/chat). Changer l'URL ne suffit donc pas, il faut changer de classe.
+            On garde les deux : la pipeline RAG continue de générer via Ollama, seul
+            le juge bascule.
+        -->
+        <dependency>
+            <groupId>dev.langchain4j</groupId>
+            <artifactId>langchain4j-open-ai</artifactId>
+            <version>${langchain4j.version}</version>
+        </dependency>
+
         <!-- LangChain4j Embedding Model (local ONNX) -->
         <dependency>
             <groupId>dev.langchain4j</groupId>
             <artifactId>langchain4j-embeddings-all-minilm-l6-v2</artifactId>
-            <version>1.0.0-beta5</version>
+            <!--
+                Ce module n'a pas de version 1.x stable : sa dernière ligne non-beta est la série
+                0.36.x, et toute la ligne 1.x est en beta. Il suit le cœur avec un suffixe propre —
+                1.20.0 côté cœur correspond à 1.20.0-beta30 ici. L'épinglage en beta n'est donc pas
+                une négligence, c'est ce que l'amont publie.
+            -->
+            <version>1.20.0-beta30</version>
         </dependency>
 
         <!-- Neo4j Embedded -->

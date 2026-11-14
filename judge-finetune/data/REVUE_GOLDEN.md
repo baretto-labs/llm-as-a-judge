@@ -1,0 +1,1934 @@
+# Relecture du golden set — journal
+
+But : les étiquettes du corpus sont produites par un modèle. Sans relecture humaine, le κ du benchmark
+mesure l'accord avec ce modèle, pas avec un humain. Ce journal trace chaque exemple relu, pour que le κ
+soit calculable à la fin et qu'aucun exemple ne soit oublié entre deux sessions.
+
+Golden set : 50 exemples, tirés en `SPLIT_SEED=11`, listés dans `data/golden/test.jsonl` (non versionné,
+reproductible par `make split`).
+
+⚠️ **Le golden set a été retiré le 2026-09-15**, après le regroupement des familles RAG par contexte
+d'extraction (chantier 7 de l'audit). Ce regroupement a supprimé la fuite — 0 item RAG sur 12 avec un
+contexte déjà vu en entraînement, contre 9 sur 11 auparavant — mais il a changé la structure du tirage,
+rendant la graine 3 caduque. Composition actuelle : 38 `CODE_ANALYSIS`, 6 `RAG_CONTEXT_RELEVANCE`,
+6 `RAG_FAITHFULNESS`, cas 19/21/10, 24 PASS / 26 FAIL.
+
+Conséquence pour la relecture : `b03-007`, relu en session 1, **est sorti du golden set**. Son arbitrage
+reste acquis — il a produit la correction de périmètre de `respect_consignes`, appliquée aux 28 exemples
+portant un contrôle dédié — mais il ne comptera pas dans le κ du golden. `b04-015`, `b07-011` et
+`b10-015` y figurent toujours.
+
+## Protocole
+
+1. L'exemple est présenté **sans son étiquette** : contexte, requête, sortie à évaluer, critères. Ni
+   verdict, ni `<thinking>`, ni motif. Montrer l'étiquette d'abord ancrerait l'annotateur, qui validerait
+   les erreurs au lieu de les trouver.
+2. L'annotateur tranche **chaque contrôle**. Le verdict en découle : PASS si et seulement si tous les
+   contrôles sont vrais.
+3. L'étiquette est révélée, les écarts sont arbitrés.
+4. Toute correction passe par `generators/gen_batch_NN.py` puis `make regen` — **jamais** par le JSONL.
+   Si un `verdict` ou un `cas` change, les strates du tirage bougent : rejouer `make split`.
+
+## Ordre de passage
+
+Du plus sujet à erreur au plus simple, pour que l'effort porte là où il compte.
+
+| Session | Contenu | Pourquoi en premier |
+|---|---|---|
+| 1 | `b04-015`, `b07-011`, `b09-009`, `b10-015` | cas `limite` à 4 contrôles où **un seul contrôle** sépare PASS de FAIL |
+| 2 | `b03-012`, `b05-008`, `b06-013`, `b07-015`, `b12-008`, `b13-013` | les 6 autres `limite` : arbitrages, donc divergence maximale entre annotateurs |
+| 3-4 | les 10 items RAG restants | portent la posture monde fermé, cœur du fine-tuning |
+| 5+ | les 30 `CODE_ANALYSIS` francs | validation rapide |
+
+Plan révisé après le retirage du 2026-09-15. `b09-009` remplace `b03-007` en session 1, même profil : un
+`limite` à quatre contrôles dont un seul est faux, donc à une voix de basculer. Les deux `limite` de
+session 2 qui sont des items RAG — `b12-008` et `b13-013` — comptent aussi dans les 12 items RAG, d'où
+les 10 restants en sessions 3-4.
+
+## Journal
+
+| # | id | Verdict annotateur | Verdict étiquette | Accord verdict | Écart sur les contrôles | Arbitrage |
+|---|---|---|---|---|---|---|
+| 1 | `b03-007` | FAIL | FAIL | ✅ | `respect_consignes` : annotateur `false`, étiquette `true` | Description corrigée, étiquette inchangée |
+| 2 | `b04-015` | FAIL | FAIL | ✅ | `respect_consignes` : annotateur `false`, étiquette `true` | Description corrigée, étiquette inchangée |
+
+**Accord verdict : 2 / 2.** Dont un seul, `b04-015`, encore dans le golden set après le retirage ;
+`b03-007` en est sorti et ne comptera pas dans le κ, sans que son arbitrage soit perdu pour autant.
+
+`b07-011` et `b10-015` ont été présentés à l'annotateur, réponse en attente. Tous deux figurent toujours
+dans le golden set et n'ont pas été réécrits par la reprise : leurs verdicts restent donc valables.
+
+## Décisions issues de la relecture
+
+### 2026-09-15 — périmètre de `respect_consignes` (exemples 1 et 2)
+
+L'annotateur marquait `respect_consignes` **et** le contrôle dédié à `false` ; l'étiquette ne marquait que
+le contrôle dédié. Vérification sur les 200 exemples : la convention était appliquée **15 fois sur 15**,
+donc systématique — mais nulle part écrite, et contredisant la description montrée au juge (« Toutes les
+consignes obligatoires de la requête sont respectées »). La lecture de l'annotateur était la lecture
+littérale, et elle était juste.
+
+Arbitrage retenu : **corriger la description**, pas les étiquettes. Quand un contrôle dédié est présent,
+`respect_consignes` annonce désormais qu'elle exclut ce que ce contrôle couvre. Le contrôle dédié garde
+ainsi sa valeur de diagnostic — le benchmark peut dire *quelle* contrainte le juge rate, ce qui
+disparaîtrait si les deux contrôles basculaient toujours ensemble.
+
+Mis en œuvre dans `generators/gen_batch_01.py` (`RESPECT_CONSIGNES_PERIMETRE_REDUIT`), appliqué aux 28
+exemples portant un contrôle dédié. Aucun `verdict` ni `cas` modifié, donc le tirage est inchangé.
+
+## Séance du 2026-09-15 — reprise après le retirage
+
+### 3. `b09-009` — accord sur le verdict, désaccord croisé sur deux contrôles
+
+| | 1 `exactitude` | 2 `absence_de_bugs` | 3 `respect_consignes` | 4 `signature_publique_inchangee` |
+|---|---|---|---|---|
+| annotateur | **F** | V | V | **V** |
+| étiquette | **V** | V | V | **F** |
+
+Verdict **FAIL des deux côtés**. Les deux écarts vont en sens opposés, chacun voyant un défaut là où
+l'autre n'en voit pas.
+
+**Contrôle 4 — tranché, l'étiquette est maintenue.** L'annotateur a confirmé une inversion de frappe. La
+signature passe bien de `total(List<Integer>)` à `total(Optional<List<Integer>>)`, ce qui rompt la
+compatibilité **source** — tout appel existant cesse de compiler — et la compatibilité **binaire**, le
+descripteur inscrit dans le bytecode des appelants changeant, d'où un `NoSuchMethodError` pour les jars
+tiers déjà compilés. La requête posait la contrainte en toutes lettres.
+
+**Contrôle 1 — correction proposée, EN ATTENTE DE CONFIRMATION.**
+
+La réponse affirme : « l'appelant voit immédiatement que la valeur peut manquer, et le compilateur
+l'oblige à en tenir compte ». C'est faux. Un `Optional` en **paramètre** ne contraint l'appelant à rien :
+`total(null)` compile sans avertissement et lève une `NullPointerException` dans `orElseGet`. Sous le
+critère « chaque affirmation technique de la sortie est vraie », `exactitude_technique` doit donc valoir
+**faux**.
+
+Le `<thinking>` actuel relève bien qu'`Optional` en paramètre contrevient à l'usage recommandé, mais le
+traite comme une question de style rattachée au contrôle 4, sans jamais peser cette phrase comme une
+**affirmation factuelle**. C'est un défaut d'étiquetage réel, repéré par la relecture.
+
+Correction envisagée : `[F, V, V, F]`. Verdict inchangé (FAIL), `cas` inchangé (`limite` — le code devient
+effectivement tolérant au nul, c'est l'explication qui ment), donc strate du tirage inchangée et golden set
+intact. Coût nul.
+
+**Pourquoi elle n'est pas appliquée :** l'accord a été donné en clôture de séance, l'annotateur signalant
+lui-même sa fatigue. Modifier une étiquette du golden sur cette base reproduirait le raccourci — agir sur
+une lecture plausible plutôt que sur une vérification — que l'audit du jour a précisément fait corriger.
+À confirmer à tête reposée.
+
+### État de la relecture
+
+- **Accord sur le verdict : 3 / 3** (`b03-007`, `b04-015`, `b09-009`), dont 2 encore dans le golden set.
+- **En attente :** `b07-011` et `b10-015`, présentés avant la pause, non réécrits depuis, toujours dans le
+  golden — les réponses restent valables.
+- **Reprise :** confirmer le contrôle 1 de `b09-009`, puis les deux exemples en attente, puis la session 2
+  (`b03-012`, `b05-008`, `b06-013`, `b07-015`, `b12-008`, `b13-013`).
+
+### 4. `b07-011` — premier désaccord sur un verdict, et ce qu'il révèle
+
+| | 1 `exactitude` | 2 `absence_de_bugs` | 3 `respect_consignes` | 4 `format_impose` | verdict |
+|---|---|---|---|---|---|
+| annotateur, **premier passage** | — | — | — | — | **PASS** |
+| étiquette | V | V | V | **F** | **FAIL** |
+| annotateur, après révélation | V | V | V | F | FAIL |
+
+**Étiquette maintenue, aucune correction du corpus.** Le contenu technique est exact de bout en bout —
+condition `volatile`, décomposition de `new Holder()`, publication d'une référence partiellement
+construite, JSR-133 depuis Java 5, idiome de la classe interne. Le seul contrôle fautif est le 4 : la
+requête impose « trois points maximum », la réponse en aligne cinq.
+
+**Ce que le cas révèle.** L'annotateur a évalué le fond, jugé — à raison — que tout y était exact, et
+conclu PASS sans peser la contrainte de forme. Il l'a reconnu de lui-même : « je me suis concentré sur le
+fond et je n'ai pas vu les 3 points ». Or le contrôle décisif ne demandait **aucune connaissance du
+double-checked locking**, seulement de compter.
+
+C'est précisément le piège que `format_impose` existe pour attraper, et le fait qu'un relecteur technique
+attentif y tombe est un indice que l'exemple est bien construit. Un indice, sur un cas.
+
+**Correctif de protocole adopté.** L'annotateur répond désormais **contrôle par contrôle**, quatre valeurs
+dans l'ordre, et non par un verdict global. Le verdict en découle mécaniquement, et un contrôle omis
+devient visible au lieu d'être absorbé par une impression d'ensemble. Le format d'appel des exemples est
+inchangé ; seule la forme de la réponse attendue se resserre.
+
+**Règle de comptage du κ.** Le jugement de **premier passage** est celui qui compte pour l'accord
+inter-annotateurs. Une révision faite après avoir vu l'étiquette gonflerait artificiellement le plafond
+mesuré. Les deux colonnes restent séparées dans ce journal, et le κ se calculera sur la première.
+
+### État de la relecture au 2026-09-16
+
+- **Accord sur le verdict, premier passage : 3 / 4** — `b03-007` ✅, `b04-015` ✅, `b09-009` ✅,
+  `b07-011` ❌ (PASS contre FAIL, révisé après révélation).
+- Dont **3 encore dans le golden set** : `b04-015`, `b09-009`, `b07-011`.
+- **En attente :** confirmation du contrôle 1 de `b09-009` ; évaluation de `b10-015`.
+
+### Arbitrage du 2026-09-16 — le premier passage de `b07-011` compte dans le κ
+
+L'annotateur a proposé de corriger son premier passage de PASS en FAIL, par crainte « d'introduire une
+erreur humaine ». Trois options ont été posées : compter la donnée, l'exclure du κ en documentant
+pourquoi, ou la re-mesurer. **Option retenue : la compter.**
+
+Le malentendu à écarter d'abord : l'erreur n'est jamais entrée dans le corpus. `b07-011` est étiqueté FAIL
+et l'a toujours été ; le PASS n'existe que dans ce journal, comme **mesure**, jamais comme étiquette.
+
+La raison de fond : le κ inter-annotateurs ne note pas le relecteur, il fixe le **plafond du benchmark**.
+Effacer un désaccord dès que l'un des deux se ravise après avoir vu la réponse de l'autre ferait monter ce
+κ à 1,0 par construction, et conduirait à conclure que les étiquettes sont parfaitement reproductibles.
+Elles ne le sont pas : un relecteur compétent et attentif a lu cet exemple et conclu PASS. C'est un fait
+sur la difficulté réelle de la tâche, et il servira à interpréter les sorties du juge fine-tuné — si
+celui-ci rend PASS sur un cas analogue, on saura qu'un humain a fait la même lecture.
+
+Réserve consignée, mais non retenue comme motif d'exclusion : ce point de mesure a été recueilli **avant**
+le correctif de protocole, quand un verdict global était demandé plutôt que quatre contrôles. Ce format a
+pu favoriser une lecture d'ensemble. Il n'a en revanche caché aucune information — la contrainte « trois
+points maximum » figurait en toutes lettres dans la requête présentée.
+
+### 5. `b10-015` — premier accord complet, avec une réserve d'amorçage
+
+| | 1 `exactitude` | 2 `absence_de_bugs` | 3 `respect_consignes` | 4 `format_impose` | verdict |
+|---|---|---|---|---|---|
+| annotateur, premier passage | V | V | V | **F** | **FAIL** |
+| étiquette | V | V | V | **F** | **FAIL** |
+
+Accord sur **les quatre contrôles**, pas seulement sur le verdict — le premier du journal. Les motifs
+coïncident également : l'annotateur relève « on demande explicitement aucun exemple et il y en a un dans
+la réponse », l'étiquette dit « insère un bloc de code avec l'exemple d'en-tête, alors que la requête
+imposait de la prose uniquement ». Aucune correction du corpus.
+
+**Réserve sur ce point de mesure : amorçage.** `b10-015` a été présenté immédiatement après `b07-011`,
+dont toute la leçon était de vérifier la contrainte de forme. La vigilance de l'annotateur ici n'est donc
+pas une lecture pleinement indépendante. Le point compte, mais il vaut moins qu'un accord obtenu à froid.
+
+**Défaut de séquencement, imputable au protocole et non à l'annotateur.** Trois des quatre exemples de la
+session 1 — `b04-015`, `b07-011`, `b10-015` — échouent sur un contrôle dédié de format ou de consigne. La
+session avait été composée sur le critère « un seul contrôle sépare PASS de FAIL », sans voir que cela
+produisait une série homogène, qui apprend au relecteur à chercher toujours le même type de défaut.
+
+**Correctif : entrelacer les types de contrôle fautif** dans les sessions suivantes, de sorte que deux
+exemples consécutifs ne partagent pas le même mode d'échec.
+
+### État de la relecture — session 1 close
+
+- **Accord sur le verdict, premier passage : 4 / 5** — `b03-007` ✅, `b04-015` ✅, `b09-009` ✅,
+  `b07-011` ❌, `b10-015` ✅.
+- Dont **4 dans le golden set actuel** (`b03-007` en est sorti au retirage) : 3 accords sur 4.
+- **Aucune correction du corpus n'a été rendue nécessaire par la session 1**, hors la correction de
+  périmètre de `respect_consignes` issue des exemples 1 et 2.
+- **En attente :** confirmation du contrôle 1 de `b09-009`, seul point resté ouvert.
+
+## Session 2
+
+**Composition revue avant de commencer.** Les six `limite` restants se répartissaient en cinq PASS sans
+aucun contrôle fautif et un seul FAIL. Les présenter dans l'ordre du bucket aurait reproduit en pire le
+défaut relevé en session 1 : après trois PASS consécutifs, le verdict devient prévisible par la position
+et les items suivants ne mesurent plus rien. La session 2 est donc tirée sur **l'ensemble du golden set**,
+en alternant les verdicts et les contrôles fautifs, au lieu de vider le bucket `limite`.
+
+### 6. `b12-008` — accord complet, non confondu
+
+| | 1 `contexte_pertinent` | 2 `contexte_suffisant` | 3 `bruit_maitrise` | verdict |
+|---|---|---|---|---|
+| annotateur, premier passage | V | **F** | V | **FAIL** |
+| étiquette | V | **F** | V | **FAIL** |
+
+Second accord consécutif sur tous les contrôles, et le premier qui ne souffre d'aucune réserve
+d'amorçage : tâche `RAG_CONTEXT_RELEVANCE` jamais rencontrée dans la relecture, mode d'échec inédit,
+aucun exemple antérieur n'orientait vers la suffisance. Les motifs coïncident — l'annotateur relève qu'il
+« manque encore quelques infos pour répondre de façon pertinente », l'étiquette que l'ordre de fusion
+demandé reste absent faute de corps de méthode.
+
+Le point remarquable est le **placement** du défaut : sur la suffisance et non sur la pertinence. C'est
+la distinction que ces trois critères servent précisément à séparer, et la partie difficile de l'item —
+le contexte est manifestement pertinent, ce qui invite à le valider en bloc. Aucune correction du corpus.
+
+### État de la relecture
+
+- **Accord sur le verdict, premier passage : 5 / 6** — seul `b07-011` reste en désaccord.
+- **Désaccord au niveau contrôle : 1**, sur `b09-009`, tranché en faveur de l'annotateur et corrigé
+  dans le corpus.
+- Aucune correction du corpus rendue nécessaire par la session 2 à ce stade.
+
+### 7. `b06-013` — accord complet sur une consigne facultative
+
+| | 1 `exactitude_technique` | 2 `absence_de_bugs` | 3 `respect_consignes` | verdict |
+|---|---|---|---|---|
+| annotateur, premier passage | V | V | V | **PASS** |
+| étiquette | V | V | V | **PASS** |
+
+Troisième accord consécutif sur tous les contrôles. L'item se joue sur une omission réelle — la réponse
+ne dit rien du passage à l'échelle derrière un répartiteur de charge, ni affinité de session, ni diffusion
+multi-instances, ni bus de messages — mais la requête introduisait cette demande par « si tu as le temps ».
+`respect_consignes` ne portant que sur les consignes obligatoires, l'omission ne fait pas échouer l'item.
+Les sept affirmations techniques vérifiables sont exactes. Aucune correction du corpus.
+
+**Réserve méthodologique sur ce point de mesure : chemin non observé.** L'annotateur a répondu « VVV, Pass »
+sans motif. Un PASS obtenu en voyant la demande facultative et en jugeant correctement qu'elle n'engage pas,
+et un PASS obtenu en ne remarquant pas qu'il y avait une seconde partie, produisent la même case. L'accord
+est réel, mais il ne démontre pas la maîtrise de la notion de consigne facultative.
+
+**Correctif de protocole : demander une ligne de motif sur les items jugés PASS.** Sur les FAIL, la
+formulation spontanée de l'annotateur (« ça Fail car… ») lève déjà l'ambiguïté ; c'est sur les PASS que le
+raisonnement reste invisible, et ce sont précisément les items où une inattention se confond avec un accord.
+
+### État de la relecture
+
+- **Accord sur le verdict, premier passage : 6 / 7** — seul `b07-011` reste en désaccord.
+- **Désaccord au niveau contrôle : 1**, sur `b09-009`, tranché en faveur de l'annotateur et corrigé.
+- Trois accords complets consécutifs : `b10-015` (amorcé), `b12-008` (non confondu), `b06-013`
+  (chemin non observé).
+
+### 8. `b02-001` — accord complet sur une injection SQL
+
+| | 1 `exactitude_technique` | 2 `absence_de_bugs` | 3 `respect_consignes` | verdict |
+|---|---|---|---|---|
+| annotateur, premier passage | V | **F** | V | **FAIL** |
+| étiquette | V | **F** | V | **FAIL** |
+
+Quatrième accord consécutif sur tous les contrôles, motif à l'appui : « il y a un risque d'injection SQL ».
+L'étiquette dit la même chose — requête construite par interpolation de chaîne, CWE-89. `exactitude_technique`
+est correctement laissé à V : les six affirmations annexes de la réponse sont vraies, `rowcount` à `-1` sur un
+`SELECT` sqlite3 compris. Sur un item de ce genre, la tentation est de tout noircir une fois la faille repérée.
+Aucune correction du corpus.
+
+**Nuance sans effet sur l'étiquette.** Le raisonnement de référence relève une seconde conséquence non
+mentionnée par l'annotateur : le même code lève `sqlite3.OperationalError` sur une donnée légitime contenant
+une apostrophe (`o'brien@example.com`). Faille de sécurité et bug de correction tombent tous deux dans
+`absence_de_bugs`, la case est donc identique et l'accord entier.
+
+**Mise en garde sur la lecture de la série.** `b02-001` est un cas `defaillant`, classé trivialement séparable
+par le relevé ci-dessous. Ce point confirme la calibration de l'annotateur, il ne la met pas à l'épreuve.
+
+### Relevé : la difficulté restante est concentrée sur quatre items
+
+Sur les 44 items du golden set non encore relus, `cas` prédit le verdict presque parfaitement — les 21 FAIL
+sont tous `defaillant`, et 19 des 23 PASS sont `parfait`. Les seuls items conservant une difficulté réelle
+sont les quatre `limite` encore PASS : `b03-012`, `b05-008`, `b07-015`, `b13-013`.
+
+**Conséquence pour la relecture :** le κ inter-annotateur finira près de 1 sans que ce soit informatif.
+
+**Conséquence pour le benchmark, plus sérieuse :** si 44 items sur 50 sont trivialement séparables, le 14B
+et le 32B y marqueront tous deux très haut et la comparaison manquera de résolution — c'est précisément la
+question que le protocole doit trancher. À traiter avant le fine-tuning, proposition chiffrée à établir.
+
+### État de la relecture
+
+- **Accord sur le verdict, premier passage : 7 / 8** — seul `b07-011` reste en désaccord.
+- **Désaccord au niveau contrôle : 1**, sur `b09-009`, tranché en faveur de l'annotateur et corrigé.
+
+### 9. `b05-008` — accord complet sur un item difficile, motif plus juste que l'étiquette
+
+| | 1 `exactitude_technique` | 2 `absence_de_bugs` | 3 `respect_consignes` | verdict |
+|---|---|---|---|---|
+| annotateur, premier passage | V | V | V | **PASS** |
+| étiquette | V | V | V | **PASS** |
+
+Cinquième accord consécutif, et le premier obtenu sur un des quatre items à difficulté réelle : `limite`,
+**verbeux**, cinq sections dont une rubrique « alternatives » non demandée — exactement le profil qui
+déclenche un rejet réflexe pour cause de longueur. L'annotateur ne l'a pas suivi. Aucune correction du corpus.
+
+**Point où le motif de l'annotateur dépasse l'étiquette.** L'étiquette qualifie les chiffres de « du bon
+ordre » ; l'annotateur écrit « exacts pour CPython ». Mesure faite sur CPython 3.12.0 :
+
+```
+avec __dict__  : objet 48 + dict 296 = 344 octets
+avec __slots__ : objet 48 octets            facteur 7,2
+sur 5 M d'instances : 1,48 Go          réponse : ~1,5 Go
+```
+
+Les 344 et 48 octets annoncés tombent à l'octet près, et l'extrapolation aussi. L'auteur de l'étiquette
+soupçonnait de surcroît, avant de mesurer, que 344 était un chiffre hérité de billets anciens et trop élevé
+pour un CPython récent : la mesure a corrigé l'auteur, pas l'annotateur. **Leçon : la couverture prudente
+(« du bon ordre ») n'est pas gratuite — elle masque une vérification qui était à portée de trois lignes.**
+
+**Nuance mesurée.** `getsizeof(obj.__dict__)` matérialise le dictionnaire, alors que depuis CPython 3.11 les
+attributs résident d'abord dans un tableau géré converti en `dict` seulement à l'accès. Une instance qui ne
+touche jamais `__dict__` coûte donc moins que 344 octets — mais les 48 octets de l'objet ne comptent pas non
+plus ce tableau. Les deux écarts se compensent grossièrement et le facteur annoncé tient. Sans effet sur l'étiquette.
+
+### État de la relecture
+
+- **Accord sur le verdict, premier passage : 8 / 9** — seul `b07-011` reste en désaccord.
+- **Désaccord au niveau contrôle : 1**, sur `b09-009`, tranché en faveur de l'annotateur et corrigé.
+- Items à difficulté réelle traités : 1 sur 4 (`b05-008`). Restent `b03-012`, `b07-015`, `b13-013`.
+
+### 10. `b13-012` — accord sur le verdict, désaccord sur `citations_exactes`
+
+| | 1 `affirmations_etayees` | 2 `absence_invention` | 3 `citations_exactes` | verdict |
+|---|---|---|---|---|
+| annotateur, premier passage | F | F | **F** | **FAIL** |
+| étiquette | F | F | **V** | **FAIL** |
+
+Premier item `RAG_FAITHFULNESS` de la relecture. Accord entier sur le fond — l'interface `Assistant`, ses
+deux signatures et le type `TokenStream` sont intégralement absents du contexte — et motif identique.
+Le désaccord porte sur le seul contrôle 3. Aucune correction du corpus.
+
+**Convention vérifiée sur l'ensemble du corpus, non inventée pour l'occasion.** Sur les onze items
+`RAG_FAITHFULNESS` où `affirmations_etayees` et `absence_invention` sont tous deux faux,
+`citations_exactes` vaut **V dix fois et F une seule**. L'unique F, `b12-014`, est le cas qui justifie la
+règle : cette sortie ne se contente pas d'inventer, elle **fabrique une citation** —
+`OllamaService -[IMPLEMENTS]-> PersistentStateComponent<OllamaService.State>` — alors que l'arête réelle
+porte `OllamaSettings` des deux côtés, y compris dans le paramètre de type. Elle présente donc un extrait
+réécrit comme preuve vérifiable.
+
+**Règle retenue :** `citations_exactes` ne sanctionne que la déformation de matériau réellement puisé dans
+le contexte. Quand la sortie ne cite ni ne paraphrase rien du contexte, le contrôle est vrai par vacuité.
+
+**Justification de conception.** Si l'invention faisait également tomber le contrôle 3, celui-ci serait
+strictement impliqué par le contrôle 2 et n'apporterait jamais d'information. Le corpus perdrait la
+distinction entre « invente » et « invente et maquille une preuve », qui est le degré au-dessus : le lecteur
+y est invité à vérifier et croit trouver confirmation. La convention inverse reste tenable, au prix de la
+réécriture de dix items et de la fusion de fait des contrôles 2 et 3. Position de l'annotateur consignée.
+
+### État de la relecture
+
+- **Accord sur le verdict, premier passage : 9 / 10** — seul `b07-011` reste en désaccord.
+- **Désaccords au niveau contrôle : 2** — `b09-009`, tranché en faveur de l'annotateur et corrigé dans le
+  corpus, et `b13-012`, où l'étiquette est maintenue, convention documentée à l'appui.
+- Items à difficulté réelle traités : 1 sur 4. Restent `b03-012`, `b07-015`, `b13-013`.
+
+### 11. `b07-015` — accord complet, et découverte d'une fuite déterministe
+
+| | 1 `exactitude_technique` | 2 `absence_de_bugs` | 3 `respect_consignes` | verdict |
+|---|---|---|---|---|
+| annotateur, premier passage | V | V | V | **PASS** |
+| étiquette | V | V | V | **PASS** |
+
+Sixième accord consécutif sur tous les contrôles. L'item se joue sur l'articulation exacte entre attente
+exponentielle et gigue — l'exponentielle seule espace les vagues sans les désynchroniser — et sur une demande
+non traitée, le disjoncteur, introduite par « si tu as le temps ». Aucune correction du corpus.
+
+**Réserve d'amorçage.** C'est le deuxième item de la relecture dont le point de bascule est une consigne
+facultative, après `b06-013`, et le motif de l'annotateur porte sur ce seul aspect. La règle appliquée est la
+bonne, mais un annotateur ayant retenu le raccourci de surface produirait la même réponse.
+
+### Fuite mesurée : la consigne facultative prédit parfaitement le verdict
+
+Balayage des 200 requêtes du corpus sur les tournures facultatives (« si tu as le temps », « si possible »,
+« éventuellement », « facultat… ») :
+
+```
+17 items portent une consigne facultative
+  cas      : limite  17 / 17
+  verdicts : PASS    17 / 17
+  formule  : « Si tu as le temps » dans 15 des 17
+```
+
+**Zéro contre-exemple.** Contrairement au biais de verbosité, corrélation statistique qu'il fallait éprouver
+par test de permutation, celle-ci est **déterministe** : aucun test n'est nécessaire, la règle de surface
+classe les 17 items sans erreur. Un juge n'a donc jamais besoin d'acquérir la notion de consigne facultative —
+détecter la chaîne suffit, et c'est le raccourci qu'un modèle apprend en premier, étant plus simple que la
+règle visée.
+
+Ces 17 items représentent par ailleurs 17 des 40 `limite` du corpus, soit la catégorie censée porter la
+difficulté.
+
+**Correctif pressenti, à chiffrer avant d'être proposé :** introduire des items portant une consigne
+facultative mais dont le verdict est FAIL pour une raison sans rapport — affirmation fausse, bug — de façon à
+briser la corrélation sans toucher aux 17 existants, et diversifier les formulations. Reste à établir leur
+répartition entre `train` et le golden set : si le golden en contient plusieurs, le benchmark est touché
+autant que l'entraînement.
+
+### État de la relecture
+
+- **Accord sur le verdict, premier passage : 10 / 11** — seul `b07-011` reste en désaccord.
+- **Désaccords au niveau contrôle : 2** — `b09-009` (corrigé en faveur de l'annotateur), `b13-012` (étiquette maintenue).
+- Items à difficulté réelle traités : 2 sur 4. Restent `b03-012`, `b13-013`.
+
+### Correctif de la fuite « consigne facultative » — exécuté
+
+Le correctif esquissé à la fiche `b07-015` a été mené en trois lots, sans créer ni supprimer aucun exemple
+et sans déplacer un seul verdict.
+
+| lot | contenu | items |
+|---|---|---|
+| 1 | diversification des formulations : les 15 « Si tu as le temps » deviennent six tournures | 12 réécritures |
+| 2 | clause facultative ajoutée à des FAIL existants, `<thinking>` repris à chaque fois | 12 (3 golden, 2 valid, 7 train) |
+| 3 | items où le volet facultatif est réellement **traité** | 3 |
+
+**Résultat mesuré.** La règle de surface « requête à clause facultative ⇒ PASS » passe de **17/17 (100 %)** à
+**17/30 (57 %)** sur le corpus et **3/6 (50 %)** sur le golden set, où elle ne vaut donc plus mieux qu'une
+pièce lancée.
+
+**Le lot 3 répond à un second raccourci**, distinct de la corrélation et plus insidieux : dans les 17 items
+d'origine, la clause facultative était *toujours ignorée* par la réponse. Un juge pouvait donc apprendre
+« une clause facultative est là pour être sautée » sans acquérir la notion. Les trois formes manquantes :
+`b02-008` traite les jours correctement et reste PASS ; `b06-009` traite les `Map` correctement et reste
+PASS ; `b10-011` traite `Cleaner` **faussement** — il lui prête l'exécution des actions à l'arrêt de la
+machine virtuelle, garantie inexistante — et le défaut tombe sur `exactitude_technique`, non sur
+`respect_consignes`, puisque la demande était facultative : c'est son contenu qui est faux, pas son omission.
+
+**Cinq candidats ont été refusés par le script plutôt que corrompus** : `b03-001` partage sa `consigne` avec
+une paire contrastive, et `b05-014`, `b06-005`, `b06-011`, `b07-012` traitaient déjà le sujet de la clause
+dans leur réponse, où la phrase « non traitée » aurait été fausse.
+
+**Invariants après correctif :** 200 exemples, 0 erreur de validation, 104 PASS / 96 FAIL, golden 24/26,
+tirage inchangé. Les onze relectures déjà faites restent valides.
+
+### 12. `b08-004` — accord complet sur un contrôle dédié de dépendance
+
+| | 1 `exactitude_technique` | 2 `absence_de_bugs` | 3 `respect_consignes` | 4 `aucune_dependance_externe` | verdict |
+|---|---|---|---|---|---|
+| annotateur, premier passage | V | V | V | **F** | **FAIL** |
+| étiquette | V | V | V | **F** | **FAIL** |
+
+Septième accord consécutif sur tous les contrôles, motif à l'appui : « le code est bon mais pydantic n'est
+pas dans la stdlib ». Aucune correction du corpus.
+
+L'item se joue sur l'articulation entre les contrôles 3 et 4. Le code écrit est valide — syntaxe Pydantic v2
+correcte, `field_validator` avec `@classmethod`, `default_factory` évitant le partage de liste — donc les
+contrôles 1 et 2 tiennent. La contrainte « bibliothèque standard uniquement » est une consigne de la requête,
+mais elle dispose d'un contrôle dédié, de sorte qu'elle ne retombe pas sur `respect_consignes`. L'annotateur
+a placé le défaut au seul endroit prévu pour lui et laissé les trois autres intacts.
+
+**Ce point valide la correction de périmètre décidée aux exemples 1 et 2 de la session 1.** Sans la formule
+`RESPECT_CONSIGNES_PERIMETRE_REDUIT`, ce même item aurait légitimement pu recevoir deux F pour un seul
+défaut, et le corpus aurait enseigné un double comptage.
+
+### État de la relecture
+
+- **Accord sur le verdict, premier passage : 11 / 12** — seul `b07-011` reste en désaccord.
+- **Désaccords au niveau contrôle : 2** — `b09-009` (corrigé en faveur de l'annotateur), `b13-012`
+  (étiquette maintenue, convention documentée).
+- Items à difficulté réelle traités : 2 sur 4. Restent `b03-012` et `b13-013`.
+
+### 13. `b03-012` — accord complet, et une erreur de présentation qui en réduit la portée
+
+| | 1 `exactitude_technique` | 2 `absence_de_bugs` | 3 `respect_consignes` | verdict |
+|---|---|---|---|---|
+| annotateur, premier passage | V | V | V | **PASS** |
+| étiquette | V | V | V | **PASS** |
+
+Huitième accord consécutif. Les sept affirmations vérifiables sont exactes, `--force-with-lease` compris,
+et le motif coïncide : « le `--onto` est sans obligation donc pas bloquant ». Aucune correction du corpus.
+
+**Réserve, imputable au présentateur.** Cet item devait établir que l'annotateur applique la *notion* de
+consigne facultative et non la chaîne « si tu as le temps », puisque sa formulation avait été réécrite en
+« sans obligation » au lot 1. Mais la présentation annonçait explicitement cette réécriture et précisait que
+« l'item teste donc la notion ». L'annotateur a donc été informé de ce qu'il fallait chercher. Le point
+demeure un accord ; il ne démontre plus la généralisation visée.
+
+C'est la troisième réserve de cette nature, après `b10-015` et `b07-015`. **Correctif : ne plus indiquer, en
+présentant un item, ce qu'il est censé tester.** La difficulté doit rester à découvrir.
+
+### Échantillon aléatoire des items faciles — tiré le 2026-09-17, graine 17
+
+Tiré parmi les 37 items du golden set ni relus ni classés difficiles, et **commité avant relecture du
+premier d'entre eux**, pour la même raison que le pré-enregistrement : sans tirage figé d'avance, rien
+n'empêche de choisir au fil de l'eau les items faciles qui arrangent.
+
+| item | verdict | cas | tâche |
+|---|---|---|---|
+| `b04-014` | FAIL | defaillant | explication |
+| `b07-005` | PASS | parfait | debogage |
+| `b07-008` | FAIL | defaillant | debogage, verbeux |
+| `b08-007` | PASS | parfait | debogage |
+| `b08-011` | FAIL | defaillant | question_reponse |
+| `b09-006` | FAIL | defaillant | generation |
+| `b09-014` | PASS | parfait | explication |
+| `b13-003` | FAIL | defaillant | retrieval (RAG_CONTEXT_RELEVANCE) |
+
+5 FAIL / 3 PASS, proche de la proportion du golden set. **Objet du sondage :** vérifier que ces items sont
+aussi séparables que leur `cas` le prétend. Un désaccord sur deux d'entre eux invaliderait l'affirmation
+« le reste du golden set est trivial » et imposerait d'élargir la relecture.
+
+### État de la relecture
+
+- **Accord sur le verdict, premier passage : 12 / 13** — seul `b07-011` reste en désaccord.
+- **Désaccords au niveau contrôle : 2** — `b09-009` (corrigé en faveur de l'annotateur), `b13-012`
+  (étiquette maintenue).
+- Items à difficulté réelle traités : **3 sur 4**. Reste `b13-013`.
+
+### 14. `b13-003` — accord complet, sur un point de mesure compromis
+
+| | 1 `contexte_pertinent` | 2 `contexte_suffisant` | 3 `bruit_maitrise` | verdict |
+|---|---|---|---|---|
+| annotateur, premier passage | F | F | F | **FAIL** |
+| étiquette | F | F | F | **FAIL** |
+
+Neuvième accord consécutif. Contraste net avec `b12-008`, où seule la suffisance tombait : ici les trois
+contrôles échouent, aucun extrait ne portant sur l'interface visée. Aucune correction du corpus.
+
+**Point de mesure compromis, signalé à l'annotateur avant sa réponse.** `b13-003` partage son contexte et sa
+requête avec `b13-012`, déjà relu : mêmes cinq extraits, même question. L'annotateur avait donc déjà établi
+que rien n'y concerne l'interface `Assistant`. Les deux items appartiennent à la même famille — le
+regroupement par contexte d'extraction les fait voyager ensemble dans le tirage, ce qui explique leur
+présence commune dans le golden set.
+
+L'item **n'a pas été échangé** contre un autre : le tirage avait été figé et commité précisément pour
+interdire de remplacer un item devenu gênant.
+
+**Conséquence à retenir pour la composition des sessions :** deux items d'une même famille RAG ne doivent
+pas être présentés à la suite, l'analyse du premier réglant le second.
+
+### 15. `b07-005` — accord complet, premier item de l'échantillon aléatoire
+
+| | 1 `exactitude_technique` | 2 `absence_de_bugs` | 3 `respect_consignes` | verdict |
+|---|---|---|---|---|
+| annotateur, premier passage | V | V | V | **PASS** |
+| étiquette | V | V | V | **PASS** |
+
+Dixième accord consécutif. Le motif de l'annotateur couvre les deux moitiés de l'item : le diagnostic
+d'épuisement du générateur, et la vérification que les deux corrections proposées sont elles-mêmes sans bug.
+C'est le piège propre à ce type d'exemple — valider l'explication et omettre de relire le code correctif.
+Aucune correction du corpus.
+
+**Premier point de l'échantillon aléatoire, et il se comporte comme prévu :** accord immédiat sur un item
+`parfait`, sans information sur la calibration de l'annotateur. C'est précisément ce qu'un sondage doit
+produire si l'hypothèse « le reste du golden set est trivialement séparable » est vraie. Ces points valent
+par leur accumulation, pas individuellement : c'est un désaccord qui serait informatif ici, pas un accord.
+
+### État de la relecture
+
+- **Accord sur le verdict, premier passage : 14 / 15** — seul `b07-011` reste en désaccord.
+- **Désaccords au niveau contrôle : 2** — `b09-009` (corrigé en faveur de l'annotateur), `b13-012`
+  (étiquette maintenue).
+- Items à difficulté réelle traités : 3 sur 4. Reste `b13-013`.
+- Échantillon aléatoire : 1 sur 8 relu.
+
+### 16. `b09-006` — accord complet, et première validation indépendante d'un rétrofit
+
+| | 1 `exactitude_technique` | 2 `absence_de_bugs` | 3 `respect_consignes` | verdict |
+|---|---|---|---|---|
+| annotateur, premier passage | F | F | F | **FAIL** |
+| étiquette | F | F | F | **FAIL** |
+
+Onzième accord consécutif, motif identique jusqu'au mécanisme : `RetentionPolicy.CLASS` conserve
+l'annotation dans le `.class` mais la machine virtuelle ne la charge pas, `isAnnotationPresent` renvoie
+`false`, et l'intercepteur ne journalise jamais rien, en silence. Aucune correction du corpus.
+
+Deux finesses tranchées correctement sans commentaire. **L'affirmation 3 de la réponse est vraie** — `CLASS`
+est bien la rétention par défaut : la réponse énonce un fait exact et s'en sert pour justifier un choix qui
+rend le dispositif inopérant, et l'annotateur n'a pas laissé le fait juste sauver le raisonnement faux.
+**`respect_consignes` tombe** parce que la requête exigeait explicitement une détection « à l'exécution »,
+consigne obligatoire violée, distincte du défaut technique.
+
+**Validation indépendante du lot 2.** `b09-006` est l'un des douze items rétrofités quelques heures plus
+tôt : sa clause « Accessoirement, dis un mot de `@Inherited` » a été ajoutée par le correctif de fuite, et
+la réponse ne la traite pas. L'annotateur, qui ignorait que cet item avait été modifié, n'en a pas fait
+état — correctement, la clause étant facultative. C'est la première vérification par un tiers non informé
+que la clause ajoutée ne dérègle pas le jugement et ne détourne pas l'attention du défaut réel.
+
+### État de la relecture
+
+- **Accord sur le verdict, premier passage : 15 / 16** — seul `b07-011` reste en désaccord.
+- **Désaccords au niveau contrôle : 2** — `b09-009` (corrigé en faveur de l'annotateur), `b13-012`
+  (étiquette maintenue).
+- Items à difficulté réelle traités : 3 sur 4. Reste `b13-013`.
+- Échantillon aléatoire : 2 sur 8 relus, 2 accords.
+
+### 17. `b09-014` — accord complet sur la hiérarchie des exceptions
+
+| | 1 `exactitude_technique` | 2 `absence_de_bugs` | 3 `respect_consignes` | verdict |
+|---|---|---|---|---|
+| annotateur, premier passage | V | V | V | **PASS** |
+| étiquette | V | V | V | **PASS** |
+
+Douzième accord consécutif. Aucune correction du corpus.
+
+Le point piégeux de l'item est l'affirmation 7 : `KeyboardInterrupt` et `SystemExit` dérivent de
+`BaseException` et non d'`Exception`, de sorte qu'`except Exception` les laisse passer là où un `except:`
+nu les intercepte. La réponse la rend exactement, et l'annotateur l'a relevée explicitement dans son motif
+— c'est la vérification qui distingue une lecture attentive d'un accord de principe sur une réponse bien
+écrite et bien structurée.
+
+### État de la relecture
+
+- **Accord sur le verdict, premier passage : 16 / 17** — seul `b07-011` reste en désaccord.
+- **Désaccords au niveau contrôle : 2** — `b09-009` (corrigé en faveur de l'annotateur), `b13-012`
+  (étiquette maintenue).
+- Items à difficulté réelle traités : 3 sur 4. Reste `b13-013`.
+- **Échantillon aléatoire : 3 sur 8 relus, 3 accords.** L'hypothèse « le reste du golden set est
+  trivialement séparable » n'est pas contredite à ce stade.
+
+### 18. `b07-008` — accord complet sur un fait exact au service d'une conclusion fausse
+
+| | 1 `exactitude_technique` | 2 `absence_de_bugs` | 3 `respect_consignes` | verdict |
+|---|---|---|---|---|
+| annotateur, premier passage | F | F | V | **FAIL** |
+| étiquette | F | F | V | **FAIL** |
+
+Treizième accord consécutif, et l'annotateur nomme le bon vecteur : `<img src=x onerror=alert(1)>` traverse
+le filtre par expression régulière sans rencontrer un seul `<script>`. Aucune correction du corpus.
+
+**Structure de l'item, identique à `b09-006`.** L'affirmation 3 est **vraie** — une balise `<script>`
+insérée via `innerHTML` n'est pas exécutée, la spécification le prévoit. Ce qui est faux, c'est l'inférence
+4 qu'on en tire (« le vecteur est donc largement neutralisé ») et la correction 5 qui en découle. Deux items
+du golden set partagent donc cette forme : un fait exact mis au service d'une conclusion dangereuse.
+`respect_consignes` reste à V, la requête demandant d'expliquer et de corriger — les deux ont été tentés.
+
+### Décision de méthode : l'annotateur peut et doit vérifier
+
+Question posée par l'annotateur à cet item : est-il légitime de faire des recherches pour répondre ?
+
+**Oui, et c'est requis**, depuis que le golden set a changé de rôle. Tant que la relecture était un sondage
+de contrôle des étiquettes, la recherche aurait biaisé la mesure. Mais le golden set sert désormais
+d'**étalon de référence** à toutes les variantes, y compris à un juge extérieur au corpus : un étalon doit
+être juste, pas rapide, et une étiquette de référence devinée ne vaut rien.
+
+**Seule interdiction : consulter l'étiquette ou le `<thinking>` de référence avant d'avoir répondu.**
+Vérifier un fait technique est légitime ; lire le raisonnement de référence détruirait l'indépendance.
+
+**À déclarer dans le REX :** le κ mesure alors l'accord entre une étiquette rédigée par un LLM et un expert
+humain disposant de temps et d'un moteur de recherche. C'est la comparaison pertinente pour un étalon, et
+elle doit être écrite explicitement plutôt que sous-entendue.
+
+### Nouvelle donnée collectée : « vérifié » contre « de tête »
+
+Le champ `cas` (`parfait` / `limite` / `defaillant`) a été attribué a priori par l'auteur des étiquettes, et
+le relevé a montré qu'il prédit le verdict presque parfaitement — il mesure donc mal la difficulté réelle.
+Le signalement par l'annotateur d'avoir dû vérifier un point constitue une **mesure de difficulté
+indépendante et humaine**, à collecter sur les items restants d'un mot (« vérifié » / « de tête »).
+
+Elle alimentera la métrique secondaire n°4 du pré-enregistrement — justesse sur la strate difficile —
+aujourd'hui adossée à un `cas` peu fiable.
+
+### État de la relecture
+
+- **Accord sur le verdict, premier passage : 17 / 18** — seul `b07-011` reste en désaccord.
+- **Désaccords au niveau contrôle : 2** — `b09-009` (corrigé), `b13-012` (étiquette maintenue).
+- Items à difficulté réelle traités : 3 sur 4. Reste `b13-013`.
+- Échantillon aléatoire : 4 sur 8 relus, 4 accords.
+
+### Report de `b13-013`, et limite de famille dans le golden set
+
+`b13-013`, dernier item classé difficile, partage sa famille `rag-ctx-assistant-neo4j` et son contexte
+(empreinte `8559f10c33bf`) avec `b13-012` et `b13-003`, tous deux déjà relus. La règle inscrite à la fiche
+`b13-003` interdit de l'enchaîner : il est reporté, et **restera compromis quel que soit le moment où il
+sera présenté**, l'annotateur ayant déjà analysé ce contexte deux fois. Il sera relu malgré tout, en tant
+que dernier item difficile, avec la réserve consignée.
+
+Le golden set contient donc **trois items adossés à un unique contexte RAG**. C'est l'effet voulu du
+regroupement par famille, qui supprime la fuite de contexte entre entraînement et test ; le prix en est une
+corrélation entre items de test, consignée en addendum daté du pré-enregistrement.
+
+### 19. `b08-007` — accord complet sur la pollution de prototype
+
+| | 1 `exactitude_technique` | 2 `absence_de_bugs` | 3 `respect_consignes` | verdict |
+|---|---|---|---|---|
+| annotateur, premier passage | V | V | V | **PASS** |
+| étiquette | V | V | V | **PASS** |
+
+Quatorzième accord consécutif. Aucune correction du corpus.
+
+Le motif de l'annotateur touche le point subtil de l'item sans avoir eu à le chercher : « issue de
+`JSON.parse` ». C'est exactement ce qui rend l'affirmation 2 vraie — `JSON.parse` crée `__proto__` comme
+propriété **propre et énumérable**, donc visible par `Object.keys`, là où un littéral d'objet passerait par
+l'accesseur et ne produirait aucune clé. Sans cette particularité, l'attaque décrite ne fonctionnerait pas,
+et la correction proposée n'aurait pas d'objet.
+
+Signal de difficulté (« vérifié » / « de tête ») : **non renseigné** pour cet item.
+
+### État de la relecture
+
+- **Accord sur le verdict, premier passage : 18 / 19** — seul `b07-011` reste en désaccord.
+- **Désaccords au niveau contrôle : 2** — `b09-009` (corrigé), `b13-012` (étiquette maintenue).
+- Items à difficulté réelle traités : 3 sur 4. Reste `b13-013`, reporté et compromis.
+- **Échantillon aléatoire : 5 sur 8 relus, 5 accords.**
+
+### 20. `b08-011` — le désaccord qui a révélé une fuite de mon fait
+
+| | 1 `exactitude_technique` | 2 `absence_de_bugs` | 3 `respect_consignes` | verdict |
+|---|---|---|---|---|
+| annotateur, premier passage | F | F | **F** | **FAIL** |
+| étiquette | F | F | **V** | **FAIL** |
+
+Accord sur le verdict, et l'analyse de fond de l'annotateur dépasse l'étiquette : `NoClassDefFoundError`
+dérive de `LinkageError` et signale un échec de résolution lors de la liaison sur une classe présente à la
+compilation, tandis que `ClassNotFoundException` provient d'un chargement dynamique explicite
+(`Class.forName`, `loadClass`). Le « distinguo historique » de la réponse est une invention.
+
+**Le désaccord sur le contrôle 3 n'est pas un écart de l'annotateur : il a révélé un défaut du corpus.**
+Le motif invoquait l'omission de la clause facultative, alors que la convention veut qu'une omission
+facultative n'entre pas dans `respect_consignes` — règle que l'annotateur avait appliquée correctement
+quatre fois. La cause était que `b08-011` est un item rétrofité, dont la clause avait été placée **en
+paragraphe séparé** au lieu d'une incise, ce qui la fait lire comme une seconde exigence.
+
+Mesure consécutive : les 17 items d'origine portaient tous la clause en incise et étaient tous PASS, les 13
+rétrofits la portaient tous en paragraphe isolé et étaient tous FAIL — une fuite déterministe à **30/30**,
+créée en corrigeant celle à 17/17. Détail complet au chantier 9 de `AUDIT.md`.
+
+**Étiquette maintenue à V sur le contrôle 3**, la convention étant inchangée. Le premier passage de
+l'annotateur est consigné tel quel, et la cause du désaccord est portée au débit du corpus, non au sien.
+
+### État de la relecture
+
+- **Accord sur le verdict, premier passage : 19 / 20.**
+- **Désaccords au niveau contrôle : 3** — `b09-009` (corrigé en faveur de l'annotateur), `b13-012`
+  (étiquette maintenue, convention documentée), `b08-011` (étiquette maintenue, corpus corrigé).
+- Échantillon aléatoire : 6 sur 8 relus. Reste `b04-014`, puis `b13-013` reporté.
+
+### 21. `b13-013` — accord complet sur une abstention, dernier item difficile
+
+| | 1 `affirmations_etayees` | 2 `absence_invention` | 3 `citations_exactes` | verdict |
+|---|---|---|---|---|
+| annotateur, premier passage | V | V | V | **PASS** |
+| étiquette | V | V | V | **PASS** |
+
+Quinzième accord consécutif, et **les quatre items à difficulté réelle sont désormais couverts**
+(`b05-008`, `b07-015`, `b03-012`, `b13-013`). Aucune correction du corpus.
+
+Le motif de l'annotateur nomme le pivot de l'item : l'abstention est « justifiée à partir des extraits
+disponibles ». C'est ce qui sauve `affirmations_etayees` — une abstention n'est pas étayée d'office, elle
+l'est ici parce que l'inventaire des cinq extraits est exact et vérifiable point par point.
+
+**Paire pédagogique avec `b13-012`, sur un contexte identique.** Là, la sortie fabriquait l'interface
+entière et échouait ; ici, elle écarte explicitement `ConversationMessage.assistant(String)` comme homonyme
+trompeur au lieu de l'exploiter. Le corpus enseigne donc les deux faces de la même situation : ce que la
+corrélation de familles coûte en indépendance statistique, elle le rapporte en valeur d'apprentissage.
+
+**Réserve maintenue :** troisième item bâti sur ce contexte, après `b13-012` et `b13-003`. Point de mesure
+compromis, signalé à l'annotateur avant sa réponse.
+
+### État de la relecture
+
+- **Accord sur le verdict, premier passage : 20 / 21.**
+- **Désaccords au niveau contrôle : 3** — `b09-009` (corrigé en faveur de l'annotateur), `b13-012` et
+  `b08-011` (étiquettes maintenues).
+- **Items à difficulté réelle : 4 sur 4, terminés.**
+- Échantillon aléatoire : 7 sur 8. Reste `b04-014`, dernier item avant le calcul du κ.
+
+### 22. `b04-014` — accord sur le verdict, désaccord de contrôle identique à `b08-011`
+
+| | 1 `exactitude_technique` | 2 `absence_de_bugs` | 3 `respect_consignes` | verdict |
+|---|---|---|---|---|
+| annotateur, premier passage | F | F | **F** | **FAIL** |
+| étiquette | F | F | **V** | **FAIL** |
+
+Sur le fond, accord entier : la réponse inverse la règle d'idempotence de la RFC 9110 — `PUT` **est**
+idempotent, `POST` ne l'est pas — et le conseil final, rejouer les `POST` et bloquer les `PUT`, est dangereux
+à l'envers. Aucune correction du corpus.
+
+**Le troisième F invoque à nouveau l'omission d'une demande facultative**, comme à `b08-011`. Mais
+l'explication retenue là-bas ne s'applique plus : `b04-014` est un item rétrofité **dont la clause a été
+remise en incise** au correctif du chantier 9. Elle se lit désormais comme celles des items d'origine, donc
+le placement n'est plus en cause.
+
+Deux lectures soumises à l'annotateur, aux conséquences opposées : soit il **énumère** les griefs sur un item
+déjà FAIL sans les attribuer à un contrôle précis — cohérent avec ses six items PASS, où aucune omission
+facultative n'a jamais fait basculer un verdict, et sans conséquence sur le corpus ; soit il **récuse la
+convention**, et il faut alors réécrire une dizaine d'items et la règle de `PROTOCOLE.md`. **Réponse en
+attente ; l'étiquette n'est pas modifiée entre-temps.**
+
+---
+
+## κ inter-annotateur — calculé le 2026-09-17 sur 21 items
+
+```
+items relus du golden set : 21 / 50  (42 %)
+accord observé sur le verdict : 20/21 = 95,2 %
+κ de Cohen : 0,901        IC 95 % bootstrap [0,674 — 1,000]
+
+matrice de confusion (verdict)
+  annotateur PASS / étiquette PASS : 8
+  annotateur PASS / étiquette FAIL : 1     (b07-011)
+  annotateur FAIL / étiquette PASS : 0
+  annotateur FAIL / étiquette FAIL : 12
+```
+
+`b03-007` est exclu du calcul : relu avant le retirage, il ne fait plus partie du golden set.
+
+**Lecture honnête de ces chiffres.**
+
+1. **L'intervalle est large.** La borne basse à 0,674 interdit d'affirmer un accord « quasi parfait » plutôt
+   que « substantiel ». C'est la limite de puissance prévue au pré-enregistrement ; porter la relecture à 50
+   items resserrerait l'intervalle d'environ moitié.
+2. **Le κ sur le verdict flatte.** L'accord **complet, contrôle par contrôle**, vaut **16/21 = 76 %** :
+   4 items portent au moins un désaccord de contrôle (`b09-009`, `b13-012`, `b08-011`, `b04-014`). Le verdict
+   est robuste, l'attribution du défaut au bon contrôle l'est nettement moins. C'est ce second chiffre qui
+   doit figurer en premier dans le REX.
+3. **Trois des quatre écarts portent sur le même point** — l'imputation d'une omission facultative à
+   `respect_consignes` — donc il s'agit d'un désaccord unique répété, non de quatre erreurs indépendantes.
+4. **Ce κ est un majorant.** Les items sont présentés à l'annotateur avec les affirmations déjà isolées dans
+   un tableau, ce qui constitue une aide réelle. Un annotateur lisant la sortie brute ferait vraisemblablement
+   moins bien. À déclarer dans le REX.
+
+### État de la relecture
+
+- **21 items relus sur 50**, accord verdict 20/21, accord complet 16/21.
+- **Items à difficulté réelle : 4 sur 4, terminés.**
+- **Échantillon aléatoire : 8 sur 8, terminé** — aucun désaccord de verdict. L'hypothèse « le reste du golden
+  set est trivialement séparable » n'est pas contredite.
+- En attente : arbitrage de l'annotateur sur la convention de `respect_consignes`.
+
+---
+
+## Arbitrage à froid — 2026-09-18
+
+**Question posée** (reportée de la veille, à dessein) : sur `b08-011` et `b04-014`, l'annotateur avait marqué
+`respect_consignes` faux en invoquant l'omission d'une demande introduite par « Accessoirement » / « En
+bonus ». Énumération de griefs sur un item déjà FAIL, ou récusation de la convention ?
+
+**Réponse, rendue en début de séance et non en fin :** erreur d'inattention. La convention est confirmée —
+une demande facultative ignorée n'entre pas dans `respect_consignes`.
+
+**Conséquences.**
+
+- **Aucune modification du corpus.** Les deux étiquettes sont maintenues, la convention de `PROTOCOLE.md`
+  est inchangée, et la dizaine d'items qu'une récusation aurait imposé de réécrire est épargnée.
+- **Les premiers passages restent consignés tels quels.** Ils comptent pour le κ, fatigue comprise :
+  l'accord complet contrôle par contrôle demeure **16/21 = 76 %**, et l'accord verdict **20/21**. Corriger
+  rétroactivement le premier passage donnerait un chiffre flatteur et faux.
+- **Les trois désaccords de contrôle sur `respect_consignes` sont donc un désaccord unique répété**, dû à
+  l'inattention et non à une divergence de fond. À dire tel quel dans le REX.
+
+**Ce que cet arbitrage valide, au-delà de son contenu.** Le protocole à deux colonnes — premier passage pour
+le κ, arbitrage à froid pour l'étiquette — a été adopté la veille en réponse à la question « la fatigue de
+l'annotateur est-elle un aléa acceptable ? ». C'est sa première mise à l'épreuve, et elle confirme la
+distinction : le même relecteur, sur le même item, a jugé différemment selon son état, et c'est le passage à
+froid qui fixe l'étalon tandis que le passage fatigué reste dans la mesure de reproductibilité.
+
+## Session 3 — reprise pendant l'entraînement du 14B
+
+### 23. `b02-002` — accord complet, point non indépendant
+
+| | 1 `exactitude_technique` | 2 `absence_de_bugs` | 3 `respect_consignes` | verdict |
+|---|---|---|---|---|
+| annotateur, premier passage | V | V | V | **PASS** |
+| étiquette | V | V | V | **PASS** |
+
+Accord sur les trois contrôles et le verdict. Motif concordant : requête paramétrée, API `sqlite3`
+standard, ni bug ni injection. Aucune correction du corpus.
+
+**Réserve : point non indépendant.** `b02-002` forme une paire contrastive avec `b02-001`, déjà relu,
+dont il partage l'énoncé mot pour mot — l'annotateur y avait jugé la version vulnérable à l'injection.
+Divulgué avant sa réponse. Même traitement que `b13-003` et `b13-013`.
+
+### État de la relecture
+
+- **Accord sur le verdict, premier passage : 21 / 22.**
+- **Désaccords au niveau contrôle : 3** — `b09-009` (corrigé en faveur de l'annotateur), `b13-012` et
+  `b08-011` (étiquettes maintenues ; l'arbitrage à froid du 2026-09-18 a confirmé la convention).
+- **22 items relus sur 50**, 28 restants.
+
+### 24. `b07-002` — accord complet sur un interblocage par verrous croisés
+
+| | 1 `exactitude_technique` | 2 `absence_de_bugs` | 3 `respect_consignes` | verdict |
+|---|---|---|---|---|
+| annotateur, premier passage | F | F | V | **FAIL** |
+| étiquette | F | F | V | **FAIL** |
+
+Seizième accord consécutif sur tous les contrôles. Le motif de l'annotateur — « le vrai problème est un
+interblocage par verrous croisés » — nomme exactement ce que l'étiquette développe : un verrou équitable
+ordonne les prétendants à un même verrou, il ne supprime pas la dépendance circulaire entre deux verrous
+distincts. Aucune correction du corpus.
+
+`respect_consignes` correctement laissé à V : la requête demandait d'expliquer et de corriger, les deux
+ont été tentés.
+
+**Nuance sans effet sur les cases.** L'étiquette relève un second défaut que le motif de l'annotateur ne
+mentionne pas : le code proposé supprime bien l'interblocage, mais en remplaçant les verrous par instance
+par un verrou unique global, ce qui sérialise tous les virements du service et échange le gel contre un
+goulot d'étranglement — précisément sous la charge qui motivait la question. Les deux défauts relèvent de
+`absence_de_bugs`, la case est donc identique.
+
+### État de la relecture
+
+- **Accord sur le verdict, premier passage : 22 / 23.**
+- **Désaccords au niveau contrôle : 3**, inchangé.
+- **23 items relus sur 50**, 27 restants.
+
+### 25. `b06-014` — accord complet, et une imprécision manquée des deux côtés
+
+| | 1 `exactitude_technique` | 2 `absence_de_bugs` | 3 `respect_consignes` | verdict |
+|---|---|---|---|---|
+| annotateur, premier passage | V | V | V | **PASS** |
+| étiquette | V | V | V | **PASS** |
+
+Dix-septième accord consécutif. Les deux réfutations demandées sont exactes — inférence à la compilation,
+bytecode identique — et le recentrage sur la lisibilité est pertinent. Aucune correction du corpus.
+
+**Réserve portée contre l'étiquette elle-même.** La réponse affirme que `var` ne s'applique « jamais aux
+champs ni aux paramètres ». C'est exact pour les paramètres de méthode, **inexact pour les paramètres de
+lambda**, autorisés depuis Java 11 sous la forme `(var x, var y) -> …`. Le `<thinking>` de référence ne
+mentionne pas les lambdas — vérifié, aucune occurrence — et l'annotateur ne l'a pas relevé davantage.
+
+L'imprécision est mineure et ne renverse pas le verdict : la question posée portait sur deux arguments
+précis, tous deux correctement réfutés. Mais elle est consignée, **parce qu'un accord peut être un accord
+sur une inattention commune** — et c'est précisément ce que le κ ne distingue pas d'un accord éclairé.
+À verser au REX comme limite de la mesure d'accord inter-annotateur.
+
+### État de la relecture
+
+- **Accord sur le verdict, premier passage : 23 / 24.**
+- **Désaccords au niveau contrôle : 3**, inchangé.
+- **24 items relus sur 50**, 26 restants.
+- **Inattentions communes repérées : 1** (`b06-014`).
+
+### 26. `b03-014` — accord sur le verdict, désaccord total sur l'attribution
+
+| | 1 `exactitude_technique` | 2 `absence_de_bugs` | 3 `respect_consignes` | verdict |
+|---|---|---|---|---|
+| annotateur, premier passage | V | V | **F** | **FAIL** |
+| étiquette | **F** | **F** | V | **FAIL** |
+
+Même verdict, attribution inversée sur les trois contrôles — cas unique du journal à ce jour.
+
+**Sur le fond, accord complet.** Le motif de l'annotateur — « asyncio ne fait pas de parallélisme, le GIL
+reste » — est exactement le diagnostic de l'étiquette : la boucle est mono-thread, l'ordonnanceur du système
+ne répartit pas des coroutines, et le gain vient du recouvrement des attentes d'entrées-sorties.
+
+**Tension interne à la réponse de l'annotateur.** Le défaut qu'il nomme est une affirmation technique fausse
+de la sortie — la section sur les cœurs, la conclusion validant le collègue, et la coche « oui » du tableau
+récapitulatif. Le critère 1 exigeant que « chaque affirmation technique de la sortie soit vraie », il devrait
+tomber. Il a pourtant été laissé à V, et `respect_consignes` marqué F alors que la requête demandait
+d'expliquer et que la réponse a expliqué — faussement. **Un contenu faux n'est pas une consigne non suivie**,
+articulation que l'annotateur avait correctement tranchée à `b08-004`.
+
+**Quatrième désaccord d'attribution, troisième de cette forme** : défaut correctement identifié en prose,
+placé sur le mauvais contrôle. Mis en file pour **arbitrage à froid**, comme celui du 2026-09-18. L'enjeu
+est réel : si `respect_consignes` est lu comme « la réponse doit être correcte », c'est une divergence de
+convention qui touche un grand nombre d'items et impose une reprise du corpus. Si c'est un glissement
+d'attribution sur un item déjà FAIL, rien ne change.
+
+**Premier passage consigné tel quel, sans révision demandée** — il compte pour le κ, conformément au
+protocole à deux colonnes.
+
+### État de la relecture
+
+- **Accord sur le verdict, premier passage : 24 / 25.**
+- **Désaccords au niveau contrôle : 4** — `b09-009` (corrigé), `b13-012`, `b08-011`, `b03-014`.
+- **25 items relus sur 50**, 25 restants. Mi-parcours.
+- Inattentions communes repérées : 1 (`b06-014`).
+- **En attente d'arbitrage à froid :** lecture de `respect_consignes` face à une affirmation fausse.
+
+### 27. `b09-011` — accord complet sur la charge de la preuve
+
+| | 1 `exactitude_technique` | 2 `absence_de_bugs` | 3 `respect_consignes` | verdict |
+|---|---|---|---|---|
+| annotateur, premier passage | V | V | V | **PASS** |
+| étiquette | V | V | V | **PASS** |
+
+Dix-huitième accord consécutif. Le motif de l'annotateur nomme le pivot exact de l'item — le **refus par
+défaut** — qui est ce qui sépare réellement les deux approches, davantage que l'énumération des
+contournements. Les deux réserves finales de la réponse, sur l'échappement contextuel et sur l'inutilité
+d'un contrôle côté client, sont relevées. Aucune correction du corpus.
+
+Note de provenance : `b09-011` fait partie des huit réponses ayant reçu des titres `##` le 2026-09-19 lors
+du correctif de la fuite de mise en forme. L'item n'avait jamais été relu, donc aucune mesure n'est
+invalidée, et la modification est purement typographique — aucun mot du contenu n'a changé.
+
+### État de la relecture
+
+- **Accord sur le verdict, premier passage : 25 / 26.**
+- **Désaccords au niveau contrôle : 4**, inchangé.
+- **26 items relus sur 50**, 24 restants.
+
+### 28. `b10-003` — accord verdict, désaccord sur les contrôles 1 et 2
+
+| | 1 `exactitude_technique` | 2 `absence_de_bugs` | 3 `respect_consignes` | verdict |
+|---|---|---|---|---|
+| annotateur, premier passage | V | V | **F** | **FAIL** |
+| étiquette | **F** | **F** | **F** | **FAIL** |
+
+**Diagnostic de l'annotateur exact et complet** : `compareTo` ignore le mineur, `TreeSet` détermine
+l'appartenance par `compareTo` et non par `equals`, donc `Version(1,0)` et `Version(1,5)` produisent un
+ensemble de taille 1 et une version est perdue silencieusement. Aucune correction du corpus.
+
+**Mais un bug décrit en prose, avec `absence_de_bugs` laissé à V.** « Supprimer à tort les versions
+suivantes » est un bug logique, définition même du contrôle 2. Et le tableau de la réponse affirme que
+`TreeSet` élimine les doublons « via `equals` », ce qui est faux : affirmation technique inexacte,
+donc contrôle 1 également.
+
+**Cinquième désaccord d'attribution, quatrième de cette forme, deuxième consécutif après `b03-014`.**
+La récurrence a conduit à **suspendre la présentation d'items** plutôt qu'à accumuler des points de mesure
+ininterprétables : une clarification immédiate protège les 24 items restants, là où un arbitrage à froid
+différé porterait sur vingt-quatre points ambigus.
+
+Deux lectures soumises à l'annotateur :
+
+- **A** — `respect_consignes` est employé comme contrôle-chapeau, « la réponse ne fait pas ce qu'on attend
+  d'elle », les contrôles 1 et 2 étant réservés à ce qui se vérifie sans référence à la requête. Divergence
+  réelle sur la rubrique : impose de réécrire la définition des contrôles dans `PROTOCOLE.md` ou de
+  reprendre les items concernés.
+- **B** — glissement d'attribution sur des items déjà FAIL, où le verdict ne change pas et où l'énumération
+  prend le pas sur le classement. Sans conséquence sur le corpus.
+
+**Convention en vigueur, rappelée à l'annotateur :** les trois contrôles sont **indépendants et
+cumulatifs**, un même défaut pouvant en faire tomber plusieurs. Affirmation fausse → contrôle 1 ;
+comportement fautif observable → contrôle 2 ; consigne explicite non honorée → contrôle 3.
+
+Premier passage consigné tel quel dans les deux cas — il compte pour le κ.
+
+### État de la relecture
+
+- **Accord sur le verdict, premier passage : 26 / 27.**
+- **Désaccords au niveau contrôle : 5** — `b09-009` (corrigé), `b13-012`, `b08-011`, `b03-014`, `b10-003`.
+- **27 items relus sur 50**, 23 restants. **Présentation suspendue** dans l'attente de la clarification.
+
+### Clarification de convention — 2026-09-19, en séance
+
+**Question posée** après le cinquième désaccord d'attribution : une affirmation fausse ou un comportement
+fautif relèvent-ils de `respect_consignes` (lecture A, contrôle-chapeau), ou des contrôles 1 et 2, le
+contrôle 3 étant réservé aux consignes explicitement formulées dans la requête (lecture B) ?
+
+**Réponse de l'annotateur : B.** La convention du corpus est confirmée. Les trois contrôles sont
+indépendants et cumulatifs ; `respect_consignes` ne couvre que les consignes explicites — format imposé,
+contrainte de dépendance, définition donnée dans l'énoncé.
+
+**Conséquences.**
+
+- **Aucune modification du corpus.** `PROTOCOLE.md` est inchangé, aucun item n'est repris.
+- `b03-014` et `b10-003` sont donc des **glissements d'attribution** sur des items déjà FAIL, non une
+  divergence de fond. L'annotateur avait appliqué B correctement une dizaine de fois auparavant —
+  `b02-001`, `b07-002`, `b07-008`, `b09-006` — avant deux écarts consécutifs.
+- **Les premiers passages restent consignés tels quels** et comptent pour le κ, conformément au protocole
+  à deux colonnes. Corriger rétroactivement produirait un chiffre flatteur et faux.
+- **Présentation reprise** à l'item 7 de la session 3.
+
+**Ce que cet épisode vaut pour le REX.** Suspendre après deux désaccords consécutifs de même forme a coûté
+une question et deux minutes ; le même doute, découvert après vingt-quatre items supplémentaires, aurait
+rendu ces vingt-quatre points ininterprétables. C'est le pendant de la leçon du chantier 9 : on arrête dès
+que la mesure devient douteuse, on ne l'accumule pas en espérant trancher plus tard.
+
+### 29. `b03-004` — accord complet sur un pool de workers Go
+
+| | 1 `exactitude_technique` | 2 `absence_de_bugs` | 3 `respect_consignes` | verdict |
+|---|---|---|---|---|
+| annotateur, premier passage | V | V | V | **PASS** |
+| étiquette | V | V | V | **PASS** |
+
+Dix-neuvième accord consécutif, et premier item depuis la clarification de convention. Le motif de
+l'annotateur nomme le patron — producteur / workers / fan-in — et la **fermeture des canaux**, qui est
+le seul endroit où ce motif casse : `close(jobs)` par le producteur libère les `range` des workers, et
+`close(results)` après `wg.Wait()` évite à la fois l'envoi sur canal fermé et la boucle de lecture
+inatteignable. Les trois exigences de la requête sont couvertes, tri croissant compris, et `sync` comme
+`sort` relèvent de la bibliothèque standard. Aucune correction du corpus.
+
+Seul item en Go du golden set.
+
+### État de la relecture
+
+- **Accord sur le verdict, premier passage : 27 / 28.**
+- **Désaccords au niveau contrôle : 5**, inchangé.
+- **28 items relus sur 50**, 22 restants — dont les 8 items RAG, gardés pour un bloc final parce que
+  plusieurs partagent leur contexte d'extraction.
+
+### 30. `b06-008` — l'annotateur corrige l'étiquette, et déclenche un audit du corpus
+
+| | 1 `exactitude_technique` | 2 `absence_de_bugs` | 3 `respect_consignes` | verdict |
+|---|---|---|---|---|
+| annotateur, premier passage | F | F | **V** | **FAIL** |
+| étiquette d'origine | F | F | **F** | **FAIL** |
+| **étiquette corrigée** | F | F | **V** | **FAIL** |
+
+Diagnostic de l'annotateur exact : ajouter `T00:00:00` fait passer l'analyse d'UTC à l'heure locale, si
+bien que `2026-03-01` devient `2026-02-28T23:00:00Z` sur un poste à UTC+1 — le correctif introduit le
+décalage qu'il prétend supprimer.
+
+**Sur le contrôle 3, l'annotateur avait raison et l'étiquette avait tort.** La requête disait « explique
+et corrige » : la réponse a fait les deux, mal. L'auteur des étiquettes avait lui-même soutenu la veille,
+à `b03-014`, qu'un contenu faux n'est pas une consigne non suivie — et son étiquette contredisait sa
+propre convention. **Étiquette corrigée.**
+
+Imprécision relevée dans le motif de l'annotateur, sans effet sur les cases : il écrit que la réponse
+« omet le remplissage par zéro », alors qu'elle le traite plus loin avec `padStart`. La lecture tient si
+l'on vise le premier correctif, qui conserve le gabarit non rempli.
+
+**Ce désaccord a déclenché un audit des 17 items portant `respect_consignes = faux`** : huit étaient
+incohérents avec la convention et ont été corrigés, neuf conservés. Détail et effets dans
+`PREENREGISTREMENT.md`, amendement du 2026-09-20. Six corrections touchant `train`, l'adaptateur du
+2026-09-19 est périmé et l'entraînement a été relancé.
+
+### 31. `b07-014` — accord complet sur le protocole `__exit__`
+
+| | 1 `exactitude_technique` | 2 `absence_de_bugs` | 3 `respect_consignes` | verdict |
+|---|---|---|---|---|
+| annotateur, premier passage | V | V | V | **PASS** |
+| étiquette | V | V | V | **PASS** |
+
+Vingtième accord consécutif sur tous les contrôles. Le motif relève les deux points qui font la valeur de
+la réponse — le triplet reçu par `__exit__` et l'absorption silencieuse sur retour vrai — c'est-à-dire la
+seconde question de la requête, celle qu'une réponse superficielle expédie. Aucune correction du corpus.
+
+### État de la relecture
+
+- **30 items relus sur 50**, 20 restants — dont les 8 RAG, gardés pour un bloc final.
+- **Accord sur le verdict, premier passage : 29 / 30.** Seul `b07-011` reste en désaccord.
+- **Désaccords au niveau contrôle : 6** — `b09-009` et `b06-008` **perdus par l'auteur des étiquettes et
+  corrigés dans le corpus** ; `b13-012`, `b08-011`, `b03-014`, `b10-003` où l'étiquette est maintenue.
+- Inattentions communes repérées : 1 (`b06-014`).
+
+### 32. `b01-005` — désaccord de contrôle provoqué par la présentation
+
+| | 1 `exactitude_technique` | 2 `absence_de_bugs` | 3 `respect_consignes` | verdict |
+|---|---|---|---|---|
+| annotateur, premier passage | F | F | **F** | **FAIL** |
+| étiquette | F | F | **V** | **FAIL** |
+
+Accord entier sur le fond. Le motif de l'annotateur — « confond visibilité et atomicité » — est le
+diagnostic de l'étiquette en plus court : `count++` est une séquence `getfield` / `iadd` / `putfield`, et
+la « barrière mémoire commune » invoquée par la réponse n'existe pas dans la JVM. Aucune correction du
+corpus : le `<thinking>` de référence dit explicitement « sur la forme, toutes les parties de la consigne
+sont traitées », donc `respect_consignes` vaut bien V sous la convention confirmée le 2026-09-20.
+
+**Ce désaccord est imputable au présentateur, et n'est pas porté au débit de l'annotateur.** Le critère 3
+lui a été présenté ainsi : « la requête pose **trois demandes explicites** : expliquer, trancher, proposer
+une alternative ». Le mot *explicites* est exactement le déclencheur de `respect_consignes` dans la
+convention. La formulation désignait la réponse attendue.
+
+**Correctif de présentation, applicable immédiatement :** décrire ce que la requête demande, sans jamais
+qualifier ces demandes d'explicites ou d'implicites — c'est précisément le jugement que l'annotateur doit
+rendre, et le lui souffler vide l'item de sa valeur de mesure.
+
+Deuxième faute de ce type après `b03-012`, où la présentation avait annoncé ce que l'item était censé
+tester. Le correctif d'alors — ne pas dire ce qu'un item teste — était trop étroit : il faut aussi
+s'interdire de qualifier les éléments sur lesquels porte le jugement.
+
+### État de la relecture
+
+- **31 items relus sur 50**, 19 restants.
+- **Accord sur le verdict, premier passage : 30 / 31.**
+- **Désaccords au niveau contrôle : 7** — dont `b09-009` et `b06-008` perdus par l'auteur des étiquettes
+  et corrigés, et **`b01-005` provoqué par la présentation**, donc non imputable à l'annotateur.
+- Inattentions communes : 1 (`b06-014`). Désaccords induits par la présentation : 1 (`b01-005`).
+
+### 33. `b08-003` — accord complet sur les imports circulaires
+
+| | 1 `exactitude_technique` | 2 `absence_de_bugs` | 3 `respect_consignes` | verdict |
+|---|---|---|---|---|
+| annotateur, premier passage | V | V | V | **PASS** |
+| étiquette | V | V | V | **PASS** |
+
+Vingt-et-unième accord consécutif. Le motif nomme le point exact — les **modules partiellement
+initialisés dans `sys.modules`** — qui est le détail dont dépend tout l'item : l'inscription du module
+avant l'exécution de son corps évite la récursion infinie mais expose un objet incomplet, d'où
+l'`AttributeError`. Les trois corrections sont valides et correctement hiérarchisées, l'extraction d'un
+module tiers étant la seule qui supprime le cycle au lieu de l'accommoder. Aucune correction du corpus.
+
+Premier item présenté avec le correctif adopté à `b01-005` : le critère 3 est décrit sans qualifier les
+demandes de la requête d'explicites ou d'implicites.
+
+### État de la relecture
+
+- **32 items relus sur 50**, 18 restants — dont les 8 RAG, gardés pour un bloc final.
+- **Accord sur le verdict, premier passage : 31 / 32.**
+- **Désaccords au niveau contrôle : 7**, inchangé.
+
+### 34. `b03-003` — sixième glissement d'attribution, présentation neutre cette fois
+
+| | 1 `exactitude_technique` | 2 `absence_de_bugs` | 3 `respect_consignes` | verdict |
+|---|---|---|---|---|
+| annotateur, premier passage | F | F | **F** | **FAIL** |
+| étiquette | F | F | **V** | **FAIL** |
+
+Diagnostic de l'annotateur complet et exact, correctifs valides compris : `await items.forEach(...)`
+attend `undefined`, donc une micro-tâche, et n'attend aucune des promesses internes ; les formes correctes
+sont `await Promise.all(items.map(save))` ou une boucle `for...of` avec `await`. Aucune correction du
+corpus.
+
+Sur le contrôle 3, la convention donne V : la requête demandait d'expliquer et de corriger, et la réponse
+a fait les deux — son explication est même **exacte**, seul le correctif est inopérant, ce que mesurent
+les contrôles 1 et 2.
+
+**Différence décisive avec `b01-005` : la présentation était neutre.** Le critère 3 avait été énoncé
+« la requête demande d'expliquer et de corriger », sans qualifier ces demandes. Le glissement n'est donc
+imputable ni à la formulation, ni à un désaccord de fond — l'annotateur a explicitement confirmé la
+convention la veille, et huit étiquettes ont été corrigées sur cette base.
+
+**Constat à verser au REX :** énoncer une convention ne suffit pas à la faire appliquer, même par
+quelqu'un qui vient de la valider. Six occurrences du même réflexe, dont quatre après la clarification.
+La rubrique doit être **sous les yeux au moment du jugement**, pas dans la mémoire.
+
+**Correctif de protocole adopté :** à partir de l'item suivant, l'annotateur reçoit les trois critères
+dans leur **texte intégral**, celui que le modèle reçoit dans son invite, et non une reformulation. Cela
+ne souffle aucune réponse — le juge dispose de la même rubrique — et rend la relecture plus fidèle au
+protocole qu'elle mesure.
+
+### État de la relecture
+
+- **33 items relus sur 50**, 17 restants — dont les 8 RAG.
+- **Accord sur le verdict, premier passage : 32 / 33.**
+- **Désaccords au niveau contrôle : 8.** Deux perdus par l'auteur des étiquettes et corrigés
+  (`b09-009`, `b06-008`), un provoqué par la présentation (`b01-005`), **six relevant du même glissement
+  d'attribution** sur `respect_consignes`.
+
+### 35. `b04-013` — accord complet sur le modèle mémoire Java
+
+| | 1 `exactitude_technique` | 2 `absence_de_bugs` | 3 `respect_consignes` | verdict |
+|---|---|---|---|---|
+| annotateur, premier passage | V | V | V | **PASS** |
+| étiquette | V | V | V | **PASS** |
+
+Vingt-deuxième accord consécutif, et **premier item présenté avec le texte intégral des critères** adopté
+à `b03-003`. Le motif nomme les deux points qui font la valeur de la réponse : les **champs d'objets**,
+contre-exemple qui suffit à défaire le mythe « primitif = pile », et l'**analyse d'échappement**, qui
+montre que la règle ne tient pas davantage au niveau de l'implémentation. Aucune correction du corpus.
+
+### État de la relecture
+
+- **34 items relus sur 50**, 16 restants — dont les 8 RAG, gardés pour un bloc final.
+- **Accord sur le verdict, premier passage : 33 / 34.**
+- **Désaccords au niveau contrôle : 8**, inchangé.
+
+### 36. `b04-002` — accord complet, y compris sur le contrôle le plus disputé
+
+| | 1 `exactitude_technique` | 2 `absence_de_bugs` | 3 `respect_consignes` | verdict |
+|---|---|---|---|---|
+| annotateur, premier passage | F | F | **F** | **FAIL** |
+| étiquette | F | F | **F** | **FAIL** |
+
+Vingt-troisième accord consécutif. Diagnostic identique : `Arrays.asList` renvoie une vue **de taille
+fixe** et non une liste immuable — `add` et `remove` lèvent, mais `set` écrit dans le tableau sous-jacent.
+Les deux corrections citées par l'annotateur, `List.copyOf` et `Collections.unmodifiableList`, sont celles
+de l'étiquette. Aucune correction du corpus.
+
+**Ce point vaut double.** `b04-002` est l'un des deux items que l'auteur des étiquettes avait **retirés de
+la liste des corrections** le 2026-09-20, contre sa propre classification initiale que l'annotateur avait
+pourtant validée, après avoir lu le `<thinking>` source et constaté que la requête y formule une exigence
+littérale — « empêche l'appelant de modifier la liste ». L'annotateur, qui l'ignorait, a tranché dans le
+même sens.
+
+**C'est aussi le premier item depuis la clarification de convention où `respect_consignes` est jugé F à
+bon droit par les deux parties.** Après six glissements dans l'autre sens, la distinction fonctionne :
+une exigence littérale non satisfaite fait bien tomber le contrôle 3, là où un contenu simplement faux ne
+le fait pas. Présenté avec le texte intégral des critères.
+
+### État de la relecture
+
+- **35 items relus sur 50**, 15 restants — 7 hors RAG, plus les 8 RAG gardés pour un bloc final.
+- **Accord sur le verdict, premier passage : 34 / 35.**
+- **Désaccords au niveau contrôle : 8**, inchangé.
+
+### 37. `b07-001` — accord complet, point non indépendant
+
+| | 1 `exactitude_technique` | 2 `absence_de_bugs` | 3 `respect_consignes` | verdict |
+|---|---|---|---|---|
+| annotateur, premier passage | V | V | V | **PASS** |
+| étiquette | V | V | V | **PASS** |
+
+Vingt-quatrième accord consécutif. Le motif relève la **réentrance de `synchronized`** pour le cas
+`from == to` — détail que la plupart des lectures sautent, et qui rend juste, plutôt que décorative, la
+remarque de la réponse. L'ordre total fondé sur l'identifiant casse bien la condition d'attente
+circulaire. Aucune correction du corpus.
+
+**Réserve : point non indépendant.** `b07-001` forme une paire contrastive avec `b07-002`, relu deux
+heures plus tôt dans la même séance, dont il partage l'énoncé mot pour mot — l'annotateur y avait déjà
+nommé l'interblocage par verrous croisés. Divulgué avant sa réponse. Même traitement que `b02-002`,
+`b13-003` et `b13-013`.
+
+### État de la relecture
+
+- **36 items relus sur 50**, 14 restants — 6 hors RAG, plus les 8 RAG en bloc final.
+- **Accord sur le verdict, premier passage : 35 / 36.**
+- **Désaccords au niveau contrôle : 8**, inchangé.
+- Points non indépendants (paires contrastives ou contexte partagé) : 4.
+
+### 38. `b03-005` — et la découverte que la rubrique, non l'annotateur, est en cause
+
+| | 1 `exactitude_technique` | 2 `absence_de_bugs` | 3 `respect_consignes` | verdict |
+|---|---|---|---|---|
+| annotateur, premier passage | F | F | **F** | **FAIL** |
+| étiquette (corrigée le matin même) | F | F | **V** | **FAIL** |
+
+Diagnostic de l'annotateur exact : `nums[:0]` partage le tableau sous-jacent et en conserve la capacité,
+`append` n'y réalloue jamais, et l'appelant se retrouve avec `[2 4 6 4 5 6]`. Aucune correction du corpus.
+
+Septième désaccord de la même forme, sur un item dont l'étiquette venait d'être corrigée le matin — et
+résistant au correctif de présentation par texte intégral des critères. La récurrence a conduit à croiser
+**tous** les jugements de l'annotateur sur `respect_consignes` avec la nature de l'exigence portée par la
+requête.
+
+#### Le croisement, sur 14 items relus
+
+| la requête porte… | accord annotateur / étiquette |
+|---|---|
+| une **exigence littérale** (format imposé, détection à l'exécution, définition donnée, interdiction de modifier…) | **7 / 7** |
+| **aucune** exigence littérale (« explique et corrige », « simplifie », « écris une fonction qui… ») | **1 / 7** |
+
+**L'annotateur n'est pas en cause.** Son comportement est parfaitement prédit par le **libellé** du
+contrôle — « Toutes les consignes obligatoires de la requête sont respectées » — dont la lecture ordinaire
+fait de « explique et corrige » une consigne obligatoire. La convention du corpus exige une lecture étroite,
+restreinte aux exigences explicites **au-delà de la tâche elle-même**, que le texte n'énonce nulle part.
+
+#### Conséquences, qui dépassent la relecture
+
+1. **Un modèle ne voyant que cette rubrique divergera de la même façon.** `14B-baseline-nu` sera pénalisé
+   sur le contrôle 3 pour une ambiguïté de rédaction, non pour une faiblesse de jugement.
+2. **Une part du gain du fine-tuning sera « avoir appris une convention que la rubrique n'énonce pas ».**
+   C'est un gain réel — acquérir les règles maison est la fonction même d'un fine-tuning — mais il doit
+   être nommé dans le REX plutôt que confondu avec une meilleure capacité de jugement.
+3. La variante `14B-baseline-conventions` reçoit les conventions de `PROTOCOLE.md` dans son invite : elle
+   est donc protégée de cet artefact, ce qui conforte le choix d'en faire le concurrent principal.
+
+**Décision en attente de l'annotateur :** réécrire le libellé du contrôle 3 et réentraîner, ou le conserver
+et publier l'ambiguïté avec cette table de contingence comme preuve.
+
+### 39. `b06-006` — accord complet sur l'attribut de classe mutable
+
+| | 1 `exactitude_technique` | 2 `absence_de_bugs` | 3 `respect_consignes` | verdict |
+|---|---|---|---|---|
+| annotateur, premier passage | V | V | V | **PASS** |
+| étiquette | V | V | V | **PASS** |
+
+Vingt-cinquième accord consécutif. Le motif nomme le pivot — la mutation d'un attribut de classe partagé —
+qui repose sur la distinction que les explications superficielles omettent : `self.items.append(...)` est
+une **lecture** qui remonte à la classe, seule une **affectation** créerait un attribut d'instance
+masquant. La nuance finale sur les attributs de classe immuables est relevée comme juste. Aucune
+correction du corpus.
+
+Premier item relu après la décision A sur l'ambiguïté de `respect_consignes` : requête sans exigence
+littérale, contrôle 3 jugé V des deux côtés, conformément à ce que la table de contingence laissait
+attendre lorsque la réponse **réussit** sa tâche.
+
+### État de la relecture
+
+- **38 items relus sur 50**, 12 restants — 4 hors RAG, plus les 8 RAG en bloc final.
+- **Accord sur le verdict, premier passage : 37 / 38.**
+- **Désaccords au niveau contrôle : 9** — dont **7 relevant de l'ambiguïté du libellé** documentée à
+  `b03-005`, 2 perdus par l'auteur des étiquettes et corrigés.
+
+### 40. `b03-001` — l'annotateur valide une décision et corrige une indulgence, sur le même item
+
+| | 1 `exactitude_technique` | 2 `absence_de_bugs` | 3 `respect_consignes` | verdict |
+|---|---|---|---|---|
+| annotateur, premier passage | **F** | F | **F** | **FAIL** |
+| étiquette d'origine | **V** | F | **F** | **FAIL** |
+| **étiquette corrigée** | **F** | F | **F** | **FAIL** |
+
+Motif de l'annotateur nommant les **deux** défauts, ce qu'aucune lecture n'avait fait jusque-là :
+`slice(i, size)` passe une longueur là où `slice` attend un index de fin — `chunk([1..7], 3)` rend
+`[[1,2,3],[],[]]` — et `size <= 0` laisse passer `2.5` alors que la requête exigeait un **entier**
+strictement positif.
+
+**Double portée de ce point de mesure.**
+
+1. **Le F sur le contrôle 3 valide une décision prise seul par l'auteur des étiquettes.** `b03-001` est
+   l'un des deux items retirés de la liste des corrections du 2026-09-20, contre la classification que
+   l'annotateur avait pourtant validée, après lecture du `<thinking>` source. L'annotateur, qui l'ignorait,
+   a tranché dans le même sens. **L'accord sur les requêtes à exigence littérale passe à 8 / 8.**
+2. **Le F sur le contrôle 1 corrige une indulgence de l'étiquette.** Le raisonnement de référence listait
+   les affirmations explicites et les trouvait exactes — ce qui est vrai — mais laissait passer la
+   conclusion « la fonction est générique et compile en mode strict », littéralement vraie et pourtant
+   présentée comme un quitus sur un code au résultat faux. **Étiquette corrigée en F F F**, raisonnement
+   et motif amendés en conséquence.
+
+**Troisième étiquette corrigée à l'initiative de l'annotateur**, après `b09-009` et `b06-008`.
+
+Effets vérifiés : verdict FAIL inchangé, `cas` inchangé, invariants intacts (200 exemples, 104/96,
+80/80/40, golden 24/26). **`b03-001` est dans le golden set et non dans `train` : l'entraînement en cours
+n'est pas affecté**, aucun réentraînement.
+
+### État de la relecture
+
+- **39 items relus sur 50**, 11 restants — 3 hors RAG, plus les 8 RAG en bloc final.
+- **Accord sur le verdict, premier passage : 38 / 39.**
+- **Désaccords au niveau contrôle : 10** — dont 7 relevant de l'ambiguïté du libellé, et **3 perdus par
+  l'auteur des étiquettes et corrigés dans le corpus** (`b09-009`, `b06-008`, `b03-001`).
+
+### 41. `b02-012` — accord complet sur le GIL
+
+| | 1 `exactitude_technique` | 2 `absence_de_bugs` | 3 `respect_consignes` | verdict |
+|---|---|---|---|---|
+| annotateur, premier passage | V | V | V | **PASS** |
+| étiquette | V | V | V | **PASS** |
+
+Vingt-sixième accord consécutif. La seule affirmation réellement datable — PEP 703, *builds* sans GIL
+optionnels depuis CPython 3.13 — tient, de même que les nuances sur le relâchement du GIL en entrées-sorties
+et par les extensions natives. Aucune correction du corpus.
+
+### Carte des familles RAG — ordre du bloc final
+
+Établie avant d'ouvrir le bloc, pour ne pas présenter deux items d'un même contexte à la suite :
+
+| contexte | items | état |
+|---|---|---|
+| `b1d8dc1d` | `b12-005` | **unique au corpus** |
+| `6bbce10c` | `b13-004` | **unique au corpus** |
+| `9fefd8a6` | `b12-007`, `b12-011`, `b12-012` | `b12-008` déjà relu → compromis |
+| `9f177235` | `b13-001`, `b13-008`, `b13-009` | trois entre eux → le premier est sain, les suivants compromis |
+| `8559f10c` | — | famille entièrement relue |
+
+**Seuls `b12-005` et `b13-004` sont des points de mesure RAG pleinement indépendants.** Ils sont présentés
+en premier ; les six autres le seront avec leur réserve, et jamais deux d'un même contexte consécutivement.
+
+### État de la relecture
+
+- **40 items relus sur 50**, 10 restants — 2 hors RAG, plus les 8 RAG du bloc final.
+- **Accord sur le verdict, premier passage : 39 / 40.**
+- **Désaccords au niveau contrôle : 10**, inchangé.
+
+### 42. `b13-004` — première erreur de verdict du golden set, trouvée par l'annotateur
+
+| | 1 `contexte_pertinent` | 2 `contexte_suffisant` | 3 `bruit_maitrise` | verdict |
+|---|---|---|---|---|
+| annotateur, premier passage | V | **F** | V | **FAIL** |
+| étiquette d'origine | V | **V** | V | **PASS** |
+| **étiquette corrigée** | V | **F** | V | **FAIL** |
+
+**Première erreur de verdict du corpus, et la quatrième étiquette corrigée à l'initiative de l'annotateur**
+après `b09-009`, `b06-008` et `b03-001`.
+
+Le contexte de `b13-004` ne contient **aucun corps de méthode** : dix extraits, tous tronqués, 769
+caractères. La requête demande *comment* les clés de cache sont construites. Le raisonnement de référence
+justifiait pourtant le PASS par une phrase **inventée** — « le corps de la méthode figure dans l'extrait,
+dont seul l'affichage est tronqué ici » — contredite par le JSONL comme par les extractions versionnées
+dans `verification/contexts/`.
+
+**La règle, dégagée en vérifiant les items de même forme.** Neuf items `RAG_CONTEXT_RELEVANCE` posent une
+question en « how » ou « in what order ». Six portent correctement `contexte_suffisant = faux`. `b14-005`
+est légitimement vrai, son contexte contenant réellement du corps. `b13-007` est légitimement vrai pour une
+autre raison : ses extraits portent `localAvailable`, `localFailedWithFallback` et `ollamaAvailable`, dont
+les **noms seuls décrivent la logique interrogée**. `b13-004` était la seule violation.
+
+> **La suffisance ne dépend pas de la présence d'un corps de méthode, mais de ce que les noms et signatures
+> suffisent ou non à répondre à la question posée.**
+
+**Effets mesurés avant d'agir, par simulation sur copie.** Le retirage fait sortir `b13-004` du golden et y
+fait entrer `b13-007` : **une seule relecture invalidée, celle de l'item erroné lui-même**, 40 des 41
+autres restent valides, et la composition reste 24 PASS / 26 FAIL. Invariants : 200 exemples, 0 erreur,
+103 PASS / 97 FAIL, `cas` 79/81/40.
+
+**Conséquence assumée :** `b13-007` quitte `train`, donc l'adaptateur entraîné ce jour est périmé.
+**Réentraînement reporté à la fin de la relecture**, sur décision de l'annotateur — deux relances ont déjà
+été provoquées par des découvertes, et il reste dix items susceptibles d'en produire d'autres.
+
+### État de la relecture
+
+- **40 items relus sur 50**, **10 restants** : `b03-002`, `b05-009`, `b12-005` (arbitrage en attente),
+  `b12-007`, `b12-011`, `b12-012`, `b13-001`, `b13-007`, `b13-008`, `b13-009`.
+- **Accord sur le verdict, premier passage : 39 / 40** — `b13-004` devient un accord après correction.
+- **Quatre étiquettes corrigées à l'initiative de l'annotateur**, dont une erreur de verdict.
+
+### 43. Audit élargi — deux règles appliquées uniformément aux items RAG
+
+Déclenché par le désaccord sur `b13-007`, lui-même issu de la correction de `b13-004`. **Simulé sur copie
+avant toute application**, conformément à la discipline adoptée à `b13-004`.
+
+#### Règle 1 — pertinence
+
+> **Si aucun symbole visé par la requête n'apparaît au contexte, `contexte_pertinent` et `bruit_maitrise`
+> valent faux.** Une ressemblance de forme sur une classe voisine n'est pas de la pertinence, et là où
+> aucune information utile n'existe, tous les extraits sont hors sujet.
+
+Vérifiée sur les 25 items `RAG_CONTEXT_RELEVANCE` : quand le symbole visé est présent, `pertinent` vaut V
+**18 fois sur 18**. Une seule violation, **`b12-005`** — `OllamaService` absent, seul un quasi-homonyme
+`OllamaSettings` porte une déclaration d'interface. Corrigé en **F F F**.
+
+**Deux items ont été écartés de la correction après lecture de leur source.** `b12-006` et `b14-004`
+paraissaient violer la règle, mais leur requête nomme **deux** entités et la seconde est bien présente au
+contexte — `NewUserMessageNotifier` et `FileApprovalNotifier`. C'est la détection automatique, qui ne
+relevait que le premier identifiant de la requête, qui était fausse. Troisième fois dans la journée qu'une
+lecture sur pièce contredit une règle tirée d'une mesure automatique.
+
+#### Règle 2 — suffisance
+
+> **Une question en « comment » ou « dans quel ordre » n'est pas satisfaite par un contexte réduit à des
+> signatures.** Un nom de méthode annonce une intention, il ne livre pas la mécanique.
+
+Vérifiée sur les 9 items concernés : 8 la respectaient déjà, `b14-005` étant légitimement suffisant
+puisque son contexte contient réellement du corps de méthode. Une violation, **`b13-007`**, corrigée en
+**V F V / FAIL**.
+
+**L'exception que l'auteur des étiquettes avait forgée pour `b13-007`** — « les noms `localAvailable`,
+`localFailedWithFallback`, `ollamaAvailable` décrivent à eux seuls la logique » — **a été reconnue comme
+un raisonnement motivé** : elle avait été écrite dans le mouvement même de la correction de `b13-004`, et
+protégeait une étiquette déjà posée. L'annotateur ne l'a pas suivie et avait raison : ces noms établissent
+qu'un repli existe, pas ce qui le déclenche.
+
+#### Effets mesurés
+
+```
+golden 50 -> 50    b13-007 sort, b13-004 revient (sa relecture reste valide)
+relectures perdues : 1 (b13-007)      items à présenter en plus : 0
+corpus 200, 0 erreur, PASS 102 / FAIL 98, cas 78/82/40, golden 23/27
+```
+
+### État de la relecture
+
+- **42 items relus sur 50**, **8 restants** : `b03-002`, `b05-009`, `b12-007`, `b12-011`, `b12-012`,
+  `b13-001`, `b13-008`, `b13-009`.
+- **Accord sur le verdict : 41 / 42** — seul `b07-011` reste en désaccord.
+- **Six étiquettes corrigées à l'initiative de l'annotateur** : `b09-009`, `b06-008`, `b03-001`,
+  `b13-004`, `b12-005`, `b13-007` — dont deux changements de verdict.
+
+### 44. `b03-002` — accord complet sur la jumelle corrigée de `b03-001`
+
+| | 1 `exactitude_technique` | 2 `absence_de_bugs` | 3 `respect_consignes` | 4 `validation_entree` | verdict |
+|---|---|---|---|---|---|
+| annotateur, premier passage | V | V | V | V | **PASS** |
+| étiquette | V | V | V | V | **PASS** |
+
+Vingt-septième accord consécutif. Le motif nomme les deux points qui séparent cette réponse de sa jumelle :
+`slice(i, i + size)` au lieu de `slice(i, size)`, et `Number.isInteger` complétant le test de signe — soit
+exactement les deux défauts que l'annotateur avait relevés sur `b03-001` une heure plus tôt. Aucune
+correction du corpus.
+
+**Réserve : point non indépendant.** Paire contrastive de `b03-001`, relu le même jour, dont il partage
+l'énoncé mot pour mot. Divulgué avant la réponse. Cinquième point de ce type après `b02-002`, `b07-001`,
+`b13-003` et `b13-013`.
+
+### État de la relecture
+
+- **43 items relus sur 50**, **7 restants** : `b05-009`, puis les 6 RAG à contexte partagé
+  (`b12-007`, `b12-011`, `b12-012`, `b13-001`, `b13-008`, `b13-009`).
+- **Accord sur le verdict : 42 / 43.**
+
+### 45. `b05-009` — accord complet, dernier item hors RAG
+
+| | 1 `exactitude_technique` | 2 `absence_de_bugs` | 3 `respect_consignes` | verdict |
+|---|---|---|---|---|
+| annotateur, premier passage | V | V | V | **PASS** |
+| étiquette | V | V | V | **PASS** |
+
+Vingt-huitième accord consécutif, et **dernier item `CODE_ANALYSIS` du golden set**. Les six affirmations
+vérifiables tiennent, y compris `-7 % 2 = -1` et `Math.floorMod(-7, 2) = 1`, et le choix de `floorMod`
+est bien la primitive correcte pour un index circulaire. Aucune correction du corpus.
+
+Le raisonnement de référence porte une réserve que le motif de l'annotateur ne mentionne pas :
+`current + offset` pourrait théoriquement déborder sur des valeurs extrêmes. Elle est explicitement jugée
+sans conséquence pour des index de carrousel, et ce silence n'est pas compté comme un défaut — la réserve
+est donc consignée sans effet sur les cases.
+
+### État de la relecture — bloc RAG final
+
+- **44 items relus sur 50**, **6 restants**, tous RAG.
+- **Accord sur le verdict : 43 / 44.**
+- Ordre retenu pour le bloc final, alternant les deux familles pour ne jamais enchaîner deux contextes
+  identiques : `b13-001`, `b12-007`, `b13-008`, `b12-011`, `b13-009`, `b12-012`.
+- **`b13-001` est le dernier point de mesure sain du corpus** : premier de sa famille `9f177235`, dont
+  `b13-008` et `b13-009` n'ont pas encore été présentés. Les cinq suivants seront tous compromis, soit par
+  un contexte déjà analysé (`9fefd8a6`, vu à `b12-008`), soit par la famille ouverte par `b13-001`.
+
+### 46. `b13-001` — accord complet sur le dernier point de mesure sain
+
+| | 1 `contexte_pertinent` | 2 `contexte_suffisant` | 3 `bruit_maitrise` | verdict |
+|---|---|---|---|---|
+| annotateur, premier passage | V | **F** | V | **FAIL** |
+| étiquette | V | **F** | V | **FAIL** |
+
+Vingt-neuvième accord consécutif. Motif identique à l'étiquette : `fileRetries` établit qu'un compteur de
+réessais existe, **pas la politique** qui le régit. Aucune correction du corpus.
+
+**Ce point vaut plus que les autres, pour deux raisons.**
+
+1. **C'est le dernier point de mesure sain du corpus** — premier de sa famille `9f177235`, dont `b13-008`
+   et `b13-009` n'avaient pas encore été présentés. L'annotateur le découvrait réellement.
+2. **Il valide les deux règles de l'audit élargi sur un item neuf.** L'annotateur a jugé `pertinent` V
+   parce que la classe visée est présente, et `suffisant` F parce qu'une question en « comment » ne se
+   satisfait pas de champs et de signatures — sans avoir les règles sous les yeux, et sans savoir qu'elles
+   venaient d'être codifiées. **Elles n'ont donc pas été taillées après coup pour produire un accord :
+   elles prédisent son jugement.**
+
+### État de la relecture
+
+- **45 items relus sur 50**, **5 restants**, tous RAG et tous compromis :
+  `b12-007`, `b13-008`, `b12-011`, `b13-009`, `b12-012`.
+- **Accord sur le verdict : 44 / 45.**
+
+### 47. `b12-007` — second désaccord de verdict, étiquette maintenue
+
+| | 1 `contexte_pertinent` | 2 `contexte_suffisant` | 3 `bruit_maitrise` | verdict |
+|---|---|---|---|---|
+| annotateur, premier passage | V | **F** | V | **FAIL** |
+| étiquette | V | **V** | V | **PASS** |
+
+**Deuxième désaccord de verdict de toute la relecture**, après `b07-011`. L'annotateur étend la règle de
+troncature aux questions factuelles ; le corpus ne le fait pas.
+
+**Mesure sur les 15 items `RAG_CONTEXT_RELEVANCE` posant une question de ce genre :**
+
+| type de question | contexte sans corps | `contexte_suffisant` |
+|---|---|---|
+| « how » / « in what order » | 10 items | **F dix fois sur dix** |
+| « what does X do » | 6 items | **V quatre fois**, F deux fois |
+
+Les deux exceptions factuelles, `b12-001` et `b13-005`, échouent pour une raison distincte — symbole visé
+absent ou contexte portant sur une autre classe — et non pour troncature. **La distinction est donc déjà
+appliquée uniformément dans le corpus et n'a pas été forgée pour cet item**, contrairement à celle que
+l'auteur des étiquettes avait taillée pour `b13-007` et reconnue comme motivée.
+
+Le motif de l'annotateur — la troncature « prive du code nécessaire pour expliquer la logique d'exécution
+et d'assemblage » — est exact, mais porte sur ce que la question ne demande pas. « What does `retrieve`
+do » trouve réponse dans le nœud : `public`, `List<Content>`, `@Override` de `ContentRetriever`, arête
+`CALLS` vers `WorkspaceContextRetriever.get()`, quatre champs nommant les sources. « How does it merge »,
+la question de `b12-008`, ne s'y répond pas — et l'annotateur y avait jugé F, à juste titre.
+
+**Étiquette maintenue, premier passage consigné tel quel.** L'annotateur, mis devant la mesure, a accepté
+la distinction sans demander de correction.
+
+**Réserve : point compromis.** Contexte `9fefd8a6`, identique à celui de `b12-008` relu le matin même.
+
+### État de la relecture
+
+- **46 items relus sur 50**, **4 restants** : `b13-008`, `b12-011`, `b13-009`, `b12-012`.
+- **Accord sur le verdict : 44 / 46** — `b07-011` et `b12-007`.
+
+### 48. `b13-008` — et la seconde rubrique dont le libellé n'exprime pas sa convention
+
+| | 1 `affirmations_etayees` | 2 `absence_invention` | 3 `citations_exactes` | verdict |
+|---|---|---|---|---|
+| annotateur, premier passage | F | F | **F** | **FAIL** |
+| étiquette | F | F | **V** | **FAIL** |
+
+Accord sur le verdict et sur les deux premiers contrôles, motif identique : `handleDocumentError`,
+`MAX_RETRIES = 3`, `handleCorruption()` et les tailles de lot 10/100 sont **absents des cinq extraits**.
+Aucune correction du corpus.
+
+Le raisonnement de référence ajoute ce qui fait l'intérêt de l'item : **ces affirmations sont exactes pour
+la codebase réelle**. C'est le piège même de la tâche — sous `RAG_FAITHFULNESS`, une affirmation non
+étayée doit tomber quand bien même elle serait vraie, sinon le juge ne distingue plus une restitution
+d'une hallucination. La précision des chiffres aggrave le défaut au lieu de le crédibiliser.
+
+**Le désaccord sur le contrôle 3 reproduit exactement celui de `b13-012`, le 2026-09-17.** Deux
+occurrences, à trois jours d'intervalle, sur deux items différents, avec la même lecture : quand une sortie
+invente tout sans rien citer, l'annotateur juge `citations_exactes` faux. La convention du corpus veut
+qu'il soit vrai par vacuité — rien de cité, donc rien de déformé — et cette convention est documentée dans
+`PROTOCOLE.md` depuis le 17.
+
+> **C'est le second libellé de rubrique qui n'exprime pas sa convention, après `respect_consignes`.**
+> Même forme, même cause : la lecture ordinaire du texte donne le jugement de l'annotateur, et la
+> convention exige une lecture restrictive que le texte n'énonce pas.
+
+**Aucune correction n'est proposée** : la convention est documentée, dix items du corpus l'appliquent, et
+la changer imposerait une troisième réécriture du corpus. Elle rejoint `respect_consignes` dans les limites
+à publier, et pour la même raison — **un modèle ne lisant que la rubrique jugera comme l'annotateur**.
+
+**Réserve : point compromis.** Contexte `9f177235` et requête identiques à `b13-001`, relu juste avant ;
+seul l'objet du jugement diffère — le contexte là, une réponse construite sur lui ici.
+
+### État de la relecture
+
+- **47 items relus sur 50**, **3 restants** : `b12-011`, `b13-009`, `b12-012`.
+- **Accord sur le verdict : 45 / 47.**
+
+### 49. `b12-011` — troisième occurrence du désaccord sur `citations_exactes`
+
+| | 1 `affirmations_etayees` | 2 `absence_invention` | 3 `citations_exactes` | verdict |
+|---|---|---|---|---|
+| annotateur, premier passage | F | F | **F** | **FAIL** |
+| étiquette | F | F | **V** | **FAIL** |
+
+Accord sur le verdict et sur les deux premiers contrôles. Le motif de l'annotateur énumère exactement les
+quatre inventions relevées par l'étiquette — pool de trois threads, filtrage à 30 caractères,
+déduplication par texte, traitement des délais et exceptions — et identifie correctement le premier
+paragraphe comme seul passage étayé : signature, visibilité, `@Override`, type de retour. Aucune correction
+du corpus.
+
+Même enseignement qu'à `b13-008` : **ces affirmations sont vraies dans la codebase réelle**, et doivent
+néanmoins tomber. Les accepter au motif de leur exactitude reviendrait à valider, sur un autre dossier,
+une hallucination indiscernable.
+
+**Troisième occurrence du désaccord sur `citations_exactes`**, après `b13-012` (2026-09-17) et `b13-008`.
+Trois items, trois jours, une seule et même lecture. Le constat tient sans qu'il faille le chercher : le
+libellé n'exprime pas la convention de vacuité.
+
+**Réserve : point compromis.** Contexte `9fefd8a6` déjà vu à `b12-008` et `b12-007`, et requête identique
+à celle de `b12-007` — seul l'objet du jugement change.
+
+### État de la relecture
+
+- **48 items relus sur 50**, **2 restants** : `b13-009`, `b12-012`.
+- **Accord sur le verdict : 46 / 48.**
+- Désaccords sur `citations_exactes` : **3**, tous de même forme.
+
+### 50. `b13-009` — l'inférence signalée passe, l'inférence assurée tombe
+
+| | 1 `affirmations_etayees` | 2 `absence_invention` | 3 `citations_exactes` | verdict |
+|---|---|---|---|---|
+| annotateur, premier passage | V | V | V | **PASS** |
+| étiquette | V | V | V | **PASS** |
+
+Accord complet. Motif de l'annotateur : « posture exemplaire en monde fermé : la réponse annonce
+l'insuffisance du contexte, se borne à restituer les seuls champs présents et s'interdit toute
+hallucination comportementale ».
+
+L'item avait été présenté avec un signalement neutre : les deux premières affirmations tirent des
+conclusions de **noms de champs** (« dont le nom indique », « vraisemblablement »). L'annotateur les a
+tenues pour étayées.
+
+**Ce que l'accord établit.** Rapproché de `b13-008`, où des inférences de même nature tombaient sur
+`absence_invention`, le critère qui sépare les deux n'est pas le contenu de l'inférence — à `b13-008`
+elle était *vraie dans la codebase réelle* — mais son **mode d'énonciation** : marquée comme inférence,
+elle passe ; avancée comme un fait, elle tombe. Deux jugements indépendants convergent sur cette ligne
+alors qu'elle ne figure dans aucun des trois libellés de la rubrique.
+
+À verser aux limites : contrairement aux deux désaccords de libellé (`respect_consignes`,
+`citations_exactes`), cette convention-ci n'a **pas** eu besoin d'être écrite pour être partagée. Elle ne
+demande donc aucune correction, mais elle indique que la rubrique sous-spécifie aussi là où elle
+fonctionne — le corpus porte des conventions que le texte n'énonce pas.
+
+**Réserve : point compromis.** Troisième item bâti sur le contexte `9f177235`, après `b13-001` et
+`b13-008`, avec une requête identique.
+
+### État de la relecture
+
+- **49 items relus sur 50**, **1 restant** : `b12-012`.
+- **Accord sur le verdict : 47 / 49.**
+- Désaccords sur `citations_exactes` : **3**, tous de même forme.
+
+### 51. `b12-012` — la déduction dont les prémisses sont au contexte
+
+| | 1 `affirmations_etayees` | 2 `absence_invention` | 3 `citations_exactes` | verdict |
+|---|---|---|---|---|
+| annotateur, premier passage | V | V | V | **PASS** |
+| étiquette | V | V | V | **PASS** |
+
+Accord complet. Motif de l'annotateur : « réponse irréprochable en monde fermé : elle restitue fidèlement
+les éléments de signature et de structure disponibles sans halluciner la logique d'assemblage absente du
+contexte ».
+
+L'item avait été présenté avec deux signalements neutres : une explication causale de l'annotation
+(`@Override` « s'explique par le fait que » la classe implémente `ContentRetriever`) et une conclusion
+tirée de noms de champs, dont quatre sur sept sont repris.
+
+**Ce que l'accord ajoute à `b13-009`.** La déduction sur `@Override` a ses **deux prémisses dans les
+extraits** — l'annotation figure au nœud de fonction, l'arête `IMPLEMENTS` au nœud de classe — et elle est
+énoncée comme déduction. Elle passe. Deux items consécutifs, jugés indépendamment, confirment la même
+ligne : c'est le mode d'énonciation qui décide, pas le caractère déductif. La reprise partielle des champs
+n'a été tenue pour un défaut par aucun des deux passages : restituer moins que le contexte n'est pas le
+déformer.
+
+**Réserve : point compromis.** Quatrième item bâti sur le contexte `9fefd8a6`, après `b12-008`, `b12-007`
+et `b12-011`, avec la requête de `b12-007` et `b12-011`.
+
+---
+
+## Relecture terminée — 50 items sur 50
+
+- **Accord sur le verdict : 48 / 50.** Désaccords : `b07-011`, `b12-007`.
+- **Désaccords sur un contrôle, verdict identique :** 3 sur `citations_exactes`
+  (`b13-012`, `b13-008`, `b12-011`), tous de même forme, plus la table de contingence
+  `respect_consignes` (7/7 contre 1/7) traitée en amendement.
+- **Étiquettes corrigées sur signalement de l'annotateur :** 6 — `b09-009`, `b06-008`, `b03-001`,
+  `b13-004`, `b12-005`, `b13-007`, dont deux changements de verdict (`b13-004`, `b13-007`).
+- Le κ est calculé par `scripts/kappa_revue.py`, qui extrait les annotations du premier passage
+  depuis ce journal ; il n'existe aucune autre trace machine de ce passage.
+
+**Réserve générale sur la puissance.** Les accords ne sont pas 50 observations indépendantes : le corpus
+RAG regroupe 12 items sur 5 contextes, et 7 des 50 items relus sont des occurrences répétées d'un même
+contexte avec une requête identique (`b13-009`, `b12-011`, `b12-012` notamment). Les intervalles rapportés
+par le bootstrap ne corrigent pas cette dépendance et sont donc optimistes.
+
+---
+
+## Rattrapage — deux items relus dont le journal ne portait pas la table
+
+Relevé en clôturant la relecture, en construisant `scripts/kappa_revue.py` : deux des 50 items n'avaient
+aucune table exploitable. Les entrées ci-dessous sont **reconstituées depuis une source primaire nommée**,
+jamais de mémoire. Leur numérotation suit l'ordre d'écriture, pas l'ordre de passage.
+
+### 52. `b04-015` — relu en session 1, consigné seulement en récapitulatif
+
+| | 1 `exactitude_technique` | 2 `absence_de_bugs` | 3 `respect_consignes` | 4 `format_impose` | verdict |
+|---|---|---|---|---|---|
+| annotateur, premier passage | — | — | **F** | — | **FAIL** |
+| étiquette | V | V | **V** | F | **FAIL** |
+
+**Provenance :** tableau récapitulatif de la session 1, plus haut dans ce journal — ligne
+`| 2 | b04-015 | FAIL | FAIL | ✅ | respect_consignes : annotateur false, étiquette true |`. La session 1
+notait un verdict et l'écart, pas les quatre contrôles un par un.
+
+**Pourquoi trois cellules restent vides.** La colonne « Écart sur les contrôles » n'énumère que les
+divergences ; les trois autres contrôles ont donc vraisemblablement concordé, mais ils ne sont pas
+*attestés* individuellement. Les compter comme des accords gonflerait le κ par contrôle d'une valeur que
+le registre ne porte pas. Ils sont laissés en `—` : le verdict compte, les trois contrôles non.
+
+### 53. `b12-005` — relu le 2026-09-20, jamais transcrit
+
+| | 1 `contexte_pertinent` | 2 `contexte_suffisant` | 3 `bruit_maitrise` | verdict |
+|---|---|---|---|---|
+| annotateur, premier passage | **F** | F | **F** | **FAIL** |
+| étiquette d'origine | **V** | F | **V** | **FAIL** |
+
+**Provenance :** transcript de session, réponse du `2026-09-20T19:28:21Z` — « FFF, le moteur de recherche a
+retourné des composants voisins (`OllamaSettings`, etc.) sans fournir aucun extrait concernant la classe
+`OllamaService` » — répondant au tour de `19:08:15Z` qui présentait `b12-005` (requête *What interfaces
+does `OllamaService` implement?*). L'étiquette telle que présentée est relevée par
+`git show 77ba2fa^:generators/gen_batch_12.py`, soit avant le commit de l'audit élargi.
+
+Accord sur le verdict, **désaccord sur deux contrôles**, et l'annotateur avait raison sur les deux :
+l'audit élargi (entrée 43) a corrigé l'étiquette en `F F F`, exactement dans son sens. C'est la cinquième
+correction à l'initiative de l'annotateur.
+
+**Ce que le trou révèle.** L'item a été présenté, répondu et corrigé, mais son passage aveugle n'a jamais
+été écrit ici : il est passé d'« arbitrage en attente » à « relu » entre deux décomptes, sans table. Le
+journal étant l'unique trace machine du premier passage, un item manquant se serait traduit par un κ
+calculé sur 49 items sans que rien ne le signale. Ce sont les recoupements du script — et non le script —
+qui l'ont fait apparaître.
+
+---
+
+## Résultat du κ inter-annotateur — 50 items, 2026-09-21
+
+Calculé par `scripts/kappa_revue.py`, selon la définition figée par l'amendement du 2026-09-21 **avant**
+exécution : premier passage en aveugle contre **l'étiquette telle que présentée**.
+
+### Verdict
+
+```
+accord brut : 47/50 = 0,940
+kappa       : 0,880   IC95% bootstrap [0,720 ; 1,000]
+marges      : annotateur 23 PASS / 27 FAIL    étiquette 24 PASS / 26 FAIL
+désaccords  : b07-011, b12-007, b13-004
+```
+
+Pour mémoire, contre l'étiquette **après** les corrections issues de la relecture : 48/50, κ 0,919
+[0,794 ; 1,000]. L'écart tient au seul `b13-004`. Ce second chiffre surestime l'accord et n'est jamais
+publié seul.
+
+Les marges sont équilibrées, l'accord attendu par hasard vaut 0,502 : le κ du verdict est ici proche de
+l'accord brut et se lit sans précaution particulière. **L'intervalle reste large** — n = 50 — et le
+bootstrap ne corrige pas la dépendance entre items partageant un contexte.
+
+### Par contrôle
+
+| contrôle | n | accord | κ |
+|---|---|---|---|
+| `respect_consignes` | 37 | 29/37 | +0,386 |
+| `absence_de_bugs` | 36 | 34/36 | +0,880 |
+| `exactitude_technique` | 36 | 32/36 | +0,750 |
+| `affirmations_etayees` | 6 | 6/6 | +1,000 |
+| `absence_invention` | 6 | 6/6 | +1,000 |
+| `contexte_pertinent` | 6 | 5/6 | +0,571 |
+| `bruit_maitrise` | 6 | 5/6 | +0,571 |
+| `contexte_suffisant` | 6 | 4/6 | 0,000 |
+| `citations_exactes` | 6 | 3/6 | 0,000 |
+| 4 contrôles dédiés | 1 chacun | 3/4 | non interprétable |
+
+**Seuls les trois premiers portent assez d'observations pour être lus.** Les autres reposent sur n ≤ 6 :
+leur κ est instable et ne doit pas être cité isolément. Les `0,000` ne signifient pas « accord nul au
+hasard » mais « κ non informatif à cet effectif ».
+
+### Le κ de `respect_consignes` est bas pour une raison qu'il faut publier avec lui
+
+```
+              étiq V   étiq F
+  annot V        25        1
+  annot F         7        4
+```
+
+Accord brut 29/37 = 0,784, mais les marges sont très déséquilibrées — annotateur 26 V / 11 F, étiquette
+32 V / 5 F — ce qui porte l'accord attendu par hasard à 0,648 et écrase le κ à 0,386. **Publier le κ seul
+sous-estimerait l'accord ; publier les 78 % seuls le surestimeraient.** Les deux vont ensemble, avec les
+marges. C'est le contrôle le plus fréquent du corpus, et celui dont le libellé a déjà été identifié comme
+ambigu : les 7 cases « annotateur F / étiquette V » sont cette ambiguïté, mesurée.
+
+### Le résultat le plus important n'est pas le κ du verdict
+
+**17 items sur 50 portent au moins un désaccord de contrôle. 15 sont absorbés par le verdict, 2 seulement
+s'y propagent.**
+
+| | items |
+|---|---|
+| absorbés — FAIL des deux côtés | `b01-005`, `b03-001`, `b03-003`, `b03-005`, `b03-014`, `b04-014`, `b04-015`, `b06-008`, `b08-011`, `b09-009`, `b10-003`, `b12-005`, `b12-011`, `b13-008`, `b13-012` |
+| propagés | `b12-007`, `b13-004` — tous deux sur `contexte_suffisant` |
+
+Le mécanisme est structurel : le verdict est une **conjonction**, PASS si et seulement si tous les
+contrôles sont vrais. Dès qu'un contrôle échoue des deux côtés, un désaccord sur un autre contrôle reste
+sans effet sur le verdict. L'accord de 94 % sur le verdict coexiste donc avec un désaccord sur au moins un
+contrôle dans **34 % des items**.
+
+**Conséquence pour le fine-tuning, à énoncer dans le REX.** Le juge n'apprend pas qu'un verdict : il
+apprend le `<thinking>`, les contrôles et le motif. La qualité de la cible est donc mieux décrite par
+l'accord par contrôle que par l'accord sur le verdict. Le verdict est reproductible ; **les raisons le sont
+beaucoup moins**. C'est un plafond sur ce que l'entraînement peut apprendre, pas un défaut de l'entraînement.
+
+### Une asymétrie, et elle n'est pas du bruit
+
+```
+annotateur F / étiquette V (annotateur plus sévère)   : 16
+annotateur V / étiquette F (annotateur plus indulgent) :  6
+```
+
+**16 désaccords sur 22 vont dans le même sens.** L'annotateur humain est systématiquement plus sévère que
+l'étiquette rédigée par le LLM. Le fait est cohérent avec les six corrections, toutes à l'initiative de
+l'annotateur et toutes dans le sens du durcissement. À publier tel quel : une vérité de référence écrite
+par un LLM puis relue par un humain est **plus indulgente** que ce que l'humain aurait produit seul.

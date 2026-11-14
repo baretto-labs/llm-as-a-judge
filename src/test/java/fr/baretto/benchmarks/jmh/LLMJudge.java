@@ -2,6 +2,7 @@ package fr.baretto.benchmarks.jmh;
 
 import dev.langchain4j.model.chat.ChatModel;
 import dev.langchain4j.model.ollama.OllamaChatModel;
+import dev.langchain4j.model.openai.OpenAiChatModel;
 import dev.langchain4j.service.AiServices;
 import dev.langchain4j.service.SystemMessage;
 import dev.langchain4j.service.UserMessage;
@@ -25,8 +26,29 @@ import java.util.List;
  * <pre>
  *   -Djmh.judge.models=qwen2.5:14b,mistral:32b   (liste — recommandé)
  *   -Djmh.judge.model=qwen2.5:14b                (modèle unique — rétrocompatible)
- *   -Djmh.judge.url=http://localhost:11434        (optionnel)
+ *   -Djmh.judge.provider=ollama|openai           (défaut : ollama)
+ *   -Djmh.judge.url=http://localhost:11434        (défaut selon le provider)
  * </pre>
+ *
+ * <p><b>Provider {@code openai}</b> — vise tout endpoint OpenAI-compatible, en
+ * particulier {@code mlx_lm.server} qui sert les variantes locales du juge sur
+ * {@code /v1/chat/completions}. {@code OllamaChatModel} ne convient pas là : il parle
+ * l'API native d'Ollama ({@code /api/chat}), donc changer l'URL ne suffit pas.</p>
+ *
+ * @deprecated Remplacée par {@link RagContextJudge}. Cette classe rend une <b>note graduée</b>
+ * ({@code score} 0-10, {@code rationale}, {@code suggestsUnknown}), format abandonné le 2026-09-13
+ * au profit d'un <b>verdict binaire</b> {@code {checks, verdict, reason}} avec la règle
+ * {@code PASS ⟺ tous les contrôles vrais}. Une échelle 0-10 sans ancrage produit du bruit entre
+ * juges et entre exécutions, et ne se teste pas : deux stratégies se comparent sur des verdicts
+ * appariés, pas sur des moyennes de notes. La classe reste compilable et utilisable — elle est
+ * l'artefact du chemin parcouru — mais n'est plus câblée dans {@code RetrievalBenchmark}.
+ *
+ * <p><b>Attention — le schéma de cette classe est celui abandonné le 2026-09-13.</b>
+ * {@link JudgementOutput} porte une note graduée ({@code score}, {@code rationale},
+ * {@code suggestsUnknown}) alors que le juge fine-tuné de {@code judge-finetune/} rend
+ * {@code {checks, verdict: PASS|FAIL, reason}} précédé d'un bloc {@code <thinking>}.
+ * Basculer le provider ne rend donc pas cette classe compatible avec ce modèle : elle
+ * sert à interroger un juge <i>gradué</i>, quel que soit l'endpoint qui l'héberge.</p>
  *
  * <p>Fonctionnalités :</p>
  * <ul>
@@ -44,12 +66,18 @@ import java.util.List;
  *   <li>{@code hintCoverage} — fraction des expectedFqnHints trouvés (calcul programmatique)</li>
  * </ul>
  */
+@Deprecated(since = "2026-09-21")
 public class LLMJudge {
 
     private static final Logger logger = LoggerFactory.getLogger(LLMJudge.class);
 
     private static final String DEFAULT_JUDGE_MODEL = "qwen2.5:14b";
     private static final String DEFAULT_OLLAMA_URL  = "http://localhost:11434";
+
+    private static final String PROVIDER_OLLAMA = "ollama";
+    private static final String PROVIDER_OPENAI = "openai";
+    /** Port de la variante {@code 14B-finetuned} dans {@code judge-finetune/configs/variants.json}. */
+    private static final String DEFAULT_OPENAI_URL = "http://127.0.0.1:8082/v1";
 
     // ── Structured output ──────────────────────────────────────────────────
 
@@ -132,7 +160,9 @@ public class LLMJudge {
     public LLMJudge() {
         String modelsProperty = System.getProperty("jmh.judge.models",
             System.getProperty("jmh.judge.model", DEFAULT_JUDGE_MODEL));
-        String baseUrl = System.getProperty("jmh.judge.url", DEFAULT_OLLAMA_URL);
+        String provider = System.getProperty("jmh.judge.provider", PROVIDER_OLLAMA);
+        String baseUrl  = System.getProperty("jmh.judge.url",
+            PROVIDER_OPENAI.equalsIgnoreCase(provider) ? DEFAULT_OPENAI_URL : DEFAULT_OLLAMA_URL);
 
         List<String> modelNames = Arrays.stream(modelsProperty.split(","))
             .map(String::trim)
@@ -141,11 +171,11 @@ public class LLMJudge {
 
         this.modelNamesLabel = String.join(",", modelNames);
         this.judgeServices = modelNames.stream()
-            .map(name -> createJudgeService(name, baseUrl))
+            .map(name -> createJudgeService(name, baseUrl, provider))
             .toList();
 
-        logger.info("LLMJudge initialisé avec {} juge(s): [{}] sur {}",
-            judgeServices.size(), modelNamesLabel, baseUrl);
+        logger.info("LLMJudge initialisé avec {} juge(s): [{}] sur {} (provider={})",
+            judgeServices.size(), modelNamesLabel, baseUrl, provider);
     }
 
     /** Constructeur pour injection directe (tests). */
@@ -228,13 +258,22 @@ public class LLMJudge {
 
     // ── Private helpers ───────────────────────────────────────────────────
 
-    private JudgeService createJudgeService(String modelName, String baseUrl) {
-        ChatModel chatModel = OllamaChatModel.builder()
-            .baseUrl(baseUrl)
-            .modelName(modelName)
-            .temperature(0.0)
-            .timeout(Duration.ofSeconds(120))
-            .build();
+    private JudgeService createJudgeService(String modelName, String baseUrl, String provider) {
+        ChatModel chatModel = PROVIDER_OPENAI.equalsIgnoreCase(provider)
+            // mlx_lm.server n'exige pas de clé, mais le client en réclame une non vide.
+            ? OpenAiChatModel.builder()
+                .baseUrl(baseUrl)
+                .apiKey("none")
+                .modelName(modelName)
+                .temperature(0.0)
+                .timeout(Duration.ofSeconds(120))
+                .build()
+            : OllamaChatModel.builder()
+                .baseUrl(baseUrl)
+                .modelName(modelName)
+                .temperature(0.0)
+                .timeout(Duration.ofSeconds(120))
+                .build();
         return AiServices.create(JudgeService.class, chatModel);
     }
 
