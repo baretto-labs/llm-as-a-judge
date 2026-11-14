@@ -1,7 +1,7 @@
 /*
   "Copie corrigée": the deck's visual identity.
   A French Seyès exercise sheet, fountain-pen ink, the grader's red pen, a highlighter,
-  rubber stamps for verdicts and a slate board for code. One metaphor: the grader and the rubric.
+  rubber stamps for verdicts and code on a white card. One metaphor: the grader and the rubric.
 */
 
 :root {
@@ -20,7 +20,7 @@
   --ardoise-bord: #3a4f46;
 
   --slidev-theme-primary: var(--rouge);
-  --slidev-code-background: var(--ardoise);
+  --slidev-code-background: var(--papier-carte);
   --slidev-code-radius: 6px;
 }
 
@@ -405,21 +405,21 @@
   height: 100%;
 }
 
-/* ── Code on the slate board ───────────────────────────────────────────── */
+/* ── Code on a white card (light: dark slides wash out on projectors) ──── */
 
 .slidev-layout pre.shiki,
 .slidev-code {
-  background: var(--ardoise) !important;
-  border: 3px solid var(--ardoise-bord);
+  background: var(--papier-carte) !important;
+  border: 2px solid rgba(28, 37, 65, 0.25);
   box-shadow: 0 10px 24px rgba(28, 37, 65, 0.2);
   font-size: 0.95rem !important;
   line-height: 1.55 !important;
   padding: 1.1rem 1.3rem !important;
 }
 
-/* Highlighted lines read as chalk underlined in blue */
+/* Highlighted lines read as a pale blue highlighter */
 .slidev-code .highlighted {
-  background: rgba(43, 79, 168, 0.28);
+  background: rgba(43, 79, 168, 0.12);
 }
 
 /* ── Cover ─────────────────────────────────────────────────────────────── */

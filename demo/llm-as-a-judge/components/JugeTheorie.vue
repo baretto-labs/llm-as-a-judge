@@ -66,10 +66,10 @@
 
     <!-- 6 · the answer comes in a shape a program can check -->
     <g v-click class="piece">
-      <rect x="540" y="70" width="250" height="56" rx="8" class="code" />
-      <text x="665" y="104" class="mono">{ critères, verdict, raison }</text>
-      <line x1="665" y1="126" x2="665" y2="176" marker-end="url(#jt-arrow)" />
-      <text x="665" y="56" class="note">format imposé, vérifié</text>
+      <rect x="525" y="294" width="280" height="70" rx="8" />
+      <text x="665" y="321" class="title">LE FORMAT <tspan class="sub">· imposé, vérifié</tspan></text>
+      <text x="665" y="345" class="mono">{ critères, verdict, raison }</text>
+      <line x1="665" y1="294" x2="665" y2="254" marker-end="url(#jt-arrow)" />
     </g>
 
   </svg>
@@ -108,7 +108,6 @@ rect {
 rect.juge { fill: var(--encre); stroke: none; }
 rect.verdict { stroke: var(--bleu); stroke-width: 2.5; stroke-opacity: 1; }
 rect.case { fill: none; filter: none; stroke-opacity: 0.8; }
-rect.code { fill: var(--ardoise); stroke: var(--ardoise-bord); stroke-width: 3; stroke-opacity: 1; }
 
 line {
   stroke: currentColor;
@@ -120,7 +119,7 @@ text { fill: currentColor; text-anchor: middle; }
 .sub { font-size: 13.5px; fill: var(--encre-douce); }
 .clair { fill: var(--papier); }
 .bleu { fill: var(--bleu); }
-.mono { font-family: 'JetBrains Mono', monospace; font-size: 14px; fill: #dbd7ca; }
+.mono { font-family: 'JetBrains Mono', monospace; font-size: 14px; fill: var(--encre); }
 .note {
   font-family: 'Caveat', cursive;
   font-size: 20px;

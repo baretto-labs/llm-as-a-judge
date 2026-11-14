@@ -1,9 +1,10 @@
 import { defineShikiSetup } from '@slidev/types'
 
-// Code always sits on the slate board, so both schemes use a dark palette.
+// Code sits on a white card on the paper sheet: a light, high-contrast palette
+// stays readable from the back of a room, where dark slides wash out on projectors.
 export default defineShikiSetup(() => ({
   themes: {
-    dark: 'vitesse-dark',
-    light: 'vitesse-dark',
+    dark: 'github-light-high-contrast',
+    light: 'github-light-high-contrast',
   },
 }))

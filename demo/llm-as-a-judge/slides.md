@@ -240,6 +240,7 @@ transition: fade-out
 ---
 # Rapide à coder ... 
 
+<div class="code-juge">
 
 ```java {7-9}
 ChatModel juge = OllamaChatModel.builder()
@@ -249,11 +250,19 @@ ChatModel juge = OllamaChatModel.builder()
     .build();
 
 ChatResponse r = juge.chat(
-    SystemMessage.from(BAREME),                // les trois contrôles + les conventions
+    SystemMessage.from(BAREME),  // le barème + les règles
     UserMessage.from(question + contexte + reponse));
 
-Judgement j = parse(r.aiMessage().text());     // { critères, verdict, raison }
+// { critères, verdict, raison }
+Judgement j = parse(r.aiMessage().text());
 ```
+
+</div>
+
+<style>
+.code-juge .slidev-code { font-size: 1.25rem !important; line-height: 1.45 !important; }
+.code-juge .slidev-code .slidev-code-dishonored { opacity: 0.6; }
+</style>
 
 <!--
 ⏱ 0:40 (6:50)
@@ -272,7 +281,7 @@ Ce que je crains de mon juge.
   <li><strong>Biais de verbosité</strong> : est-ce qu'il se laisse impressionner par une réponse longue ?</li>
 </ul>
 
-<p v-click class="mt-12"><span class="entoure font-bold">Pour le savoir, il me faut un corrigé : un étalon.</span></p>
+<p v-click class="mt-12"><span class="entoure font-bold">Pour le savoir, il me faut une copie test.</span></p>
 
 <style>
 .biais { margin-top: 2.5rem; font-size: 1.4rem; line-height: 1.5; }
@@ -283,7 +292,7 @@ Ce que je crains de mon juge.
 ⏱ 0:40 (7:30)
 - Indulgence : il laisse passer le faible ?
 - Verbosité : le long l'impressionne ?
-- [click] Pour le savoir, il me faut un corrigé : un étalon.
+- [click] Pour le savoir, il me faut une copie test : des questions dont je connais déjà le verdict.
 -->
 
 ---
@@ -303,7 +312,7 @@ transition: fade-out
 ---
 # Qui juge le juge ?
 
-Moi. Ma copie test : 50 questions dont je connais le verdict.
+50 questions dont je connais le verdict.
 
 <div class="etalon mt-5">
 <div class="scotch copie-test">
@@ -329,7 +338,7 @@ Moi. Ma copie test : 50 questions dont je connais le verdict.
 </div>
 </div>
 
-<p v-click class="mt-6"><span class="entoure font-bold">Avant d'écrire le juge, écris le corrigé.</span></p>
+<p v-click class="mt-6"><span class="entoure font-bold">Avant d'écrire le juge, écris ta copie test.</span></p>
 
 <style>
 .etalon { display: grid; grid-template-columns: 1.35fr 1fr; gap: 2.5rem; align-items: start; }
@@ -360,8 +369,8 @@ Moi. Ma copie test : 50 questions dont je connais le verdict.
 - La copie n'est pas au hasard : elle vise les biais.
 - [click] 27 fausses sur 50. Un juge qui dit toujours oui : 46 %.
 - [click] 11 longues, dont 8 fausses. S'il aime le long, il tombe.
-- [click] Avant d'écrire le juge, écris le corrigé.
-- Aujourd'hui, je fixerais aussi une barre avant de commencer, par exemple 85 %. Je ne l'avais pas fait.
+- [click] Avant d'écrire le juge, écris ta copie test.
+- Aujourd'hui, je fixerais aussi un score minimum avant de commencer, par exemple 85 %. Je ne l'avais pas fait.
 -->
 
 ---
@@ -400,7 +409,7 @@ Premier prompt : rien d'exploitable.
 - 50 questions, il n'en juge aucune : 0 %. Pas faux : illisible. Il s'arrête avant le verdict.
 - [click] Quatre règles dans le prompt, même modèle : 76 %. (je laisse l'écran parler)
 - [click] Le plus gros levier : quatre règles.
-- Mon étalon me montre qu'il est indulgent : 10 mauvaises réponses sur 27 passent.
+- Ma copie test me montre qu'il est indulgent : 10 mauvaises réponses sur 27 passent.
 -->
 
 ---
@@ -412,25 +421,26 @@ Mon juge fait 76 %. Comment monter ?
 
 <div class="bulletin mt-4">
   <div v-click="1" class="ligne">
-    <span class="candidat">J'entraîne <small>QLoRA, 91 min, sur le MacBook</small></span>
+    <span class="candidat">J'entraîne</span>
     <span class="note">76 → 76 %</span>
     <Tampon couleur="encre" taille="0.9rem" :angle="3">rien gagné</Tampon>
     <span v-click="2" class="annotation faute" style="grid-column: 1 / -1">le format, pas le jugement</span>
   </div>
   <div v-click="3" class="ligne">
-    <span class="candidat">Je prends plus gros <small>Qwen 14B → 32B, quantifié</small></span>
+    <span class="candidat">Je prends plus gros <small>14B → 32B</small></span>
     <span class="note">76 → 90 %</span>
     <Tampon couleur="vert" taille="0.9rem" :angle="-4">retenu</Tampon>
-    <span v-click="4" class="annotation" style="grid-column: 1 / -1">+14 : dans la marge (McNemar : il faut 15)</span>
+    <span v-click="4" class="annotation" style="grid-column: 1 / -1">+14 : sous le seuil de 15</span>
   </div>
   <div v-click="5" class="ligne">
-    <span class="candidat">Un jury de trois familles <small>trois modèles à faire tourner</small></span>
+    <span class="candidat">Un jury</span>
     <span class="note">90 → 94 %</span>
-    <Tampon couleur="rouge" taille="0.9rem" :angle="3">sous le seuil</Tampon>
+    <Tampon couleur="rouge" taille="0.9rem" :angle="3">pas rentable</Tampon>
+    <span v-click="6" class="annotation faute" style="grid-column: 1 / -1">+4 : sous le seuil, pour trois modèles</span>
   </div>
 </div>
 
-<p v-click="6" class="mt-6"><span class="entoure font-bold">Mon juge est retenu : qwen2.5-coder 32B.</span></p>
+<p v-click="7" class="mt-6"><span class="entoure font-bold">Mon juge est retenu : Qwen 32B.</span></p>
 
 <!--
 ⏱ 1:30 (11:20)
@@ -440,22 +450,11 @@ Mon juge fait 76 %. Comment monter ?
 - [click] Plus gros, 32 milliards : 90 %.
 - [click] +14, soit 7 questions. C'est comme un sondage : sur 50 questions, il en faut 8. Ça se calcule : test de McNemar.
 - Je le garde quand même : les mauvaises réponses qui passent tombent de 10 à 4.
-- Sujet critique, médical ou juridique : pour diviser cette marge par deux, quatre fois plus de questions.
-- [click] Un jury de trois familles : 94 %. Trois modèles à faire tourner, sous le seuil.
+- Sujet critique, médical ou juridique : pour diviser ce seuil par deux, quatre fois plus de questions.
+- [click] Un jury de trois familles : 94 %, c'est le plus haut.
+- [click] Mais +4, c'est 2 questions : sous le seuil. Et je paie trois modèles. Le 32B, c'est un seul modèle, et les fausses qui passent tombent de 10 à 4.
 - [click] Mon juge est retenu. L'instrument est prêt.
 - Je ne le sais que grâce à ma copie test. Pour mon labo, 50 questions suffisent. Pour un chatbot qui engage la compagnie, il en faut beaucoup plus.
--->
-
----
-layout: center
-transition: fade-out
----
-
-<Exercices :courant="3" />
-
-<!--
-⏱ 0:05 (11:25)
-- Exercice 3 : mon juge est retenu. Je le mets au travail sur mon RAG.
 -->
 
 ---
@@ -469,10 +468,10 @@ Je le relance trois fois sur chaque question.
   <div v-click class="ligne">
     <span class="candidat">Il change d'avis <small>sur ma copie test de 50</small></span>
     <span class="note">4 <span class="unite">questions</span></span>
-    <Tampon couleur="vert" taille="0.9rem" :angle="-4">à relire</Tampon>
+    <Tampon couleur="encre" taille="0.9rem" :angle="-4">à relire</Tampon>
   </div>
   <div v-click class="ligne">
-    <span class="candidat">Je relis ces 4 questions <small>il se trompait sur 5</small></span>
+    <span class="candidat">Je relis ces 4 questions <small>sur ses 5 erreurs</small></span>
     <span class="note">2 <span class="unite">sur 5</span></span>
     <Tampon couleur="vert" taille="0.9rem" :angle="3">attrapées</Tampon>
   </div>
@@ -485,11 +484,24 @@ Je le relance trois fois sur chaque question.
 </style>
 
 <!--
-⏱ 0:45 (12:10)
-- Au travail, mon juge n'est pas toujours sûr de lui. Je le relance trois fois sur chaque question.
+⏱ 0:45 (12:05)
+- Mon juge est retenu. Dernière chose sur ma copie test : où il hésite. Je le relance trois fois sur chaque question.
 - [click] Là où il change d'avis, il hésite : 4 questions sur 50, mesuré sur ma copie test.
+- Trois passes, ça coûte aussi. Mais là, je sais ce que j'achète : 4 relectures au lieu de 50.
 - [click] Je ne relis que celles-là : 2 erreurs attrapées sur 5. Les 3 autres, il les répète : ce sont ses angles morts.
 - [click] Ne relis que les doutes.
+-->
+
+---
+layout: center
+transition: fade-out
+---
+
+<Exercices :courant="3" />
+
+<!--
+⏱ 0:05 (12:10)
+- Exercice 3 : mon juge est retenu. Je le mets au travail sur mon RAG.
 -->
 
 ---
@@ -497,7 +509,7 @@ transition: fade-out
 ---
 # Premier verdict
 
-La copie de mon assistant : 60 questions. Mon juge compte les contextes suffisants.
+La copie de mon assistant : 60 questions.
 
 <div class="barres mt-8">
   <div v-click class="barre-ligne">
@@ -512,20 +524,21 @@ La copie de mon assistant : 60 questions. Mon juge compte les contextes suffisan
   </div>
 </div>
 
-<div v-click class="deux mt-10">
-  <p><span class="annotation faute">un écart pareil ? c’est ton code</span></p>
-  <p class="text-right"><span class="entoure font-bold">Un juge sert d'abord à trouver tes bugs.</span></p>
+<div v-click class="mt-8">
+  <p><span class="annotation faute">un écart pareil ? c’est mon code</span></p>
+  <p class="mt-4"><span class="entoure font-bold">En mesurant, mon juge a trouvé un bug dans mon RAG.</span></p>
 </div>
 
 
 <!--
 ⏱ 1:00 (13:10)
 - Alors, j'améliore ?
+- Mon juge corrige les 60 questions de mon assistant : il compte les contextes suffisants.
 - [click] Graphe : 10 contextes suffisants sur 60.
 - [click] Vectoriel : 36 sur 60.
 - [click] Un tel écart, c'est mon code : le graphe perd des liens. Il ramène la classe, pas ce qu'elle implémente.
 - Je m'attendais à l'inverse.
-- Un juge sert d'abord à trouver tes bugs.
+- En mesurant, mon juge a trouvé un bug dans mon RAG. Le suivant sera dans mon script de mesure.
 -->
 
 ---
@@ -533,13 +546,13 @@ transition: fade-out
 ---
 # « Aucune différence »
 
-Vectoriel, ou vectoriel + BM25 ? Mon banc : « aucune différence ».
+Vectoriel, ou vectoriel + mots-clés (BM25) ? Ma mesure : « aucune différence ».
 
 <div class="fiches mt-6">
 <div v-click class="fiche">
   <span class="etiquette">01 · la panne</span>
   <strong>Contextes coupés</strong>
-  <p>Mon banc coupait chaque contexte à 6&nbsp;000&nbsp;caractères : 46 sur 60 côté BM25.</p>
+  <p>Mon script coupait les contextes avant le juge : plus de 3 sur 4 côté BM25.</p>
   <span class="annotation faute">contextes arrachés</span>
 </div>
 <div v-click class="fiche">
@@ -557,10 +570,44 @@ Vectoriel, ou vectoriel + BM25 ? Mon banc : « aucune différence ».
 ⏱ 1:15 (14:25)
 - Vectoriel + BM25 (mots-clés) : mon premier passage ne voit pas de différence.
 - Je ne l'ai pas cru.
-- [click] Mon banc coupait les contextes à 6 000 caractères : 46 sur 60.
+- [click] Mon script de mesure coupait les contextes à 6 000 caractères, avant le juge : 46 sur 60, plus de 3 sur 4.
 - [click] Contextes entiers : 36 contre 47 sur 60. Même calcul que pour le juge : 11 de plus, au-dessus du seuil.
 - [click] « Vérifie ce que ton juge lit. »
-- J'ai corrigé mon banc, pas le juge. En prod le jour même.
+- J'ai corrigé mon script, pas le juge.
+-->
+
+---
+layout: center
+class: text-center
+transition: fade-out
+---
+
+<p class="rappel">Comment savoir si j'améliore mon assistant ?</p>
+
+<h1 class="reponse">Je mesure. Puis je livre.</h1>
+
+<div class="pari mt-10">
+  <span class="etiquette">mon pari</span>
+  <span class="choix"><span class="pari-nom">GraphRAG<span v-click="1" class="trait"></span></span></span>
+  <span v-click="1" class="etiquette">livré</span>
+  <span v-click="1" class="choix">Vectoriel + BM25 <Tampon couleur="vert" taille="1rem" :angle="-4">en prod</Tampon></span>
+</div>
+
+<style>
+.pari { display: grid; grid-template-columns: auto auto; gap: 1rem 2rem; justify-content: center; align-items: center; text-align: left; }
+.pari .choix { font-size: 1.8rem; font-weight: 700; display: flex; align-items: center; gap: 1.5rem; }
+.pari .pari-nom { position: relative; }
+.pari .trait { position: absolute; left: -0.1em; right: -0.1em; top: 52%; height: 0.12em; background: var(--encre); rotate: -6deg; }
+.rappel { font-size: 1.3rem; color: var(--encre-douce); margin: 0 0 1.2rem; }
+.slidev-layout h1.reponse { font-size: 3.2rem; }
+</style>
+
+<!--
+⏱ 0:20 (14:45)
+- Ma question de départ : comment savoir si j'améliore mon assistant ?
+- Maintenant, je mesure. Puis je livre.
+- Mon pari, c'était le graphe, tel que je l'avais codé.
+- [click] La mesure m'a fait livrer autre chose : vectoriel + BM25. En prod le jour même, et je sais que c'est mieux.
 -->
 
 ---
@@ -572,10 +619,10 @@ transition: fade-out
 <CopieCorrigee />
 
 <!--
-⏱ 1:00 (15:25)
+⏱ 1:00 (15:45)
 - La couverture disait « copie à corriger ». La voici.
 - Pour chaque règle : je la lis, je lis l'annotation, je clique.
-- [click] Écris ta copie test et ta barre d'abord.
+- [click] Écris ta copie test d'abord.
 - [click] Écris ton barème.
 - [click] Ne relis que les doutes.
 - [click] « Vérifie ce que ton juge lit. » (mot pour mot)
@@ -594,7 +641,7 @@ transition: fade-out
 <div>
   <span class="etiquette">le code</span>
   <p><b>OllamAssist</b><br><span class="ref">github.com/baretto-labs/OllamAssist</span></p>
-  <p><b>Le banc et le juge</b><br><span class="ref">github.com/baretto-labs/llm-as-a-judge</span></p>
+  <p><b>Le juge et le script de mesure</b><br><span class="ref">github.com/baretto-labs/llm-as-a-judge</span></p>
   <span class="etiquette mt-6 block">les affaires</span>
   <p><b>Moffatt v. Air Canada</b><br><span class="ref">2024 BCCRT 149 · canlii.org</span></p>
   <p><b>Mata v. Avianca</b><br><span class="ref">S.D.N.Y., 22-cv-1461, 22 juin 2023 · courtlistener.com</span></p>
@@ -614,8 +661,8 @@ transition: fade-out
 </div>
 
 <!--
-⏱ 0:15 (15:40)
-- Le code, le banc et les articles : tout est ici.
+⏱ 0:15 (16:00)
+- Le code, le script de mesure et les articles : tout est ici.
 -->
 
 ---
@@ -637,7 +684,7 @@ transition: fade-out
 </div>
 
 <!--
-⏱ 0:15 (15:55)
+⏱ 0:15 (16:15)
 - Vos questions ?
 - Laisser cette diapo pendant les questions.
 
