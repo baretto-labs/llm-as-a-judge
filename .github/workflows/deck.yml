@@ -5,7 +5,7 @@ name: Deck
 
 on:
   push:
-    branches: [main, talk/v1]
+    branches: [main]
     paths:
       - 'demo/llm-as-a-judge/**'
       - '.github/workflows/deck.yml'
