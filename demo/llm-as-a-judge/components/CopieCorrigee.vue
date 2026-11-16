@@ -1,7 +1,7 @@
 <!--
   The closing picture: the cover said "Copie à corriger", this is the copy, corrected.
   Four rules to take home, ticked one per click in green, then the grader's remark
-  (the loop back to the opening: Jake Moffatt, who had to go to court) and the stamp. Keep the rules in
+  (the loop back to the opening: the chatbot will be judged, by you before or by a court after) and the stamp. Keep the rules in
   sync with the REX acts (slides 12-19).
 -->
 <template>
@@ -22,7 +22,7 @@
     </ol>
 
     <div v-click class="appreciation">
-      <p class="annotation">Jake Moffatt a dû aller au tribunal. Vérifiez avant lui.</p>
+      <p class="annotation">Tôt ou tard, votre chatbot sera jugé. Choisissez quand.</p>
       <div class="tampon-final"><Tampon :angle="-9" taille="1.3rem">Copie corrigée</Tampon></div>
     </div>
   </div>
