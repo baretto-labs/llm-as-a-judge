@@ -314,35 +314,44 @@ transition: fade-out
 
 50 questions dont je connais le verdict.
 
-<div class="etalon mt-5">
-<div class="scotch copie-test">
-  <div class="entete"><span></span><span>moi</span><span>mon juge</span><span></span></div>
-  <div class="q"><span>Question 1</span><span class="ok">✓</span><span class="ok">✓</span><span class="egal">=</span></div>
-  <div class="q"><span>Question 2</span><span class="ko">✗ faux</span><span class="ok">✓</span><span class="diff">≠</span></div>
-  <div class="q"><span>Question 3</span><span class="ko">✗ long, faux</span><span class="ko">✗</span><span class="egal">=</span></div>
-  <div class="q"><span>…</span><span></span><span></span><span></span></div>
-  <div class="q"><span>Question 50</span><span class="ok">✓</span><span class="ok">✓</span><span class="egal">=</span></div>
-  <p class="accord">Sa note : le % de questions où il tranche comme moi.</p>
-</div>
+<div class="etalon mt-3">
 <div class="pieges">
-  <div v-click class="lecon">
+  <div v-click="1" class="lecon">
     <span class="etiquette">piège · indulgence</span>
     <div class="chiffre">27 <small>fausses</small></div>
     <p>Un juge qui dit toujours «&nbsp;oui&nbsp;» ne fait que 46&nbsp;%.</p>
   </div>
-  <div v-click class="lecon">
+  <div v-click="2" class="lecon">
     <span class="etiquette">piège · verbosité</span>
     <div class="chiffre">11 <small>longues</small></div>
     <p>dont 8 fausses. La longueur ne rapporte rien.</p>
   </div>
 </div>
+<div v-click="3" class="scotch copie-test">
+  <div class="entete"><span></span><span>moi</span><span>mon juge</span><span></span></div>
+  <div class="q"><span>Question 1</span><span class="ok">✓</span><span class="ok">✓</span><span class="egal">=</span></div>
+  <div class="q"><span>Question 2</span><span class="ko">✗ faux</span><span class="ok">✓</span><span class="diff">≠</span></div>
+  <div v-click="4" class="detail">
+    <p class="enonce">« Liste en lecture seule » : <code>Arrays.asList(…)</code>, « liste immuable »</p>
+    <div class="avis"><span class="qui">moi</span><span class="ko">✗ exact ✗ bugs ✗ consigne</span><span class="raison">« taille fixe, pas immuable »</span></div>
+    <div class="avis"><span class="qui">mon juge</span><span class="ok">✓ exact ✓ bugs ✓ consigne</span><span class="raison">« une liste immuable »</span></div>
+  </div>
+  <div class="q"><span>…</span><span></span><span></span><span></span></div>
+  <div class="q"><span>Question 50</span><span class="ok">✓</span><span class="ok">✓</span><span class="egal">=</span></div>
+</div>
 </div>
 
-<p v-click class="mt-6"><span class="entoure font-bold">Avant d'écrire le juge, écris ta copie test.</span></p>
+<p v-click="5" class="mt-4"><span class="entoure font-bold">Avant d'écrire le juge, écris ta copie test.</span></p>
 
 <style>
-.etalon { display: grid; grid-template-columns: 1.35fr 1fr; gap: 2.5rem; align-items: start; }
-.copie-test { padding: 1rem 1.4rem 0.8rem; }
+.etalon { display: grid; grid-template-columns: 1fr 2.1fr; gap: 2rem; align-items: start; }
+.copie-test .detail.slidev-vclick-hidden { display: none; }
+.copie-test .detail { padding: 0.5rem 0 0.6rem; border-bottom: 1px dashed rgba(28, 37, 65, 0.18); }
+.copie-test .detail .enonce { margin: 0 0 0.4rem; font-size: 0.95rem; }
+.copie-test .detail .avis { display: grid; grid-template-columns: 5rem auto 1fr; gap: 0.8rem; align-items: baseline; font-size: 0.9rem; }
+.copie-test .detail .qui { font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--encre-douce); }
+.copie-test .detail .raison { font-family: 'Caveat', cursive; font-size: 1.25rem; color: var(--encre); white-space: nowrap; }
+.copie-test { padding: 0.7rem 1.3rem 0.5rem; }
 .copie-test .entete, .copie-test .q {
   display: grid; grid-template-columns: 1fr 7.5rem 5.5rem 2rem; align-items: center;
 }
@@ -350,28 +359,57 @@ transition: fade-out
   font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; letter-spacing: 0.12em;
   text-transform: uppercase; color: var(--encre-douce); padding-bottom: 0.3rem;
 }
-.copie-test .q { font-size: 1.05rem; padding: 0.35rem 0; border-bottom: 1px dashed rgba(28, 37, 65, 0.18); }
+.copie-test .q { font-size: 1rem; padding: 0.2rem 0; border-bottom: 1px dashed rgba(28, 37, 65, 0.18); }
 .copie-test .ok { color: var(--vert); font-weight: 700; }
 .copie-test .ko { color: var(--rouge); font-weight: 700; }
 .copie-test .egal { color: var(--encre-douce); font-weight: 700; text-align: center; }
 .copie-test .diff { color: var(--rouge); font-weight: 800; text-align: center; }
-.copie-test .accord { margin: 0.7rem 0 0; font-weight: 700; font-size: 1rem; }
 .pieges { display: flex; flex-direction: column; gap: 1.4rem; }
-.pieges .chiffre { font-size: 2.6rem; }
-.pieges p { font-size: 0.95rem; line-height: 1.4; margin: 0; }
+.pieges .chiffre { font-size: 2.2rem; }
+.pieges p { font-size: 0.9rem; line-height: 1.35; margin: 0; }
 </style>
 
 <!--
 ⏱ 1:15 (8:50)
-- Qui juge le juge ? Moi. Ma copie test : 50 questions, je connais chaque verdict.
-- Mon juge corrige la même copie. Je compare question par question : sa note, c'est le % de questions où il tranche comme moi.
-- Même note finale que moi, ça ne suffit pas : il faut les mêmes verdicts, aux mêmes questions.
-- La copie n'est pas au hasard : elle vise les biais.
-- [click] 27 fausses sur 50. Un juge qui dit toujours oui : 46 %.
-- [click] 11 longues, dont 8 fausses. S'il aime le long, il tombe.
+- Qui juge le juge ? Moi. Ma copie test : 50 questions dont je connais le verdict. Je l'ai écrite pour piéger les deux biais.
+- [click] Indulgence : 27 fausses sur 50. Un juge qui dit toujours oui : 46 %.
+- [click] Verbosité : 11 longues, dont 8 fausses. S'il aime le long, il tombe.
+- [click] Mon juge corrige la même copie. Je compare question par question : sa note, c'est le % de questions où il tranche comme moi. Les mêmes verdicts, aux mêmes questions.
+- [click] Question 2 : une liste en lecture seule. La réponse dit « Arrays.asList, liste immuable ». Moi : faux, elle est de taille fixe, set() passe. Mon juge : trois cases vertes, il la croit. C'est l'indulgence.
 - [click] Avant d'écrire le juge, écris ta copie test.
 - Aujourd'hui, je fixerais aussi un score minimum avant de commencer, par exemple 85 %. Je ne l'avais pas fait.
 -->
+
+---
+layout: center
+class: text-center
+transition: fade-out
+---
+
+<h1 class="titre-seuil">Une mesure a une marge d'erreur</h1>
+
+<div class="seuils mt-10">
+  <span class="n">50 questions</span><span class="fleche">→</span><strong>seuil : 14 points</strong><span class="annotation">ma copie test</span>
+  <span v-click class="n">100 questions</span><span v-click="1" class="fleche">→</span><strong v-click="1">seuil : 10 points</strong><span></span>
+</div>
+
+<p class="mt-10"><span class="ref">ça se calcule : test de McNemar, confiance 90 %</span></p>
+
+<style>
+.slidev-layout h1.titre-seuil { font-size: 2.6rem; }
+.seuils { display: grid; grid-template-columns: auto auto auto auto; gap: 1.2rem 1.5rem; justify-content: center; align-items: baseline; text-align: left; font-size: 1.6rem; }
+.seuils .fleche { color: var(--encre-douce); }
+.seuils .annotation { font-size: 1.5rem; }
+</style>
+
+<!--
+⏱ 0:15 (9:05)
+- C'est comme un sondage : un petit écart peut venir du hasard.
+- Avec mes 50 questions, il faut au moins 14 points d'écart : 7 questions.
+- [click] Avec 100 questions, 10 points. Plus j'ai de questions, plus je vois les petits écarts.
+- Ça se calcule : test de McNemar. Sujet critique, médical ou juridique : il faut plus de questions.
+-->
+
 
 ---
 transition: fade-out
@@ -382,7 +420,7 @@ Premier prompt : rien d'exploitable.
 
 <div class="grid gap-10 mt-8 items-center" style="grid-template-columns: auto 1fr">
 <div class="lecon items-center text-center">
-  <span class="etiquette">mon juge · même modèle</span>
+  <span class="etiquette">mon juge · Qwen 14B</span>
   <div class="chiffre grand whitespace-nowrap"><span class="zero">0 %<span v-click="1" class="trait"></span></span><span v-click="1"> → 76 %</span></div>
   <p>d'accord avec moi sur les 50 questions</p>
 </div>
@@ -405,9 +443,9 @@ Premier prompt : rien d'exploitable.
 </style>
 
 <!--
-⏱ 1:00 (9:50)
+⏱ 1:00 (10:05)
 - 50 questions, il n'en juge aucune : 0 %. Pas faux : illisible. Il s'arrête avant le verdict.
-- [click] Quatre règles dans le prompt, même modèle : 76 %. (je laisse l'écran parler)
+- [click] Quatre règles dans le prompt, même modèle, Qwen 14B : 76 %. (je laisse l'écran parler)
 - [click] Le plus gros levier : quatre règles.
 - Ma copie test me montre qu'il est indulgent : 10 mauvaises réponses sur 27 passent.
 -->
@@ -430,10 +468,10 @@ Mon juge fait 76 %. Comment monter ?
     <span class="candidat">Je prends plus gros <small>14B → 32B</small></span>
     <span class="note">76 → 90 %</span>
     <span v-click="7"><Tampon couleur="vert" taille="0.9rem" :angle="-4">retenu</Tampon></span>
-    <span v-click="4" class="annotation" style="grid-column: 1 / -1">+14 : sous le seuil de 15</span>
+    <span v-click="4" class="annotation" style="grid-column: 1 / -1; color: var(--vert)">+14 : seuil atteint</span>
   </div>
   <div v-click="5" class="ligne">
-    <span class="candidat">Un jury</span>
+    <span class="candidat">Un jury <small>Qwen 32B, Mistral 24B, Gemma 31B</small></span>
     <span class="note">90 → 94 %</span>
     <span v-click="6"><Tampon couleur="rouge" taille="0.9rem" :angle="3">pas rentable</Tampon></span>
     <span v-click="6" class="annotation faute" style="grid-column: 1 / -1">+4 : sous le seuil, pour trois modèles</span>
@@ -443,14 +481,13 @@ Mon juge fait 76 %. Comment monter ?
 <p v-click="8" class="mt-6"><span class="entoure font-bold">Mon juge est retenu : Qwen 32B.</span></p>
 
 <!--
-⏱ 1:30 (11:20)
+⏱ 1:15 (11:20)
 - 76 %. Comment monter ? Une phrase par clic.
 - [click] J'entraîne, sur le MacBook : rien ne bouge.
 - [click] Il apprend le format, pas le jugement : rien gagné.
 - [click] Plus gros, 32 milliards : 90 %.
-- [click] +14, soit 7 questions. C'est comme un sondage : sur 50 questions, il en faut 8. Ça se calcule : test de McNemar.
-- Sujet critique, médical ou juridique : pour diviser ce seuil par deux, quatre fois plus de questions.
-- [click] Un jury de trois familles : 94 %, c'est le plus haut.
+- [click] +14, soit 7 questions de plus : il atteint le seuil.
+- [click] Un jury de trois familles, Qwen, Mistral et Gemma : 94 %, c'est le plus haut.
 - [click] Mais +4, c'est 2 questions : sous le seuil. Et je paie trois modèles. Le 32B, c'est un seul modèle, et les fausses qui passent tombent de 10 à 4.
 - [click] Le plus gros est retenu : il tourne sur mon poste.
 - [click] Mon juge est retenu : Qwen 32B. L'instrument est prêt.
@@ -464,31 +501,63 @@ transition: fade-out
 
 Je le relance trois fois sur chaque question.
 
-<div class="bulletin mt-6">
-  <div v-click class="ligne">
-    <span class="candidat">Il change d'avis <small>sur ma copie test de 50</small></span>
-    <span class="note">4 <span class="unite">questions</span></span>
-    <Tampon couleur="encre" taille="0.9rem" :angle="-4">à relire</Tampon>
-  </div>
-  <div v-click class="ligne">
-    <span class="candidat">Je relis ces 4 questions <small>sur ses 5 erreurs</small></span>
-    <span class="note">2 <span class="unite">sur 5</span></span>
-    <Tampon couleur="vert" taille="0.9rem" :angle="3">attrapées</Tampon>
-  </div>
+<div class="routage mt-8">
+  <div class="boite depart pile">Mon juge</div>
+  <svg v-click="1" class="fourche haut" viewBox="0 0 100 100" preserveAspectRatio="none"><path d="M0,100 L30,100 L30,50 L100,50" /></svg>
+  <svg v-click="2" class="fourche bas" viewBox="0 0 100 100" preserveAspectRatio="none"><path d="M0,0 L30,0 L30,50 L100,50" /></svg>
+  <div v-click="1" class="branche haut"><span class="compte">4</span><span class="votes"><i class="ok">✓</i> <i class="ko">✗</i> <i class="ok">✓</i></span>il change d'avis</div>
+  <div v-click="1" class="cible haut">→ <span class="boite">je relis</span></div>
+  <div v-click="2" class="branche bas"><span class="compte">46</span><span class="votes"><i class="ok">✓</i> <i class="ok">✓</i> <i class="ok">✓</i></span><span class="ou">ou</span><span class="votes"><i class="ko">✗</i> <i class="ko">✗</i> <i class="ko">✗</i></span>même avis</div>
+  <div v-click="2" class="cible bas">→ <span class="boite">verdict direct</span></div>
+  <div v-click="3" class="issue haut vert">→ 2 erreurs attrapées</div>
+  <div v-click="3" class="issue bas rouge">→ 3 erreurs passent<span class="annotation faute">ses angles morts</span></div>
 </div>
 
-<p v-click class="mt-8"><span class="entoure font-bold">Ne relis que les doutes.</span></p>
+<p v-click="4" class="mt-10"><span class="entoure font-bold">Ne relis que les doutes.</span></p>
 
 <style>
-.note .unite { font-size: 1rem; font-weight: 500; color: var(--encre-douce); }
+.routage {
+  display: grid;
+  grid-template-columns: auto 2.2rem auto auto 1fr;
+  grid-template-rows: 6rem 6rem;
+  align-items: center; column-gap: 0.6rem; font-size: 1.05rem;
+}
+.routage .boite {
+  border: 2px solid var(--encre); border-radius: 6px; padding: 0.35rem 0.8rem;
+  background: var(--papier-carte); font-weight: 600; white-space: nowrap;
+}
+.routage .depart { grid-row: 1 / 3; }
+.routage .pile {
+  margin: 12px 12px 0 0;
+  box-shadow: 6px -6px 0 -2px var(--papier-carte), 6px -6px 0 0 var(--encre),
+              12px -12px 0 -2px var(--papier-carte), 12px -12px 0 0 var(--encre);
+}
+.routage .votes { display: inline-block; margin: 0 0.5rem 0 0.3rem; padding: 0.1rem 0.3rem; border: 1.5px solid var(--encre-douce); border-radius: 4px; font-size: 0.95rem; font-weight: 700; letter-spacing: 0.05em; color: var(--encre); }
+.routage .votes i { font-style: normal; }
+.routage .ou { margin: 0 0.3rem 0 -0.2rem; font-size: 0.95rem; color: var(--encre-douce); }
+.routage .votes .ok { color: var(--vert); }
+.routage .votes .ko { color: var(--rouge); }
+.routage .fourche { grid-column: 2; width: 100%; height: 100%; overflow: visible; }
+.routage .fourche path { fill: none; stroke: var(--encre); stroke-width: 2; vector-effect: non-scaling-stroke; }
+.routage .haut { grid-row: 1; }
+.routage .bas { grid-row: 2; }
+.routage .branche { grid-column: 3; white-space: nowrap; }
+.routage .compte { display: inline-block; min-width: 2.4rem; text-align: right; font-size: 1.9rem; font-weight: 800; margin-right: 0.3rem; }
+.routage .cible { grid-column: 4; white-space: nowrap; }
+.routage .issue { grid-column: 5; font-weight: 700; white-space: nowrap; position: relative; }
+.routage .issue.vert { color: var(--vert); }
+.routage .issue.rouge { color: var(--rouge); }
+.routage .issue .annotation { position: absolute; left: 1.4rem; top: 1.9rem; font-weight: 400; }
 </style>
+
 
 <!--
 ⏱ 0:45 (12:05)
 - Mon juge est retenu. Dernière chose sur ma copie test : où il hésite. Je le relance trois fois sur chaque question.
-- [click] Là où il change d'avis, il hésite : 4 questions sur 50, mesuré sur ma copie test.
+- [click] Là où il change d'avis, il hésite : 4 questions sur 50, mesuré sur ma copie test. Celles-là, je les relis.
 - Trois passes, ça coûte aussi. Mais là, je sais ce que j'achète : 4 relectures au lieu de 50.
-- [click] Je ne relis que celles-là : 2 erreurs attrapées sur 5. Les 3 autres, il les répète : ce sont ses angles morts.
+- [click] Les 46 autres, même avis trois fois : verdict direct, je ne les relis pas.
+- [click] Sur ses 5 erreurs, 2 tombent dans mes relectures : attrapées. Les 3 autres, il les répète : ce sont ses angles morts.
 - [click] Ne relis que les doutes.
 -->
 
@@ -509,7 +578,7 @@ transition: fade-out
 ---
 # Premier verdict
 
-La copie de mon assistant : 60 questions.
+Mon assistant répond à 60 questions.
 
 <div class="barres mt-8">
   <div v-click class="barre-ligne">
@@ -557,13 +626,26 @@ Vectoriel, ou vectoriel + mots-clés (BM25) ? Ma mesure : « aucune différence 
 </div>
 <div v-click class="fiche">
   <span class="etiquette">02 · contextes entiers</span>
-  <strong>36 contre 47, sur 60</strong>
-  <p>Contextes suffisants : vectoriel contre vectoriel + BM25.</p>
-  <span class="annotation" style="color: var(--vert)">+11 contextes : au-dessus du seuil</span>
+  <strong>Contextes suffisants, sur 60</strong>
+  <div class="mini-barres">
+    <span>Vectoriel</span>
+    <div class="piste"><div class="plein" style="--v: 60"></div></div>
+    <b>36</b>
+    <span>+ BM25</span>
+    <div class="piste"><div class="plein vert" style="--v: 78.33"></div></div>
+    <b>47</b>
+  </div>
+  <span class="annotation" style="color: var(--vert)">+11 contextes, il en fallait 7</span>
 </div>
 </div>
 
 <p v-click class="text-right mt-10"><span class="entoure font-bold">Vérifie ce que ton juge lit.</span></p>
+
+<style>
+.mini-barres { display: grid; grid-template-columns: 5.5rem 1fr 2rem; gap: 0.5rem 0.7rem; align-items: center; margin-top: 0.6rem; font-size: 0.95rem; }
+.mini-barres b { font-size: 1.2rem; text-align: right; }
+.mini-barres .piste { height: 1.2rem; }
+</style>
 
 
 <!--
@@ -571,7 +653,7 @@ Vectoriel, ou vectoriel + mots-clés (BM25) ? Ma mesure : « aucune différence 
 - Vectoriel + BM25 (mots-clés) : mon premier passage ne voit pas de différence.
 - Je ne l'ai pas cru.
 - [click] Mon script de mesure coupait les contextes à 6 000 caractères, avant le juge : 46 sur 60, plus de 3 sur 4.
-- [click] Contextes entiers : 36 contre 47 sur 60. Même calcul que pour le juge : 11 de plus, au-dessus du seuil.
+- [click] Contextes entiers : 36 contre 47 sur 60. Comme pour le juge : sur 60 questions, moins de 7 d'écart, ça peut être le hasard. Ici, 11.
 - [click] « Vérifie ce que ton juge lit. »
 - J'ai corrigé mon script, pas le juge.
 -->
@@ -626,7 +708,7 @@ transition: fade-out
 - [click] Écris ton barème.
 - [click] Ne relis que les doutes.
 - [click] « Vérifie ce que ton juge lit. » (mot pour mot)
-- [click] Dernière phrase : « Jake Moffatt a dû aller au tribunal. Vérifiez avant lui. »
+- [click] Dernière phrase : « Tôt ou tard, votre chatbot sera jugé. Choisissez quand. »
 - 2 s de silence. Puis « Merci ».
 -->
 
@@ -637,32 +719,45 @@ transition: fade-out
 ---
 # Les sources
 
-<div class="deux mt-8 sources">
+<div class="sources sources-qr mt-6">
 <div>
   <span class="etiquette">le code</span>
   <p><b>OllamAssist</b><br><span class="ref">github.com/baretto-labs/OllamAssist</span></p>
   <p><b>Le juge et le script de mesure</b><br><span class="ref">github.com/baretto-labs/llm-as-a-judge</span></p>
-  <span class="etiquette mt-6 block">les affaires</span>
-  <p><b>Moffatt v. Air Canada</b><br><span class="ref">2024 BCCRT 149 · canlii.org</span></p>
-  <p><b>Mata v. Avianca</b><br><span class="ref">S.D.N.Y., 22-cv-1461, 22 juin 2023 · courtlistener.com</span></p>
-  <span class="etiquette mt-6 block">le seuil · McNemar</span>
-  <p><b>Approximate Statistical Tests for Comparing Supervised Classification Learning Algorithms</b><br><span class="ref">Dietterich · Neural Computation · 1998</span></p>
+  <span class="etiquette mt-5 block">les affaires</span>
+  <p><b>Moffatt v. Air Canada</b><br><span class="ref">2024 BCCRT 149</span></p>
+  <p><b>Mata v. Avianca</b><br><span class="ref">S.D.N.Y. · 2023</span></p>
+  <span class="etiquette mt-5 block">le seuil</span>
+  <p><b>McNemar</b><br><span class="ref">Dietterich · 1998</span></p>
+</div>
+<div class="qr-centre">
+  <div class="scotch"><img src="./img/qr-repo.svg" alt="QR code du repo llm-as-a-judge" /></div>
+  <span class="annotation">le repo</span>
 </div>
 <div>
   <span class="etiquette">les articles</span>
-  <p><b>Using LLM-as-a-Judge For Evaluation</b><br><span class="ref">Hamel Husain · hamel.dev/blog/posts/llm-judge</span></p>
-  <p><b>Judging LLM-as-a-Judge</b><br><span class="ref">Zheng et al. · NeurIPS 2023 · arXiv:2306.05685</span></p>
-  <p><b>CheckEval</b><br><span class="ref">Lee et al. · 2024 · arXiv:2403.18771</span></p>
-  <p><b>SelfCheckGPT</b><br><span class="ref">Manakul, Liusie, Gales · EMNLP 2023 · arXiv:2303.08896</span></p>
-  <span class="etiquette mt-6 block">le jury</span>
-  <p><b>Replacing Judges with Juries</b> <span class="annotation text-base">pour</span><br><span class="ref">Verga et al. · 2024 · arXiv:2404.18796</span></p>
-  <p><b>Nine Judges, Two Effective Votes</b> <span class="annotation text-base">contre</span><br><span class="ref">Kohli · 2026 · arXiv:2605.29800</span></p>
+  <p><b>Using LLM-as-a-Judge</b><br><span class="ref">Hamel Husain · hamel.dev</span></p>
+  <p><b>Judging LLM-as-a-Judge</b><br><span class="ref">Zheng et al. · 2023</span></p>
+  <p><b>CheckEval</b><br><span class="ref">Lee et al. · 2024</span></p>
+  <p><b>SelfCheckGPT</b><br><span class="ref">Manakul et al. · 2023</span></p>
+  <span class="etiquette mt-5 block">le jury</span>
+  <p><b>Replacing Judges with Juries</b> <span class="annotation text-base">pour</span><br><span class="ref">Verga et al. · 2024</span></p>
+  <p><b>Nine Judges, Two Effective Votes</b> <span class="annotation text-base">contre</span><br><span class="ref">Kohli · 2026</span></p>
 </div>
 </div>
+
+<style>
+.sources-qr { display: grid; grid-template-columns: 1fr auto 1fr; gap: 2.5rem; align-items: center; }
+.sources-qr p { font-size: 0.9rem; }
+.qr-centre { display: flex; flex-direction: column; align-items: center; gap: 0.6rem; }
+.qr-centre img { width: 210px; height: 210px; display: block; }
+.qr-centre .annotation { font-size: 1.5rem; }
+</style>
 
 <!--
 ⏱ 0:15 (16:00)
 - Le code, le script de mesure et les articles : tout est ici.
+- Le QR code, au centre, mène au repo.
 -->
 
 ---
