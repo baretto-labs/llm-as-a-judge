@@ -423,37 +423,37 @@ Mon juge fait 76 %. Comment monter ?
   <div v-click="1" class="ligne">
     <span class="candidat">J'entraîne</span>
     <span class="note">76 → 76 %</span>
-    <Tampon couleur="encre" taille="0.9rem" :angle="3">rien gagné</Tampon>
+    <span v-click="2"><Tampon couleur="encre" taille="0.9rem" :angle="3">rien gagné</Tampon></span>
     <span v-click="2" class="annotation faute" style="grid-column: 1 / -1">le format, pas le jugement</span>
   </div>
   <div v-click="3" class="ligne">
     <span class="candidat">Je prends plus gros <small>14B → 32B</small></span>
     <span class="note">76 → 90 %</span>
-    <Tampon couleur="vert" taille="0.9rem" :angle="-4">retenu</Tampon>
+    <span v-click="7"><Tampon couleur="vert" taille="0.9rem" :angle="-4">retenu</Tampon></span>
     <span v-click="4" class="annotation" style="grid-column: 1 / -1">+14 : sous le seuil de 15</span>
   </div>
   <div v-click="5" class="ligne">
     <span class="candidat">Un jury</span>
     <span class="note">90 → 94 %</span>
-    <Tampon couleur="rouge" taille="0.9rem" :angle="3">pas rentable</Tampon>
+    <span v-click="6"><Tampon couleur="rouge" taille="0.9rem" :angle="3">pas rentable</Tampon></span>
     <span v-click="6" class="annotation faute" style="grid-column: 1 / -1">+4 : sous le seuil, pour trois modèles</span>
   </div>
 </div>
 
-<p v-click="7" class="mt-6"><span class="entoure font-bold">Mon juge est retenu : Qwen 32B.</span></p>
+<p v-click="8" class="mt-6"><span class="entoure font-bold">Mon juge est retenu : Qwen 32B.</span></p>
 
 <!--
 ⏱ 1:30 (11:20)
 - 76 %. Comment monter ? Une phrase par clic.
 - [click] J'entraîne, sur le MacBook : rien ne bouge.
-- [click] Il apprend le format, pas le jugement.
+- [click] Il apprend le format, pas le jugement : rien gagné.
 - [click] Plus gros, 32 milliards : 90 %.
 - [click] +14, soit 7 questions. C'est comme un sondage : sur 50 questions, il en faut 8. Ça se calcule : test de McNemar.
-- Je le garde quand même : les mauvaises réponses qui passent tombent de 10 à 4.
 - Sujet critique, médical ou juridique : pour diviser ce seuil par deux, quatre fois plus de questions.
 - [click] Un jury de trois familles : 94 %, c'est le plus haut.
 - [click] Mais +4, c'est 2 questions : sous le seuil. Et je paie trois modèles. Le 32B, c'est un seul modèle, et les fausses qui passent tombent de 10 à 4.
-- [click] Mon juge est retenu. L'instrument est prêt.
+- [click] Le plus gros est retenu : il tourne sur mon poste.
+- [click] Mon juge est retenu : Qwen 32B. L'instrument est prêt.
 - Je ne le sais que grâce à ma copie test. Pour mon labo, 50 questions suffisent. Pour un chatbot qui engage la compagnie, il en faut beaucoup plus.
 -->
 
