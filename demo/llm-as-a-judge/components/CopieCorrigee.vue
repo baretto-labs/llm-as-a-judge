@@ -33,7 +33,7 @@ const regles = [
   { texte: 'Écris ta copie test d’abord.', marge: 'avant le juge' },
   { texte: 'Écris ton barème.', marge: 'trois cases' },
   { texte: 'Ne relis que les doutes.', marge: '4 relues : 2 erreurs sur 5' },
-  { texte: 'Vérifie ce que ton juge lit.', marge: 'pas ce que tu lui envoies' },
+  { texte: 'Lis les raisons de ton juge.', marge: 'il m\'a montré mon bug' },
 ]
 </script>
 

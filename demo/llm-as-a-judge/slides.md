@@ -82,8 +82,7 @@ Air Canada plaide : le chatbot est
 
 Le tribunal :
 
-> « This is a remarkable submission. While a chatbot has an interactive
-> component, it is still just a part of Air Canada's website. »
+> « It is still just a part of Air Canada's website. »
 
 <span class="ref">Moffatt v. Air Canada, 2024 BCCRT 149</span>
 
@@ -119,7 +118,7 @@ transition: fade-out
   <div v-click="1" class="tampon-faux coup-de-tampon"><Tampon :angle="-9" taille="1.5rem">Aucun n'existe</Tampon></div>
 </div>
 
-<p v-click="1" class="text-center mt-4"><span class="ref">Mata v. Avianca, S.D.N.Y., 22-cv-1461, juge P. Kevin Castel, 22 juin 2023</span></p>
+<p v-click="1" class="text-center mt-4"><span class="ref">Mata v. Avianca, 2023</span></p>
 
 <p v-click="2" class="text-center" style="margin-top: 1.5rem"><span class="entoure font-bold">Avec un LLM, le faux a exactement la forme du vrai.</span></p>
 
@@ -153,13 +152,11 @@ transition: fade-out
 **Un assistant de code dans IntelliJ,
 entièrement local. Mon labo.**
 
-<p v-click>D’abord un <strong>chatbot</strong> : il répond avec ce qu’il sait.</p>
+<p v-click>D’abord un <strong>chatbot</strong> : ce qu’il sait.</p>
 
-<p v-click>Puis un <strong>agent</strong> : il lit mon workspace,
-et répond sur <strong>mon</strong> code.</p>
+<p v-click>Puis un <strong>agent</strong> : ce qu’il trouve dans <strong>mon</strong> code.</p>
 
-<p v-click><strong>Sa réponse ne dépend plus surtout du modèle.
-Elle dépend de ce qu’il a trouvé.</strong></p>
+<p v-click><strong>Sa réponse dépend de ce qu’il a trouvé.</strong></p>
 
 </div>
 <img src="./img/ollamassist-marketplace.png" width="480" height="316" alt="OllamAssist ouvert dans IntelliJ">
@@ -182,14 +179,10 @@ Deux façons de récupérer les extraits.
 
 <div class="fiches mt-6">
 <div class="fiche">
-  <span class="etiquette">vectoriel</span>
-  <strong>Cherche ce qui ressemble</strong>
-  <p>Les passages les plus proches de la question, par le sens.</p>
+  <strong>Vectoriel : il cherche ce qui ressemble</strong>
 </div>
 <div class="fiche">
-  <span class="etiquette">graphe</span>
-  <strong>Suit les liens du code</strong>
-  <p>Qui appelle qui, qui implémente quoi : un Ctrl+clic automatique.</p>
+  <strong>Graphe : il suit les liens du code</strong>
   <span class="annotation">sur du code, il devrait gagner</span>
 </div>
 </div>
@@ -274,11 +267,9 @@ transition: fade-out
 ---
 # Quelques biais des LLM ...
 
-Ce que je crains de mon juge.
-
 <ul class="biais">
-  <li><strong>Biais d'indulgence</strong> : est-ce qu'il valide trop facilement ?</li>
-  <li><strong>Biais de verbosité</strong> : est-ce qu'il se laisse impressionner par une réponse longue ?</li>
+  <li><strong>Indulgence</strong> : il valide trop facilement ?</li>
+  <li><strong>Verbosité</strong> : le long l'impressionne ?</li>
 </ul>
 
 <p v-click class="mt-12"><span class="entoure font-bold">Pour le savoir, il me faut une copie test.</span></p>
@@ -319,12 +310,12 @@ transition: fade-out
   <div v-click="1" class="lecon">
     <span class="etiquette">piège · indulgence</span>
     <div class="chiffre">27 <small>fausses</small></div>
-    <p>Un juge qui dit toujours «&nbsp;oui&nbsp;» ne fait que 46&nbsp;%.</p>
+    <p>Toujours «&nbsp;oui&nbsp;» : 46&nbsp;%</p>
   </div>
   <div v-click="2" class="lecon">
     <span class="etiquette">piège · verbosité</span>
     <div class="chiffre">11 <small>longues</small></div>
-    <p>dont 8 fausses. La longueur ne rapporte rien.</p>
+    <p>dont 8 fausses</p>
   </div>
 </div>
 <div v-click="3" class="scotch copie-test">
@@ -374,8 +365,11 @@ transition: fade-out
 - Qui juge le juge ? Moi. Ma copie test : 50 questions dont je connais le verdict. Je l'ai écrite pour piéger les deux biais.
 - [click] Indulgence : 27 fausses sur 50. Un juge qui dit toujours oui : 46 %.
 - [click] Verbosité : 11 longues, dont 8 fausses. S'il aime le long, il tombe.
-- [click] Mon juge corrige la même copie. Je compare question par question : sa note, c'est le % de questions où il tranche comme moi. Les mêmes verdicts, aux mêmes questions.
-- [click] Question 2 : une liste en lecture seule. La réponse dit « Arrays.asList, liste immuable ». Moi : faux, elle est de taille fixe, set() passe. Mon juge : trois cases vertes, il la croit. C'est l'indulgence.
+- [click] Mon juge corrige la même copie. Je compare question par question : sa note, c'est le % de questions où il tranche comme moi. Les mêmes verdicts, aux mêmes questions. Question 1 : d'accord. Question 2 : pas d'accord.
+- [click] Question 2 : une liste en lecture seule. La réponse : « Arrays.asList, c'est une liste immuable ».
+- Faux : taille fixe. Pas d'ajout, pas de suppression… mais set() passe.
+- Moi : faux. Mon juge : trois cases vertes, et il écrit « une liste immuable ». (1 s)
+- Il a cru la réponse. Tout se joue sur un mot. C'est ça, l'indulgence.
 - [click] Avant d'écrire le juge, écris ta copie test.
 - Aujourd'hui, je fixerais aussi un score minimum avant de commencer, par exemple 85 %. Je ne l'avais pas fait.
 -->
@@ -393,7 +387,7 @@ transition: fade-out
   <span v-click class="n">100 questions</span><span v-click="1" class="fleche">→</span><strong v-click="1">seuil : 10 points</strong><span></span>
 </div>
 
-<p class="mt-10"><span class="ref">ça se calcule : test de McNemar, confiance 90 %</span></p>
+<p class="mt-10"><span class="ref">ça se calcule : test de McNemar</span></p>
 
 <style>
 .slidev-layout h1.titre-seuil { font-size: 2.6rem; }
@@ -425,10 +419,10 @@ Premier prompt : rien d'exploitable.
   <p>d'accord avec moi sur les 50 questions</p>
 </div>
 <ol v-click="1" class="conventions">
-  <li>Une seule case rouge, et la réponse est recalée.</li>
-  <li>« Si possible », c'est un bonus, pas une obligation.</li>
-  <li>Chaque faute se note à un seul endroit.</li>
-  <li>Ne rien citer, ce n'est pas mal citer : l'invention est punie ailleurs.</li>
+  <li>1 case rouge : recalée</li>
+  <li>« Si possible » : bonus</li>
+  <li>1 faute, 1 seul endroit</li>
+  <li>Ne rien citer ≠ mal citer</li>
 </ol>
 </div>
 
@@ -474,7 +468,7 @@ Mon juge fait 76 %. Comment monter ?
     <span class="candidat">Un jury <small>Qwen 32B, Mistral 24B, Gemma 31B</small></span>
     <span class="note">90 → 94 %</span>
     <span v-click="6"><Tampon couleur="rouge" taille="0.9rem" :angle="3">pas rentable</Tampon></span>
-    <span v-click="6" class="annotation faute" style="grid-column: 1 / -1">+4 : sous le seuil, pour trois modèles</span>
+    <span v-click="6" class="annotation faute" style="grid-column: 1 / -1">+4 : sous le seuil</span>
   </div>
 </div>
 
@@ -595,7 +589,7 @@ Mon assistant répond à 60 questions.
 
 <div v-click class="mt-8">
   <p><span class="annotation faute">un écart pareil ? c’est mon code</span></p>
-  <p class="mt-4"><span class="entoure font-bold">En mesurant, mon juge a trouvé un bug dans mon RAG.</span></p>
+  <p class="mt-4"><span class="entoure font-bold">Mon juge a trouvé un bug dans mon RAG.</span></p>
 </div>
 
 
@@ -607,55 +601,44 @@ Mon assistant répond à 60 questions.
 - [click] Vectoriel : 36 sur 60.
 - [click] Un tel écart, c'est mon code : le graphe perd des liens. Il ramène la classe, pas ce qu'elle implémente.
 - Je m'attendais à l'inverse.
-- En mesurant, mon juge a trouvé un bug dans mon RAG. Le suivant sera dans mon script de mesure.
+- En mesurant, mon juge a trouvé un bug dans mon RAG. Je l'ai trouvé en lisant ses raisons.
 -->
 
 ---
 transition: fade-out
 ---
-# « Aucune différence »
+# Une autre piste
 
-Vectoriel, ou vectoriel + mots-clés (BM25) ? Ma mesure : « aucune différence ».
+Vectoriel + mots-clés (BM25)
 
-<div class="fiches mt-6">
-<div v-click class="fiche">
-  <span class="etiquette">01 · la panne</span>
-  <strong>Contextes coupés</strong>
-  <p>Mon script coupait les contextes avant le juge : plus de 3 sur 4 côté BM25.</p>
-  <span class="annotation faute">contextes arrachés</span>
-</div>
-<div v-click class="fiche">
-  <span class="etiquette">02 · contextes entiers</span>
-  <strong>Contextes suffisants, sur 60</strong>
-  <div class="mini-barres">
-    <span>Vectoriel</span>
-    <div class="piste"><div class="plein" style="--v: 60"></div></div>
-    <b>36</b>
-    <span>+ BM25</span>
-    <div class="piste"><div class="plein vert" style="--v: 78.33"></div></div>
-    <b>47</b>
+<div class="barres mt-8">
+  <div class="barre-ligne deja">
+    <span>GraphRAG <small>Neo4j</small></span>
+    <div class="piste"><div class="plein rouge" style="--v: 16.7"></div></div>
+    <strong>10 / 60</strong>
   </div>
-  <span class="annotation" style="color: var(--vert)">+11 contextes, il en fallait 7</span>
-</div>
+  <div class="barre-ligne">
+    <span>Vectoriel <small>Lucene</small></span>
+    <div class="piste"><div class="plein" style="--v: 60"></div></div>
+    <strong>36 / 60</strong>
+  </div>
+  <div v-click class="barre-ligne">
+    <span>Vectoriel + BM25 <small>Lucene</small></span>
+    <div class="piste"><div class="plein vert" style="--v: 78.33"></div></div>
+    <strong>47 / 60</strong>
+  </div>
 </div>
 
-<p v-click class="text-right mt-10"><span class="entoure font-bold">Vérifie ce que ton juge lit.</span></p>
+<p v-click="1" class="mt-8"><span class="annotation" style="color: var(--vert)">+11 contextes, il en fallait 7</span></p>
 
 <style>
-.mini-barres { display: grid; grid-template-columns: 5.5rem 1fr 2rem; gap: 0.5rem 0.7rem; align-items: center; margin-top: 0.6rem; font-size: 0.95rem; }
-.mini-barres b { font-size: 1.2rem; text-align: right; }
-.mini-barres .piste { height: 1.2rem; }
+.barre-ligne.deja { opacity: 0.4; }
 </style>
 
-
 <!--
-⏱ 1:15 (14:25)
-- Vectoriel + BM25 (mots-clés) : mon premier passage ne voit pas de différence.
-- Je ne l'ai pas cru.
-- [click] Mon script de mesure coupait les contextes à 6 000 caractères, avant le juge : 46 sur 60, plus de 3 sur 4.
-- [click] Contextes entiers : 36 contre 47 sur 60. Comme pour le juge : sur 60 questions, moins de 7 d'écart, ça peut être le hasard. Ici, 11.
-- [click] « Vérifie ce que ton juge lit. »
-- J'ai corrigé mon script, pas le juge.
+⏱ 0:40 (13:50)
+- Corriger le graphe, ça prend du temps. Mais j'ai de quoi mesurer : j'essaie une autre piste. Vectoriel, plus une recherche par mots-clés, BM25.
+- [click] Contextes suffisants : 36 contre 47, sur 60. Comme pour le juge : sur 60 questions, moins de 7 d'écart, ça peut être le hasard. Ici, 11.
 -->
 
 ---
@@ -685,7 +668,7 @@ transition: fade-out
 </style>
 
 <!--
-⏱ 0:20 (14:45)
+⏱ 0:20 (14:10)
 - Ma question de départ : comment savoir si j'améliore mon assistant ?
 - Maintenant, je mesure. Puis je livre.
 - Mon pari, c'était le graphe, tel que je l'avais codé.
@@ -701,13 +684,13 @@ transition: fade-out
 <CopieCorrigee />
 
 <!--
-⏱ 1:00 (15:45)
+⏱ 1:00 (15:10)
 - La couverture disait « copie à corriger ». La voici.
 - Pour chaque règle : je la lis, je lis l'annotation, je clique.
 - [click] Écris ta copie test d'abord.
 - [click] Écris ton barème.
 - [click] Ne relis que les doutes.
-- [click] « Vérifie ce que ton juge lit. » (mot pour mot)
+- [click] « Lis les raisons de ton juge. » C'est en les lisant que j'ai trouvé mon bug.
 - [click] Dernière phrase : « Tôt ou tard, votre chatbot sera jugé. Choisissez quand. »
 - 2 s de silence. Puis « Merci ».
 -->
@@ -755,7 +738,7 @@ transition: fade-out
 </style>
 
 <!--
-⏱ 0:15 (16:00)
+⏱ 0:15 (15:25)
 - Le code, le script de mesure et les articles : tout est ici.
 - Le QR code, au centre, mène au repo.
 -->
@@ -779,7 +762,7 @@ transition: fade-out
 </div>
 
 <!--
-⏱ 0:15 (16:15)
+⏱ 0:15 (15:40)
 - Vos questions ?
 - Laisser cette diapo pendant les questions.
 
