@@ -208,7 +208,7 @@ transition: fade-out
 
 <!--
 ⏱ 0:05 (4:30)
-- Trois exercices. Exercice 1 : le principe.
+- Trois exercices. Mon RAG répond, un autre LLM le juge. Exercice 1 : le principe.
 -->
 
 ---
@@ -295,7 +295,7 @@ transition: fade-out
 
 <!--
 ⏱ 0:05 (7:35)
-- Exercice 2 : j'étalonne mon juge.
+- Exercice 2 : j'étalonne mon juge, avec une copie test.
 -->
 
 ---
@@ -418,12 +418,10 @@ Premier prompt : rien d'exploitable.
   <div class="chiffre grand whitespace-nowrap"><span class="zero">0 %<span v-click="1" class="trait"></span></span><span v-click="1"> → 76 %</span></div>
   <p>d'accord avec moi sur les 50 questions</p>
 </div>
-<ol v-click="1" class="conventions">
-  <li>1 case rouge : recalée</li>
-  <li>« Si possible » : bonus</li>
-  <li>1 faute, 1 seul endroit</li>
-  <li>Ne rien citer ≠ mal citer</li>
-</ol>
+<div v-click="1" class="regles">
+  <span class="etiquette">4 règles ajoutées au barème</span>
+  <p><em>par exemple :</em> une seule case rouge, la réponse est recalée.</p>
+</div>
 </div>
 
 <p v-click="2" class="mt-8 text-center"><span class="entoure font-bold">Le plus gros levier m'a coûté quatre règles.</span></p>
@@ -434,12 +432,15 @@ Premier prompt : rien d'exploitable.
   position: absolute; left: -0.1em; right: -0.1em; top: 52%;
   height: 0.12em; background: var(--rouge); rotate: -8deg;
 }
+.regles { text-align: left; }
+.regles .etiquette { font-size: 1rem; }
+.regles p { font-size: 1.4rem; line-height: 1.4; margin-top: 0.6rem; }
 </style>
 
 <!--
 ⏱ 1:00 (10:05)
 - 50 questions, il n'en juge aucune : 0 %. Pas faux : illisible. Il s'arrête avant le verdict.
-- [click] Quatre règles dans le prompt, même modèle, Qwen 14B : 76 %. (je laisse l'écran parler)
+- [click] J'ajoute quatre règles au barème, des règles de notation. Par exemple : une seule case rouge, et la réponse est recalée. Même modèle, Qwen 14B : 76 %.
 - [click] Le plus gros levier : quatre règles.
 - Ma copie test me montre qu'il est indulgent : 10 mauvaises réponses sur 27 passent.
 -->
@@ -564,7 +565,7 @@ transition: fade-out
 
 <!--
 ⏱ 0:05 (12:10)
-- Exercice 3 : mon juge est retenu. Je le mets au travail sur mon RAG.
+- Exercice 3 : mon juge est retenu. Je le mets au travail sur mon RAG, avec 60 questions.
 -->
 
 ---
@@ -705,27 +706,27 @@ transition: fade-out
 <div class="sources sources-qr mt-6">
 <div>
   <span class="etiquette">le code</span>
-  <p><b>OllamAssist</b><br><span class="ref">github.com/baretto-labs/OllamAssist</span></p>
-  <p><b>Le juge et le script de mesure</b><br><span class="ref">github.com/baretto-labs/llm-as-a-judge</span></p>
+  <p><a href="https://github.com/baretto-labs/OllamAssist" target="_blank"><b>OllamAssist</b></a><br><span class="ref">github.com/baretto-labs/OllamAssist</span></p>
+  <p><a href="https://github.com/baretto-labs/llm-as-a-judge" target="_blank"><b>Le juge et le script de mesure</b></a><br><span class="ref">github.com/baretto-labs/llm-as-a-judge</span></p>
   <span class="etiquette mt-5 block">les affaires</span>
-  <p><b>Moffatt v. Air Canada</b><br><span class="ref">2024 BCCRT 149</span></p>
-  <p><b>Mata v. Avianca</b><br><span class="ref">S.D.N.Y. · 2023</span></p>
+  <p><a href="https://www.canlii.org/en/bc/bccrt/doc/2024/2024bccrt149/2024bccrt149.html" target="_blank"><b>Moffatt v. Air Canada</b></a><br><span class="ref">2024 BCCRT 149</span></p>
+  <p><a href="https://storage.courtlistener.com/recap/gov.uscourts.nysd.575368/gov.uscourts.nysd.575368.54.0_1.pdf" target="_blank"><b>Mata v. Avianca</b></a><br><span class="ref">S.D.N.Y. · 2023</span></p>
   <span class="etiquette mt-5 block">le seuil</span>
-  <p><b>McNemar</b><br><span class="ref">Dietterich · 1998</span></p>
+  <p><a href="https://doi.org/10.1162/089976698300017197" target="_blank"><b>McNemar</b></a><br><span class="ref">Dietterich · 1998</span></p>
 </div>
 <div class="qr-centre">
-  <div class="scotch"><img src="./img/qr-repo.svg" alt="QR code du repo llm-as-a-judge" /></div>
+  <div class="scotch"><a href="https://github.com/baretto-labs/llm-as-a-judge" target="_blank"><img src="./img/qr-repo.svg" alt="QR code du repo llm-as-a-judge" /></a></div>
   <span class="annotation">le repo</span>
 </div>
 <div>
   <span class="etiquette">les articles</span>
-  <p><b>Using LLM-as-a-Judge</b><br><span class="ref">Hamel Husain · hamel.dev</span></p>
-  <p><b>Judging LLM-as-a-Judge</b><br><span class="ref">Zheng et al. · 2023</span></p>
-  <p><b>CheckEval</b><br><span class="ref">Lee et al. · 2024</span></p>
-  <p><b>SelfCheckGPT</b><br><span class="ref">Manakul et al. · 2023</span></p>
+  <p><a href="https://hamel.dev/blog/posts/llm-judge/" target="_blank"><b>Using LLM-as-a-Judge</b></a><br><span class="ref">Hamel Husain · hamel.dev</span></p>
+  <p><a href="https://arxiv.org/abs/2306.05685" target="_blank"><b>Judging LLM-as-a-Judge</b></a><br><span class="ref">Zheng et al. · 2023</span></p>
+  <p><a href="https://arxiv.org/abs/2403.18771" target="_blank"><b>CheckEval</b></a><br><span class="ref">Lee et al. · 2024</span></p>
+  <p><a href="https://arxiv.org/abs/2303.08896" target="_blank"><b>SelfCheckGPT</b></a><br><span class="ref">Manakul et al. · 2023</span></p>
   <span class="etiquette mt-5 block">le jury</span>
-  <p><b>Replacing Judges with Juries</b> <span class="annotation text-base">pour</span><br><span class="ref">Verga et al. · 2024</span></p>
-  <p><b>Nine Judges, Two Effective Votes</b> <span class="annotation text-base">contre</span><br><span class="ref">Kohli · 2026</span></p>
+  <p><a href="https://arxiv.org/abs/2404.18796" target="_blank"><b>Replacing Judges with Juries</b></a> <span class="annotation text-base">pour</span><br><span class="ref">Verga et al. · 2024</span></p>
+  <p><a href="https://arxiv.org/abs/2605.29800" target="_blank"><b>Nine Judges, Two Effective Votes</b></a> <span class="annotation text-base">contre</span><br><span class="ref">Kohli · 2026</span></p>
 </div>
 </div>
 
@@ -735,6 +736,8 @@ transition: fade-out
 .qr-centre { display: flex; flex-direction: column; align-items: center; gap: 0.6rem; }
 .qr-centre img { width: 210px; height: 210px; display: block; }
 .qr-centre .annotation { font-size: 1.5rem; }
+.sources-qr a { color: inherit; text-decoration: none; border-bottom: 1px dotted var(--encre-douce); }
+.sources-qr .scotch a { border: 0; }
 </style>
 
 <!--

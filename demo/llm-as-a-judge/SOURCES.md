@@ -17,6 +17,7 @@ Liste complète. La diapo 19 en affiche l'essentiel. Chaque entrée dit où elle
 - Hamel Husain, *Using LLM-as-a-Judge For Evaluation*. https://hamel.dev/blog/posts/llm-judge/ (méthode de l'étalon, un expert, verdict PASS/FAIL).
 - Lianmin Zheng et al., *Judging LLM-as-a-Judge with MT-Bench and Chatbot Arena*, NeurIPS 2023 (Datasets and Benchmarks). https://arxiv.org/abs/2306.05685 (biais de position, de verbosité, d'auto-préférence ; diapo 10).
 - Yukyung Lee et al., *CheckEval: A reliable LLM-as-a-Judge framework for evaluating text generation using checklists*, 2024. https://arxiv.org/abs/2403.18771 (questions oui/non plutôt qu'une échelle ; diapo 13).
+- Thomas G. Dietterich, *Approximate Statistical Tests for Comparing Supervised Classification Learning Algorithms*, Neural Computation 10(7):1895-1923, 1998. https://doi.org/10.1162/089976698300017197 (le test de McNemar pour comparer deux systèmes sur les mêmes questions ; diapos 13, 15 et 19).
 - Jacob Cohen, *A Coefficient of Agreement for Nominal Scales*, Educational and Psychological Measurement 20(1):37-46, 1960. Le kappa (réponse en questions).
 - Potsawee Manakul, Adian Liusie, Mark J. F. Gales, *SelfCheckGPT: Zero-Resource Black-Box Hallucination Detection for Generative Large Language Models*, EMNLP 2023. https://arxiv.org/abs/2303.08896 (relancer le modèle avec un peu de hasard : là où les réponses divergent, il hésite ; diapo 17).
 
