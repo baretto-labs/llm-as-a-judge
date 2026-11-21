@@ -46,9 +46,9 @@ duration: 20min
 </div>
 
 <!--
-⏱ 0:30 (0:30). Cible : 18 min max.
-- Bonsoir, je m'appelle Mehdi Elketroussi, software engineer chez Baretto.
-- Un assistant de code : comment savoir s'il s'améliore ? Aujourd'hui : comment on juge le juge.
+⏱ 0:10 (0:10). Cible : 18 min max.
+- Bonsoir à tous ! Dernier talk de la journée : promis, je vous rends à l'apéro à l'heure.
+- (1 s de silence, puis Moffatt. Je me présente à la diapo 5.)
 - [click] Tampon. 1 s de silence.
 -->
 
@@ -164,7 +164,7 @@ entièrement local. Mon labo.**
 
 <!--
 ⏱ 0:40 (3:40)
-- OllamAssist : assistant de code, en local. Mon labo.
+- Moi, c'est Mehdi. Le jour, je suis développeur chez Baretto. Certains soirs, quand mes deux petites princesses dorment… je code OllamAssist. Un assistant de code, en local. Mon labo.
 - [click] D'abord un chatbot.
 - [click] Puis un agent : il lit mon code.
 - [click] RAG : on lui donne des extraits, il répond à partir d'eux.
@@ -195,7 +195,8 @@ Deux façons de récupérer les extraits.
 ⏱ 0:45 (4:25)
 - Deux façons de récupérer les extraits. Vectoriel : ce qui ressemble à la question. Graphe : il suit les liens du code, comme un Ctrl+clic.
 - Sur du code, le graphe devrait gagner. Lequel est meilleur ?
-- [click] J'écris, je choisis, je juge : rien ne me contredit. Mes utilisateurs le verraient avant moi.
+- [click] J'écris, je choisis, je juge : rien ne me contredit.
+- Un jour, je reçois une issue GitHub : « le RAG ne fonctionne pas ». Ma réaction : impossible. Mais pour le prouver, je n'avais rien.
 - [click] Il me faut un autre juge.
 -->
 
@@ -603,6 +604,7 @@ Mon assistant répond à 60 questions.
 - [click] Un tel écart, c'est mon code : le graphe perd des liens. Il ramène la classe, pas ce qu'elle implémente.
 - Je m'attendais à l'inverse.
 - En mesurant, mon juge a trouvé un bug dans mon RAG. Je l'ai trouvé en lisant ses raisons.
+- L'issue GitHub avait raison. (1 s)
 -->
 
 ---
