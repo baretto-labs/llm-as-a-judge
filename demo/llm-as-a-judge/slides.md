@@ -755,7 +755,7 @@ transition: fade-out
 ---
 # Votre avis
 
-<div class="scotch qr-cadre mx-auto mt-4"><img src="./img/openfeedback.png" alt="QR code OpenFeedback" /></div>
+<div class="scotch qr-cadre mx-auto mt-4"><a href="https://openfeedback.io/sBSRvQdfgZv87UJ1Zr8p/2026-11-27/df26-029" target="_blank" style="border: 0; display: block;"><img src="./img/qr-openfeedback.svg" alt="QR code OpenFeedback" /></a></div>
 
 <p class="mt-4"><span class="annotation">merci ! des questions ?</span></p>
 
