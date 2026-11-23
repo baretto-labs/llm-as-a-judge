@@ -20,7 +20,7 @@ comark: true
 duration: 20min
 ---
 
-<div v-click class="abs-tr mt-14 mr-16 coup-de-tampon">
+<div class="abs-tr mt-14 mr-16 coup-de-tampon">
   <Tampon :angle="10">Copie à corriger</Tampon>
 </div>
 
@@ -49,7 +49,6 @@ duration: 20min
 ⏱ 0:10 (0:10). Cible : 18 min max.
 - Bonsoir à tous ! Dernier talk de la journée : promis, je vous rends à l'apéro à l'heure.
 - (1 s de silence, puis Moffatt. Je me présente à la diapo 5.)
-- [click] Tampon. 1 s de silence.
 -->
 
 ---
@@ -688,7 +687,6 @@ transition: fade-out
 
 <!--
 ⏱ 1:00 (15:10)
-- La couverture disait « copie à corriger ». La voici.
 - Pour chaque règle : je la lis, je lis l'annotation, je clique.
 - [click] Écris ta copie test d'abord.
 - [click] Écris ton barème.
