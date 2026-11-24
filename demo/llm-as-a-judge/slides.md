@@ -42,7 +42,7 @@ duration: 20min
 
 <!--
 ⏱ 0:10 (0:10). Cible : 18 min max.
-- Bonsoir à tous ! Dernier talk de la journée : promis, je vous rends à l'apéro à l'heure.
+- Bonsoir à tous, merci d'être là pour mon tout premier talk… et le dernier de la journée : promis, je vous rends à l'apéro à l'heure.
 - (1 s de silence, puis Moffatt. Je me présente à la diapo 5.)
 -->
 
@@ -59,7 +59,7 @@ transition: fade-out
 
 <!--
 ⏱ 0:35 (1:05)
-- Jake Moffatt, 2022. Un deuil, un voyage en urgence.
+- Jake Moffatt, 2022. Un deuil, un voyage en urgence. Il demande le tarif décès.
 - Le chatbot : « achetez votre billet, on vous remboursera une partie à votre retour ».
 - Au retour : « c'était une erreur du chatbot ».
 -->
@@ -90,7 +90,7 @@ Le tribunal :
 ⏱ 0:55 (2:00)
 - Air Canada : « le chatbot est responsable de ses actes ».
 - [click] Le tribunal : il fait partie du site. (laisser lire)
-- [click] 650,88 $. (laisser le tampon) Un chatbot n'est pas un POC.
+- [click] 650,88 $ : le prix de la leçon pour Air Canada. (1 s) Un chatbot n'est pas un POC.
 - Mains levées : qui a un LLM en prod ? (2 s) Qui l'évalue ? (2 s, un mot de réaction)
 -->
 
