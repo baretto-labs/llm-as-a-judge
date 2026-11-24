@@ -59,7 +59,7 @@ transition: fade-out
 
 <!--
 ⏱ 0:35 (1:05)
-- Jake Moffatt, 2022. Un deuil, un voyage en urgence. Il demande le tarif décès.
+- Jake Moffatt, 2022. Un deuil, un voyage en urgence. Il demande le tarif pour les familles en deuil.
 - Le chatbot : « achetez votre billet, on vous remboursera une partie à votre retour ».
 - Au retour : « c'était une erreur du chatbot ».
 -->
