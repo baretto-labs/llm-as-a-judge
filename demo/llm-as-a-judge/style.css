@@ -440,20 +440,6 @@
   color: var(--encre-douce);
 }
 
-/* The DevFest badge has a black background: it sits on an ink label */
-.etiquette-logo {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.75rem;
-  background: var(--encre);
-  color: var(--papier);
-  padding: 0.45rem 0.9rem;
-  border-radius: 4px;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.75rem;
-  letter-spacing: 0.05em;
-}
-
 /* A stamp that lands on click: it drops from above the page and hits the paper. */
 .coup-de-tampon {
   transition: opacity 0.12s ease-in, scale 0.22s cubic-bezier(0.3, 1.5, 0.6, 1);

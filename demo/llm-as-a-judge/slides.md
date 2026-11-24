@@ -38,12 +38,7 @@ duration: 20min
   </a>
 </p>
 
-<div class="abs-bl ml-18 mb-10">
-  <span class="etiquette-logo">
-    <img src="./img/devfest-paris-logo.png" class="h-16 rounded-full" alt="DevFest Paris 2026">
-    DevFest Paris · 27 novembre 2026
-  </span>
-</div>
+<img src="./img/devfest-paris-logo.png" class="abs-br mr-16 mb-10 h-36 rounded-full" alt="DevFest Paris 2026">
 
 <!--
 ⏱ 0:10 (0:10). Cible : 18 min max.
