@@ -542,9 +542,8 @@ Je le relance trois fois sur chaque question.
 
 <!--
 ⏱ 0:45 (12:05)
-- Mon juge est retenu. Dernière chose sur ma copie test : où il hésite. Je le relance trois fois sur chaque question.
-- [click] Là où il change d'avis, il hésite : 4 questions sur 50, mesuré sur ma copie test. Celles-là, je les relis.
-- Trois passes, ça coûte aussi. Mais là, je sais ce que j'achète : 4 relectures au lieu de 50.
+- Mon juge est retenu. Dernière chose : je lui pose chaque question trois fois.
+- [click] Parfois, il change d'avis : oui, non, oui (montrer ✓ ✗ ✓). Là, il hésite. 4 questions sur 50 : celles-là, je les relis.
 - [click] Les 46 autres, même avis trois fois : verdict direct, je ne les relis pas.
 - [click] Sur ses 5 erreurs, 2 tombent dans mes relectures : attrapées. Les 3 autres, il les répète : ce sont ses angles morts.
 - [click] Ne relis que les doutes.
