@@ -434,10 +434,9 @@ Premier prompt : rien d'exploitable.
 
 <!--
 ⏱ 1:00 (10:05)
-- 50 questions, il n'en juge aucune : 0 %. Pas faux : illisible. Il s'arrête avant le verdict.
-- [click] J'ajoute quatre règles au barème, des règles de notation. Par exemple : une seule case rouge, et la réponse est recalée. Même modèle, Qwen 14B : 76 %.
-- [click] Le plus gros levier : quatre règles.
-- Ma copie test me montre qu'il est indulgent : 10 mauvaises réponses sur 27 passent.
+- Premier prompt. 50 questions, il n'en juge aucune : 0 %. Il raisonne, il nomme les bons contrôles… mais il ne conclut jamais.
+- [click] Alors je lui écris comment conclure. Quatre règles. Par exemple : une seule case rouge, la réponse est recalée. Même modèle : 76 %.
+- [click] Le plus gros levier m'a coûté quatre règles.
 -->
 
 ---
