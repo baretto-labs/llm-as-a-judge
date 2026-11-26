@@ -133,6 +133,7 @@ transition: fade-out
 ⏱ 1:00 (3:00)
 - Autre affaire, New York, 2023 : un avocat dépose ce mémoire. Tout a l'air juste.
 - [click] Six jugements, tous inventés par ChatGPT. L'avocat paie 5 000 dollars.
+- Et ça continue. Ce mois-ci, la CEDH a exclu un avocat roumain pour deux ans. Même raison : des arrêts inventés.
 - Test unitaire, comparaison mot à mot : ils ne voient rien.
 - [click] « Avec un LLM, le faux a exactement la forme du vrai. »
 -->
@@ -704,6 +705,7 @@ transition: fade-out
   <span class="etiquette mt-5 block">les affaires</span>
   <p><a href="https://www.canlii.org/en/bc/bccrt/doc/2024/2024bccrt149/2024bccrt149.html" target="_blank"><b>Moffatt v. Air Canada</b></a><br><span class="ref">2024 BCCRT 149</span></p>
   <p><a href="https://storage.courtlistener.com/recap/gov.uscourts.nysd.575368/gov.uscourts.nysd.575368.54.0_1.pdf" target="_blank"><b>Mata v. Avianca</b></a><br><span class="ref">S.D.N.Y. · 2023</span></p>
+  <p><a href="https://www.irishlegal.com/articles/ecthr-bars-romanian-lawyer-for-two-years-over-ai-generated-citations" target="_blank"><b>Avocat exclu de la CEDH</b></a><br><span class="ref">CEDH · novembre 2026</span></p>
   <span class="etiquette mt-5 block">le seuil</span>
   <p><a href="https://doi.org/10.1162/089976698300017197" target="_blank"><b>McNemar</b></a><br><span class="ref">Dietterich · 1998</span></p>
 </div>

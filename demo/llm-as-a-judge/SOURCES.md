@@ -11,6 +11,7 @@ Liste complète. La diapo 19 en affiche l'essentiel. Chaque entrée dit où elle
 
 - **Moffatt v. Air Canada**, 2024 BCCRT 149. https://www.canlii.org/en/bc/bccrt/doc/2024/2024bccrt149/2024bccrt149.html Le chatbot d'Air Canada, 650,88 $ CA (diapos 2, 3 et 18).
 - **Mata v. Avianca**, S.D.N.Y., 22-cv-1461, juge P. Kevin Castel, 22 juin 2023. https://storage.courtlistener.com/recap/gov.uscourts.nysd.575368/gov.uscourts.nysd.575368.54.0_1.pdf Six décisions inventées par ChatGPT, 5 000 $ d'amende (diapo 5).
+- **CEDH, avocat roumain exclu deux ans** (Rule 44D), décision du 13 novembre 2026. https://www.irishlegal.com/articles/ecthr-bars-romanian-lawyer-for-two-years-over-ai-generated-citations Arrêts inexistants et paragraphes inventés dans de vrais arrêts, générés par IA (cité à l'oral, diapo 5). Communiqué officiel à vérifier sur HUDOC.
 
 ## Le juge
 
